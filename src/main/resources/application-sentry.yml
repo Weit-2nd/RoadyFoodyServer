@@ -1,0 +1,13 @@
+sentry:
+  environment: ${spring.profiles.active}
+  exception-resolver-order: -2147483647
+
+---
+spring.config.activate.on-profile: sandbox
+sentry:
+  traces-sample-rate: 1.0
+
+---
+spring.config.activate.on-profile: stable
+sentry:
+  traces-sample-rate: 1.0
