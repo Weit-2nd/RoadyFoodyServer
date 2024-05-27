@@ -8,7 +8,6 @@ spring:
     properties:
       hibernate:
         default_batch_fetch_size: 100 # 나중에 부족하시면 늘려주세요!
-  config.activate.on-profile: sandbox, stable
   datasource:
     driver-class-name: oracle.jdbc.OracleDriver
     hikari:
