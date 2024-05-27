@@ -32,7 +32,7 @@ class TestContainersConfig {
         @JvmStatic
         @Container
         val oracleContainer: GenericContainer<*> =
-            GenericContainer("konempty/oracle-db-19c:arm641")
+            GenericContainer("konempty/oracle-db-19c:latest")
                 .withLogConsumer(Slf4jLogConsumer(LOGGER))
                 .withExposedPorts(1521)
                 .withReuse(true)
