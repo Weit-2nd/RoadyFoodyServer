@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: RoadyFoody
+  profiles:
+    include:
+      - database
+      - sentry
+      - flyway
+  servlet:
+    multipart:
+      max-file-size: 5MB # 사진 한장당 최대 1MB * 3장 = 3MB + 넉넉하게 2MB 버퍼 = 5MB
+      max-request-size: 6MB # 최대 파일 사이즈 5MB + 넉넉하게 1MB 버퍼 = 6MB
+  cloud:
+    compatibility-verifier:
+      enabled: false
+server:
+  error:
+    whitelabel:
+      enabled: false
+  shutdown: graceful
+management:
+  server:
+    port: 8888
+  endpoints:
+    web:
+      exposure:
+        include: prometheus, httpexchanges
+  endpoint:
+    metrics:
+      enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
