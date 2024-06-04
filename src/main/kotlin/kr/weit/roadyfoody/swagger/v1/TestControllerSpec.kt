@@ -2,6 +2,7 @@ package kr.weit.roadyfoody.swagger.v1
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.tags.Tag
 
 // TODO TestController를 지우게 되면 이 파일도 지워주세요
@@ -19,4 +20,17 @@ interface TestControllerSpec {
 
     @Operation(description = "에러 테스트 API")
     fun error(): String
+
+    @Operation(
+        description = "필터 테스트 API",
+        parameters = [
+            Parameter(
+                `in` = ParameterIn.HEADER,
+                name = "userId",
+                description = "개발 시 임의 로그인 처리를 위한 아무 유저 ID 값",
+                required = true,
+            ),
+        ],
+    )
+    fun filter(): String
 }

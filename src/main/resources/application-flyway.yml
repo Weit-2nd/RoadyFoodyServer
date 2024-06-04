@@ -5,6 +5,7 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
+    baseline-version: 0
 
 ---
 spring.config.activate.on-profile: stable
