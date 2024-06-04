@@ -41,5 +41,5 @@ private val PERMITTED_URL_PATTERNS =
         "/api/v1/test/success",
         "/api/v1/test/error",
         "/swagger-ui/**",
-        "/api-docs/**",
+        "/v3/api-docs/**",
     )
