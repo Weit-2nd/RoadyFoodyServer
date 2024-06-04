@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import jakarta.validation.ConstraintViolationException
 import kr.weit.roadyfoody.dto.ErrorResponse
+import kr.weit.roadyfoody.support.exception.BaseException
 import kr.weit.roadyfoody.support.exception.ErrorCode
 import kr.weit.roadyfoody.support.log.TraceManager
 import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException
@@ -131,6 +132,13 @@ class ExceptionHandler(
         val payloadTooLargeErrorCode = ErrorCode.PAYLOAD_TOO_LARGE
         return ResponseEntity.status(payloadTooLargeErrorCode.httpStatus)
             .body(ErrorResponse.of(payloadTooLargeErrorCode, ex.message))
+    }
+
+    @ExceptionHandler(BaseException::class)
+    fun baseException(ex: BaseException): ResponseEntity<ErrorResponse> {
+        traceManager.doErrorLog(ex)
+        return ResponseEntity.status(ex.errorCode.httpStatus)
+            .body(ErrorResponse.of(ex.errorCode, ex.message))
     }
 
     @ExceptionHandler(Exception::class)

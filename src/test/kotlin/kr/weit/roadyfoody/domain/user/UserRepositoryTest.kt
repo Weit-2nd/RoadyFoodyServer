@@ -4,6 +4,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import kr.weit.roadyfoody.support.annotation.RepositoryTest
+import kr.weit.roadyfoody.support.exception.UserNotFoundException
 
 @RepositoryTest
 class UserRepositoryTest(
@@ -27,9 +28,9 @@ class UserRepositoryTest(
             }
 
             context("존재하지 않는 id 를 받는 경우") {
-                it("IllegalArgumentException 을 반환한다.") {
+                it("UserNotFoundException 을 반환한다.") {
                     val ex =
-                        shouldThrow<IllegalArgumentException> {
+                        shouldThrow<UserNotFoundException> {
                             userRepository.getByUserId(nonexistentId)
                         }
                     ex.message shouldBe "$nonexistentId ID 의 사용자는 존재하지 않습니다."
@@ -46,9 +47,9 @@ class UserRepositoryTest(
             }
 
             context("존재하지 않는 nickname 을 받는 경우") {
-                it("IllegalArgumentException 을 반환한다.") {
+                it("UserNotFoundException 을 반환한다.") {
                     val ex =
-                        shouldThrow<IllegalArgumentException> {
+                        shouldThrow<UserNotFoundException> {
                             userRepository.getByNickname(nonexistentNickname)
                         }
                     ex.message shouldBe "$nonexistentNickname 닉네임의 사용자는 존재하지 않습니다."
