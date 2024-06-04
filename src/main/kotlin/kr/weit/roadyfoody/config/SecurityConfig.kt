@@ -10,7 +10,9 @@ import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
 @Configuration
-class SecurityConfig {
+class SecurityConfig(
+    private val customAuthenticationEntryPoint: CustomAuthenticationEntryPoint,
+) {
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         return http
@@ -25,7 +27,7 @@ class SecurityConfig {
                     .anyRequest().authenticated()
             }
             .exceptionHandling {
-                it.authenticationEntryPoint(CustomAuthenticationEntryPoint())
+                it.authenticationEntryPoint(customAuthenticationEntryPoint)
             }
             .build()
     }
