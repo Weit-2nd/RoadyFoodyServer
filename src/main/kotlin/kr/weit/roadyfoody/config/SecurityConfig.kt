@@ -10,10 +10,7 @@ import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
 @Configuration
-class SecurityConfig(
-    val mockPassFilter: MockPassFilter,
-    val customAuthenticationFilter: CustomAuthenticationEntryPoint,
-) {
+class SecurityConfig {
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         return http
@@ -21,14 +18,14 @@ class SecurityConfig(
             .formLogin { it.disable() }
             .httpBasic { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
-            .addFilterBefore(mockPassFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterBefore(MockPassFilter(), UsernamePasswordAuthenticationFilter::class.java)
             .authorizeHttpRequests {
                 it
                     .requestMatchers(*PERMITTED_URL_PATTERNS).permitAll()
                     .anyRequest().authenticated()
             }
             .exceptionHandling {
-                it.authenticationEntryPoint(customAuthenticationFilter)
+                it.authenticationEntryPoint(CustomAuthenticationEntryPoint())
             }
             .build()
     }
@@ -42,4 +39,5 @@ private val PERMITTED_URL_PATTERNS =
         "/api/v1/test/error",
         "/swagger-ui/**",
         "/v3/api-docs/**",
+        "/actuator/prometheus",
     )
