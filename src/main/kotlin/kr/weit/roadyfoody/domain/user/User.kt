@@ -17,9 +17,9 @@ import kr.weit.roadyfoody.support.regex.NICKNAME_REGEX_DESC
 class User(
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "USERS_SEQ_GENERATOR")
-    @Column(name = "id", columnDefinition = "NUMERIC(19, 0)", updatable = false, nullable = false)
+    @Column(name = "id", updatable = false, nullable = false)
     val id: Long = 0L,
-    @Column(name = "nickname", nullable = false, unique = true)
+    @Column(name = "nickname", length = 48, nullable = false, unique = true)
     var nickname: String,
 ) :
     BaseModifiableEntity() {
