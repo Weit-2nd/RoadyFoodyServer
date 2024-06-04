@@ -26,4 +26,9 @@ class User(
     init {
         require(NICKNAME_REGEX.matches(nickname)) { NICKNAME_REGEX_DESC }
     }
+
+    fun changeNickname(nickname: String) {
+        require(NICKNAME_REGEX.matches(nickname)) { NICKNAME_REGEX_DESC }
+        this.nickname = nickname
+    }
 }
