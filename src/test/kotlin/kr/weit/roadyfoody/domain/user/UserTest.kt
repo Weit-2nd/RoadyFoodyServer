@@ -5,6 +5,10 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.data.forAll
 import io.kotest.data.row
 import io.kotest.matchers.shouldBe
+import kr.weit.roadyfoody.support.fixture.TEST_MAX_LENGTH_NICKNAME
+import kr.weit.roadyfoody.support.fixture.TEST_MIN_LENGTH_NICKNAME
+import kr.weit.roadyfoody.support.regex.NICKNAME_MAX_LENGTH
+import kr.weit.roadyfoody.support.regex.NICKNAME_MIN_LENGTH
 import kr.weit.roadyfoody.support.regex.NICKNAME_REGEX_DESC
 
 class UserTest :
@@ -13,12 +17,13 @@ class UserTest :
             `when`("User 를 생성하면") {
                 then("User 을 반환한다.") {
                     forAll(
-                        row("abcdef"),
+                        row(TEST_MIN_LENGTH_NICKNAME),
                         row("ABCDEF"),
                         row("123456"),
                         row("테스터테스터"),
                         row("tester1234"),
-                        row("테스터테스터1234567890"),
+                        row("테스터테스터123456"),
+                        row(TEST_MAX_LENGTH_NICKNAME),
                     ) {
                             nickname ->
                         User(nickname = nickname).nickname shouldBe nickname
@@ -27,8 +32,8 @@ class UserTest :
             }
         }
 
-        given("6 자 미만의 닉네임을 입력한 경우") {
-            val nickname = "12345"
+        given("$NICKNAME_MIN_LENGTH 자 미만의 닉네임을 입력한 경우") {
+            val nickname = TEST_MIN_LENGTH_NICKNAME.dropLast(1)
             `when`("User 를 생성하면") {
                 then("IllegalArgumentException 을 반환한다.") {
                     val ex =
@@ -40,8 +45,8 @@ class UserTest :
             }
         }
 
-        given("16 자 초과의 닉네임을 입력한 경우") {
-            val nickname = "12345678901234567"
+        given("$NICKNAME_MAX_LENGTH 자 초과의 닉네임을 입력한 경우") {
+            val nickname = TEST_MAX_LENGTH_NICKNAME + "a"
             `when`("User 를 생성하면") {
                 then("IllegalArgumentException 을 반환한다.") {
                     val ex =
@@ -54,7 +59,7 @@ class UserTest :
         }
 
         given("특수기호가 들어간 닉네임을 입력한 경우") {
-            val nickname = "a#bc_de"
+            val nickname = "$TEST_MIN_LENGTH_NICKNAME! @#"
             `when`("User 를 생성하면") {
                 then("IllegalArgumentException 을 반환한다.") {
                     val ex =
@@ -67,7 +72,7 @@ class UserTest :
         }
 
         given("이모지가 들어간 닉네임을 입력한 경우") {
-            val nickname = "abcde☺️"
+            val nickname = "${TEST_MIN_LENGTH_NICKNAME}☺️"
             `when`("User 를 생성하면") {
                 then("IllegalArgumentException 을 반환한다.") {
                     val ex =
