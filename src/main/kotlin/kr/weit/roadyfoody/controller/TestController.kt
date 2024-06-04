@@ -19,4 +19,9 @@ class TestController : TestControllerSpec {
     override fun error(): String {
         throw RuntimeException("test")
     }
+
+    @GetMapping("/filter")
+    override fun filter(): String {
+        return "success filter"
+    }
 }
