@@ -8,6 +8,8 @@ import jakarta.persistence.Id
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
 import kr.weit.roadyfoody.domain.BaseModifiableEntity
+import kr.weit.roadyfoody.support.regex.NICKNAME_REGEX
+import kr.weit.roadyfoody.support.regex.NICKNAME_REGEX_DESC
 
 @Entity
 @Table(name = "users")
@@ -20,4 +22,8 @@ class User(
     @Column(name = "nickname", nullable = false, unique = true)
     var nickname: String,
 ) :
-    BaseModifiableEntity()
+    BaseModifiableEntity() {
+    init {
+        require(NICKNAME_REGEX.matches(nickname)) { NICKNAME_REGEX_DESC }
+    }
+}
