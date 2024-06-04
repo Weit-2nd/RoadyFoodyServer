@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
+// TODO : TestControllerTest.kt 를 걷어낼 때 같이 걷어내면 됩니다.
 @ActiveProfiles("test")
 @Import(TraceManager::class, SecurityConfig::class, CustomAuthenticationEntryPoint::class)
 @WebMvcTest(TestController::class)
