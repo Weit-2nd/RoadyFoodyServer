@@ -3,6 +3,7 @@ package kr.weit.roadyfoody.controller
 import io.kotest.core.spec.style.BehaviorSpec
 import kr.weit.roadyfoody.config.SecurityConfig
 import kr.weit.roadyfoody.security.handler.CustomAuthenticationEntryPoint
+import kr.weit.roadyfoody.support.jsonmapper.ObjectMapperProvider
 import kr.weit.roadyfoody.support.log.TraceManager
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
@@ -13,7 +14,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 // TODO : TestControllerTest.kt 를 걷어낼 때 같이 걷어내면 됩니다.
 @ActiveProfiles("test")
-@Import(TraceManager::class, SecurityConfig::class, CustomAuthenticationEntryPoint::class)
+@Import(TraceManager::class, SecurityConfig::class, ObjectMapperProvider::class, CustomAuthenticationEntryPoint::class)
 @WebMvcTest(TestController::class)
 class TestControllerTest(
     private val mockMvc: MockMvc,
