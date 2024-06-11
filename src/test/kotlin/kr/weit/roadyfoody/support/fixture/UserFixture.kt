@@ -1,8 +1,8 @@
 package kr.weit.roadyfoody.support.fixture
 
-import kr.weit.roadyfoody.domain.user.User
-import kr.weit.roadyfoody.support.regex.NICKNAME_MAX_LENGTH
-import kr.weit.roadyfoody.support.regex.NICKNAME_MIN_LENGTH
+import kr.weit.roadyfoody.user.domain.User
+import kr.weit.roadyfoody.user.utils.NICKNAME_MAX_LENGTH
+import kr.weit.roadyfoody.user.utils.NICKNAME_MIN_LENGTH
 
 const val TEST_USER_1_NICKNAME = "existentNick"
 
