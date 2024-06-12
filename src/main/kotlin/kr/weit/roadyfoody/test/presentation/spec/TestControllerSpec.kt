@@ -2,7 +2,6 @@ package kr.weit.roadyfoody.test.presentation.spec
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
-import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.tags.Tag
 import kr.weit.roadyfoody.global.swagger.v1.SwaggerTag
 
@@ -22,16 +21,6 @@ interface TestControllerSpec {
     @Operation(description = "에러 테스트 API")
     fun error(): String
 
-    @Operation(
-        description = "필터 테스트 API",
-        parameters = [
-            Parameter(
-                `in` = ParameterIn.HEADER,
-                name = "userId",
-                description = "개발 시 임의 로그인 처리를 위한 아무 유저 ID 값",
-                required = true,
-            ),
-        ],
-    )
+    @Operation(description = "필터 테스트 API")
     fun filter(): String
 }
