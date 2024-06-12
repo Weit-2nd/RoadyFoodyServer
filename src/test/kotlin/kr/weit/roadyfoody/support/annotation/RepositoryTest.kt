@@ -1,6 +1,6 @@
 package kr.weit.roadyfoody.support.annotation
 
-import kr.weit.roadyfoody.config.JpaAuditingConfig
+import kr.weit.roadyfoody.global.config.JpaAuditingConfig
 import kr.weit.roadyfoody.testcontainers.TestContainersConfig
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
