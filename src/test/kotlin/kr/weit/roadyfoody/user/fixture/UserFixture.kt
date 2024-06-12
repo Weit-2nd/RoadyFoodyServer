@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.support.fixture
+package kr.weit.roadyfoody.user.fixture
 
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.utils.NICKNAME_MAX_LENGTH

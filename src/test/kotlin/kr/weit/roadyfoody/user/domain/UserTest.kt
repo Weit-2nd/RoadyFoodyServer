@@ -5,8 +5,8 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.data.forAll
 import io.kotest.data.row
 import io.kotest.matchers.shouldBe
-import kr.weit.roadyfoody.support.fixture.TEST_MAX_LENGTH_NICKNAME
-import kr.weit.roadyfoody.support.fixture.TEST_MIN_LENGTH_NICKNAME
+import kr.weit.roadyfoody.user.fixture.TEST_MAX_LENGTH_NICKNAME
+import kr.weit.roadyfoody.user.fixture.TEST_MIN_LENGTH_NICKNAME
 import kr.weit.roadyfoody.user.utils.NICKNAME_MAX_LENGTH
 import kr.weit.roadyfoody.user.utils.NICKNAME_MIN_LENGTH
 import kr.weit.roadyfoody.user.utils.NICKNAME_REGEX_DESC
