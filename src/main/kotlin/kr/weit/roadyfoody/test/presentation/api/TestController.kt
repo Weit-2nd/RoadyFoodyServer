@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/v1/test")
 class TestController(
-    val testClientInterface: TestClientInterface,
+    private val testClientInterface: TestClientInterface,
 ) : TestControllerSpec {
     @GetMapping("/success")
     override fun success(name: String): String {
