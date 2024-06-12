@@ -13,20 +13,26 @@ import java.time.Duration
 
 @Configuration
 class RestClientConfig {
-    @Bean
-    fun testClientInterface(): TestClientInterface {
-        return creatClient("https://jsonplaceholder.typicode.com", TestClientInterface::class.java)
+    companion object {
+        private const val CONNECT_TIME = 1L
+        private const val READ_TIME = 5L
+        private const val TEST_URL = "https://jsonplaceholder.typicode.com"
     }
 
-    // Todo RestClient에 가상 쓰레드 지정
+    @Bean
+    fun testClientInterface(): TestClientInterface {
+        return creatClient(TEST_URL, TestClientInterface::class.java)
+    }
+
     private fun <T> creatClient(
         baseUrl: String,
         clientClass: Class<T>,
     ): T {
+        // Todo. 가상 쓰레드를 사용하기 위해 API 비동기화를 위한 설정 추가 필요
         val requestSettings: ClientHttpRequestFactorySettings =
             ClientHttpRequestFactorySettings.DEFAULTS
-                .withConnectTimeout(Duration.ofSeconds(1L))
-                .withReadTimeout(Duration.ofSeconds(5L))
+                .withConnectTimeout(Duration.ofSeconds(CONNECT_TIME))
+                .withReadTimeout(Duration.ofSeconds(READ_TIME))
 
         val jdkClientHttpRequestFactory: JdkClientHttpRequestFactory =
             ClientHttpRequestFactories.get(
