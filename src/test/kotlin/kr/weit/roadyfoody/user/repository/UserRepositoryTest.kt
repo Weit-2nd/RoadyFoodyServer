@@ -3,9 +3,9 @@ package kr.weit.roadyfoody.user.repository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
-import kr.weit.roadyfoody.common.exception.UserNotFoundException
 import kr.weit.roadyfoody.support.annotation.RepositoryTest
 import kr.weit.roadyfoody.user.domain.User
+import kr.weit.roadyfoody.user.exception.UserNotFoundException
 import kr.weit.roadyfoody.user.fixture.TEST_NONEXISTENT_ID
 import kr.weit.roadyfoody.user.fixture.TEST_NONEXISTENT_NICKNAME
 import kr.weit.roadyfoody.user.fixture.createTestUser1
