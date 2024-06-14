@@ -14,8 +14,8 @@ class SecurityConfig(
     private val customAuthenticationEntryPoint: CustomAuthenticationEntryPoint,
 ) {
     @Bean
-    fun filterChain(http: HttpSecurity): SecurityFilterChain {
-        return http
+    fun filterChain(http: HttpSecurity): SecurityFilterChain =
+        http
             .csrf { it.disable() }
             .formLogin { it.disable() }
             .httpBasic { it.disable() }
@@ -23,14 +23,13 @@ class SecurityConfig(
             .addFilterBefore(MockPassFilter(), UsernamePasswordAuthenticationFilter::class.java)
             .authorizeHttpRequests {
                 it
-                    .requestMatchers(*PERMITTED_URL_PATTERNS).permitAll()
-                    .anyRequest().authenticated()
-            }
-            .exceptionHandling {
+                    .requestMatchers(*PERMITTED_URL_PATTERNS)
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated()
+            }.exceptionHandling {
                 it.authenticationEntryPoint(customAuthenticationEntryPoint)
-            }
-            .build()
-    }
+            }.build()
 }
 
 private val PERMITTED_URL_PATTERNS =
@@ -42,4 +41,5 @@ private val PERMITTED_URL_PATTERNS =
         "/swagger-ui/**",
         "/v3/api-docs/**",
         "/actuator/prometheus",
+        "/api/v1/terms/**",
     )
