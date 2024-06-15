@@ -11,6 +11,6 @@ class TermNotFoundException(
         private const val TERM_NOT_FOUND_MESSAGE_SUFFIX = "약관을 찾을 수 없습니다."
 
         @JvmStatic
-        fun termNotFoundMessage(termId: Long) = "$TERM_NOT_FOUND_MESSAGE_PREFIX $termId $TERM_NOT_FOUND_MESSAGE_SUFFIX"
+        fun getTermNotFoundMessage(termId: Long) = "$TERM_NOT_FOUND_MESSAGE_PREFIX $termId $TERM_NOT_FOUND_MESSAGE_SUFFIX"
     }
 }

@@ -11,7 +11,7 @@ class RequiredTermNotAgreedException(
         private const val REQUIRED_TERM_NOT_AGREED_MESSAGE_SUFFIX = "필수 약관에 동의하지 않았습니다."
 
         @JvmStatic
-        fun requiredTermNotAgreedMessage(termIds: Iterable<Long>) =
+        fun getRequiredTermNotAgreedMessage(termIds: Iterable<Long>) =
             "$REQUIRED_TERM_NOT_AGREED_MESSAGE_PREFIX ${termIds.joinToString()} $REQUIRED_TERM_NOT_AGREED_MESSAGE_SUFFIX"
     }
 }
