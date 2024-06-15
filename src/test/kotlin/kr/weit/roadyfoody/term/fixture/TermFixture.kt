@@ -1,6 +1,7 @@
 package kr.weit.roadyfoody.term.fixture
 
 import kr.weit.roadyfoody.term.domain.Term
+import kr.weit.roadyfoody.term.service.RequiredAndOptionalSizes
 
 const val TEST_REQUIRED_TERM_1_ID = 1L
 const val TEST_REQUIRED_TERM_1_TITLE = "테스트 필수 약관 $TEST_REQUIRED_TERM_1_ID"
@@ -107,7 +108,9 @@ fun createTestTerms() = createTestRequiredTerms() + createTestOptionalTerms()
 
 val TEST_TERMS_SIZE = createTestTerms().size
 
-val TEST_EACH_TYPE_TERMS_SIZES = Triple(TEST_TERMS_SIZE, TEST_REQUIRED_TERMS_SIZE, TEST_OPTIONAL_TERMS_SIZE)
+fun createTestRequiredAndOptionalSizes() = RequiredAndOptionalSizes(TEST_REQUIRED_TERMS_SIZE, TEST_OPTIONAL_TERMS_SIZE)
+
+fun createTestZerosRequiredAndOptionalSizes() = RequiredAndOptionalSizes(0, 0)
 
 fun createTestTermIds() = createTestTerms().map { it.id }
 
