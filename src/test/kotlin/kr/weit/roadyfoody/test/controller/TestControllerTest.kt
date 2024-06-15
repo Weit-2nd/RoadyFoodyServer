@@ -1,10 +1,12 @@
 package kr.weit.roadyfoody.test.controller
 
 import io.kotest.core.spec.style.BehaviorSpec
+import kr.weit.roadyfoody.test.application.client.TestClientInterface
 import kr.weit.roadyfoody.support.annotation.ControllerTest
 import kr.weit.roadyfoody.support.utils.getWithAuth
 import kr.weit.roadyfoody.test.presentation.api.TestController
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
