@@ -14,20 +14,25 @@ class TermQueryService(
 ) {
     fun getAllSummaryTerms(): SummaryTermsResponse {
         val terms = termRepository.findAll()
-        val (allTermsSize, requiredSize, optionalSize) = calculateEachTypeSizes(terms)
-        return SummaryTermsResponse.from(allTermsSize, requiredSize, optionalSize, termRepository.findAll())
+        val (requiredSize, optionalSize) = getRequiredAndOptionalSizes(terms)
+        return SummaryTermsResponse.from(terms.size, requiredSize, optionalSize, termRepository.findAll())
     }
 
     fun getAllDetailedTerms(): DetailedTermsResponse {
         val terms = termRepository.findAll()
-        val (allTermsSize, requiredSize, optionalSize) = calculateEachTypeSizes(terms)
-        return DetailedTermsResponse.from(allTermsSize, requiredSize, optionalSize, termRepository.findAll())
+        val (requiredSize, optionalSize) = getRequiredAndOptionalSizes(terms)
+        return DetailedTermsResponse.from(terms.size, requiredSize, optionalSize, termRepository.findAll())
     }
 
     fun getDetailedTerm(termId: Long): DetailedTermResponse = DetailedTermResponse.from(termRepository.getByTermId(termId))
 
-    private fun calculateEachTypeSizes(terms: List<Term>): Triple<Int, Int, Int> {
+    private fun getRequiredAndOptionalSizes(terms: List<Term>): RequiredAndOptionalSizes {
         val requiredSize = terms.count { it.requiredFlag }
-        return Triple(terms.size, requiredSize, terms.size - requiredSize)
+        return RequiredAndOptionalSizes(requiredSize, terms.size - requiredSize)
     }
 }
+
+data class RequiredAndOptionalSizes(
+    val requiredSize: Int,
+    val optionalSize: Int,
+)

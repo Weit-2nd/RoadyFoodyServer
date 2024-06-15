@@ -8,7 +8,7 @@ import kr.weit.roadyfoody.common.exception.ErrorResponse
 import kr.weit.roadyfoody.global.jsonmapper.ObjectMapperProvider
 import kr.weit.roadyfoody.support.annotation.ControllerTest
 import kr.weit.roadyfoody.term.exception.TermNotFoundException
-import kr.weit.roadyfoody.term.exception.TermNotFoundException.Companion.termNotFoundMessage
+import kr.weit.roadyfoody.term.exception.TermNotFoundException.Companion.getTermNotFoundMessage
 import kr.weit.roadyfoody.term.fixture.TEST_NONEXISTENT_TERM_ID
 import kr.weit.roadyfoody.term.fixture.TEST_REQUIRED_TERM_1_ID
 import kr.weit.roadyfoody.term.fixture.createTestDetailedTermResponse
@@ -85,7 +85,7 @@ class TermControllerTest(
             }
 
             `when`("존재하지 않는 termId 를 보내면") {
-                val termNotFoundEx = TermNotFoundException(termNotFoundMessage(TEST_NONEXISTENT_TERM_ID))
+                val termNotFoundEx = TermNotFoundException(getTermNotFoundMessage(TEST_NONEXISTENT_TERM_ID))
                 every { termQueryService.getDetailedTerm(TEST_NONEXISTENT_TERM_ID) } throws termNotFoundEx
                 then("${termNotFoundEx.errorCode.httpStatus.value()} 응답을 반환한다.") {
                     mockMvc

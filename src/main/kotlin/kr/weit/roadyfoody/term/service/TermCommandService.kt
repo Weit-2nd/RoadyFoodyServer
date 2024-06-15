@@ -2,7 +2,7 @@ package kr.weit.roadyfoody.term.service
 
 import kr.weit.roadyfoody.term.repository.TermRepository
 import kr.weit.roadyfoody.useragreedterm.exception.RequiredTermNotAgreedException
-import kr.weit.roadyfoody.useragreedterm.exception.RequiredTermNotAgreedException.Companion.requiredTermNotAgreedMessage
+import kr.weit.roadyfoody.useragreedterm.exception.RequiredTermNotAgreedException.Companion.getRequiredTermNotAgreedMessage
 import org.springframework.stereotype.Service
 
 @Service
@@ -16,7 +16,7 @@ class TermCommandService(
         val notAgreedTermIdSet = requiredTermIds.subtract(agreedTermIdSet)
 
         if (notAgreedTermIdSet.isNotEmpty()) {
-            throw RequiredTermNotAgreedException(requiredTermNotAgreedMessage(notAgreedTermIdSet))
+            throw RequiredTermNotAgreedException(getRequiredTermNotAgreedMessage(notAgreedTermIdSet))
         }
     }
 }
