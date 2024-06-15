@@ -6,9 +6,9 @@ import kr.weit.roadyfoody.term.domain.Term
 data class SummaryTermsResponse(
     @JsonProperty("all_terms_size")
     val allTermsSize: Int,
-    @JsonProperty("required_term_size")
+    @JsonProperty("required_terms_size")
     val requiredTermsSize: Int,
-    @JsonProperty("optional_term_size")
+    @JsonProperty("optional_terms_size")
     val optionalTermsSize: Int,
     val terms: List<SummaryTermResponse>,
 ) {
