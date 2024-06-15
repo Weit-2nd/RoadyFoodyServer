@@ -17,9 +17,9 @@ class Term(
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "TERMS_SEQ_GENERATOR")
     val id: Long = 0L,
     @Column(nullable = false, length = 90, unique = true)
-    val title: String,
+    var title: String,
     @Column(columnDefinition = "CLOB", nullable = false)
-    val content: String,
+    var content: String,
     @Column(name = "required_flag")
-    val requiredFlag: Boolean,
+    var requiredFlag: Boolean,
 ) : BaseModifiableEntity()
