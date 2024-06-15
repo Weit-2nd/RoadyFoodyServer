@@ -5,12 +5,18 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
 import kr.weit.roadyfoody.common.domain.BaseModifiableEntity
 
 @Entity
-@Table(name = "terms")
+@Table(
+    name = "terms",
+    indexes = [
+        Index(name = "terms_required_flag_idx", columnList = "required_flag"),
+    ],
+)
 @SequenceGenerator(name = "TERMS_SEQ_GENERATOR", sequenceName = "terms_seq", initialValue = 1, allocationSize = 1)
 class Term(
     @Id
