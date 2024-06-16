@@ -14,7 +14,6 @@ import kr.weit.roadyfoody.term.fixture.TEST_OPTIONAL_TERMS_SIZE
 import kr.weit.roadyfoody.term.fixture.TEST_REQUIRED_TERMS_SIZE
 import kr.weit.roadyfoody.term.fixture.createTestDetailedTermsResponse
 import kr.weit.roadyfoody.term.fixture.createTestRequiredAndOptionalSizes
-import kr.weit.roadyfoody.term.fixture.createTestRequiredTerms
 import kr.weit.roadyfoody.term.fixture.createTestSummaryTermsResponse
 import kr.weit.roadyfoody.term.fixture.createTestTermIds
 import kr.weit.roadyfoody.term.fixture.createTestTerms
@@ -87,10 +86,10 @@ class TermQueryServiceTest :
 
         given("getDetailedTerm 테스트") {
             `when`("termId 가 ${createTestTermIds().first()} 일 시") {
-                every { termRepository.getByTermId(createTestTermIds().first()) } returns createTestRequiredTerms().first()
+                every { termRepository.getByTermId(createTestTermIds().first()) } returns createTestTerms().first()
                 then("DetailedTermResponse 를 반환한다.") {
                     termQueryService.getDetailedTerm(createTestTermIds().first()) shouldBeEqual
-                        DetailedTermResponse.from(createTestRequiredTerms().first())
+                        DetailedTermResponse.from(createTestTerms().first())
                     verify { termRepository.getByTermId(createTestTermIds().first()) }
                 }
             }

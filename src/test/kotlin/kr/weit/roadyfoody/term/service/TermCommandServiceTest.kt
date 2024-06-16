@@ -32,7 +32,7 @@ class TermCommandServiceTest :
             `when`("모든 필수 약관 ($TEST_REQUIRED_TERMS_SIZE 개) 만 전달받으면") {
                 then("RequiredTermNotAgreedException 을 던지지 않는다.") {
                     shouldNotThrow<RequiredTermNotAgreedException> {
-                        termCommandService.checkRequiredTermsOrThrow(createTestTermIds())
+                        termCommandService.checkRequiredTermsOrThrow(createTestRequiredTermIds())
                     }
                     verify { termRepository.findAllIdsByRequiredFlagIsTrue() }
                 }
