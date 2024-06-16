@@ -1,94 +1,44 @@
 package kr.weit.roadyfoody.useragreedterm.fixture
 
-import kr.weit.roadyfoody.term.fixture.createTestOptionalTerm1
-import kr.weit.roadyfoody.term.fixture.createTestOptionalTerm2
-import kr.weit.roadyfoody.term.fixture.createTestOptionalTerm3
-import kr.weit.roadyfoody.term.fixture.createTestRequiredTerm1
-import kr.weit.roadyfoody.term.fixture.createTestRequiredTerm2
-import kr.weit.roadyfoody.term.fixture.createTestRequiredTerm3
+import kr.weit.roadyfoody.term.fixture.createTestOptionalTerm
+import kr.weit.roadyfoody.term.fixture.createTestRequiredTerm
 import kr.weit.roadyfoody.user.fixture.createTestUser1
 import kr.weit.roadyfoody.useragreedterm.domain.UserAgreedTerm
 
-const val TEST_USER_1_AGREED_REQUIRED_TERM_1_ID = 1L
-const val TEST_USER_1_AGREED_REQUIRED_TERM_1_AGREED_FLAG = true
+fun createTestUser1AgreedRequiredTerm(
+    id: Long,
+    termId: Long,
+) = UserAgreedTerm(
+    id = id,
+    user = createTestUser1(),
+    term = createTestRequiredTerm(termId),
+)
 
-fun createTestUser1AgreedRequiredTerm1() =
-    UserAgreedTerm(
-        TEST_USER_1_AGREED_REQUIRED_TERM_1_ID,
-        TEST_USER_1_AGREED_REQUIRED_TERM_1_AGREED_FLAG,
-        createTestUser1(),
-        createTestRequiredTerm1(),
-    )
-
-const val TEST_USER_1_AGREED_REQUIRED_TERM_2_ID = TEST_USER_1_AGREED_REQUIRED_TERM_1_ID + 1L
-const val TEST_USER_1_AGREED_REQUIRED_TERM_2_AGREED_FLAG = true
-
-fun createTestUser1AgreedRequiredTerm2() =
-    UserAgreedTerm(
-        TEST_USER_1_AGREED_REQUIRED_TERM_2_ID,
-        TEST_USER_1_AGREED_REQUIRED_TERM_2_AGREED_FLAG,
-        createTestUser1(),
-        createTestRequiredTerm2(),
-    )
-
-const val TEST_USER_1_AGREED_REQUIRED_TERM_3_ID = TEST_USER_1_AGREED_REQUIRED_TERM_2_ID + 1L
-const val TEST_USER_1_AGREED_REQUIRED_TERM_3_AGREED_FLAG = true
-
-fun createTestUser1AgreedRequiredTerm3() =
-    UserAgreedTerm(
-        TEST_USER_1_AGREED_REQUIRED_TERM_3_ID,
-        TEST_USER_1_AGREED_REQUIRED_TERM_3_AGREED_FLAG,
-        createTestUser1(),
-        createTestRequiredTerm3(),
-    )
+const val TEST_USER_1_AGREED_REQUIRED_TERMS_SIZE = 3
 
 fun createTestUser1AgreedRequiredTerms() =
-    listOf(
-        createTestUser1AgreedRequiredTerm1(),
-        createTestUser1AgreedRequiredTerm2(),
-        createTestUser1AgreedRequiredTerm3(),
-    )
+    (1..TEST_USER_1_AGREED_REQUIRED_TERMS_SIZE).map {
+        createTestUser1AgreedRequiredTerm(
+            it.toLong(),
+            it.toLong(),
+        )
+    }
 
-val TEST_USER_1_AGREED_REQUIRED_TERMS_SIZE = createTestUser1AgreedRequiredTerms().size
-
-val TEST_USER_1_AGREED_OPTIONAL_TERM_1_ID = TEST_USER_1_AGREED_REQUIRED_TERMS_SIZE + 1L
-const val TEST_USER_1_AGREED_OPTIONAL_TERM_1_ID_AGREED_FLAG = true
-
-fun createTestUser1AgreedOptionalTerm1() =
-    UserAgreedTerm(
-        TEST_USER_1_AGREED_OPTIONAL_TERM_1_ID,
-        TEST_USER_1_AGREED_OPTIONAL_TERM_1_ID_AGREED_FLAG,
-        createTestUser1(),
-        createTestOptionalTerm1(),
-    )
-
-val TEST_USER_1_AGREED_OPTIONAL_TERM_2_ID = TEST_USER_1_AGREED_OPTIONAL_TERM_1_ID + 1L
-const val TEST_USER_1_AGREED_OPTIONAL_TERM_2_ID_AGREED_FLAG = true
-
-fun createTestUser1AgreedOptionalTerm2() =
-    UserAgreedTerm(
-        TEST_USER_1_AGREED_OPTIONAL_TERM_2_ID,
-        TEST_USER_1_AGREED_OPTIONAL_TERM_2_ID_AGREED_FLAG,
-        createTestUser1(),
-        createTestOptionalTerm2(),
-    )
-
-val TEST_USER_1_AGREED_OPTIONAL_TERM_3_ID = TEST_USER_1_AGREED_OPTIONAL_TERM_2_ID + 1L
-const val TEST_USER_1_AGREED_OPTIONAL_TERM_3_ID_AGREED_FLAG = true
-
-fun createTestUser1AgreedOptionalTerm3() =
-    UserAgreedTerm(
-        TEST_USER_1_AGREED_OPTIONAL_TERM_3_ID,
-        TEST_USER_1_AGREED_OPTIONAL_TERM_3_ID_AGREED_FLAG,
-        createTestUser1(),
-        createTestOptionalTerm3(),
-    )
+fun createTestUser1AgreedOptionalTerm(
+    id: Long,
+    termId: Long,
+) = UserAgreedTerm(
+    id = id,
+    user = createTestUser1(),
+    term = createTestOptionalTerm(termId),
+)
 
 fun createTestUser1AgreedOptionalTerms() =
-    listOf(
-        createTestUser1AgreedOptionalTerm1(),
-        createTestUser1AgreedOptionalTerm2(),
-        createTestUser1AgreedOptionalTerm3(),
-    )
+    (TEST_USER_1_AGREED_REQUIRED_TERMS_SIZE + 1..TEST_USER_1_AGREED_REQUIRED_TERMS_SIZE + 3).map {
+        createTestUser1AgreedOptionalTerm(
+            it.toLong(),
+            it.toLong(),
+        )
+    }
 
 fun createTestUser1AgreedTerms() = createTestUser1AgreedRequiredTerms() + createTestUser1AgreedOptionalTerms()

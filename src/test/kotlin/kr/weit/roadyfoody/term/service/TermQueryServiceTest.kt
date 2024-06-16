@@ -12,11 +12,11 @@ import kr.weit.roadyfoody.term.exception.TermNotFoundException.Companion.getTerm
 import kr.weit.roadyfoody.term.fixture.TEST_NONEXISTENT_TERM_ID
 import kr.weit.roadyfoody.term.fixture.TEST_OPTIONAL_TERMS_SIZE
 import kr.weit.roadyfoody.term.fixture.TEST_REQUIRED_TERMS_SIZE
-import kr.weit.roadyfoody.term.fixture.TEST_REQUIRED_TERM_1_ID
 import kr.weit.roadyfoody.term.fixture.createTestDetailedTermsResponse
 import kr.weit.roadyfoody.term.fixture.createTestRequiredAndOptionalSizes
-import kr.weit.roadyfoody.term.fixture.createTestRequiredTerm1
+import kr.weit.roadyfoody.term.fixture.createTestRequiredTerms
 import kr.weit.roadyfoody.term.fixture.createTestSummaryTermsResponse
+import kr.weit.roadyfoody.term.fixture.createTestTermIds
 import kr.weit.roadyfoody.term.fixture.createTestTerms
 import kr.weit.roadyfoody.term.fixture.createTestZerosRequiredAndOptionalSizes
 import kr.weit.roadyfoody.term.repository.TermRepository
@@ -86,12 +86,12 @@ class TermQueryServiceTest :
         }
 
         given("getDetailedTerm 테스트") {
-            `when`("termId 가 $TEST_REQUIRED_TERM_1_ID 일 시") {
-                every { termRepository.getByTermId(TEST_REQUIRED_TERM_1_ID) } returns createTestRequiredTerm1()
+            `when`("termId 가 ${createTestTermIds().first()} 일 시") {
+                every { termRepository.getByTermId(createTestTermIds().first()) } returns createTestRequiredTerms().first()
                 then("DetailedTermResponse 를 반환한다.") {
-                    termQueryService.getDetailedTerm(TEST_REQUIRED_TERM_1_ID) shouldBeEqual
-                        DetailedTermResponse.from(createTestRequiredTerm1())
-                    verify { termRepository.getByTermId(TEST_REQUIRED_TERM_1_ID) }
+                    termQueryService.getDetailedTerm(createTestTermIds().first()) shouldBeEqual
+                        DetailedTermResponse.from(createTestRequiredTerms().first())
+                    verify { termRepository.getByTermId(createTestTermIds().first()) }
                 }
             }
 

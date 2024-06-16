@@ -12,9 +12,9 @@ fun createTestSummaryTermsResponse() =
         createTestTerms(),
     )
 
-fun createTestDetailedTermResponse() =
+fun createTestDetailedTermResponse(id: Long) =
     DetailedTermResponse.from(
-        createTestRequiredTerm1(),
+        createTestRequiredTerm(id),
     )
 
 fun createTestDetailedTermsResponse() =
