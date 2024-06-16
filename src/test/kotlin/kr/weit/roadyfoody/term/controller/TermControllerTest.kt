@@ -10,10 +10,10 @@ import kr.weit.roadyfoody.support.annotation.ControllerTest
 import kr.weit.roadyfoody.term.exception.TermNotFoundException
 import kr.weit.roadyfoody.term.exception.TermNotFoundException.Companion.getTermNotFoundMessage
 import kr.weit.roadyfoody.term.fixture.TEST_NONEXISTENT_TERM_ID
-import kr.weit.roadyfoody.term.fixture.TEST_REQUIRED_TERM_1_ID
 import kr.weit.roadyfoody.term.fixture.createTestDetailedTermResponse
 import kr.weit.roadyfoody.term.fixture.createTestDetailedTermsResponse
 import kr.weit.roadyfoody.term.fixture.createTestSummaryTermsResponse
+import kr.weit.roadyfoody.term.fixture.createTestTermIds
 import kr.weit.roadyfoody.term.presentation.api.TermController
 import kr.weit.roadyfoody.term.service.TermQueryService
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -67,20 +67,20 @@ class TermControllerTest(
 
         given("GET $requestPath/{termId} 테스트") {
             `when`("정상적인 요청을 보내면") {
-                every { termQueryService.getDetailedTerm(TEST_REQUIRED_TERM_1_ID) } returns
-                    createTestDetailedTermResponse()
+                every { termQueryService.getDetailedTerm(createTestTermIds().first()) } returns
+                    createTestDetailedTermResponse(createTestTermIds().first())
                 then("200 상태번호와 DetailedTermResponse 를 반환한다.") {
                     mockMvc
-                        .perform(get("$requestPath/${TEST_REQUIRED_TERM_1_ID}"))
+                        .perform(get("$requestPath/${createTestTermIds().first()}"))
                         .andExpect(status().isOk)
                         .andExpect(
                             content().json(
                                 objectMapperProvider.objectMapper.writeValueAsString(
-                                    createTestDetailedTermResponse(),
+                                    createTestDetailedTermResponse(createTestTermIds().first()),
                                 ),
                             ),
                         )
-                    verify { termQueryService.getDetailedTerm(TEST_REQUIRED_TERM_1_ID) }
+                    verify { termQueryService.getDetailedTerm(createTestTermIds().first()) }
                 }
             }
 
