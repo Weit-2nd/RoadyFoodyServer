@@ -1,52 +1,52 @@
 package kr.weit.roadyfoody.tourism.dto
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 
 data class ResponseWrapper(
-    val response: Response,
+    @JsonProperty("response") val response: Response,
 )
 
 data class Response(
-    val header: Header,
-    val body: Body,
+    @JsonProperty("header") val header: Header,
+    @JsonProperty("body") val body: Body,
 )
 
 data class Header(
-    val resultCode: String,
-    val resultMsg: String,
+    @JsonProperty("resultCode") val resultCode: String,
+    @JsonProperty("resultMsg") val resultMsg: String,
 )
 
 data class Body(
-    @JsonDeserialize(using = ItemsDeserializer::class)
-    val items: Items?,
-    val numOfRows: Int,
-    val pageNo: Int,
-    val totalCount: Int,
+    @JsonProperty("items") @JsonDeserialize(using = ItemsDeserializer::class) val items: Items,
+    @JsonProperty("numOfRows") val numOfRows: Int,
+    @JsonProperty("pageNo") val pageNo: Int,
+    @JsonProperty("totalCount") val totalCount: Int,
 )
 
 data class Items(
-    val item: List<TourismItem> = emptyList(),
+    @JsonProperty("item") val item: List<TourismItem> = emptyList(),
 )
 
 data class TourismItem(
-    val addr1: String,
-    val addr2: String,
-    val areacode: String,
-    val booktour: String,
-    val cat1: String,
-    val cat2: String,
-    val cat3: String,
-    val contentid: String,
-    val contenttypeid: String,
-    val createdtime: String,
-    val firstimage: String,
-    val firstimage2: String,
-    val cpyrhtDivCd: String,
-    val mapx: String,
-    val mapy: String,
-    val mlevel: String,
-    val modifiedtime: String,
-    val sigungucode: String,
-    val tel: String,
-    val title: String,
+    @JsonProperty("addr1") val addr1: String,
+    @JsonProperty("addr2") val addr2: String,
+    @JsonProperty("areacode") val areacode: String,
+    @JsonProperty("booktour") val booktour: String,
+    @JsonProperty("cat1") val cat1: String,
+    @JsonProperty("cat2") val cat2: String,
+    @JsonProperty("cat3") val cat3: String,
+    @JsonProperty("contentid") val contentid: String,
+    @JsonProperty("contenttypeid") val contenttypeid: String,
+    @JsonProperty("createdtime") val createdtime: String,
+    @JsonProperty("firstimage") val firstimage: String,
+    @JsonProperty("firstimage2") val firstimage2: String,
+    @JsonProperty("cpyrhtDivCd") val cpyrhtDivCd: String,
+    @JsonProperty("mapx") val mapx: Double,
+    @JsonProperty("mapy") val mapy: Double,
+    @JsonProperty("mlevel") val mlevel: String,
+    @JsonProperty("modifiedtime") val modifiedtime: String,
+    @JsonProperty("sigungucode") val sigungucode: String,
+    @JsonProperty("tel") val tel: String,
+    @JsonProperty("title") val title: String,
 )

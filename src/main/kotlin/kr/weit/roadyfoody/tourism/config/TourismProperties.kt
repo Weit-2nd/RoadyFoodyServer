@@ -7,5 +7,4 @@ class TourismProperties(
     val apiKey: String,
     val mobileApp: String,
     val mobileOs: String,
-    val contentTypeId: String,
 )
