@@ -1,6 +1,7 @@
 package kr.weit.roadyfoody.useragreedterm.service
 
 import io.kotest.core.spec.style.BehaviorSpec
+import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -20,6 +21,8 @@ class UserAgreedTermCommandServiceTest :
         val userAgreedTermRepository = mockk<UserAgreedTermRepository>()
         val userAgreedTermCommandService = UserAgreedTermCommandService(userAgreedTermRepository, termRepository)
 
+        afterTest { clearAllMocks() }
+
         given("storeUserAgreedTerms 테스트") {
             `when`("단일 User 와 하나 이상의 termId 가 주어질 시") {
                 every { termRepository.findAllByIdIn(any<Set<Long>>()) } returns createTestTerms()
@@ -27,8 +30,8 @@ class UserAgreedTermCommandServiceTest :
                     createTestUserAgreedTerms(TEST_USER_ID)
                 then("해당 UserAgreedTerm 들을 저장한다.") {
                     userAgreedTermCommandService.storeUserAgreedTerms(createTestUser(TEST_USER_ID), createTestTermIdSet())
-                    verify { termRepository.findAllByIdIn(any<Set<Long>>()) }
-                    verify { userAgreedTermRepository.saveAll(any<List<UserAgreedTerm>>()) }
+                    verify(exactly = 1) { termRepository.findAllByIdIn(any<Set<Long>>()) }
+                    verify(exactly = 1) { userAgreedTermRepository.saveAll(any<List<UserAgreedTerm>>()) }
                 }
             }
 
@@ -37,8 +40,8 @@ class UserAgreedTermCommandServiceTest :
                 every { userAgreedTermRepository.saveAll(any<List<UserAgreedTerm>>()) } returns emptyList()
                 then("해당 UserAgreedTerm 들을 저장하지 않는다.") {
                     userAgreedTermCommandService.storeUserAgreedTerms(createTestUser(TEST_USER_ID), setOf(TEST_NONEXISTENT_TERM_ID))
-                    verify { termRepository.findAllByIdIn(any<Set<Long>>()) }
-                    verify { userAgreedTermRepository.saveAll(any<List<UserAgreedTerm>>()) }
+                    verify(exactly = 1) { termRepository.findAllByIdIn(any<Set<Long>>()) }
+                    verify(exactly = 1) { userAgreedTermRepository.saveAll(any<List<UserAgreedTerm>>()) }
                 }
             }
 
@@ -47,8 +50,8 @@ class UserAgreedTermCommandServiceTest :
                 every { userAgreedTermRepository.saveAll(emptyList()) } returns emptyList()
                 then("해당 UserAgreedTerm 들을 저장하지 않는다.") {
                     userAgreedTermCommandService.storeUserAgreedTerms(createTestUser(TEST_USER_ID), emptySet())
-                    verify { termRepository.findAllByIdIn(emptySet()) }
-                    verify { userAgreedTermRepository.saveAll(emptyList()) }
+                    verify(exactly = 1) { termRepository.findAllByIdIn(emptySet()) }
+                    verify(exactly = 1) { userAgreedTermRepository.saveAll(emptyList()) }
                 }
             }
         }
