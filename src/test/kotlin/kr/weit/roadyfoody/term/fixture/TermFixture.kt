@@ -16,9 +16,9 @@ fun createTestRequiredTerm(id: Long) =
 
 const val TEST_REQUIRED_TERMS_SIZE = 3
 
-fun createTestRequiredTerms() = (1..TEST_REQUIRED_TERMS_SIZE).map { createTestRequiredTerm(it.toLong()) }
+fun createTestRequiredTerms() = (1L..TEST_REQUIRED_TERMS_SIZE).map { createTestRequiredTerm(it) }
 
-fun createTestRequiredTermIds() = createTestRequiredTerms().map { it.id }
+fun createTestRequiredTermIdSet() = createTestRequiredTerms().map { it.id }.toSet()
 
 // Optional Terms
 fun createTestOptionalTerm(id: Long) =
@@ -32,8 +32,8 @@ fun createTestOptionalTerm(id: Long) =
 const val TEST_OPTIONAL_TERMS_SIZE = 3
 
 fun createTestOptionalTerms() =
-    (TEST_REQUIRED_TERMS_SIZE + 1..TEST_REQUIRED_TERMS_SIZE + TEST_OPTIONAL_TERMS_SIZE).map {
-        createTestOptionalTerm(it.toLong())
+    (TEST_REQUIRED_TERMS_SIZE + 1L..TEST_REQUIRED_TERMS_SIZE + TEST_OPTIONAL_TERMS_SIZE).map {
+        createTestOptionalTerm(it)
     }
 
 // All Terms
@@ -41,7 +41,7 @@ const val TEST_TERMS_SIZE = TEST_REQUIRED_TERMS_SIZE + TEST_OPTIONAL_TERMS_SIZE
 
 fun createTestTerms() = createTestRequiredTerms() + createTestOptionalTerms()
 
-fun createTestTermIds() = createTestTerms().map { it.id }
+fun createTestTermIdSet() = createTestTerms().map { it.id }.toSet()
 
 fun createTestRequiredAndOptionalSizes() =
     RequiredAndOptionalSizes(
@@ -56,4 +56,4 @@ private fun coverContentHtmlTag(content: String) = """<!DOCTYPE html><html lang=
 // Fail Case
 const val TEST_NONEXISTENT_TERM_ID = 0L
 
-fun createTestNotEnoughRequiredTermIds() = createTestRequiredTerms().run { this.subList(0, this.size - 1) }.map { it.id }
+fun createTestNotEnoughRequiredTermIdSet() = createTestRequiredTerms().run { this.subList(0, this.size - 1) }.map { it.id }.toSet()
