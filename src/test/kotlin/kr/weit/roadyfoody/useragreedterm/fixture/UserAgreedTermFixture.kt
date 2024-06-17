@@ -41,7 +41,7 @@ fun createTestUserAgreedOptionalTerms(userId: Long) =
         createTestUserAgreedOptionalTerm(
             id,
             userId,
-            TEST_REQUIRED_TERMS_SIZE + id,
+            id,
         )
     }
 

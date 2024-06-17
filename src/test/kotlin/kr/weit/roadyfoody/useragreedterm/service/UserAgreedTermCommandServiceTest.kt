@@ -24,9 +24,7 @@ class UserAgreedTermCommandServiceTest :
             `when`("단일 User 와 하나 이상의 termId 가 주어질 시") {
                 every { termRepository.findAllByIdIn(any<Set<Long>>()) } returns createTestTerms()
                 every { userAgreedTermRepository.saveAll(any<List<UserAgreedTerm>>()) } returns
-                    createTestUserAgreedTerms(
-                        TEST_USER_ID,
-                    )
+                    createTestUserAgreedTerms(TEST_USER_ID)
                 then("해당 UserAgreedTerm 들을 저장한다.") {
                     userAgreedTermCommandService.storeUserAgreedTerms(createTestUser(TEST_USER_ID), createTestTermIdSet())
                     verify { termRepository.findAllByIdIn(any<Set<Long>>()) }
