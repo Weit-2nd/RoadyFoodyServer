@@ -8,16 +8,15 @@ import io.mockk.spyk
 import io.mockk.verify
 import kr.weit.roadyfoody.term.domain.Term
 import kr.weit.roadyfoody.term.exception.TermNotFoundException
-import kr.weit.roadyfoody.term.exception.TermNotFoundException.Companion.getTermNotFoundMessage
 import kr.weit.roadyfoody.term.fixture.TEST_NONEXISTENT_TERM_ID
 import kr.weit.roadyfoody.term.fixture.TEST_OPTIONAL_TERMS_SIZE
 import kr.weit.roadyfoody.term.fixture.TEST_REQUIRED_TERMS_SIZE
-import kr.weit.roadyfoody.term.fixture.createTestDetailedTermsResponse
 import kr.weit.roadyfoody.term.fixture.createTestRequiredAndOptionalSizes
 import kr.weit.roadyfoody.term.fixture.createTestSummaryTermsResponse
-import kr.weit.roadyfoody.term.fixture.createTestTermIds
+import kr.weit.roadyfoody.term.fixture.createTestTermIdSet
 import kr.weit.roadyfoody.term.fixture.createTestTerms
 import kr.weit.roadyfoody.term.fixture.createTestZerosRequiredAndOptionalSizes
+import kr.weit.roadyfoody.term.fixture.createTestZerosSummaryTermsResponse
 import kr.weit.roadyfoody.term.repository.TermRepository
 import kr.weit.roadyfoody.term.repository.getByTermId
 import kr.weit.roadyfoody.term.service.dto.DetailedTermResponse
@@ -44,40 +43,7 @@ class TermQueryServiceTest :
                 every { termQueryService["getRequiredAndOptionalSizes"](any<List<Term>>()) } returns
                     createTestZerosRequiredAndOptionalSizes()
                 then("내용이 0인 SummaryTermsResponse 를 반환한다.") {
-                    termQueryService.getAllSummaryTerms().also {
-                        it.allTermsSize shouldBeEqual 0
-                        it.requiredTermsSize shouldBeEqual 0
-                        it.optionalTermsSize shouldBeEqual 0
-                        it.terms shouldBeEqual emptyList()
-                    }
-                    verify { termRepository.findAll() }
-                    verify { termQueryService["getRequiredAndOptionalSizes"](any<List<Term>>()) }
-                }
-            }
-        }
-
-        given("getAllDetailedTerms 테스트") {
-            `when`("필수 약관이 $TEST_REQUIRED_TERMS_SIZE 개 , 선택 약관이 $TEST_OPTIONAL_TERMS_SIZE 개 존재할 시") {
-                every { termRepository.findAll() } returns createTestTerms()
-                every { termQueryService["getRequiredAndOptionalSizes"](any<List<Term>>()) } returns createTestRequiredAndOptionalSizes()
-                then("DetailedTermsResponse 를 반환한다.") {
-                    termQueryService.getAllDetailedTerms() shouldBeEqual createTestDetailedTermsResponse()
-                    verify { termRepository.findAll() }
-                    verify { termQueryService["getRequiredAndOptionalSizes"](any<List<Term>>()) }
-                }
-            }
-
-            `when`("약관이 존재하지 않을 시") {
-                every { termRepository.findAll() } returns emptyList()
-                every { termQueryService["getRequiredAndOptionalSizes"](any<List<Term>>()) } returns
-                    createTestZerosRequiredAndOptionalSizes()
-                then("내용이 0인 DetailedTermsResponse 를 반환한다.") {
-                    termQueryService.getAllDetailedTerms().also {
-                        it.allTermsSize shouldBeEqual 0
-                        it.requiredTermsSize shouldBeEqual 0
-                        it.optionalTermsSize shouldBeEqual 0
-                        it.terms shouldBeEqual emptyList()
-                    }
+                    termQueryService.getAllSummaryTerms() shouldBeEqual createTestZerosSummaryTermsResponse()
                     verify { termRepository.findAll() }
                     verify { termQueryService["getRequiredAndOptionalSizes"](any<List<Term>>()) }
                 }
@@ -85,18 +51,18 @@ class TermQueryServiceTest :
         }
 
         given("getDetailedTerm 테스트") {
-            `when`("termId 가 ${createTestTermIds().first()} 일 시") {
-                every { termRepository.getByTermId(createTestTermIds().first()) } returns createTestTerms().first()
+            `when`("termId 가 ${createTestTermIdSet().first()} 일 시") {
+                every { termRepository.getByTermId(createTestTermIdSet().first()) } returns createTestTerms().first()
                 then("DetailedTermResponse 를 반환한다.") {
-                    termQueryService.getDetailedTerm(createTestTermIds().first()) shouldBeEqual
-                        DetailedTermResponse.from(createTestTerms().first())
-                    verify { termRepository.getByTermId(createTestTermIds().first()) }
+                    val detailedTerm = termQueryService.getDetailedTerm(createTestTermIdSet().first())
+                    detailedTerm shouldBeEqual DetailedTermResponse.from(createTestTerms().first())
+                    verify { termRepository.getByTermId(createTestTermIdSet().first()) }
                 }
             }
 
             `when`("termId 가 존재하지 않을 시") {
                 every { termRepository.getByTermId(TEST_NONEXISTENT_TERM_ID) } throws
-                    TermNotFoundException(getTermNotFoundMessage(TEST_NONEXISTENT_TERM_ID))
+                    TermNotFoundException(TEST_NONEXISTENT_TERM_ID)
                 then("TermNotFoundException 를 던진다.") {
                     assertThrows<TermNotFoundException> { termQueryService.getDetailedTerm(TEST_NONEXISTENT_TERM_ID) }
                     verify { termRepository.getByTermId(TEST_NONEXISTENT_TERM_ID) }
