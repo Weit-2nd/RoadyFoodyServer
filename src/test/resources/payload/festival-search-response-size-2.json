@@ -1,0 +1,61 @@
+{
+  "response":{
+    "header":{
+      "resultCode":"0000",
+      "resultMsg":"OK"
+    },
+    "body":{
+      "items":{
+        "item":[
+          {
+            "addr1":"강원특별자치도 춘천시 스포츠타운길399번길 25 KT\u0026G상상마당 춘천아트센터",
+            "addr2":"",
+            "areacode":"32",
+            "booktour":"",
+            "cat1":"A02",
+            "cat2":"A0207",
+            "cat3":"A02070200",
+            "contentid":"2997769",
+            "contenttypeid":"15",
+            "createdtime":"20230816111924",
+            "firstimage":"http://tong.visitkorea.or.kr/cms/resource/67/2997767_image2_1.png",
+            "firstimage2":"http://tong.visitkorea.or.kr/cms/resource/67/2997767_image3_1.png",
+            "cpyrhtDivCd":"Type3",
+            "mapx":"127.7021517672",
+            "mapy":"37.8735012283",
+            "mlevel":"6",
+            "modifiedtime":"20240206130654",
+            "sigungucode":"13",
+            "tel":"1644-4845",
+            "title":"행사 0"
+          },
+          {
+            "addr1":"강원특별자치도 홍천군 홍천읍 갈마곡리",
+            "addr2":"",
+            "areacode":"32",
+            "booktour":"",
+            "cat1":"A02",
+            "cat2":"A0207",
+            "cat3":"A02070200",
+            "contentid":"2597638",
+            "contenttypeid":"15",
+            "createdtime":"20190418024010",
+            "firstimage":"http://tong.visitkorea.or.kr/cms/resource/99/3301599_image2_1.jpg",
+            "firstimage2":"http://tong.visitkorea.or.kr/cms/resource/99/3301599_image3_1.jpg",
+            "cpyrhtDivCd":"Type3",
+            "mapx":"127.8934981666",
+            "mapy":"37.6894650682",
+            "mlevel":"6",
+            "modifiedtime":"20240516141830",
+            "sigungucode":"16",
+            "tel":"033-439-5864",
+            "title":"행사 1"
+          }
+        ]
+      },
+      "numOfRows":9,
+      "pageNo":1,
+      "totalCount":9
+    }
+  }
+}
