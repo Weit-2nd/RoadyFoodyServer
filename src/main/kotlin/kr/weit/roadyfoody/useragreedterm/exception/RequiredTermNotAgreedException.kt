@@ -4,14 +4,11 @@ import kr.weit.roadyfoody.common.exception.BaseException
 import kr.weit.roadyfoody.common.exception.ErrorCode
 
 class RequiredTermNotAgreedException(
-    message: String,
-) : BaseException(ErrorCode.INVALID_REQUEST, message) {
-    companion object {
-        private const val REQUIRED_TERM_NOT_AGREED_MESSAGE_PREFIX = "약관 ID:"
-        private const val REQUIRED_TERM_NOT_AGREED_MESSAGE_SUFFIX = "필수 약관에 동의하지 않았습니다."
+    termIds: Iterable<Long>,
+) : BaseException(
+        ErrorCode.INVALID_REQUEST,
+        "$ERROR_MSG_PREFIX ${termIds.joinToString()} $ERROR_MSG_SUFFIX",
+    )
 
-        @JvmStatic
-        fun getRequiredTermNotAgreedMessage(termIds: Iterable<Long>) =
-            "$REQUIRED_TERM_NOT_AGREED_MESSAGE_PREFIX ${termIds.joinToString()} $REQUIRED_TERM_NOT_AGREED_MESSAGE_SUFFIX"
-    }
-}
+private const val ERROR_MSG_PREFIX = "약관 ID: "
+private const val ERROR_MSG_SUFFIX = "에 동의하지 않았습니다."
