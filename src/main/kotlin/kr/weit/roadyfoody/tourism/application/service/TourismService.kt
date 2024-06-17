@@ -1,7 +1,5 @@
 package kr.weit.roadyfoody.tourism.application.service
 
-import kr.weit.roadyfoody.tourism.application.util.NumberGenerator
-import kr.weit.roadyfoody.tourism.application.util.RandomNumberGenerator
 import kr.weit.roadyfoody.tourism.config.TourismProperties
 import kr.weit.roadyfoody.tourism.dto.ResponseWrapper
 import kr.weit.roadyfoody.tourism.dto.SearchResponse
@@ -20,7 +18,6 @@ import java.util.concurrent.Executors
 class TourismService(
     private val tourismProperties: TourismProperties,
     private val tourismClientInterface: TourismClientInterface,
-    private val numberGenerator: NumberGenerator = RandomNumberGenerator(),
 ) {
     private val log: Logger = LoggerFactory.getLogger(TourismService::class.java)
 
@@ -106,16 +103,24 @@ class TourismService(
                 )
             }
 
-        val mergedItems = (filteredTourItems + filteredFestivalItems)
+        val mergedItems = mutableListOf<SearchResponse>()
+        val maxItems = minOf(count, filteredTourItems.size + filteredFestivalItems.size)
 
-        val selectedItems =
-            if (mergedItems.size > count) {
-                val randomIndexes = numberGenerator.generate(mergedItems.size, count)
-                randomIndexes.map { mergedItems[it] }
-            } else {
-                mergedItems
+        var tourIndex = 0
+        var festivalIndex = 0
+        var toggle = true
+
+        while (mergedItems.size < maxItems) {
+            if (toggle && tourIndex < filteredTourItems.size) {
+                mergedItems.add(filteredTourItems[tourIndex])
+                tourIndex++
+            } else if (!toggle && festivalIndex < filteredFestivalItems.size) {
+                mergedItems.add(filteredFestivalItems[festivalIndex])
+                festivalIndex++
             }
+            toggle = !toggle
+        }
 
-        return SearchResponses(items = selectedItems)
+        return SearchResponses(items = mergedItems)
     }
 }

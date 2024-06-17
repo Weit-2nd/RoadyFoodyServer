@@ -4,7 +4,6 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import kr.weit.roadyfoody.tourism.application.util.MockRandomNumberGenerator
 import kr.weit.roadyfoody.tourism.config.TourismProperties
 import kr.weit.roadyfoody.tourism.fixture.TourismFixture
 import kr.weit.roadyfoody.tourism.presentation.client.TourismClientInterface
@@ -29,22 +28,8 @@ class TourismServiceTest :
             )
 
         val tourismClientInterface = mockk<TourismClientInterface>()
-        val mockRandomNumberGenerator =
-            MockRandomNumberGenerator(
-                setOf(
-                    1,
-                    3,
-                    4,
-                    5,
-                    7,
-                    10,
-                    13,
-                    15,
-                    17,
-                    18,
-                ),
-            )
-        val tourismService = TourismService(tourismProperties, tourismClientInterface, mockRandomNumberGenerator)
+
+        val tourismService = TourismService(tourismProperties, tourismClientInterface)
 
         given("searchTourism 테스트") {
             `when`("관광지와 행사의 검색 결과가 10을 넘는 경우") {
@@ -80,16 +65,16 @@ class TourismServiceTest :
                     searchResponses.items.size shouldBe TEN
                     val expectedTitles =
                         listOf(
+                            "관광지 0",
+                            "행사 0",
                             "관광지 1",
+                            "행사 1",
+                            "관광지 2",
+                            "행사 2",
                             "관광지 3",
+                            "행사 3",
                             "관광지 4",
-                            "관광지 5",
-                            "관광지 7",
-                            "관광지 10",
-                            "관광지 13",
-                            "관광지 15",
-                            "관광지 17",
-                            "관광지 18",
+                            "행사 4",
                         )
 
                     for ((index, title) in expectedTitles.withIndex()) {
@@ -130,8 +115,8 @@ class TourismServiceTest :
                     val expectedTitles =
                         listOf(
                             "관광지 0",
-                            "관광지 1",
                             "행사 0",
+                            "관광지 1",
                             "행사 1",
                         )
 

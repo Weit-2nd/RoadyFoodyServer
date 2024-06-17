@@ -48,27 +48,27 @@ object TourismFixture {
     }
 
     //
-    fun createSearchResponses(): SearchResponses  {
+    fun createSearchResponses(): SearchResponses {
         return SearchResponses(
             listOf(
                 SearchResponse(
                     title = "title",
                     addr1 = "addr1",
                     addr2 = "addr2",
-                    mapx = 1.0,
-                    mapy = 1.0,
+                    mapX = 1.0,
+                    mapY = 1.0,
                     tel = "tel",
-                    firstimage2 = "firstimage2",
+                    firstImage2 = "firstimage2",
                     type = TourismType.TOUR,
                 ),
                 SearchResponse(
                     title = "title",
                     addr1 = "addr1",
                     addr2 = "addr2",
-                    mapx = 1.0,
-                    mapy = 1.0,
+                    mapX = 1.0,
+                    mapY = 1.0,
                     tel = "tel",
-                    firstimage2 = "firstimage2",
+                    firstImage2 = "firstimage2",
                     type = TourismType.FESTIVAL,
                 ),
             ),
