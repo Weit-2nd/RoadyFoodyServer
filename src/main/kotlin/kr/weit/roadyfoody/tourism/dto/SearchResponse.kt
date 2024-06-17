@@ -4,10 +4,10 @@ data class SearchResponse(
     val title: String,
     val addr1: String?,
     val addr2: String?,
-    val mapx: Double,
-    val mapy: Double,
+    val mapX: Double,
+    val mapY: Double,
     val tel: String?,
-    val firstimage2: String?,
+    val firstImage2: String?,
     val type: TourismType,
 )
 

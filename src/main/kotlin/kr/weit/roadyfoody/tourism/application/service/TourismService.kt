@@ -76,32 +76,32 @@ class TourismService(
     ): SearchResponses {
         val filteredTourItems =
             tourResponse.response.body.items.item.filter {
-                it.mapx != null && it.mapy != null
+                it.mapX != null && it.mapX != null
             }.map {
                 SearchResponse(
                     title = it.title,
                     addr1 = it.addr1,
                     addr2 = it.addr2,
-                    mapx = it.mapx!!,
-                    mapy = it.mapy!!,
+                    mapX = it.mapX!!,
+                    mapY = it.mapY!!,
                     tel = it.tel,
-                    firstimage2 = it.firstimage2,
+                    firstImage2 = it.firstImage2,
                     type = TourismType.TOUR,
                 )
             }
 
         val filteredFestivalItems =
             festivalResponse.response.body.items.item.filter {
-                it.mapx != null && it.mapy != null
+                it.mapX != null && it.mapY != null
             }.map {
                 SearchResponse(
                     title = it.title,
                     addr1 = it.addr1,
                     addr2 = it.addr2,
-                    mapx = it.mapx!!,
-                    mapy = it.mapy!!,
+                    mapX = it.mapX!!,
+                    mapY = it.mapY!!,
                     tel = it.tel,
-                    firstimage2 = it.firstimage2,
+                    firstImage2 = it.firstImage2,
                     type = TourismType.FESTIVAL,
                 )
             }
