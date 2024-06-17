@@ -10,7 +10,7 @@ class TermCommandService(
 ) {
     fun checkRequiredTermsOrThrow(agreedTermIdSet: Set<Long>) {
         val requiredTermIdSet = termRepository.findAllIdsByRequiredIsTrue()
-        val notAgreedTermIdSet = requiredTermIdSet.subtract(agreedTermIdSet)
+        val notAgreedTermIdSet = requiredTermIdSet.minus(agreedTermIdSet)
 
         if (notAgreedTermIdSet.isNotEmpty()) {
             throw RequiredTermNotAgreedException(notAgreedTermIdSet)
