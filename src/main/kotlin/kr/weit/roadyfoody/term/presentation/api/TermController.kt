@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController
 class TermController(
     private val termQueryService: TermQueryService,
 ) : TermControllerSpec {
-    @GetMapping("/summary")
+    @GetMapping
     override fun getAllSummaryTerms(): SummaryTermsResponse = termQueryService.getAllSummaryTerms()
 
     @GetMapping("/{termId}")
