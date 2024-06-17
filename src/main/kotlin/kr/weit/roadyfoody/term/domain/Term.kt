@@ -14,7 +14,7 @@ import kr.weit.roadyfoody.common.domain.BaseModifiableEntity
 @Table(
     name = "terms",
     indexes = [
-        Index(name = "terms_required_flag_idx", columnList = "required_flag"),
+        Index(name = "terms_required_idx", columnList = "required"),
     ],
 )
 @SequenceGenerator(name = "TERMS_SEQ_GENERATOR", sequenceName = "terms_seq", initialValue = 1, allocationSize = 1)
@@ -26,6 +26,6 @@ class Term(
     var title: String,
     @Column(columnDefinition = "CLOB", nullable = false)
     var content: String,
-    @Column(name = "required_flag")
-    var requiredFlag: Boolean,
+    @Column(nullable = false)
+    var required: Boolean,
 ) : BaseModifiableEntity()

@@ -3,7 +3,6 @@ package kr.weit.roadyfoody.term.presentation.api
 import kr.weit.roadyfoody.term.presentation.spec.TermControllerSpec
 import kr.weit.roadyfoody.term.service.TermQueryService
 import kr.weit.roadyfoody.term.service.dto.DetailedTermResponse
-import kr.weit.roadyfoody.term.service.dto.DetailedTermsResponse
 import kr.weit.roadyfoody.term.service.dto.SummaryTermsResponse
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -17,9 +16,6 @@ class TermController(
 ) : TermControllerSpec {
     @GetMapping("/summary")
     override fun getAllSummaryTerms(): SummaryTermsResponse = termQueryService.getAllSummaryTerms()
-
-    @GetMapping
-    override fun getAllDetailedTerms(): DetailedTermsResponse = termQueryService.getAllDetailedTerms()
 
     @GetMapping("/{termId}")
     override fun getDetailedTerm(

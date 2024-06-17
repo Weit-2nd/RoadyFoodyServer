@@ -1,7 +1,6 @@
 package kr.weit.roadyfoody.term.fixture
 
 import kr.weit.roadyfoody.term.service.dto.DetailedTermResponse
-import kr.weit.roadyfoody.term.service.dto.DetailedTermsResponse
 import kr.weit.roadyfoody.term.service.dto.SummaryTermsResponse
 
 fun createTestSummaryTermsResponse() =
@@ -17,10 +16,11 @@ fun createTestDetailedTermResponse(id: Long) =
         createTestRequiredTerm(id),
     )
 
-fun createTestDetailedTermsResponse() =
-    DetailedTermsResponse.from(
-        TEST_TERMS_SIZE,
-        TEST_REQUIRED_TERMS_SIZE,
-        TEST_OPTIONAL_TERMS_SIZE,
-        createTestTerms(),
+// fail case
+fun createTestZerosSummaryTermsResponse() =
+    SummaryTermsResponse.from(
+        0,
+        0,
+        0,
+        emptyList(),
     )

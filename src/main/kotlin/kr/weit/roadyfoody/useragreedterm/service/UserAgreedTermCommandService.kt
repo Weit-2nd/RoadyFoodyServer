@@ -13,9 +13,9 @@ class UserAgreedTermCommandService(
 ) {
     fun storeUserAgreedTerms(
         user: User,
-        termIds: List<Long>,
+        termIdSet: Set<Long>,
     ) {
-        val terms = termRepository.findAllByIdIn(termIds)
+        val terms = termRepository.findAllByIdIn(termIdSet)
         val userAgreedTerms =
             terms.map { term ->
                 UserAgreedTerm(user = user, term = term)
