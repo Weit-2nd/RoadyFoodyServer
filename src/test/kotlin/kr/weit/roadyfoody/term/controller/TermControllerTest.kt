@@ -8,12 +8,10 @@ import kr.weit.roadyfoody.common.exception.ErrorResponse
 import kr.weit.roadyfoody.global.jsonmapper.ObjectMapperProvider
 import kr.weit.roadyfoody.support.annotation.ControllerTest
 import kr.weit.roadyfoody.term.exception.TermNotFoundException
-import kr.weit.roadyfoody.term.exception.TermNotFoundException.Companion.getTermNotFoundMessage
 import kr.weit.roadyfoody.term.fixture.TEST_NONEXISTENT_TERM_ID
 import kr.weit.roadyfoody.term.fixture.createTestDetailedTermResponse
-import kr.weit.roadyfoody.term.fixture.createTestDetailedTermsResponse
 import kr.weit.roadyfoody.term.fixture.createTestSummaryTermsResponse
-import kr.weit.roadyfoody.term.fixture.createTestTermIds
+import kr.weit.roadyfoody.term.fixture.createTestTermIdSet
 import kr.weit.roadyfoody.term.presentation.api.TermController
 import kr.weit.roadyfoody.term.service.TermQueryService
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -48,44 +46,27 @@ class TermControllerTest(
             }
         }
 
-        given("GET $requestPath 테스트") {
-            `when`("정상적인 요청을 보내면") {
-                every { termQueryService.getAllDetailedTerms() } returns createTestDetailedTermsResponse()
-                then("200 상태번호와 DetailedTermsResponse 를 반환한다.") {
-                    mockMvc
-                        .perform(get(requestPath))
-                        .andExpect(status().isOk)
-                        .andExpect(
-                            content().json(
-                                objectMapperProvider.objectMapper.writeValueAsString(createTestDetailedTermsResponse()),
-                            ),
-                        )
-                    verify { termQueryService.getAllDetailedTerms() }
-                }
-            }
-        }
-
         given("GET $requestPath/{termId} 테스트") {
             `when`("정상적인 요청을 보내면") {
-                every { termQueryService.getDetailedTerm(createTestTermIds().first()) } returns
-                    createTestDetailedTermResponse(createTestTermIds().first())
+                every { termQueryService.getDetailedTerm(createTestTermIdSet().first()) } returns
+                    createTestDetailedTermResponse(createTestTermIdSet().first())
                 then("200 상태번호와 DetailedTermResponse 를 반환한다.") {
                     mockMvc
-                        .perform(get("$requestPath/${createTestTermIds().first()}"))
+                        .perform(get("$requestPath/${createTestTermIdSet().first()}"))
                         .andExpect(status().isOk)
                         .andExpect(
                             content().json(
                                 objectMapperProvider.objectMapper.writeValueAsString(
-                                    createTestDetailedTermResponse(createTestTermIds().first()),
+                                    createTestDetailedTermResponse(createTestTermIdSet().first()),
                                 ),
                             ),
                         )
-                    verify { termQueryService.getDetailedTerm(createTestTermIds().first()) }
+                    verify { termQueryService.getDetailedTerm(createTestTermIdSet().first()) }
                 }
             }
 
             `when`("존재하지 않는 termId 를 보내면") {
-                val termNotFoundEx = TermNotFoundException(getTermNotFoundMessage(TEST_NONEXISTENT_TERM_ID))
+                val termNotFoundEx = TermNotFoundException(TEST_NONEXISTENT_TERM_ID)
                 every { termQueryService.getDetailedTerm(TEST_NONEXISTENT_TERM_ID) } throws termNotFoundEx
                 then("${termNotFoundEx.errorCode.httpStatus.value()} 응답을 반환한다.") {
                     mockMvc
