@@ -7,19 +7,33 @@ import org.springframework.web.service.annotation.GetExchange
 
 @ClientInterface
 interface TourismClientInterface {
-    // /searchKeyword1?serviceKey=RNWgs15JIYmz1aIBG4bJLG2Uu2VcZ7bdR34dbxah1cpG+pJrx3wQJyoMJmi29LNRQxO8Ac3pCgjDX3QOCBpXrw==&MobileApp=AppTest&MobileOS=ETC&pageNo=1&numOfRows=10&listYN=Y&&arrange=A&contentTypeId=15&keyword=강원
     @GetExchange(
         "/searchKeyword1?" +
             "serviceKey={SERVICE_KEY}" +
-            "&MobileApp={MOBILE_APP}&MobileOS={MOBILE_OS}&pageNo={PAGE_NO}&numOfRows={NUM_OF_ROWS}&listYN=Y" +
-            "&&arrange=A&contentTypeId=15&keyword={KEYWORD}&_type=json",
+            "&MobileApp={MOBILE_APP}&MobileOS={MOBILE_OS}&pageNo=1&numOfRows={NUM_OF_ROWS}&listYN=Y" +
+            "&&arrange=A&contentTypeId={CONTENT_TYPE_ID}&keyword={KEYWORD}&_type=json",
     )
     fun searchTourismKeyword(
         @PathVariable(name = "SERVICE_KEY") serviceKey: String,
         @PathVariable(name = "MOBILE_APP") mobileApp: String,
         @PathVariable(name = "MOBILE_OS") mobileOs: String,
-        @PathVariable(name = "PAGE_NO") pageNo: Int,
         @PathVariable(name = "NUM_OF_ROWS") numOfRows: Int,
         @PathVariable(name = "KEYWORD") keyword: String,
+        @PathVariable(name = "CONTENT_TYPE_ID") contentTypeId: Int = 15,
     ): ResponseWrapper
+
+    @GetExchange(
+        "/searchKeyword1?" +
+            "serviceKey={SERVICE_KEY}" +
+            "&MobileApp={MOBILE_APP}&MobileOS={MOBILE_OS}&pageNo=1&numOfRows={NUM_OF_ROWS}&listYN=Y" +
+            "&&arrange=A&contentTypeId={CONTENT_TYPE_ID}&keyword={KEYWORD}&_type=json",
+    )
+    fun searchTourismKeywordTemp(
+        @PathVariable(name = "SERVICE_KEY") serviceKey: String,
+        @PathVariable(name = "MOBILE_APP") mobileApp: String,
+        @PathVariable(name = "MOBILE_OS") mobileOs: String,
+        @PathVariable(name = "NUM_OF_ROWS") numOfRows: Int,
+        @PathVariable(name = "KEYWORD") keyword: String,
+        @PathVariable(name = "CONTENT_TYPE_ID") contentTypeId: Int = 15,
+    ): String
 }

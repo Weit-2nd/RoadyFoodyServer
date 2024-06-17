@@ -5,6 +5,7 @@ import kr.weit.roadyfoody.test.application.client.TestClientInterface
 import kr.weit.roadyfoody.tourism.presentation.client.TourismClientInterface
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.web.client.ClientHttpRequestFactories
 import org.springframework.boot.web.client.ClientHttpRequestFactorySettings
 import org.springframework.context.annotation.Bean
@@ -15,7 +16,9 @@ import org.springframework.web.client.RestClient
 import org.springframework.web.client.support.RestClientAdapter
 import org.springframework.web.service.invoker.HttpServiceProxyFactory
 import org.springframework.web.util.DefaultUriBuilderFactory
+import java.net.http.HttpClient
 import java.time.Duration
+import java.util.concurrent.Executors
 
 @Configuration
 class RestClientConfig {
@@ -28,44 +31,55 @@ class RestClientConfig {
 
     private val log: Logger = LoggerFactory.getLogger(RestClientConfig::class.java)
 
+    @Value("\${spring.threads.virtual.enabled}")
+    private val virtualThreadEnabled: Boolean = false
+
     @Bean
     fun testClientInterface(): TestClientInterface {
-        return creatClient(TEST_URL, TestClientInterface::class.java)
+        return createClient(TEST_URL, TestClientInterface::class.java)
     }
 
     @Bean
     fun tourismClientInterface(): TourismClientInterface {
-        return creatClient(TOURISM_URL, TourismClientInterface::class.java)
+        return createClient(TOURISM_URL, TourismClientInterface::class.java)
     }
 
-    private fun <T> creatClient(
+    private fun <T> createClient(
         baseUrl: String,
         clientClass: Class<T>,
     ): T {
-        // Todo. 가상 쓰레드를 사용하기 위해 API 비동기화를 위한 설정 추가 필요
-        val restClient =
+        val restClientBuilder =
             RestClient.builder()
                 .uriBuilderFactory(defaultUriBuilderFactory(baseUrl))
-                .requestFactory(clientHttpRequestFactory())
-                .requestInterceptor(RetryClientHttpRequestInterceptor())
-                .defaultStatusHandler(
-                    HttpStatusCode::is4xxClientError,
-                ) { _, response ->
-                    log.error("Client Error Code={}", response.statusCode)
-                    log.error("Client Error Message={}", String(response.body.readAllBytes()))
 
-                    throw RestClientException()
-                }
-                .defaultStatusHandler(
-                    HttpStatusCode::is5xxServerError,
-                ) { _, response ->
-                    log.error("Server Error Code={}", response.statusCode)
-                    log.error("Server Error Message={}", String(response.body.readAllBytes()))
+        log.info("virtualThreadEnabled={}", virtualThreadEnabled)
 
-                    throw RestClientException()
-                }
-                .build()
+        if (virtualThreadEnabled) {
+            restClientBuilder.requestFactory(
+                JdkClientHttpRequestFactory(
+                    HttpClient.newBuilder()
+                        .executor(Executors.newVirtualThreadPerTaskExecutor())
+                        .build(),
+                ),
+            )
+        }
 
+        restClientBuilder
+            .requestInterceptor(RetryClientHttpRequestInterceptor())
+            .requestFactory(clientHttpRequestFactory())
+            .defaultStatusHandler(HttpStatusCode::is4xxClientError) { _, response ->
+                log.error("Client Error Code={}", response.statusCode)
+                log.error("Client Error Message={}", String(response.body.readAllBytes()))
+                throw RestClientException()
+            }
+            .defaultStatusHandler(HttpStatusCode::is5xxServerError) { _, response ->
+                log.error("Server Error Code={}", response.statusCode)
+                log.error("Server Error Message={}", String(response.body.readAllBytes()))
+                throw RestClientException()
+            }
+            .build()
+
+        val restClient = restClientBuilder.build()
         val adapter = RestClientAdapter.create(restClient)
         val factory = HttpServiceProxyFactory.builderFor(adapter).build()
 
@@ -73,22 +87,22 @@ class RestClientConfig {
     }
 
     private fun clientHttpRequestFactory(): JdkClientHttpRequestFactory {
-        val requestSettings: ClientHttpRequestFactorySettings =
+        val requestSettings =
             ClientHttpRequestFactorySettings.DEFAULTS
                 .withConnectTimeout(Duration.ofSeconds(CONNECT_TIME))
                 .withReadTimeout(Duration.ofSeconds(READ_TIME))
-        val jdkClientHttpRequestFactory: JdkClientHttpRequestFactory =
-            ClientHttpRequestFactories.get(
-                JdkClientHttpRequestFactory::class.java,
-                requestSettings,
+
+        return ClientHttpRequestFactories.get(JdkClientHttpRequestFactory::class.java, requestSettings)
+            ?: JdkClientHttpRequestFactory(
+                HttpClient.newBuilder()
+                    .executor(Executors.newVirtualThreadPerTaskExecutor())
+                    .build(),
             )
-        return jdkClientHttpRequestFactory
     }
 
     private fun defaultUriBuilderFactory(baseUrl: String): DefaultUriBuilderFactory {
-        val uriBuilderFactory =
-            DefaultUriBuilderFactory(baseUrl)
-        uriBuilderFactory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.NONE)
-        return uriBuilderFactory
+        return DefaultUriBuilderFactory(baseUrl).apply {
+            setEncodingMode(DefaultUriBuilderFactory.EncodingMode.NONE)
+        }
     }
 }
