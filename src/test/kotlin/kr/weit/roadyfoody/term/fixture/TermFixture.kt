@@ -1,7 +1,6 @@
 package kr.weit.roadyfoody.term.fixture
 
 import kr.weit.roadyfoody.term.domain.Term
-import kr.weit.roadyfoody.term.service.RequiredAndOptionalSizes
 
 const val TEST_TERM_PREFIX = "테스트 약관"
 
@@ -37,23 +36,13 @@ fun createTestOptionalTerms() =
     }
 
 // All Terms
-const val TEST_TERMS_SIZE = TEST_REQUIRED_TERMS_SIZE + TEST_OPTIONAL_TERMS_SIZE
-
 fun createTestTerms() = createTestRequiredTerms() + createTestOptionalTerms()
 
 fun createTestTermIdSet() = createTestTerms().map { it.id }.toSet()
-
-fun createTestRequiredAndOptionalSizes() =
-    RequiredAndOptionalSizes(
-        TEST_REQUIRED_TERMS_SIZE,
-        TEST_OPTIONAL_TERMS_SIZE,
-    )
-
-fun createTestZerosRequiredAndOptionalSizes() = RequiredAndOptionalSizes(0, 0)
 
 private fun coverContentHtmlTag(content: String) = """<!DOCTYPE html><html lang="ko">$content</html>"""
 
 // Fail Case
 const val TEST_NONEXISTENT_TERM_ID = 0L
 
-fun createTestNotEnoughRequiredTermIdSet() = createTestRequiredTerms().run { this.subList(0, this.size - 1) }.map { it.id }.toSet()
+fun createTestNotEnoughRequiredTermIdSet() = createTestRequiredTerms().dropLast(1).map { it.id }.toSet()
