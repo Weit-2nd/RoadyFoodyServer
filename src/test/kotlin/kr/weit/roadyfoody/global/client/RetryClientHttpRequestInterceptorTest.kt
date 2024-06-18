@@ -52,7 +52,7 @@ class RetryClientHttpRequestInterceptorTest : BehaviorSpec({
             val retryableResponse = MockClientHttpResponse(ByteArray(0), HttpStatus.TOO_MANY_REQUESTS)
             every { execution.execute(request, body) } returns retryableResponse
 
-            then("세 번째 시도에서 실패하면 RetriesExceededException을 던진���.") {
+            then("세 번째 시도에서 실패하면 RetriesExceededException 던진다") {
                 val exception =
                     shouldThrow<RetriesExceededException> {
                         interceptor.intercept(request, body, execution)
