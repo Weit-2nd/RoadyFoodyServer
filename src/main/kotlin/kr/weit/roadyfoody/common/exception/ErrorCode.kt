@@ -11,6 +11,8 @@ enum class ErrorCode(val httpStatus: HttpStatus, val code: Int, val errorMessage
     EXIST_RESOURCE(HttpStatus.CONFLICT, -10005, "Exist resource"),
     NOT_FOUND_DEFAULT_RESOURCE(HttpStatus.INTERNAL_SERVER_ERROR, -10007, "Not found default resource"),
     PAYLOAD_TOO_LARGE(HttpStatus.PAYLOAD_TOO_LARGE, -10008, "Payload too large"),
+    NOT_FOUND_USER(HttpStatus.NOT_FOUND, -10009, "Not found user"),
+    NOT_FOUND_TERM(HttpStatus.NOT_FOUND, -10010, "Not found term"),
 
     // external API error 11000대
 
