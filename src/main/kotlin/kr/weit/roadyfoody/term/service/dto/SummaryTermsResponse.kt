@@ -10,7 +10,7 @@ data class SummaryTermsResponse(
 ) {
     companion object {
         fun from(terms: List<Term>): SummaryTermsResponse {
-            val requiredTermsSize = terms.map { it.required }.count()
+            val requiredTermsSize = terms.count { it.required }
             return SummaryTermsResponse(
                 terms.size,
                 requiredTermsSize,
