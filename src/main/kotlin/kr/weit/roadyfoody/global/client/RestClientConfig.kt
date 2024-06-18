@@ -1,7 +1,6 @@
 package kr.weit.roadyfoody.global.client
 
 import kr.weit.roadyfoody.common.exception.RestClientException
-import kr.weit.roadyfoody.test.application.client.TestClientInterface
 import kr.weit.roadyfoody.tourism.presentation.client.TourismClientInterface
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -25,7 +24,6 @@ class RestClientConfig {
     companion object {
         private const val CONNECT_TIME = 1L
         private const val READ_TIME = 5L
-        private const val TEST_URL = "https://jsonplaceholder.typicode.com"
         private const val TOURISM_URL = "http://apis.data.go.kr/B551011/KorService1"
     }
 
@@ -33,11 +31,6 @@ class RestClientConfig {
 
     @Value("\${spring.threads.virtual.enabled}")
     private val virtualThreadEnabled: Boolean = false
-
-    @Bean
-    fun testClientInterface(): TestClientInterface {
-        return createClient(TEST_URL, TestClientInterface::class.java)
-    }
 
     @Bean
     fun tourismClientInterface(): TourismClientInterface {
