@@ -9,7 +9,6 @@ data class DetailedTermResponse(
     val content: String,
 ) {
     companion object {
-        @JvmStatic
         fun from(term: Term): DetailedTermResponse =
             DetailedTermResponse(
                 term.id,

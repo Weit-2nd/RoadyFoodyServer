@@ -29,19 +29,19 @@ class TermControllerTest(
 ) : BehaviorSpec({
         val requestPath = "/api/v1/terms"
 
-        given("GET $requestPath/summary 테스트") {
+        given("GET $requestPath 테스트") {
             `when`("정상적인 요청을 보내면") {
                 every { termQueryService.getAllSummaryTerms() } returns createTestSummaryTermsResponse()
                 then("200 상태번호와 SummaryTermsResponse 를 반환한다.") {
                     mockMvc
-                        .perform(get("$requestPath/summary"))
+                        .perform(get(requestPath))
                         .andExpect(status().isOk)
                         .andExpect(
                             content().json(
                                 objectMapperProvider.objectMapper.writeValueAsString(createTestSummaryTermsResponse()),
                             ),
                         )
-                    verify { termQueryService.getAllSummaryTerms() }
+                    verify(exactly = 1) { termQueryService.getAllSummaryTerms() }
                 }
             }
         }
@@ -61,7 +61,7 @@ class TermControllerTest(
                                 ),
                             ),
                         )
-                    verify { termQueryService.getDetailedTerm(createTestTermIdSet().first()) }
+                    verify(exactly = 1) { termQueryService.getDetailedTerm(createTestTermIdSet().first()) }
                 }
             }
 
@@ -79,7 +79,7 @@ class TermControllerTest(
                                 ),
                             ),
                         )
-                    verify { termQueryService.getDetailedTerm(TEST_NONEXISTENT_TERM_ID) }
+                    verify(exactly = 1) { termQueryService.getDetailedTerm(TEST_NONEXISTENT_TERM_ID) }
                 }
             }
         }

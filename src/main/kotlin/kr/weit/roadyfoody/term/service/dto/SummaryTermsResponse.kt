@@ -9,18 +9,15 @@ data class SummaryTermsResponse(
     val terms: List<SummaryTermResponse>,
 ) {
     companion object {
-        fun from(
-            allTermsSize: Int,
-            requiredTermsSize: Int,
-            optionalTermsSize: Int,
-            terms: List<Term>,
-        ): SummaryTermsResponse =
-            SummaryTermsResponse(
-                allTermsSize,
+        fun from(terms: List<Term>): SummaryTermsResponse {
+            val requiredTermsSize = terms.map { it.required }.count()
+            return SummaryTermsResponse(
+                terms.size,
                 requiredTermsSize,
-                optionalTermsSize,
+                terms.size - requiredTermsSize,
                 terms.map { SummaryTermResponse.from(it) },
             )
+        }
     }
 }
 
