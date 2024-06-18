@@ -12,16 +12,14 @@ import org.springframework.stereotype.Service
 import org.yaml.snakeyaml.util.UriEncoder
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 
 @Service
 class TourismService(
     private val tourismProperties: TourismProperties,
     private val tourismClientInterface: TourismClientInterface,
+    private val executor: ExecutorService,
 ) {
     private val log: Logger = LoggerFactory.getLogger(TourismService::class.java)
-
-    private val executor: ExecutorService = Executors.newVirtualThreadPerTaskExecutor()
 
     fun searchTourism(
         numOfRows: Int,

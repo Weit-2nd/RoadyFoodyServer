@@ -7,6 +7,7 @@ import io.mockk.mockk
 import kr.weit.roadyfoody.tourism.config.TourismProperties
 import kr.weit.roadyfoody.tourism.fixture.TourismFixture
 import kr.weit.roadyfoody.tourism.presentation.client.TourismClientInterface
+import java.util.concurrent.ExecutorService
 
 private const val TOURISM_CONTENT_ID = 12
 
@@ -28,10 +29,14 @@ class TourismServiceTest :
             )
 
         val tourismClientInterface = mockk<TourismClientInterface>()
+        val executor = mockk<ExecutorService>()
 
-        val tourismService = TourismService(tourismProperties, tourismClientInterface)
+        val tourismService = TourismService(tourismProperties, tourismClientInterface, executor)
 
         given("searchTourism 테스트") {
+            every { executor.execute(any()) } answers {
+                firstArg<Runnable>().run()
+            }
             `when`("관광지와 행사의 검색 결과가 10을 넘는 경우") {
 
                 val tourResponseWrapper = TourismFixture.loadTourResponseSize10()
@@ -110,7 +115,7 @@ class TourismServiceTest :
 
                 val searchResponses = tourismService.searchTourism(TEN, "keyword")
 
-                then("관광지와 행사의 검색 결과를 랜덤하게 반환한다.") {
+                then("관광지와 행사의 검색 결과를 그대로 반환한다.") {
                     searchResponses.items.size shouldBe FOUR
                     val expectedTitles =
                         listOf(
