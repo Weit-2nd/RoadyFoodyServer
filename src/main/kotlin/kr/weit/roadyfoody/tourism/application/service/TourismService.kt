@@ -6,12 +6,14 @@ import kr.weit.roadyfoody.tourism.dto.SearchResponse
 import kr.weit.roadyfoody.tourism.dto.SearchResponses
 import kr.weit.roadyfoody.tourism.dto.TourismType
 import kr.weit.roadyfoody.tourism.presentation.client.TourismClientInterface
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.yaml.snakeyaml.util.UriEncoder
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutorService
+
+private const val TOUR_CONTENT_ID = 12
+
+private const val FESTIVAL_CONTENT_ID = 15
 
 @Service
 class TourismService(
@@ -19,8 +21,6 @@ class TourismService(
     private val tourismClientInterface: TourismClientInterface,
     private val executor: ExecutorService,
 ) {
-    private val log: Logger = LoggerFactory.getLogger(TourismService::class.java)
-
     fun searchTourism(
         numOfRows: Int,
         keyword: String,
@@ -37,7 +37,7 @@ class TourismService(
                         tourismProperties.mobileOs,
                         numOfRows,
                         encodedKeyword,
-                        12,
+                        TOUR_CONTENT_ID,
                     )
                 },
                 executor,
@@ -52,7 +52,7 @@ class TourismService(
                         tourismProperties.mobileOs,
                         numOfRows,
                         encodedKeyword,
-                        15,
+                        FESTIVAL_CONTENT_ID,
                     )
                 },
                 executor,
@@ -70,7 +70,7 @@ class TourismService(
     ): SearchResponses {
         val filteredTourItems =
             tourResponse.response.body.items.item.filter {
-                it.mapX != null && it.mapX != null
+                it.mapX != null && it.mapY != null
             }.map {
                 SearchResponse(
                     title = it.title,
