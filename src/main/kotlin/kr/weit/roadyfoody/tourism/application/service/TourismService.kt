@@ -29,7 +29,6 @@ class TourismService(
     ): SearchResponses {
         val encodedKeyword: String = UriEncoder.encode(keyword)
         val encodedServiceKey: String = UriEncoder.encode(tourismProperties.apiKey)
-        var start = System.currentTimeMillis()
 
         val tourResponse =
             CompletableFuture.supplyAsync(
@@ -62,8 +61,6 @@ class TourismService(
             )
 
         CompletableFuture.allOf(tourResponse, festivalResponse).join()
-        var end = System.currentTimeMillis()
-        log.info("Time : {} ms", end - start)
 
         return mergeResponses(tourResponse.get(), festivalResponse.get(), numOfRows)
     }
