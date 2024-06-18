@@ -31,7 +31,7 @@ class TourismService(
         val encodedServiceKey: String = UriEncoder.encode(tourismProperties.apiKey)
         var start = System.currentTimeMillis()
 
-        var tourResponse =
+        val tourResponse =
             CompletableFuture.supplyAsync(
                 {
                     tourismClientInterface.searchTourismKeyword(
@@ -46,7 +46,7 @@ class TourismService(
                 executor,
             )
 
-        var festivalResponse =
+        val festivalResponse =
             CompletableFuture.supplyAsync(
                 {
                     tourismClientInterface.searchTourismKeyword(
@@ -60,6 +60,8 @@ class TourismService(
                 },
                 executor,
             )
+
+        CompletableFuture.allOf(tourResponse, festivalResponse).join()
         var end = System.currentTimeMillis()
         log.info("Time : {} ms", end - start)
 
