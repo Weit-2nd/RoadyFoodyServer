@@ -1,6 +1,7 @@
 package kr.weit.roadyfoody.tourism.application.service
 
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -159,7 +160,7 @@ class TourismServiceTest :
                 val searchResponses = tourismService.searchTourism(TEN, "keyword")
 
                 then("빈 리스트를 반환한다.") {
-                    searchResponses.items.size shouldBe ZERO
+                    searchResponses.items.shouldBeEmpty()
                 }
             }
         }
