@@ -76,13 +76,13 @@ class TourismService(
             }.map {
                 SearchResponse(
                     title = it.title,
-                    addr1 = it.addr1,
-                    addr2 = it.addr2,
-                    mapX = it.mapX!!,
-                    mapY = it.mapY!!,
+                    mainAddr = it.addr1,
+                    secondaryAddr = it.addr2,
+                    longitude = it.mapX!!,
+                    latitude = it.mapY!!,
                     tel = it.tel,
-                    firstImage2 = it.firstImage2,
-                    type = TourismType.TOUR,
+                    thumbnailImage = it.firstImage2,
+                    tourismType = TourismType.TOUR,
                 )
             }
 
@@ -92,13 +92,13 @@ class TourismService(
             }.map {
                 SearchResponse(
                     title = it.title,
-                    addr1 = it.addr1,
-                    addr2 = it.addr2,
-                    mapX = it.mapX!!,
-                    mapY = it.mapY!!,
+                    mainAddr = it.addr1,
+                    secondaryAddr = it.addr2,
+                    longitude = it.mapX!!,
+                    latitude = it.mapY!!,
                     tel = it.tel,
-                    firstImage2 = it.firstImage2,
-                    type = TourismType.FESTIVAL,
+                    thumbnailImage = it.firstImage2,
+                    tourismType = TourismType.FESTIVAL,
                 )
             }
 
