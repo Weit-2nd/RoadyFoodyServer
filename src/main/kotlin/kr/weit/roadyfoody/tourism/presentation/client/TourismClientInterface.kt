@@ -2,23 +2,22 @@ package kr.weit.roadyfoody.tourism.presentation.client
 
 import kr.weit.roadyfoody.common.annotation.ClientInterface
 import kr.weit.roadyfoody.tourism.dto.ResponseWrapper
-import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.service.annotation.GetExchange
 
 @ClientInterface
 interface TourismClientInterface {
-    @GetExchange(
-        "/searchKeyword1?" +
-            "serviceKey={SERVICE_KEY}" +
-            "&MobileApp={MOBILE_APP}&MobileOS={MOBILE_OS}&pageNo=1&numOfRows={NUM_OF_ROWS}&listYN=Y" +
-            "&&arrange=C&contentTypeId={CONTENT_TYPE_ID}&keyword={KEYWORD}&_type=json",
-    )
+    @GetExchange("/searchKeyword1")
     fun searchTourismKeyword(
-        @PathVariable(name = "SERVICE_KEY") serviceKey: String,
-        @PathVariable(name = "MOBILE_APP") mobileApp: String,
-        @PathVariable(name = "MOBILE_OS") mobileOs: String,
-        @PathVariable(name = "NUM_OF_ROWS") numOfRows: Int,
-        @PathVariable(name = "KEYWORD") keyword: String,
-        @PathVariable(name = "CONTENT_TYPE_ID") contentTypeId: Int = 15,
+        @RequestParam(name = "serviceKey") serviceKey: String,
+        @RequestParam(name = "MobileApp") mobileApp: String,
+        @RequestParam(name = "MobileOS") mobileOs: String,
+        @RequestParam(name = "numOfRows") numOfRows: Int,
+        @RequestParam(name = "keyword") keyword: String,
+        @RequestParam(name = "contentTypeId") contentTypeId: Int = 15,
+        @RequestParam(name = "_type") type: String = "json",
+        @RequestParam(name = "pageNo") pageNo: Int = 1,
+        @RequestParam(name = "listYN") listYN: String = "Y",
+        @RequestParam(name = "arrange") arrange: String = "C",
     ): ResponseWrapper
 }

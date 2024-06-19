@@ -4,11 +4,9 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonNode
-import java.io.IOException
 
 // Items 빈 문자열 처리
 class ItemsDeserializer : JsonDeserializer<Items>() {
-    @Throws(IOException::class)
     override fun deserialize(
         p: JsonParser,
         ctxt: DeserializationContext,

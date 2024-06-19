@@ -19,11 +19,4 @@ class ThreadConfig {
         log.info("Create virtual executor")
         return Executors.newVirtualThreadPerTaskExecutor()
     }
-
-    @Bean
-    @ConditionalOnThreading(Threading.PLATFORM)
-    fun platformThreadExecutor(): ExecutorService {
-        log.info("Create platform executor")
-        return Executors.newFixedThreadPool(100)
-    }
 }

@@ -1,16 +1,14 @@
 package kr.weit.roadyfoody.tourism.application.service
 
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import kr.weit.roadyfoody.tourism.config.TourismProperties
 import kr.weit.roadyfoody.tourism.fixture.TourismFixture
 import kr.weit.roadyfoody.tourism.presentation.client.TourismClientInterface
-
-private const val TOURISM_CONTENT_ID = 12
-
-private const val FESTIVAL_CONTENT_ID = 15
+import java.util.concurrent.ExecutorService
 
 private const val TEN = 10
 
@@ -28,10 +26,14 @@ class TourismServiceTest :
             )
 
         val tourismClientInterface = mockk<TourismClientInterface>()
+        val executor = mockk<ExecutorService>()
 
-        val tourismService = TourismService(tourismProperties, tourismClientInterface)
+        val tourismService = TourismService(tourismProperties, tourismClientInterface, executor)
 
         given("searchTourism 테스트") {
+            every { executor.execute(any()) } answers {
+                firstArg<Runnable>().run()
+            }
             `when`("관광지와 행사의 검색 결과가 10을 넘는 경우") {
 
                 val tourResponseWrapper = TourismFixture.loadTourResponseSize10()
@@ -44,7 +46,7 @@ class TourismServiceTest :
                         tourismProperties.mobileOs,
                         TEN,
                         "keyword",
-                        TOURISM_CONTENT_ID,
+                        TOUR_CONTENT_ID,
                     )
                 } returns tourResponseWrapper
 
@@ -93,7 +95,7 @@ class TourismServiceTest :
                         tourismProperties.mobileOs,
                         TEN,
                         "keyword",
-                        TOURISM_CONTENT_ID,
+                        TOUR_CONTENT_ID,
                     )
                 } returns tourResponseWrapper
 
@@ -110,7 +112,7 @@ class TourismServiceTest :
 
                 val searchResponses = tourismService.searchTourism(TEN, "keyword")
 
-                then("관광지와 행사의 검색 결과를 랜덤하게 반환한다.") {
+                then("관광지와 행사의 검색 결과를 그대로 반환한다.") {
                     searchResponses.items.size shouldBe FOUR
                     val expectedTitles =
                         listOf(
@@ -136,7 +138,7 @@ class TourismServiceTest :
                         tourismProperties.mobileOs,
                         TEN,
                         "keyword",
-                        TOURISM_CONTENT_ID,
+                        TOUR_CONTENT_ID,
                     )
                 } returns tourResponseWrapper
 
@@ -154,7 +156,7 @@ class TourismServiceTest :
                 val searchResponses = tourismService.searchTourism(TEN, "keyword")
 
                 then("빈 리스트를 반환한다.") {
-                    searchResponses.items.size shouldBe ZERO
+                    searchResponses.items.shouldBeEmpty()
                 }
             }
         }

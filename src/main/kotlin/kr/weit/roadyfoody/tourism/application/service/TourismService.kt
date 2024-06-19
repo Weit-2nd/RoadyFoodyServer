@@ -6,30 +6,27 @@ import kr.weit.roadyfoody.tourism.dto.SearchResponse
 import kr.weit.roadyfoody.tourism.dto.SearchResponses
 import kr.weit.roadyfoody.tourism.dto.TourismType
 import kr.weit.roadyfoody.tourism.presentation.client.TourismClientInterface
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.yaml.snakeyaml.util.UriEncoder
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+
+const val TOUR_CONTENT_ID = 12
+
+const val FESTIVAL_CONTENT_ID = 15
 
 @Service
 class TourismService(
     private val tourismProperties: TourismProperties,
     private val tourismClientInterface: TourismClientInterface,
+    private val executor: ExecutorService,
 ) {
-    private val log: Logger = LoggerFactory.getLogger(TourismService::class.java)
-
-    private val executor: ExecutorService = Executors.newVirtualThreadPerTaskExecutor()
-
     fun searchTourism(
         numOfRows: Int,
         keyword: String,
     ): SearchResponses {
         val encodedKeyword: String = UriEncoder.encode(keyword)
         val encodedServiceKey: String = UriEncoder.encode(tourismProperties.apiKey)
-        var start = System.currentTimeMillis()
 
         val tourResponse =
             CompletableFuture.supplyAsync(
@@ -40,7 +37,7 @@ class TourismService(
                         tourismProperties.mobileOs,
                         numOfRows,
                         encodedKeyword,
-                        12,
+                        TOUR_CONTENT_ID,
                     )
                 },
                 executor,
@@ -55,15 +52,13 @@ class TourismService(
                         tourismProperties.mobileOs,
                         numOfRows,
                         encodedKeyword,
-                        15,
+                        FESTIVAL_CONTENT_ID,
                     )
                 },
                 executor,
             )
 
         CompletableFuture.allOf(tourResponse, festivalResponse).join()
-        var end = System.currentTimeMillis()
-        log.info("Time : {} ms", end - start)
 
         return mergeResponses(tourResponse.get(), festivalResponse.get(), numOfRows)
     }
@@ -75,17 +70,17 @@ class TourismService(
     ): SearchResponses {
         val filteredTourItems =
             tourResponse.response.body.items.item.filter {
-                it.mapX != null && it.mapX != null
+                it.mapX != null && it.mapY != null
             }.map {
                 SearchResponse(
                     title = it.title,
-                    addr1 = it.addr1,
-                    addr2 = it.addr2,
-                    mapX = it.mapX!!,
-                    mapY = it.mapY!!,
+                    mainAddr = it.addr1,
+                    secondaryAddr = it.addr2,
+                    longitude = it.mapX!!,
+                    latitude = it.mapY!!,
                     tel = it.tel,
-                    firstImage2 = it.firstImage2,
-                    type = TourismType.TOUR,
+                    thumbnailImage = it.firstImage2,
+                    tourismType = TourismType.TOUR,
                 )
             }
 
@@ -95,13 +90,13 @@ class TourismService(
             }.map {
                 SearchResponse(
                     title = it.title,
-                    addr1 = it.addr1,
-                    addr2 = it.addr2,
-                    mapX = it.mapX!!,
-                    mapY = it.mapY!!,
+                    mainAddr = it.addr1,
+                    secondaryAddr = it.addr2,
+                    longitude = it.mapX!!,
+                    latitude = it.mapY!!,
                     tel = it.tel,
-                    firstImage2 = it.firstImage2,
-                    type = TourismType.FESTIVAL,
+                    thumbnailImage = it.firstImage2,
+                    tourismType = TourismType.FESTIVAL,
                 )
             }
 
