@@ -23,7 +23,7 @@ class FoodSpots(
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "FOOD_SPOTS_SEQ_GENERATOR")
     val id: Long = 0L,
-    @Column(length = 20, nullable = false)
+    @Column(length = 60, nullable = false)
     var name: String,
     @Column(nullable = false, updatable = false)
     val foodTruck: Boolean,
