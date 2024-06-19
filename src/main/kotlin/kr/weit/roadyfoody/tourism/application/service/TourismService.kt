@@ -11,9 +11,9 @@ import org.yaml.snakeyaml.util.UriEncoder
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutorService
 
-private const val TOUR_CONTENT_ID = 12
+const val TOUR_CONTENT_ID = 12
 
-private const val FESTIVAL_CONTENT_ID = 15
+const val FESTIVAL_CONTENT_ID = 15
 
 @Service
 class TourismService(

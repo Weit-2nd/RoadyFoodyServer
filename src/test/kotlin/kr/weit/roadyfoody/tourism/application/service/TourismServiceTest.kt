@@ -10,10 +10,6 @@ import kr.weit.roadyfoody.tourism.fixture.TourismFixture
 import kr.weit.roadyfoody.tourism.presentation.client.TourismClientInterface
 import java.util.concurrent.ExecutorService
 
-private const val TOURISM_CONTENT_ID = 12
-
-private const val FESTIVAL_CONTENT_ID = 15
-
 private const val TEN = 10
 
 private const val ZERO = 0
@@ -50,7 +46,7 @@ class TourismServiceTest :
                         tourismProperties.mobileOs,
                         TEN,
                         "keyword",
-                        TOURISM_CONTENT_ID,
+                        TOUR_CONTENT_ID,
                     )
                 } returns tourResponseWrapper
 
@@ -99,7 +95,7 @@ class TourismServiceTest :
                         tourismProperties.mobileOs,
                         TEN,
                         "keyword",
-                        TOURISM_CONTENT_ID,
+                        TOUR_CONTENT_ID,
                     )
                 } returns tourResponseWrapper
 
@@ -142,7 +138,7 @@ class TourismServiceTest :
                         tourismProperties.mobileOs,
                         TEN,
                         "keyword",
-                        TOURISM_CONTENT_ID,
+                        TOUR_CONTENT_ID,
                     )
                 } returns tourResponseWrapper
 
