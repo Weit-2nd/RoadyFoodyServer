@@ -66,8 +66,8 @@ CREATE TABLE food_spots_histories
     food_spots_id    NUMBER(19, 0),
     user_id          NUMBER(19, 0),
     name             VARCHAR2(20)  NOT NULL,
-    is_food_truck    NUMBER(1)     NOT NULL,
-    is_open          NUMBER(1)     NOT NULL,
+    food_truck       NUMBER(1)     NOT NULL,
+    open             NUMBER(1)     NOT NULL,
     store_closure    NUMBER(1)     NOT NULL,
     point            SDO_GEOMETRY  NOT NULL,
     CONSTRAINT pk_food_spots_histories PRIMARY KEY (id)

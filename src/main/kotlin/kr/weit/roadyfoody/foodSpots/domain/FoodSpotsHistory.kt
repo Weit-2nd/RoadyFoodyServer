@@ -39,9 +39,9 @@ class FoodSpotsHistory(
     @Column(nullable = false, updatable = false, length = 20)
     val name: String,
     @Column(nullable = false, updatable = false)
-    val isFoodTruck: Boolean,
+    val foodTruck: Boolean,
     @Column(nullable = false, updatable = false)
-    val isOpen: Boolean,
+    val open: Boolean,
     @Column(nullable = false, updatable = false)
     val storeClosure: Boolean,
     @Column(columnDefinition = "SDO_GEOMETRY", nullable = false, updatable = false)
