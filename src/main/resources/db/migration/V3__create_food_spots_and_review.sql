@@ -29,7 +29,7 @@ values ('FOOD_SPOTS',
                 SDO_DIM_ELEMENT('Longitude', -180, 180, 0.5),
                 SDO_DIM_ELEMENT('Latitude', -90, 90, 0.5)
         ),
-        4326);
+        4326); -- 4326은 WGS84 좌표계를 이용한다는 의미
 
 CREATE INDEX food_spots_point_index ON food_spots (point) INDEXTYPE IS MDSYS.SPATIAL_INDEX;
 
@@ -80,7 +80,7 @@ values ('FOOD_SPOTS_HISTORIES',
                 SDO_DIM_ELEMENT('Longitude', -180, 180, 0.5),
                 SDO_DIM_ELEMENT('Latitude', -90, 90, 0.5)
         ),
-        4326);
+        4326); -- 4326은 WGS84 좌표계를 이용한다는 의미
 
 CREATE INDEX food_spots_histories_point_index ON food_spots_histories (point) INDEXTYPE IS MDSYS.SPATIAL_INDEX;
 
@@ -99,7 +99,7 @@ CREATE TABLE food_spots_operation_hours
     food_spots_id    NUMBER(19, 0) NOT NULL,
     updated_datetime TIMESTAMP     NOT NULL,
     created_datetime TIMESTAMP     NOT NULL,
-    day_of_week      NUMBER(5)     NOT NULL,
+    day_of_week      NUMBER(1)     NOT NULL,
     opening_hours    VARCHAR2(5)   NOT NULL,
     closing_hours    VARCHAR2(5)   NOT NULL,
     CONSTRAINT pk_food_spots_operation_hours PRIMARY KEY (food_spots_id, day_of_week)
