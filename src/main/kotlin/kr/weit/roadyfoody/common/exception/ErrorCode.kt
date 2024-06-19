@@ -15,5 +15,7 @@ enum class ErrorCode(val httpStatus: HttpStatus, val code: Int, val errorMessage
     NOT_FOUND_TERM(HttpStatus.NOT_FOUND, -10010, "Not found term"),
 
     // external API error 11000대
-    RETRIES_EXCEEDED_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, -11000, "외부 API 호출 재시도 횟수 초과"),
+
+    REST_CLIENT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, -11000, "외부 API 호출 중 에러 발생"),
+    RETRIES_EXCEEDED_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, -11001, "외부 API 호출 재시도 횟수 초과"),
 }
