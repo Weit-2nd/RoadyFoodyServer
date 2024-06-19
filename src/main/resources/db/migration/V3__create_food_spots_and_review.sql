@@ -14,7 +14,7 @@ CREATE TABLE food_spots
     id               NUMBER(19, 0) NOT NULL,
     updated_datetime TIMESTAMP     NOT NULL,
     created_datetime TIMESTAMP     NOT NULL,
-    name             VARCHAR2(20)  NOT NULL,
+    name             VARCHAR2(60)  NOT NULL,
     food_truck       NUMBER(1)     NOT NULL,
     open             NUMBER(1)     NOT NULL,
     store_closure    NUMBER(1)     NOT NULL,
