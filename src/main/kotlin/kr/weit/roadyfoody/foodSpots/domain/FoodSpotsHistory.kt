@@ -36,12 +36,12 @@ class FoodSpotsHistory(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(updatable = false)
     val user: User,
-    @Column(nullable = false, updatable = false, length = 20)
+    @Column(nullable = false, updatable = false, length = 60)
     val name: String,
     @Column(nullable = false, updatable = false)
-    val isFoodTruck: Boolean,
+    val foodTruck: Boolean,
     @Column(nullable = false, updatable = false)
-    val isOpen: Boolean,
+    val open: Boolean,
     @Column(nullable = false, updatable = false)
     val storeClosure: Boolean,
     @Column(columnDefinition = "SDO_GEOMETRY", nullable = false, updatable = false)
