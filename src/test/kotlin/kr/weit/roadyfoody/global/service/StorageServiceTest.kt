@@ -23,16 +23,15 @@ class StorageServiceTest(
     private val redisTemplate: StringRedisTemplate,
 ) : BehaviorSpec({
         beforeSpec { s3Template.createBucket(s3Properties.bucket) }
-        afterSpec {
-            s3Template.deleteObject(s3Properties.bucket, TEST_OBJECT_NAME)
-            s3Template.deleteBucket(s3Properties.bucket)
-        }
+        afterSpec { s3Template.deleteBucket(s3Properties.bucket) }
+
         afterTest {
             s3Template.deleteObject(s3Properties.bucket, TEST_OBJECT_NAME)
         }
 
         given("파일이 존재 하지 않는 경우") {
             s3Template.objectExists(s3Properties.bucket, TEST_OBJECT_NAME).shouldBeFalse()
+
             `when`("파일을 저장하면") {
                 storageService.upload(TEST_OBJECT_NAME, Random.nextBytes(20).inputStream())
                 then("파일이 저장된다.") {
@@ -45,6 +44,7 @@ class StorageServiceTest(
                     shouldNotThrowAny { storageService.downloadUrl(TEST_OBJECT_NAME) }
                 }
             }
+
             `when`("파일을 삭제하면") {
                 then("아무런 에러가 발생하지 않는다.") {
                     shouldNotThrowAny { storageService.delete(TEST_OBJECT_NAME) }
