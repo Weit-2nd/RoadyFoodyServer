@@ -35,6 +35,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
     implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("io.awspring.cloud:spring-cloud-aws-starter-s3:3.1.1")
 
     // Kotlin
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
@@ -49,7 +50,6 @@ dependencies {
     implementation("com.linecorp.kotlin-jdsl:jpql-render:3.4.1")
     implementation("com.linecorp.kotlin-jdsl:spring-data-jpa-support:3.4.1")
     implementation("org.hibernate.orm:hibernate-spatial:6.5.2.Final")
-    implementation("com.amazonaws:aws-java-sdk-s3:1.12.747")
 
     // Secret & Config
     implementation(platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.1.1"))
