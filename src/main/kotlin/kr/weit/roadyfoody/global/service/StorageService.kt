@@ -22,7 +22,7 @@ class StorageService(
     }
 
     fun downloadUrl(key: String): String {
-        val cacheKey = OBJECT_STORAGE_CACHE_KEY + key
+        val cacheKey = getObjectStorageCacheKey(key)
         if (redisTemplate.hasKey(cacheKey)) {
             return redisTemplate.opsForValue().get(cacheKey)!!
         } else {
@@ -35,12 +35,14 @@ class StorageService(
 
     fun delete(key: String) {
         s3Template.deleteObject(s3Properties.bucket, key)
-        redisTemplate.delete(OBJECT_STORAGE_CACHE_KEY + key)
+        redisTemplate.delete(getObjectStorageCacheKey(key))
     }
 
     companion object {
         @JvmStatic
         private val CACHE_DURATION = Duration.ofDays(1)
-        const val OBJECT_STORAGE_CACHE_KEY = "rofo:object-url-cache:"
+        private const val OBJECT_STORAGE_CACHE_KEY = "rofo:object-url-cache:"
+
+        fun getObjectStorageCacheKey(key: String): String = "$OBJECT_STORAGE_CACHE_KEY$key"
     }
 }
