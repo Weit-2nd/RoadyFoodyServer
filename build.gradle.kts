@@ -48,6 +48,8 @@ dependencies {
     implementation("com.linecorp.kotlin-jdsl:jpql-dsl:3.4.1")
     implementation("com.linecorp.kotlin-jdsl:jpql-render:3.4.1")
     implementation("com.linecorp.kotlin-jdsl:spring-data-jpa-support:3.4.1")
+    implementation("org.hibernate.orm:hibernate-spatial:6.5.2.Final")
+    implementation("com.amazonaws:aws-java-sdk-s3:1.12.747")
 
     // Secret & Config
     implementation(platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.1.1"))
@@ -68,12 +70,11 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter:1.19.8")
     testImplementation("org.testcontainers:oracle-xe:1.19.8")
     testImplementation("com.redis:testcontainers-redis:2.2.2")
+    testImplementation("org.testcontainers:localstack:1.19.8")
 
     // Monitoring
     implementation("io.sentry:sentry-spring-boot-starter-jakarta:7.9.0")
     implementation("io.micrometer:micrometer-registry-prometheus:1.13.0")
-
-    implementation("org.hibernate.orm:hibernate-spatial:6.5.2.Final")
 }
 
 tasks.withType<KotlinCompile> {
