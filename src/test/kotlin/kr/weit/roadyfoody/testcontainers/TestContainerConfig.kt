@@ -8,9 +8,11 @@ import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
 import org.testcontainers.containers.GenericContainer
+import org.testcontainers.containers.localstack.LocalStackContainer
 import org.testcontainers.containers.output.Slf4jLogConsumer
 import org.testcontainers.containers.wait.strategy.Wait
 import org.testcontainers.junit.jupiter.Container
+import org.testcontainers.utility.DockerImageName
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -48,15 +50,23 @@ class TestContainersConfig {
                 withExposedPorts(6379)
                 withReuse(true)
             }
+
+        @JvmStatic
+        @Container
+        val s3Container =
+            LocalStackContainer(DockerImageName.parse("localstack/localstack:3.5.0"))
+                .withServices(LocalStackContainer.Service.S3)
     }
 
     internal class Initializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
         override fun initialize(configurableApplicationContext: ConfigurableApplicationContext) {
             // 컨테이너를 동시에 다 띄우도록 비동기로 요청을 보내고 뜰때까지 기다린다.
-            CompletableFuture.allOf(
-                CompletableFuture.runAsync { oracleContainer.start() },
-                CompletableFuture.runAsync { redisContainer.start() },
-            ).get()
+            CompletableFuture
+                .allOf(
+                    CompletableFuture.runAsync { oracleContainer.start() },
+                    CompletableFuture.runAsync { redisContainer.start() },
+                    CompletableFuture.runAsync { s3Container.start() },
+                ).get()
 
             val properties =
                 mapOf(
@@ -65,9 +75,15 @@ class TestContainersConfig {
                         "/" + ORACLE_SID,
                     "spring.datasource.username" to ORACLE_USER,
                     "spring.datasource.password" to ORACLE_PWD,
-                    "spring.sql.init.mode" to (if (isSQLInit.get()) DatabaseInitializationMode.NEVER else DatabaseInitializationMode.ALWAYS).toString(),
+                    "spring.sql.init.mode" to
+                        (if (isSQLInit.get()) DatabaseInitializationMode.NEVER else DatabaseInitializationMode.ALWAYS).toString(),
                     "spring.data.redis.host" to redisContainer.host,
                     "spring.data.redis.port" to redisContainer.getMappedPort(6379).toString(),
+                    "aws.s3.endpoint" to s3Container.endpoint.toString(),
+                    "aws.s3.region" to s3Container.region,
+                    "aws.s3.access-key" to s3Container.accessKey,
+                    "aws.s3.secret-key" to s3Container.secretKey,
+                    "aws.s3.bucket-name" to "test-bucket",
                 )
             isSQLInit.set(true)
 

@@ -4,6 +4,6 @@ import kr.weit.roadyfoody.tourism.config.TourismProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration
 
-@EnableConfigurationProperties(TourismProperties::class)
+@EnableConfigurationProperties(TourismProperties::class, S3Properties::class)
 @Configuration
 class EnablePropertiesConfig
