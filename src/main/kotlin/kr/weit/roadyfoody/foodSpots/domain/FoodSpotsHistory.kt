@@ -46,4 +46,10 @@ class FoodSpotsHistory(
     val storeClosure: Boolean,
     @Column(columnDefinition = "SDO_GEOMETRY", nullable = false, updatable = false)
     val point: Point,
-) : BaseTimeEntity()
+) : BaseTimeEntity() {
+    val writerId: Long
+        get() = user.id
+
+    val writerNickname: String
+        get() = user.nickname
+}

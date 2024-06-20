@@ -1,0 +1,114 @@
+package kr.weit.roadyfoody.foodSpots.dto
+
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Pattern
+import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
+import kr.weit.roadyfoody.foodSpots.domain.FoodSpots.Companion.SRID_WGS84
+import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
+import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_REGEX_DESC
+import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_REGEX_STR
+import kr.weit.roadyfoody.foodSpots.validator.Latitude
+import kr.weit.roadyfoody.foodSpots.validator.Longitude
+import kr.weit.roadyfoody.user.domain.User
+import org.locationtech.jts.geom.Coordinate
+import org.locationtech.jts.geom.GeometryFactory
+import java.time.LocalDateTime
+
+data class ReportRequest(
+    @field:Pattern(regexp = FOOD_SPOTS_NAME_REGEX_STR, message = FOOD_SPOTS_NAME_REGEX_DESC)
+    @field:NotBlank(message = "상호명은 필수입니다.")
+    val name: String,
+    @field:NotNull(message = "경도는 필수입니다.")
+    @field:Longitude
+    val longitude: Double,
+    @field:NotNull(message = "위도는 필수입니다.")
+    @field:Latitude
+    val latitude: Double,
+    @NotNull(message = "음식점 여부는 필수입니다.")
+    val foodTruck: Boolean,
+    @NotNull(message = "영업 여부는 필수입니다.")
+    val open: Boolean,
+    @NotNull(message = "폐업 여부는 필수입니다.")
+    val closed: Boolean,
+) {
+    fun toFoodSpotsEntity() =
+        FoodSpots(
+            name = name,
+            point = GeometryFactory().createPoint(Coordinate(longitude, latitude)).also { it.srid = SRID_WGS84 },
+            foodTruck = foodTruck,
+            open = open,
+            storeClosure = closed,
+        )
+
+    fun toFoodSpotsHistoryEntity(
+        foodSpots: FoodSpots,
+        user: User,
+    ) = FoodSpotsHistory(
+        name = name,
+        foodSpots = foodSpots,
+        user = user,
+        point = GeometryFactory().createPoint(Coordinate(longitude, latitude)).also { it.srid = SRID_WGS84 },
+        foodTruck = foodTruck,
+        open = open,
+        storeClosure = closed,
+    )
+}
+
+data class ReportHistoriesResponse(
+    val id: Long,
+    val userId: Long,
+    val userNickname: String,
+    val foodSpotsId: Long,
+    val name: String,
+    val longitude: Double,
+    val latitude: Double,
+    val foodTruck: Boolean,
+    val open: Boolean,
+    val closed: Boolean,
+    val createdDateTime: LocalDateTime,
+) {
+    constructor(foodSpotsHistory: FoodSpotsHistory) : this(
+        id = foodSpotsHistory.id,
+        userId = foodSpotsHistory.writerId,
+        userNickname = foodSpotsHistory.writerNickname,
+        foodSpotsId = foodSpotsHistory.foodSpots.id,
+        name = foodSpotsHistory.name,
+        longitude = foodSpotsHistory.point.x,
+        latitude = foodSpotsHistory.point.y,
+        foodTruck = foodSpotsHistory.foodTruck,
+        open = foodSpotsHistory.open,
+        closed = foodSpotsHistory.storeClosure,
+        createdDateTime = foodSpotsHistory.createdDateTime,
+    )
+}
+
+data class ReportResponse(
+    val id: Long,
+    val name: String,
+    val longitude: Double,
+    val latitude: Double,
+    val foodTruck: Boolean,
+    val open: Boolean,
+    val closed: Boolean,
+    val createdDateTime: LocalDateTime,
+    val reportPhotos: List<ReportPhotoResponse>,
+) {
+    constructor(foodSpots: FoodSpots) : this(
+        id = foodSpots.id,
+        name = foodSpots.name,
+        longitude = foodSpots.point.x,
+        latitude = foodSpots.point.y,
+        foodTruck = foodSpots.foodTruck,
+        open = foodSpots.open,
+        closed = foodSpots.storeClosure,
+        createdDateTime = foodSpots.createdDateTime,
+        reportPhotos = emptyList(), // TODO: Implement report photos 갖고 오기
+    )
+}
+
+data class ReportPhotoResponse(
+    val reportPhotoId: Long,
+    val reportPhotoName: String,
+    val reportPhotoUrl: String,
+)

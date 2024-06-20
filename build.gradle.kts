@@ -48,6 +48,8 @@ dependencies {
     implementation("com.linecorp.kotlin-jdsl:jpql-dsl:3.4.1")
     implementation("com.linecorp.kotlin-jdsl:jpql-render:3.4.1")
     implementation("com.linecorp.kotlin-jdsl:spring-data-jpa-support:3.4.1")
+    // object storage
+    implementation("com.oracle.oci.sdk:oci-java-sdk-objectstorage:3.14.0")
 
     // Secret & Config
     implementation(platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.1.1"))
@@ -74,6 +76,9 @@ dependencies {
     implementation("io.micrometer:micrometer-registry-prometheus:1.13.0")
 
     implementation("org.hibernate.orm:hibernate-spatial:6.5.2.Final")
+
+    // JDSL
+    implementation("com.linecorp.kotlin-jdsl:hibernate-kotlin-jdsl-jakarta:2.2.1.RELEASE")
 }
 
 tasks.withType<KotlinCompile> {
