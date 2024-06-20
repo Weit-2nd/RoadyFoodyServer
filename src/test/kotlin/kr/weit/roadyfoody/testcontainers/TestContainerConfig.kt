@@ -79,11 +79,11 @@ class TestContainersConfig {
                         (if (isSQLInit.get()) DatabaseInitializationMode.NEVER else DatabaseInitializationMode.ALWAYS).toString(),
                     "spring.data.redis.host" to redisContainer.host,
                     "spring.data.redis.port" to redisContainer.getMappedPort(6379).toString(),
-                    "aws.s3.endpoint" to s3Container.endpoint.toString(),
-                    "aws.s3.region" to s3Container.region,
-                    "aws.s3.access-key" to s3Container.accessKey,
-                    "aws.s3.secret-key" to s3Container.secretKey,
-                    "aws.s3.bucket-name" to "test-bucket",
+                    "spring.cloud.aws.s3.endpoint" to s3Container.endpoint.toString(),
+                    "spring.cloud.aws.s3.bucket" to "test-bucket",
+                    "spring.cloud.aws.region.static" to s3Container.region,
+                    "spring.cloud.aws.credentials.accessKey" to s3Container.accessKey,
+                    "spring.cloud.aws.credentials.secretKey" to s3Container.secretKey,
                 )
             isSQLInit.set(true)
 
