@@ -65,7 +65,7 @@ CREATE TABLE food_spots_histories
     created_datetime TIMESTAMP     NOT NULL,
     food_spots_id    NUMBER(19, 0),
     user_id          NUMBER(19, 0),
-    name             VARCHAR2(20)  NOT NULL,
+    name             VARCHAR2(60)  NOT NULL,
     food_truck       NUMBER(1)     NOT NULL,
     open             NUMBER(1)     NOT NULL,
     store_closure    NUMBER(1)     NOT NULL,
