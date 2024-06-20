@@ -72,6 +72,8 @@ dependencies {
     // Monitoring
     implementation("io.sentry:sentry-spring-boot-starter-jakarta:7.9.0")
     implementation("io.micrometer:micrometer-registry-prometheus:1.13.0")
+
+    implementation("org.hibernate.orm:hibernate-spatial:6.5.2.Final")
 }
 
 tasks.withType<KotlinCompile> {
