@@ -56,6 +56,9 @@ dependencies {
     implementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store:3.1.1")
     implementation("org.springframework.cloud:spring-cloud-starter-bootstrap:4.1.2")
 
+    // utils
+    implementation("org.apache.tika:tika-core:2.9.1")
+
     // Test
     testImplementation(platform("org.junit:junit-bom:5.10.2"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
