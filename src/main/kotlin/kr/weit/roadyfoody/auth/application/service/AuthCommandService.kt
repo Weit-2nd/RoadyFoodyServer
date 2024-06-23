@@ -29,28 +29,28 @@ class AuthCommandService(
         socialAccessToken: SocialAccessToken,
         signUpRequest: SignUpRequest,
     ) {
-        val socialId = generateSocialId(signUpRequest.socialLoginType, socialAccessToken)
+        val socialId = obtainSocialId(signUpRequest.socialLoginType, socialAccessToken)
 
         if (userRepository.existsBySocialId(socialId)) {
             log.error("UserAlreadyExistsException={}", socialId)
             throw UserAlreadyExistsException()
         }
-        termCommandService.checkRequiredTermsOrThrow(signUpRequest.agreedTermIdSet)
+        termCommandService.checkRequiredTermsOrThrow(signUpRequest.agreedTermIds)
 
         if (signUpRequest.profileImage == null) {
             val user = User.of(socialId, signUpRequest.nickname)
             userRepository.save(user)
-            userAgreedTermCommandService.storeUserAgreedTerms(user, signUpRequest.agreedTermIdSet)
+            userAgreedTermCommandService.storeUserAgreedTerms(user, signUpRequest.agreedTermIds)
         } else {
             val imageName = imageService.generateImageName(signUpRequest.profileImage.originalFilename)
             val user = User.of(socialId, signUpRequest.nickname, imageName)
             userRepository.save(user)
-            userAgreedTermCommandService.storeUserAgreedTerms(user, signUpRequest.agreedTermIdSet)
+            userAgreedTermCommandService.storeUserAgreedTerms(user, signUpRequest.agreedTermIds)
             imageService.upload(imageName, signUpRequest.profileImage) // 외부 저장소 롤백 어려움을 고려해 가장 아래에 배치
         }
     }
 
-    private fun generateSocialId(
+    private fun obtainSocialId(
         socialLoginType: SocialLoginType,
         socialAccessToken: SocialAccessToken,
     ): String = "$socialLoginType ${authQueryService.requestKakaoUserInfo(socialAccessToken).id}"
