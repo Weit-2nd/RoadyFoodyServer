@@ -1,7 +1,7 @@
-package kr.weit.roadyfoody.user.security.config
+package kr.weit.roadyfoody.auth.security.config
 
-import kr.weit.roadyfoody.user.security.filter.MockPassFilter
-import kr.weit.roadyfoody.user.security.handler.CustomAuthenticationEntryPoint
+import kr.weit.roadyfoody.auth.security.filter.MockPassFilter
+import kr.weit.roadyfoody.auth.security.handler.CustomAuthenticationEntryPoint
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -44,4 +44,5 @@ private val PERMITTED_URL_PATTERNS =
         "/v3/api-docs/**",
         "/actuator/prometheus",
         "/api/v1/terms/**",
+        "/api/v1/auth/**",
     )
