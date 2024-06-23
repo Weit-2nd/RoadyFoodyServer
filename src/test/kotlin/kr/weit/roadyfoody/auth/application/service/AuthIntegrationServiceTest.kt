@@ -48,8 +48,8 @@ class AuthIntegrationServiceTest(
         afterEach {
             userRepository.findAll()
                 .forEach {
-                    it.profile.profileImageName?.let { it ->
-                        s3Template.deleteObject(s3Properties.bucket, it)
+                    it.profile.profileImageName?.let { imageName ->
+                        s3Template.deleteObject(s3Properties.bucket, imageName)
                     }
                 }
         }
