@@ -1,5 +1,6 @@
 package kr.weit.roadyfoody.global.client
 
+import kr.weit.roadyfoody.auth.presentation.client.KakaoClientInterface
 import kr.weit.roadyfoody.common.exception.RestClientException
 import kr.weit.roadyfoody.tourism.presentation.client.TourismClientInterface
 import org.slf4j.Logger
@@ -25,6 +26,7 @@ class RestClientConfig {
         private const val CONNECT_TIME = 1L
         private const val READ_TIME = 5L
         private const val TOURISM_URL = "http://apis.data.go.kr/B551011/KorService1"
+        private const val KAKAO_URL = "https://kapi.kakao.com"
     }
 
     private val log: Logger = LoggerFactory.getLogger(RestClientConfig::class.java)
@@ -35,6 +37,11 @@ class RestClientConfig {
     @Bean
     fun tourismClientInterface(): TourismClientInterface {
         return createClient(TOURISM_URL, TourismClientInterface::class.java)
+    }
+
+    @Bean
+    fun kakaoClientInterface(): KakaoClientInterface {
+        return createClient(KAKAO_URL, KakaoClientInterface::class.java)
     }
 
     private fun <T> createClient(

@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.user.security.filter
+package kr.weit.roadyfoody.auth.security.filter
 
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
