@@ -29,6 +29,9 @@ class AuthCommandService(
         socialAccessToken: SocialAccessToken,
         signUpRequest: SignUpRequest,
     ) {
+        requireNotNull(signUpRequest.agreedTermIds)
+        requireNotNull(signUpRequest.nickname)
+
         val socialId = obtainSocialId(signUpRequest.socialLoginType, socialAccessToken)
 
         if (userRepository.existsBySocialId(socialId)) {
@@ -37,15 +40,13 @@ class AuthCommandService(
         }
         termCommandService.checkRequiredTermsOrThrow(signUpRequest.agreedTermIds)
 
-        if (signUpRequest.profileImage == null) {
-            val user = User.of(socialId, signUpRequest.nickname)
-            userRepository.save(user)
-            userAgreedTermCommandService.storeUserAgreedTerms(user, signUpRequest.agreedTermIds)
-        } else {
-            val imageName = imageService.generateImageName(signUpRequest.profileImage.originalFilename)
-            val user = User.of(socialId, signUpRequest.nickname, imageName)
-            userRepository.save(user)
-            userAgreedTermCommandService.storeUserAgreedTerms(user, signUpRequest.agreedTermIds)
+        val user = User.of(socialId, signUpRequest.nickname)
+        userRepository.save(user)
+        userAgreedTermCommandService.storeUserAgreedTerms(user, signUpRequest.agreedTermIds)
+
+        if (signUpRequest.profileImage != null) {
+            val imageName = imageService.generateImageName(signUpRequest.profileImage)
+            user.profile.changeProfileImageName(imageName)
             imageService.upload(imageName, signUpRequest.profileImage) // 외부 저장소 롤백 어려움을 고려해 가장 아래에 배치
         }
     }
