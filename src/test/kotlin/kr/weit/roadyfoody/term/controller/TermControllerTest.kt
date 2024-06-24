@@ -7,13 +7,13 @@ import io.mockk.verify
 import kr.weit.roadyfoody.common.exception.ErrorResponse
 import kr.weit.roadyfoody.global.jsonmapper.ObjectMapperProvider
 import kr.weit.roadyfoody.support.annotation.ControllerTest
+import kr.weit.roadyfoody.term.application.service.TermQueryService
 import kr.weit.roadyfoody.term.exception.TermNotFoundException
 import kr.weit.roadyfoody.term.fixture.TEST_NONEXISTENT_TERM_ID
 import kr.weit.roadyfoody.term.fixture.createTestDetailedTermResponse
 import kr.weit.roadyfoody.term.fixture.createTestSummaryTermsResponse
 import kr.weit.roadyfoody.term.fixture.createTestTermIdSet
 import kr.weit.roadyfoody.term.presentation.api.TermController
-import kr.weit.roadyfoody.term.service.TermQueryService
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get

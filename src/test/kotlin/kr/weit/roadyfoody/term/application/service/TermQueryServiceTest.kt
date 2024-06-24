@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.term.service
+package kr.weit.roadyfoody.term.application.service
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.equals.shouldBeEqual
@@ -6,6 +6,7 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kr.weit.roadyfoody.term.application.service.dto.DetailedTermResponse
 import kr.weit.roadyfoody.term.exception.TermNotFoundException
 import kr.weit.roadyfoody.term.fixture.TEST_NONEXISTENT_TERM_ID
 import kr.weit.roadyfoody.term.fixture.TEST_OPTIONAL_TERMS_SIZE
@@ -16,7 +17,6 @@ import kr.weit.roadyfoody.term.fixture.createTestTerms
 import kr.weit.roadyfoody.term.fixture.createTestZerosSummaryTermsResponse
 import kr.weit.roadyfoody.term.repository.TermRepository
 import kr.weit.roadyfoody.term.repository.getByTermId
-import kr.weit.roadyfoody.term.service.dto.DetailedTermResponse
 import org.junit.jupiter.api.assertThrows
 
 class TermQueryServiceTest :

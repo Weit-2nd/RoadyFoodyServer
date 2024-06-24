@@ -4,8 +4,8 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import kr.weit.roadyfoody.global.swagger.v1.SwaggerTag
-import kr.weit.roadyfoody.term.service.dto.DetailedTermResponse
-import kr.weit.roadyfoody.term.service.dto.SummaryTermsResponse
+import kr.weit.roadyfoody.term.application.service.dto.DetailedTermResponse
+import kr.weit.roadyfoody.term.application.service.dto.SummaryTermsResponse
 
 @Tag(name = SwaggerTag.TERM)
 interface TermControllerSpec {
