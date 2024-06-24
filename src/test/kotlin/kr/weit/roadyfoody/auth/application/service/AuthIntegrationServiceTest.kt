@@ -40,25 +40,6 @@ class AuthIntegrationServiceTest(
     private val imageService: ImageService,
     private val termRepository: TermRepository,
 ) : BehaviorSpec({
-        lateinit var validTermIdSet: Set<Long>
-        beforeSpec {
-            s3Template.createBucket(s3Properties.bucket)
-            validTermIdSet = termRepository.saveAll(createTestTerms()).map { it.id }.toSet()
-        }
-        afterEach {
-            userRepository.findAll()
-                .forEach {
-                    it.profile.profileImageName?.let { imageName ->
-                        s3Template.deleteObject(s3Properties.bucket, imageName)
-                    }
-                }
-        }
-        afterTest { clearAllMocks() }
-        afterSpec {
-            termRepository.deleteAll()
-            s3Template.deleteBucket(s3Properties.bucket)
-        }
-
         val authQueryService: AuthQueryService = mockk<AuthQueryService>()
         val authCommandService =
             AuthCommandService(
@@ -69,13 +50,37 @@ class AuthIntegrationServiceTest(
                 imageService,
             )
 
+        lateinit var validTermIdSet: Set<Long>
+        beforeSpec {
+            s3Template.createBucket(s3Properties.bucket)
+            validTermIdSet = termRepository.saveAll(createTestTerms()).map { it.id }.toSet()
+        }
+        beforeEach {
+            every { authQueryService.requestKakaoUserInfo(any<SocialAccessToken>()) } returns createTestKakaoUserResponse()
+        }
+        afterEach {
+            userRepository.findAll()
+                .forEach {
+                    it.profile.profileImageName?.let { imageName ->
+                        s3Template.deleteObject(s3Properties.bucket, imageName)
+                    }
+                }
+            clearAllMocks()
+        }
+        afterSpec {
+            termRepository.deleteAll()
+            s3Template.deleteBucket(s3Properties.bucket)
+        }
+
         given("프로필 사진이 존재하는 경우") {
             `when`("회원가입을 요청하면") {
-                every { authQueryService.requestKakaoUserInfo(any<SocialAccessToken>()) } returns createTestKakaoUserResponse()
                 then("회원가입이 성공한다") {
                     val signUpRequest = createTestSignUpRequest(validTermIdSet)
                     authCommandService.register(TEST_SOCIAL_ACCESS_TOKEN, signUpRequest)
-                    val profileImageName = userRepository.getByNickname(signUpRequest.nickname).profile.profileImageName
+                    val profileImageName =
+                        userRepository.getByNickname(
+                            signUpRequest.nickname ?: throw IllegalArgumentException(),
+                        ).profile.profileImageName
                     profileImageName.shouldNotBeNull()
                     s3Template.objectExists(s3Properties.bucket, profileImageName).shouldBeTrue()
                     verify(exactly = 1) { authQueryService.requestKakaoUserInfo(any<SocialAccessToken>()) }
@@ -85,11 +90,13 @@ class AuthIntegrationServiceTest(
 
         given("프로필 사진이 존재하지 않는 경우") {
             `when`("회원가입을 요청하면") {
-                every { authQueryService.requestKakaoUserInfo(any<SocialAccessToken>()) } returns createTestKakaoUserResponse()
                 then("회원가입이 성공한다") {
                     val signUpRequest = createTestSignUpRequest(validTermIdSet, profileImage = null)
                     authCommandService.register(TEST_SOCIAL_ACCESS_TOKEN, signUpRequest)
-                    val profileImageName = userRepository.getByNickname(signUpRequest.nickname).profile.profileImageName
+                    val profileImageName =
+                        userRepository.getByNickname(
+                            signUpRequest.nickname ?: throw IllegalArgumentException(),
+                        ).profile.profileImageName
                     profileImageName.shouldBeNull()
                     verify(exactly = 1) { authQueryService.requestKakaoUserInfo(any<SocialAccessToken>()) }
                 }
@@ -98,7 +105,6 @@ class AuthIntegrationServiceTest(
 
         given("필수약관을 동의하지 않은 경우") {
             `when`("회원가입을 요청하면") {
-                every { authQueryService.requestKakaoUserInfo(any<SocialAccessToken>()) } returns createTestKakaoUserResponse()
                 then("RequiredTermNotAgreedException 을 던진다") {
                     shouldThrow<RequiredTermNotAgreedException> {
                         authCommandService.register(
@@ -119,7 +125,6 @@ class AuthIntegrationServiceTest(
                 userRepository.deleteAll()
             }
             `when`("회원가입을 요청하면") {
-                every { authQueryService.requestKakaoUserInfo(any<SocialAccessToken>()) } returns createTestKakaoUserResponse()
                 then("UserAlreadyExistsException 을 던진다") {
                     shouldThrow<UserAlreadyExistsException> {
                         authCommandService.register(TEST_SOCIAL_ACCESS_TOKEN, createTestSignUpRequest(validTermIdSet))
