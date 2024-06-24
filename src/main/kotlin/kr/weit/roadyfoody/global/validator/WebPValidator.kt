@@ -4,7 +4,7 @@ import jakarta.validation.Constraint
 import jakarta.validation.ConstraintValidator
 import jakarta.validation.ConstraintValidatorContext
 import jakarta.validation.Payload
-import org.apache.tika.Tika
+import kr.weit.roadyfoody.global.utils.MimeUtils
 import org.springframework.web.multipart.MultipartFile
 import kotlin.reflect.KClass
 
@@ -21,5 +21,5 @@ class WebPImageValidator : ConstraintValidator<WebPImage, MultipartFile?> {
     override fun isValid(
         p0: MultipartFile?,
         p1: ConstraintValidatorContext?,
-    ): Boolean = p0 == null || Tika().detect(p0.inputStream) == "image/webp"
+    ): Boolean = p0 == null || MimeUtils.detectMimeType(p0) == "image/webp"
 }
