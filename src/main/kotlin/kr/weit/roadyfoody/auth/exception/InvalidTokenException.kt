@@ -3,7 +3,7 @@ package kr.weit.roadyfoody.auth.exception
 import kr.weit.roadyfoody.common.exception.BaseException
 import kr.weit.roadyfoody.common.exception.ErrorCode
 
-class UserAlreadyExistsException : BaseException(
-    ErrorCode.EXIST_RESOURCE,
-    "이미 존재하는 유저입니다.",
+class InvalidTokenException : BaseException(
+    ErrorCode.UNAUTHORIZED,
+    "유효하지 않은 토큰입니다.",
 )

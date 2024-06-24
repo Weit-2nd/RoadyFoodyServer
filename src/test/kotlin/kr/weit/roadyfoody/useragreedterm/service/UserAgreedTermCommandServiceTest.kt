@@ -21,7 +21,7 @@ class UserAgreedTermCommandServiceTest :
         val userAgreedTermRepository = mockk<UserAgreedTermRepository>()
         val userAgreedTermCommandService = UserAgreedTermCommandService(userAgreedTermRepository, termRepository)
 
-        afterTest { clearAllMocks() }
+        afterEach { clearAllMocks() }
 
         given("storeUserAgreedTerms 테스트") {
             `when`("단일 User 와 하나 이상의 termId 가 주어질 시") {

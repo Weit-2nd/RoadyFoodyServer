@@ -2,8 +2,8 @@ package kr.weit.roadyfoody.support.annotation
 
 import kr.weit.roadyfoody.auth.security.config.SecurityConfig
 import kr.weit.roadyfoody.auth.security.handler.CustomAuthenticationEntryPoint
-import kr.weit.roadyfoody.global.jsonmapper.ObjectMapperProvider
 import kr.weit.roadyfoody.global.log.TraceManager
+import kr.weit.roadyfoody.global.utils.ObjectMapperProvider
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 

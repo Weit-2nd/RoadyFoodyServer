@@ -4,7 +4,7 @@ import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
 import io.mockk.verify
-import kr.weit.roadyfoody.global.jsonmapper.ObjectMapperProvider
+import kr.weit.roadyfoody.global.utils.ObjectMapperProvider
 import kr.weit.roadyfoody.support.annotation.ControllerTest
 import kr.weit.roadyfoody.tourism.application.service.TourismService
 import kr.weit.roadyfoody.tourism.fixture.TourismFixture.createSearchResponses

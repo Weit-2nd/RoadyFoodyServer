@@ -8,7 +8,6 @@ import kr.weit.roadyfoody.auth.presentation.spec.AuthControllerSpec
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
-import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
@@ -24,10 +23,9 @@ class AuthController(
     @PostMapping(consumes = [MULTIPART_FORM_DATA_VALUE])
     override fun signUp(
         @RequestHeader(AUTHORIZATION) socialAccessToken: String?,
-        @Valid @ModelAttribute signUpRequest: SignUpRequest,
+        @Valid signUpRequest: SignUpRequest,
     ) {
-        socialAccessToken?.let {
-            authCommandService.register(SocialAccessToken(socialAccessToken), signUpRequest)
-        } ?: throw IllegalArgumentException("socialAccessToken 가 존재하지 않습니다.")
+        requireNotNull(socialAccessToken) { "socialAccessToken 가 존재하지 않습니다." }
+        authCommandService.register(SocialAccessToken(socialAccessToken), signUpRequest)
     }
 }

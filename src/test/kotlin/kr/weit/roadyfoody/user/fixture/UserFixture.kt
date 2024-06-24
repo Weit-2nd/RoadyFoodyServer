@@ -16,23 +16,17 @@ val TEST_USER_SOCIAL_ID = "$TEST_SOCIAL_LOGIN_TYPE $TEST_SOCIAL_ID"
 const val TEST_USER_NICKNAME = "existentNick"
 const val TEST_USER_PROFILE_IMAGE_NAME = "test_image_name"
 
-fun createTestUser(id: Long = TEST_USER_ID) =
-    User(
-        id,
-        TEST_USER_SOCIAL_ID,
-        Profile(
-            "$TEST_USER_NICKNAME$id",
-            "${TEST_USER_PROFILE_IMAGE_NAME}_$id",
-        ),
-    )
-
 fun createTestUser(
+    id: Long = TEST_USER_ID,
     nickname: String = TEST_USER_NICKNAME,
     socialId: String = TEST_USER_SOCIAL_ID,
-) = User.of(
+) = User(
+    id,
     socialId,
-    nickname,
-    TEST_USER_PROFILE_IMAGE_NAME,
+    Profile(
+        nickname,
+        "${TEST_USER_PROFILE_IMAGE_NAME}_$id",
+    ),
 )
 
 // fail case

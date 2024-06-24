@@ -12,12 +12,9 @@ import kr.weit.roadyfoody.auth.application.service.AuthCommandService
 import kr.weit.roadyfoody.auth.domain.SocialAccessToken
 import kr.weit.roadyfoody.auth.dto.SignUpRequest
 import kr.weit.roadyfoody.auth.fixture.TEST_BEARER_TOKEN
-import kr.weit.roadyfoody.auth.fixture.TEST_FAKE_WEBP_IMAGE_BYTES
-import kr.weit.roadyfoody.auth.fixture.TEST_GIF_IMAGE_BYTES
-import kr.weit.roadyfoody.auth.fixture.TEST_JPEG_IMAGE_BYTES
-import kr.weit.roadyfoody.auth.fixture.TEST_PNG_IMAGE_BYTES
-import kr.weit.roadyfoody.auth.fixture.TEST_WEBP_IMAGE_BYTES
 import kr.weit.roadyfoody.support.annotation.ControllerTest
+import kr.weit.roadyfoody.support.utils.ImageFormat
+import kr.weit.roadyfoody.support.utils.generateImageBytes
 import kr.weit.roadyfoody.term.fixture.createTestRequiredTermIdSet
 import kr.weit.roadyfoody.user.fixture.TEST_USER_NICKNAME
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -36,12 +33,12 @@ class AuthControllerTest(
         val requestPath = "/api/v1/auth"
 
         given("POST $requestPath") {
-            `when`("WebP 이미지 프로필 사진을 업로드하면") {
+            `when`("${ImageFormat.WEBP.getStrValues()} 이미지 프로필 사진을 업로드하면") {
                 every { authCommandService.register(any<SocialAccessToken>(), any<SignUpRequest>()) } just runs
                 then("회원가입에 성공한다") {
                     mockMvc.perform(
                         multipart(requestPath)
-                            .file("profileImage", TEST_WEBP_IMAGE_BYTES)
+                            .file("profileImage", generateImageBytes(ImageFormat.WEBP))
                             .param("nickname", TEST_USER_NICKNAME)
                             .param("agreedTermIds", createTestRequiredTermIdSet().joinToString())
                             .header(AUTHORIZATION, TEST_BEARER_TOKEN)
@@ -65,18 +62,17 @@ class AuthControllerTest(
                 }
             }
 
-            `when`("WebP 이미지가 아닌 프로필 사진을 업로드하면") {
+            `when`("${ImageFormat.WEBP.first()} 이미지가 아닌 프로필 사진을 업로드하면") {
                 every { authCommandService.register(any<SocialAccessToken>(), any<SignUpRequest>()) } just runs
                 then("회원가입에 실패한다") {
                     forAll(
-                        row(TEST_FAKE_WEBP_IMAGE_BYTES),
-                        row(TEST_JPEG_IMAGE_BYTES),
-                        row(TEST_PNG_IMAGE_BYTES),
-                        row(TEST_GIF_IMAGE_BYTES),
-                    ) { imageBytes ->
+                        row(ImageFormat.JPEG),
+                        row(ImageFormat.PNG),
+                        row(ImageFormat.GIF),
+                    ) { format ->
                         mockMvc.perform(
                             multipart(requestPath)
-                                .file("profileImage", imageBytes)
+                                .file("profileImage", generateImageBytes(format))
                                 .param("nickname", TEST_USER_NICKNAME)
                                 .param("agreedTermIds", createTestRequiredTermIdSet().joinToString())
                                 .header(AUTHORIZATION, TEST_BEARER_TOKEN)
@@ -92,7 +88,7 @@ class AuthControllerTest(
                 then("회원가입에 실패한다") {
                     mockMvc.perform(
                         multipart(requestPath)
-                            .file("profileImage", TEST_WEBP_IMAGE_BYTES)
+                            .file("profileImage", generateImageBytes(ImageFormat.WEBP))
                             .param("agreedTermIds", createTestRequiredTermIdSet().joinToString())
                             .header(AUTHORIZATION, TEST_BEARER_TOKEN)
                             .contentType(MediaType.MULTIPART_FORM_DATA),
@@ -106,7 +102,7 @@ class AuthControllerTest(
                 then("회원가입에 실패한다") {
                     mockMvc.perform(
                         multipart(requestPath)
-                            .file("profileImage", TEST_WEBP_IMAGE_BYTES)
+                            .file("profileImage", generateImageBytes(ImageFormat.WEBP))
                             .param("nickname", TEST_USER_NICKNAME)
                             .param("agreedTermIds", createTestRequiredTermIdSet().joinToString())
                             .contentType(MediaType.MULTIPART_FORM_DATA),
