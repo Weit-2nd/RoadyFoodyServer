@@ -115,10 +115,9 @@ interface AuthControllerSpec {
                         ],
                     ),
                 ],
-            ),
-            ApiResponse(
-                responseCode = "500",
-                description = "외부 API 호출 문제",
+            ), ApiResponse(
+                responseCode = "409",
+                description = "중복 회원가입 요청",
                 content = [
                     Content(
                         mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -127,8 +126,8 @@ interface AuthControllerSpec {
                             ExampleObject(
                                 value = """
                         {
-                            "code": -11000,
-                            "errorMessage": "외부 API 호출 중 에러 발생"
+                            "code": -10005,
+                            "errorMessage": "이미 존재하는 유저입니다."
                         }
                         """,
                             ),
