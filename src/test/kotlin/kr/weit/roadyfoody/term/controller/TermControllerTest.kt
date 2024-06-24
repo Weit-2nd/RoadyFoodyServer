@@ -5,7 +5,7 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
 import io.mockk.verify
 import kr.weit.roadyfoody.common.exception.ErrorResponse
-import kr.weit.roadyfoody.global.jsonmapper.ObjectMapperProvider
+import kr.weit.roadyfoody.global.utils.ObjectMapperProvider
 import kr.weit.roadyfoody.support.annotation.ControllerTest
 import kr.weit.roadyfoody.term.exception.TermNotFoundException
 import kr.weit.roadyfoody.term.fixture.TEST_NONEXISTENT_TERM_ID
