@@ -58,6 +58,7 @@ dependencies {
 
     // utils
     implementation("org.apache.tika:tika-core:2.9.1")
+    implementation("com.sksamuel.scrimage:scrimage-webp:4.1.3")
 
     // Test
     testImplementation(platform("org.junit:junit-bom:5.10.2"))
