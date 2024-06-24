@@ -1,7 +1,7 @@
 package kr.weit.roadyfoody.global.service
 
+import kr.weit.roadyfoody.global.utils.MimeUtils
 import org.springframework.stereotype.Service
-import org.springframework.util.StringUtils
 import org.springframework.web.multipart.MultipartFile
 import java.util.UUID
 
@@ -16,13 +16,8 @@ class ImageService(
         storageService.upload(name, file.inputStream)
     }
 
-    fun generateImageName(fileName: String?): String {
-        val extension =
-            if (fileName == null) {
-                ""
-            } else {
-                ".${StringUtils.getFilenameExtension(fileName)}"
-            }
+    fun generateImageName(file: MultipartFile): String {
+        val extension = MimeUtils.getFileExtension(file)
         return "${UUID.randomUUID()}$extension"
     }
 }
