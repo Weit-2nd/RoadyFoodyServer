@@ -23,7 +23,7 @@ import java.time.Duration
 import java.util.concurrent.Executors
 
 @Configuration
-class RestClientConfig() {
+class RestClientConfig {
     companion object {
         private const val CONNECT_TIME = 1L
         private const val READ_TIME = 5L
