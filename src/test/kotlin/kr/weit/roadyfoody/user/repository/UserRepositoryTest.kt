@@ -20,7 +20,7 @@ class UserRepositoryTest(
         lateinit var givenUser: User
 
         beforeEach {
-            givenUser = userRepository.save(createTestUser(1))
+            givenUser = userRepository.save(createTestUser())
         }
 
         describe("getByUserId 메소드는") {
@@ -32,7 +32,7 @@ class UserRepositoryTest(
             }
 
             context("존재하지 않는 id 를 받는 경우") {
-                it("UserNotFoundException 을 반환한다.") {
+                it("UserNotFoundException 을 던진다.") {
                     val ex =
                         shouldThrow<UserNotFoundException> {
                             userRepository.getByUserId(TEST_NONEXISTENT_ID)
@@ -45,13 +45,13 @@ class UserRepositoryTest(
         describe("getByNickname 메소드는") {
             context("존재하는 nickname 을 받는 경우") {
                 it("일치하는 유저를 반환한다.") {
-                    val user = userRepository.getByNickname(givenUser.nickname)
+                    val user = userRepository.getByNickname(givenUser.profile.nickname)
                     user shouldBe givenUser
                 }
             }
 
             context("존재하지 않는 nickname 을 받는 경우") {
-                it("UserNotFoundException 을 반환한다.") {
+                it("UserNotFoundException 을 던진다.") {
                     val ex =
                         shouldThrow<UserNotFoundException> {
                             userRepository.getByNickname(TEST_NONEXISTENT_NICKNAME)
@@ -61,17 +61,33 @@ class UserRepositoryTest(
             }
         }
 
-        describe("existsByNickname 메소드는") {
+        describe("existsByProfileNickname 메소드는") {
             context("존재하는 nickname 을 받는 경우") {
                 it("true 를 반환한다.") {
-                    val exists = userRepository.existsByNickname(givenUser.nickname)
+                    val exists = userRepository.existsByProfileNickname(givenUser.profile.nickname)
                     exists.shouldBeTrue()
                 }
             }
 
             context("존재하지 않는 nickname 을 받는 경우") {
                 it("false 를 반환한다.") {
-                    val exists = userRepository.existsByNickname(TEST_NONEXISTENT_NICKNAME)
+                    val exists = userRepository.existsByProfileNickname(TEST_NONEXISTENT_NICKNAME)
+                    exists.shouldBeFalse()
+                }
+            }
+        }
+
+        describe("existsBySocialId 메소드는") {
+            context("존재하는 socialId 를 받는 경우") {
+                it("true 를 반환한다.") {
+                    val exists = userRepository.existsBySocialId(givenUser.socialId)
+                    exists.shouldBeTrue()
+                }
+            }
+
+            context("존재하지 않는 socialId 를 받는 경우") {
+                it("false 를 반환한다.") {
+                    val exists = userRepository.existsBySocialId(TEST_NONEXISTENT_NICKNAME)
                     exists.shouldBeFalse()
                 }
             }

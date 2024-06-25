@@ -10,5 +10,5 @@ class RequiredTermNotAgreedException(
         "$ERROR_MSG_PREFIX ${termIds.joinToString()} $ERROR_MSG_SUFFIX",
     )
 
-private const val ERROR_MSG_PREFIX = "약관 ID: "
-private const val ERROR_MSG_SUFFIX = "에 동의하지 않았습니다."
+const val ERROR_MSG_PREFIX = "약관 ID: "
+const val ERROR_MSG_SUFFIX = "에 동의하지 않았습니다."
