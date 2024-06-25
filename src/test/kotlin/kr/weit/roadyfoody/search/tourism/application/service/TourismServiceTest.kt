@@ -5,16 +5,13 @@ import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import kr.weit.roadyfoody.global.FOUR
+import kr.weit.roadyfoody.global.KEYWORD
+import kr.weit.roadyfoody.global.TEN
 import kr.weit.roadyfoody.search.tourism.config.TourismProperties
 import kr.weit.roadyfoody.search.tourism.fixture.TourismFixture
 import kr.weit.roadyfoody.search.tourism.presentation.client.TourismClientInterface
 import java.util.concurrent.ExecutorService
-
-private const val TEN = 10
-
-private const val ZERO = 0
-
-private const val FOUR = 4
 
 class TourismServiceTest :
     BehaviorSpec({
@@ -45,7 +42,7 @@ class TourismServiceTest :
                         tourismProperties.mobileApp,
                         tourismProperties.mobileOs,
                         TEN,
-                        "keyword",
+                        KEYWORD,
                         TOUR_CONTENT_ID,
                     )
                 } returns tourResponseWrapper
@@ -56,12 +53,12 @@ class TourismServiceTest :
                         tourismProperties.mobileApp,
                         tourismProperties.mobileOs,
                         TEN,
-                        "keyword",
+                        KEYWORD,
                         FESTIVAL_CONTENT_ID,
                     )
                 } returns festivalResponseWrapper
 
-                val searchResponses = tourismService.searchTourism(TEN, "keyword")
+                val searchResponses = tourismService.searchTourism(TEN, KEYWORD)
 
                 then("관광지와 행사의 검색 결과를 랜덤하게 반환한다.") {
                     searchResponses.items.size shouldBe TEN
@@ -94,7 +91,7 @@ class TourismServiceTest :
                         tourismProperties.mobileApp,
                         tourismProperties.mobileOs,
                         TEN,
-                        "keyword",
+                        KEYWORD,
                         TOUR_CONTENT_ID,
                     )
                 } returns tourResponseWrapper
@@ -105,12 +102,12 @@ class TourismServiceTest :
                         tourismProperties.mobileApp,
                         tourismProperties.mobileOs,
                         TEN,
-                        "keyword",
+                        KEYWORD,
                         FESTIVAL_CONTENT_ID,
                     )
                 } returns festivalResponseWrapper
 
-                val searchResponses = tourismService.searchTourism(TEN, "keyword")
+                val searchResponses = tourismService.searchTourism(TEN, KEYWORD)
 
                 then("관광지와 행사의 검색 결과를 그대로 반환한다.") {
                     searchResponses.items.size shouldBe FOUR
@@ -137,7 +134,7 @@ class TourismServiceTest :
                         tourismProperties.mobileApp,
                         tourismProperties.mobileOs,
                         TEN,
-                        "keyword",
+                        KEYWORD,
                         TOUR_CONTENT_ID,
                     )
                 } returns tourResponseWrapper
@@ -148,12 +145,12 @@ class TourismServiceTest :
                         tourismProperties.mobileApp,
                         tourismProperties.mobileOs,
                         TEN,
-                        "keyword",
+                        KEYWORD,
                         FESTIVAL_CONTENT_ID,
                     )
                 } returns festivalResponseWrapper
 
-                val searchResponses = tourismService.searchTourism(TEN, "keyword")
+                val searchResponses = tourismService.searchTourism(TEN, KEYWORD)
 
                 then("빈 리스트를 반환한다.") {
                     searchResponses.items.shouldBeEmpty()
