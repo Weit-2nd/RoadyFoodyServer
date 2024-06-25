@@ -7,6 +7,7 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kr.weit.roadyfoody.auth.dto.DuplicatedNicknameResponse
 import kr.weit.roadyfoody.auth.exception.InvalidTokenException
 import kr.weit.roadyfoody.auth.fixture.TEST_SOCIAL_ACCESS_TOKEN
 import kr.weit.roadyfoody.auth.fixture.createTestKakaoUserResponse
@@ -56,16 +57,18 @@ class AuthQueryServiceTest :
         given("checkDuplicatedNickname 테스트") {
             `when`("닉네임이 중복되면") {
                 every { userRepository.existsByProfileNickname(any()) } returns true
-                then("true 를 반환한다") {
-                    authQueryService.checkDuplicatedNickname("중복닉네임") shouldBe true
+                then("내용이 true 인 응답을 반환한다") {
+                    val actual = authQueryService.checkDuplicatedNickname("중복닉네임")
+                    actual shouldBe DuplicatedNicknameResponse(true)
                     verify(exactly = 1) { userRepository.existsByProfileNickname("중복닉네임") }
                 }
             }
 
             `when`("닉네임이 중복되지 않으면") {
                 every { userRepository.existsByProfileNickname(any()) } returns false
-                then("false 를 반환한다") {
-                    authQueryService.checkDuplicatedNickname("중복되지않는닉네임") shouldBe false
+                then("내용이 false 인 응답을 반환한다") {
+                    val actual = authQueryService.checkDuplicatedNickname("중복되지않는닉네임")
+                    actual shouldBe DuplicatedNicknameResponse(false)
                     verify(exactly = 1) { userRepository.existsByProfileNickname("중복되지않는닉네임") }
                 }
             }

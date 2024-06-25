@@ -1,5 +1,6 @@
 package kr.weit.roadyfoody.auth.application.service
 
+import kr.weit.roadyfoody.auth.dto.DuplicatedNicknameResponse
 import kr.weit.roadyfoody.auth.dto.KakaoUserResponse
 import kr.weit.roadyfoody.auth.exception.InvalidTokenException
 import kr.weit.roadyfoody.auth.presentation.client.KakaoClientInterface
@@ -18,5 +19,8 @@ class AuthQueryService(
             throw InvalidTokenException()
         }
 
-    fun checkDuplicatedNickname(nickname: String): Boolean = userRepository.existsByProfileNickname(nickname)
+    fun checkDuplicatedNickname(nickname: String): DuplicatedNicknameResponse =
+        DuplicatedNicknameResponse(
+            userRepository.existsByProfileNickname(nickname),
+        )
 }
