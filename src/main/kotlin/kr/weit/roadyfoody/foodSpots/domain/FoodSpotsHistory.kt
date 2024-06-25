@@ -49,7 +49,4 @@ class FoodSpotsHistory(
 ) : BaseTimeEntity() {
     val writerId: Long
         get() = user.id
-
-    val writerNickname: String
-        get() = user.nickname
 }
