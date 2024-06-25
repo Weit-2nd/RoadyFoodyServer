@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.user.security.handler
+package kr.weit.roadyfoody.auth.security.handler
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.http.HttpServletRequest
