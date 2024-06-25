@@ -11,35 +11,35 @@ import kr.weit.roadyfoody.auth.dto.DuplicatedNicknameResponse
 import kr.weit.roadyfoody.auth.exception.InvalidTokenException
 import kr.weit.roadyfoody.auth.fixture.TEST_SOCIAL_ACCESS_TOKEN
 import kr.weit.roadyfoody.auth.fixture.createTestKakaoUserResponse
-import kr.weit.roadyfoody.auth.presentation.client.KakaoClientInterface
+import kr.weit.roadyfoody.auth.presentation.client.KakaoLoginClientInterface
 import kr.weit.roadyfoody.common.exception.RestClientException
 import kr.weit.roadyfoody.user.repository.UserRepository
 
 class AuthQueryServiceTest :
     BehaviorSpec({
-        val kakaoClientInterface = mockk<KakaoClientInterface>()
+        val kakaoLoginClientInterface = mockk<KakaoLoginClientInterface>()
         val userRepository = mockk<UserRepository>()
-        val authQueryService = AuthQueryService(kakaoClientInterface, userRepository)
+        val authQueryService = AuthQueryService(kakaoLoginClientInterface, userRepository)
 
         afterEach { clearAllMocks() }
 
         given("requestKakaoUserInfo 테스트") {
             `when`("카카오 Access Token 을 가져오면") {
                 every {
-                    kakaoClientInterface.requestUserInfo(
+                    kakaoLoginClientInterface.requestUserInfo(
                         TEST_SOCIAL_ACCESS_TOKEN,
                     )
                 } returns createTestKakaoUserResponse()
                 then("카카오 사용자 정보를 반환한다") {
                     val kakaoUserResponse = authQueryService.requestKakaoUserInfo(TEST_SOCIAL_ACCESS_TOKEN)
                     kakaoUserResponse shouldBe createTestKakaoUserResponse()
-                    verify(exactly = 1) { kakaoClientInterface.requestUserInfo(TEST_SOCIAL_ACCESS_TOKEN) }
+                    verify(exactly = 1) { kakaoLoginClientInterface.requestUserInfo(TEST_SOCIAL_ACCESS_TOKEN) }
                 }
             }
 
             `when`("카카오 API 호출 시 에러가 발생하면") {
                 every {
-                    kakaoClientInterface.requestUserInfo(
+                    kakaoLoginClientInterface.requestUserInfo(
                         TEST_SOCIAL_ACCESS_TOKEN,
                     )
                 } throws RestClientException()
@@ -49,7 +49,7 @@ class AuthQueryServiceTest :
                             authQueryService.requestKakaoUserInfo(TEST_SOCIAL_ACCESS_TOKEN)
                         }
                     exception shouldBe InvalidTokenException()
-                    verify(exactly = 1) { kakaoClientInterface.requestUserInfo(TEST_SOCIAL_ACCESS_TOKEN) }
+                    verify(exactly = 1) { kakaoLoginClientInterface.requestUserInfo(TEST_SOCIAL_ACCESS_TOKEN) }
                 }
             }
         }
