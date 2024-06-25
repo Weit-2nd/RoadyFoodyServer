@@ -1,0 +1,2 @@
+ALTER TABLE users ADD social_id VARCHAR2(48) DEFAULT 'EMPTY' NOT NULL;
+ALTER TABLE users ADD profile_image_name VARCHAR2(50);

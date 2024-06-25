@@ -24,7 +24,7 @@ class TermQueryServiceTest :
         val termRepository = mockk<TermRepository>()
         val termQueryService = TermQueryService(termRepository)
 
-        afterTest { clearAllMocks() }
+        afterEach { clearAllMocks() }
 
         given("getAllSummaryTerms 테스트") {
             `when`("필수 약관이 $TEST_REQUIRED_TERMS_SIZE 개 , 선택 약관이 $TEST_OPTIONAL_TERMS_SIZE 개 존재할 시") {
