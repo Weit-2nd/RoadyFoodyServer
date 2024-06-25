@@ -16,7 +16,20 @@ data class AddressSearchResponse(
     val latitude: Double,
     @Schema(description = "전화번호", example = "1566-3607", nullable = true)
     val tel: String?,
-)
+) {
+    companion object {
+        fun from(document: Document): AddressSearchResponse {
+            return AddressSearchResponse(
+                placeName = document.placeName,
+                addressName = document.addressName,
+                roadAddressName = document.roadAddressName,
+                longitude = document.x.toDouble(),
+                latitude = document.y.toDouble(),
+                tel = document.phone,
+            )
+        }
+    }
+}
 
 @Schema(description = "주소 검색 결과 응답")
 data class AddressSearchResponses(

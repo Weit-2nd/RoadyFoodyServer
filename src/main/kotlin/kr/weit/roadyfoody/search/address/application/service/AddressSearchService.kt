@@ -20,21 +20,14 @@ class AddressSearchService(
     ): AddressSearchResponses {
         var encodedKeyword = keyword.replace(" ", "")
 
-        val originalResponse = kakaoAddressClientInterface.searchAddress(KAKAO_AK + kakaoProperties.apiKey, encodedKeyword, size)
+        val originalResponse = kakaoAddressClientInterface.searchAddress(encodedKeyword, size)
         return convertResponse(originalResponse)
     }
 
     private fun convertResponse(originalResponse: AddressResponseWrapper): AddressSearchResponses {
         val items =
             originalResponse.documents.map {
-                AddressSearchResponse(
-                    placeName = it.placeName,
-                    addressName = it.addressName,
-                    roadAddressName = it.roadAddressName,
-                    longitude = it.x.toDouble(),
-                    latitude = it.y.toDouble(),
-                    tel = it.phone,
-                )
+                AddressSearchResponse.from(it)
             }
         return AddressSearchResponses(items = items)
     }
