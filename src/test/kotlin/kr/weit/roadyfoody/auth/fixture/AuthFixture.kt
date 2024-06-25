@@ -1,44 +1,47 @@
 package kr.weit.roadyfoody.auth.fixture
 
-import kr.weit.roadyfoody.auth.domain.SocialAccessToken
-import kr.weit.roadyfoody.auth.dto.KakaoUserResponse
-import kr.weit.roadyfoody.auth.dto.SignUpRequest
 import kr.weit.roadyfoody.support.utils.ImageFormat
 import kr.weit.roadyfoody.support.utils.generateImageBytes
-import kr.weit.roadyfoody.term.fixture.createTestRequiredTermIdSet
-import kr.weit.roadyfoody.user.fixture.TEST_SOCIAL_ID
-import kr.weit.roadyfoody.user.fixture.TEST_SOCIAL_LOGIN_TYPE
-import kr.weit.roadyfoody.user.fixture.TEST_USER_NICKNAME
+import org.springframework.http.MediaType
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.web.multipart.MultipartFile
-import java.time.LocalDateTime
+import java.io.InputStream
 
-val TEST_SOCIAL_ACCESS_TOKEN = SocialAccessToken("test-token")
-val TEST_CONNECTED_AT: LocalDateTime = LocalDateTime.now()
+const val TEST_IMAGE_FILE_NAME = "testImage"
 
-fun createTestKakaoUserResponse(): KakaoUserResponse =
-    KakaoUserResponse(
-        TEST_SOCIAL_ID,
-        TEST_CONNECTED_AT,
-    )
-
-fun createTestSignUpRequest(
-    termIdSet: Set<Long> = createTestRequiredTermIdSet(),
-    profileImage: MultipartFile? = createTestImageFile(ImageFormat.WEBP),
-): SignUpRequest =
-    SignUpRequest(
-        TEST_USER_NICKNAME,
-        profileImage,
-        termIdSet,
-        TEST_SOCIAL_LOGIN_TYPE,
-    )
-
-fun createTestImageFile(format: ImageFormat): MultipartFile =
+fun createTestImageFile(
+    format: ImageFormat,
+    name: String = TEST_IMAGE_FILE_NAME,
+    originalName: String = TEST_IMAGE_FILE_NAME,
+): MultipartFile =
     MockMultipartFile(
-        "mockImage${format.values}",
-        "mockImage${format.values}.$format.value",
+        name,
+        name,
         "image/$format.value",
         generateImageBytes(format),
     )
+
+const val PROFILE_IMAGE_FILE_NAME = "profileImage"
+
+fun createProfileImageFile(
+    format: ImageFormat,
+    name: String = PROFILE_IMAGE_FILE_NAME,
+    originalName: String = PROFILE_IMAGE_FILE_NAME,
+): MockMultipartFile =
+    MockMultipartFile(
+        name,
+        originalName,
+        "image/$format.value",
+        generateImageBytes(format),
+    )
+
+const val SIGN_UP_REQUEST_FILE_NAME = "signUpRequest"
+
+fun createSignUpRequestFile(
+    contentStream: InputStream,
+    name: String = SIGN_UP_REQUEST_FILE_NAME,
+    originalName: String = SIGN_UP_REQUEST_FILE_NAME,
+    contentType: String = MediaType.APPLICATION_JSON_VALUE,
+): MockMultipartFile = MockMultipartFile(name, originalName, contentType, contentStream)
 
 const val TEST_BEARER_TOKEN = "Bearer test-token"

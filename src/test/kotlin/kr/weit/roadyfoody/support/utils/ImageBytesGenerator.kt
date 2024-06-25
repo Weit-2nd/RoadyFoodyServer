@@ -39,7 +39,5 @@ enum class ImageFormat(val values: List<String>) {
 
     fun first(): String = values.first()
 
-    fun getStrValues(): String = values.joinToString()
-
     fun getContentTypes(): List<String> = values.map { "image/$it" }
 }
