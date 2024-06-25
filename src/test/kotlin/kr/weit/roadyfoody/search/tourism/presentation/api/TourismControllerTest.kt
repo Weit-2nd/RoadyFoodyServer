@@ -1,10 +1,10 @@
 package kr.weit.roadyfoody.search.tourism.presentation.api
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
 import io.mockk.verify
-import kr.weit.roadyfoody.global.jsonmapper.ObjectMapperProvider
 import kr.weit.roadyfoody.search.tourism.application.service.TourismService
 import kr.weit.roadyfoody.search.tourism.fixture.TourismFixture.createSearchResponses
 import kr.weit.roadyfoody.support.annotation.ControllerTest
@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @ControllerTest
 @WebMvcTest(TourismController::class)
 class TourismControllerTest(
-    private val objectMapperProvider: ObjectMapperProvider,
+    private val objectMapper: ObjectMapper,
     @MockkBean private val tourismService: TourismService,
     private val mockMvc: MockMvc,
 ) : BehaviorSpec({
@@ -31,7 +31,7 @@ class TourismControllerTest(
                         .andExpect(status().isOk)
                         .andExpect(
                             content().json(
-                                objectMapperProvider.objectMapper.writeValueAsString(
+                                objectMapper.writeValueAsString(
                                     createSearchResponses(),
                                 ),
                             ),

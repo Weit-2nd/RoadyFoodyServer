@@ -1,10 +1,10 @@
 package kr.weit.roadyfoody.search.address.presentation.api
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
 import io.mockk.verify
-import kr.weit.roadyfoody.global.jsonmapper.ObjectMapperProvider
 import kr.weit.roadyfoody.search.address.application.service.AddressSearchService
 import kr.weit.roadyfoody.search.address.fixture.AddressFixture.createSearchResponses
 import kr.weit.roadyfoody.support.annotation.ControllerTest
@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @ControllerTest
 @WebMvcTest(AddressSearchController::class)
 class AddressSearchControllerTest(
-    private val objectMapperProvider: ObjectMapperProvider,
+    private val objectMapper: ObjectMapper,
     @MockkBean private val addressSearchService: AddressSearchService,
     private val mockMvc: MockMvc,
 ) : BehaviorSpec({
@@ -31,7 +31,7 @@ class AddressSearchControllerTest(
                         .andExpect(status().isOk)
                         .andExpect(
                             content().json(
-                                objectMapperProvider.objectMapper.writeValueAsString(
+                                objectMapper.writeValueAsString(
                                     createSearchResponses(),
                                 ),
                             ),
