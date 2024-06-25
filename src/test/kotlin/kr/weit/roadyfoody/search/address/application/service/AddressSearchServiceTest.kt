@@ -1,11 +1,13 @@
 package kr.weit.roadyfoody.search.address.application.service
 
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import kr.weit.roadyfoody.global.KEYWORD
-import kr.weit.roadyfoody.global.TEN
+import kr.weit.roadyfoody.global.TEST_KEYWORD
+import kr.weit.roadyfoody.global.TEST_PAGE_SIZE
 import kr.weit.roadyfoody.search.address.config.KakaoProperties
 import kr.weit.roadyfoody.search.address.fixture.AddressFixture
 import kr.weit.roadyfoody.search.address.presentation.client.KakaoAddressClientInterface
@@ -23,15 +25,15 @@ class AddressSearchServiceTest :
 
                 every {
                     kakaoAddressClientInterface.searchAddress(
-                        KEYWORD,
-                        TEN,
+                        TEST_KEYWORD,
+                        TEST_PAGE_SIZE,
                     )
                 } returns addressResponseWrapper
 
-                val addressResponses = addressService.searchAddress(KEYWORD, TEN)
+                val addressResponses = addressService.searchAddress(TEST_KEYWORD, TEST_PAGE_SIZE)
 
                 then("주소 검색을 반환한다.") {
-                    addressResponses.items.size shouldBe TEN
+                    addressResponses.items.shouldHaveSize(TEST_PAGE_SIZE)
                     val expectedPlaceName =
                         listOf(
                             "주소0",
@@ -57,15 +59,15 @@ class AddressSearchServiceTest :
 
                 every {
                     kakaoAddressClientInterface.searchAddress(
-                        KEYWORD,
-                        TEN,
+                        TEST_KEYWORD,
+                        TEST_PAGE_SIZE,
                     )
                 } returns addressResponseWrapper
 
-                val addressResponses = addressService.searchAddress(KEYWORD, TEN)
+                val addressResponses = addressService.searchAddress(TEST_KEYWORD, TEST_PAGE_SIZE)
 
                 then("빈 리스트를 반환한다.") {
-                    addressResponses.items.size shouldBe 0
+                    addressResponses.items.shouldBeEmpty()
                 }
             }
         }

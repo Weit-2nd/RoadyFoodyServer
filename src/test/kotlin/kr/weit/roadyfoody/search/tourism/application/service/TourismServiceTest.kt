@@ -2,12 +2,12 @@ package kr.weit.roadyfoody.search.tourism.application.service
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import kr.weit.roadyfoody.global.FOUR
-import kr.weit.roadyfoody.global.KEYWORD
-import kr.weit.roadyfoody.global.TEN
+import kr.weit.roadyfoody.global.TEST_KEYWORD
+import kr.weit.roadyfoody.global.TEST_PAGE_SIZE
 import kr.weit.roadyfoody.search.tourism.config.TourismProperties
 import kr.weit.roadyfoody.search.tourism.fixture.TourismFixture
 import kr.weit.roadyfoody.search.tourism.presentation.client.TourismClientInterface
@@ -41,8 +41,8 @@ class TourismServiceTest :
                         tourismProperties.apiKey,
                         tourismProperties.mobileApp,
                         tourismProperties.mobileOs,
-                        TEN,
-                        KEYWORD,
+                        TEST_PAGE_SIZE,
+                        TEST_KEYWORD,
                         TOUR_CONTENT_ID,
                     )
                 } returns tourResponseWrapper
@@ -52,16 +52,16 @@ class TourismServiceTest :
                         tourismProperties.apiKey,
                         tourismProperties.mobileApp,
                         tourismProperties.mobileOs,
-                        TEN,
-                        KEYWORD,
+                        TEST_PAGE_SIZE,
+                        TEST_KEYWORD,
                         FESTIVAL_CONTENT_ID,
                     )
                 } returns festivalResponseWrapper
 
-                val searchResponses = tourismService.searchTourism(TEN, KEYWORD)
+                val searchResponses = tourismService.searchTourism(TEST_PAGE_SIZE, TEST_KEYWORD)
 
                 then("관광지와 행사의 검색 결과를 랜덤하게 반환한다.") {
-                    searchResponses.items.size shouldBe TEN
+                    searchResponses.items.shouldHaveSize(TEST_PAGE_SIZE)
                     val expectedTitles =
                         listOf(
                             "관광지 0",
@@ -90,8 +90,8 @@ class TourismServiceTest :
                         tourismProperties.apiKey,
                         tourismProperties.mobileApp,
                         tourismProperties.mobileOs,
-                        TEN,
-                        KEYWORD,
+                        TEST_PAGE_SIZE,
+                        TEST_KEYWORD,
                         TOUR_CONTENT_ID,
                     )
                 } returns tourResponseWrapper
@@ -101,16 +101,16 @@ class TourismServiceTest :
                         tourismProperties.apiKey,
                         tourismProperties.mobileApp,
                         tourismProperties.mobileOs,
-                        TEN,
-                        KEYWORD,
+                        TEST_PAGE_SIZE,
+                        TEST_KEYWORD,
                         FESTIVAL_CONTENT_ID,
                     )
                 } returns festivalResponseWrapper
 
-                val searchResponses = tourismService.searchTourism(TEN, KEYWORD)
+                val searchResponses = tourismService.searchTourism(TEST_PAGE_SIZE, TEST_KEYWORD)
 
                 then("관광지와 행사의 검색 결과를 그대로 반환한다.") {
-                    searchResponses.items.size shouldBe FOUR
+                    searchResponses.items.shouldHaveSize(4)
                     val expectedTitles =
                         listOf(
                             "관광지 0",
@@ -133,8 +133,8 @@ class TourismServiceTest :
                         tourismProperties.apiKey,
                         tourismProperties.mobileApp,
                         tourismProperties.mobileOs,
-                        TEN,
-                        KEYWORD,
+                        TEST_PAGE_SIZE,
+                        TEST_KEYWORD,
                         TOUR_CONTENT_ID,
                     )
                 } returns tourResponseWrapper
@@ -144,13 +144,13 @@ class TourismServiceTest :
                         tourismProperties.apiKey,
                         tourismProperties.mobileApp,
                         tourismProperties.mobileOs,
-                        TEN,
-                        KEYWORD,
+                        TEST_PAGE_SIZE,
+                        TEST_KEYWORD,
                         FESTIVAL_CONTENT_ID,
                     )
                 } returns festivalResponseWrapper
 
-                val searchResponses = tourismService.searchTourism(TEN, KEYWORD)
+                val searchResponses = tourismService.searchTourism(TEST_PAGE_SIZE, TEST_KEYWORD)
 
                 then("빈 리스트를 반환한다.") {
                     searchResponses.items.shouldBeEmpty()
