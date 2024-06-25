@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.service.annotation.GetExchange
 
 @ClientInterface
-interface DapiClientInterface {
+interface KakaoAddressClientInterface {
     @GetExchange("/v2/local/search/keyword.json")
     fun searchAddress(
         @RequestHeader(name = "Authorization") apiKey: String,

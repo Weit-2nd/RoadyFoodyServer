@@ -4,7 +4,7 @@ import kr.weit.roadyfoody.search.address.application.dto.AddressResponseWrapper
 import kr.weit.roadyfoody.search.address.application.dto.AddressSearchResponse
 import kr.weit.roadyfoody.search.address.application.dto.AddressSearchResponses
 import kr.weit.roadyfoody.search.address.config.KakaoProperties
-import kr.weit.roadyfoody.search.address.presentation.client.DapiClientInterface
+import kr.weit.roadyfoody.search.address.presentation.client.KakaoAddressClientInterface
 import org.springframework.stereotype.Service
 
 const val KAKAO_AK = "KakaoAK "
@@ -12,7 +12,7 @@ const val KAKAO_AK = "KakaoAK "
 @Service
 class AddressSearchService(
     private val kakaoProperties: KakaoProperties,
-    private val dapiClientInterface: DapiClientInterface,
+    private val kakaoAddressClientInterface: KakaoAddressClientInterface,
 ) {
     fun searchAddress(
         keyword: String,
@@ -20,7 +20,7 @@ class AddressSearchService(
     ): AddressSearchResponses {
         var encodedKeyword = keyword.replace(" ", "")
 
-        val originalResponse = dapiClientInterface.searchAddress(KAKAO_AK + kakaoProperties.apiKey, encodedKeyword, size)
+        val originalResponse = kakaoAddressClientInterface.searchAddress(KAKAO_AK + kakaoProperties.apiKey, encodedKeyword, size)
         return convertResponse(originalResponse)
     }
 
