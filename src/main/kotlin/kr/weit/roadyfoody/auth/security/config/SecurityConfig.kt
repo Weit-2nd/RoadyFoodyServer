@@ -40,6 +40,7 @@ private val PERMITTED_URL_PATTERNS =
         "/api/v1/test/error",
         "/api/v1/test/rest",
         "/api/v1/tourism/**",
+        "/api/v1/address/**",
         "/swagger-ui/**",
         "/v3/api-docs/**",
         "/actuator/prometheus",
