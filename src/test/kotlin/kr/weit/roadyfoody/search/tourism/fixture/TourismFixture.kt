@@ -1,10 +1,10 @@
-package kr.weit.roadyfoody.tourism.fixture
+package kr.weit.roadyfoody.search.tourism.fixture
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import kr.weit.roadyfoody.tourism.dto.ResponseWrapper
-import kr.weit.roadyfoody.tourism.dto.SearchResponse
-import kr.weit.roadyfoody.tourism.dto.SearchResponses
-import kr.weit.roadyfoody.tourism.dto.TourismType
+import kr.weit.roadyfoody.search.tourism.dto.ResponseWrapper
+import kr.weit.roadyfoody.search.tourism.dto.SearchResponse
+import kr.weit.roadyfoody.search.tourism.dto.SearchResponses
+import kr.weit.roadyfoody.search.tourism.dto.TourismType
 import org.springframework.core.io.ClassPathResource
 
 object TourismFixture {

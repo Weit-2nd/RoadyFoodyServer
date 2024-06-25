@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.tourism.dto
+package kr.weit.roadyfoody.search.tourism.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 

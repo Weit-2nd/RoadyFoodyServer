@@ -1,13 +1,13 @@
-package kr.weit.roadyfoody.tourism.application.service
+package kr.weit.roadyfoody.search.tourism.application.service
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import kr.weit.roadyfoody.tourism.config.TourismProperties
-import kr.weit.roadyfoody.tourism.fixture.TourismFixture
-import kr.weit.roadyfoody.tourism.presentation.client.TourismClientInterface
+import kr.weit.roadyfoody.search.tourism.config.TourismProperties
+import kr.weit.roadyfoody.search.tourism.fixture.TourismFixture
+import kr.weit.roadyfoody.search.tourism.presentation.client.TourismClientInterface
 import java.util.concurrent.ExecutorService
 
 private const val TEN = 10

@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.tourism.presentation.spec
+package kr.weit.roadyfoody.search.tourism.presentation.spec
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -9,9 +9,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import kr.weit.roadyfoody.common.exception.ErrorResponse
 import kr.weit.roadyfoody.global.swagger.v1.SwaggerTag
-import kr.weit.roadyfoody.tourism.dto.SearchResponses
+import kr.weit.roadyfoody.search.tourism.dto.SearchResponses
 
-@Tag(name = SwaggerTag.TOURISM)
+@Tag(name = SwaggerTag.SEARCH)
 interface TourismControllerSpec {
     @Operation(
         description = "관광지 검색 API",

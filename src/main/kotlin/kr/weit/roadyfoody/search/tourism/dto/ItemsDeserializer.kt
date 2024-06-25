@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.tourism.dto
+package kr.weit.roadyfoody.search.tourism.dto
 
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationContext

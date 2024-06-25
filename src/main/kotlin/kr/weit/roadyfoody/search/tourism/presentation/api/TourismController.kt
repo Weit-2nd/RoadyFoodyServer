@@ -1,8 +1,8 @@
-package kr.weit.roadyfoody.tourism.presentation.api
+package kr.weit.roadyfoody.search.tourism.presentation.api
 
-import kr.weit.roadyfoody.tourism.application.service.TourismService
-import kr.weit.roadyfoody.tourism.dto.SearchResponses
-import kr.weit.roadyfoody.tourism.presentation.spec.TourismControllerSpec
+import kr.weit.roadyfoody.search.tourism.application.service.TourismService
+import kr.weit.roadyfoody.search.tourism.dto.SearchResponses
+import kr.weit.roadyfoody.search.tourism.presentation.spec.TourismControllerSpec
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController

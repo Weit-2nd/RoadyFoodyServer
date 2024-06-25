@@ -1,7 +1,7 @@
-package kr.weit.roadyfoody.tourism.presentation.client
+package kr.weit.roadyfoody.search.tourism.presentation.client
 
 import kr.weit.roadyfoody.common.annotation.ClientInterface
-import kr.weit.roadyfoody.tourism.dto.ResponseWrapper
+import kr.weit.roadyfoody.search.tourism.dto.ResponseWrapper
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.service.annotation.GetExchange
 

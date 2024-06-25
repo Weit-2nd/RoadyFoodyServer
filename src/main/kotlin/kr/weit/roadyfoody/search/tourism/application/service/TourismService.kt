@@ -1,11 +1,11 @@
-package kr.weit.roadyfoody.tourism.application.service
+package kr.weit.roadyfoody.search.tourism.application.service
 
-import kr.weit.roadyfoody.tourism.config.TourismProperties
-import kr.weit.roadyfoody.tourism.dto.ResponseWrapper
-import kr.weit.roadyfoody.tourism.dto.SearchResponse
-import kr.weit.roadyfoody.tourism.dto.SearchResponses
-import kr.weit.roadyfoody.tourism.dto.TourismType
-import kr.weit.roadyfoody.tourism.presentation.client.TourismClientInterface
+import kr.weit.roadyfoody.search.tourism.config.TourismProperties
+import kr.weit.roadyfoody.search.tourism.dto.ResponseWrapper
+import kr.weit.roadyfoody.search.tourism.dto.SearchResponse
+import kr.weit.roadyfoody.search.tourism.dto.SearchResponses
+import kr.weit.roadyfoody.search.tourism.dto.TourismType
+import kr.weit.roadyfoody.search.tourism.presentation.client.TourismClientInterface
 import org.springframework.stereotype.Service
 import org.yaml.snakeyaml.util.UriEncoder
 import java.util.concurrent.CompletableFuture

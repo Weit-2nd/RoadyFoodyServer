@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.tourism.config
+package kr.weit.roadyfoody.search.tourism.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 

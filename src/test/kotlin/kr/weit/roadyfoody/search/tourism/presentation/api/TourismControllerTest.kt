@@ -1,13 +1,13 @@
-package kr.weit.roadyfoody.tourism.presentation.api
+package kr.weit.roadyfoody.search.tourism.presentation.api
 
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
 import io.mockk.verify
 import kr.weit.roadyfoody.global.jsonmapper.ObjectMapperProvider
+import kr.weit.roadyfoody.search.tourism.application.service.TourismService
+import kr.weit.roadyfoody.search.tourism.fixture.TourismFixture.createSearchResponses
 import kr.weit.roadyfoody.support.annotation.ControllerTest
-import kr.weit.roadyfoody.tourism.application.service.TourismService
-import kr.weit.roadyfoody.tourism.fixture.TourismFixture.createSearchResponses
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
