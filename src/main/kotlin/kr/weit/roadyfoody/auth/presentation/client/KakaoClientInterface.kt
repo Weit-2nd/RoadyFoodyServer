@@ -1,6 +1,5 @@
 package kr.weit.roadyfoody.auth.presentation.client
 
-import kr.weit.roadyfoody.auth.domain.SocialAccessToken
 import kr.weit.roadyfoody.auth.dto.KakaoUserResponse
 import kr.weit.roadyfoody.common.annotation.ClientInterface
 import org.springframework.http.HttpHeaders.AUTHORIZATION
@@ -11,6 +10,6 @@ import org.springframework.web.service.annotation.GetExchange
 interface KakaoClientInterface {
     @GetExchange("/v2/user/me")
     fun requestUserInfo(
-        @RequestHeader(AUTHORIZATION) socialAccessToken: SocialAccessToken,
+        @RequestHeader(AUTHORIZATION) socialAccessToken: String,
     ): KakaoUserResponse
 }
