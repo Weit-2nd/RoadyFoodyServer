@@ -1,6 +1,5 @@
 package kr.weit.roadyfoody.auth.application.service
 
-import kr.weit.roadyfoody.auth.domain.SocialAccessToken
 import kr.weit.roadyfoody.auth.dto.SignUpRequest
 import kr.weit.roadyfoody.auth.exception.UserAlreadyExistsException
 import kr.weit.roadyfoody.global.service.ImageService
@@ -13,6 +12,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.multipart.MultipartFile
 
 @Service
 class AuthCommandService(
@@ -26,12 +26,10 @@ class AuthCommandService(
 
     @Transactional
     fun register(
-        socialAccessToken: SocialAccessToken,
+        socialAccessToken: String,
         signUpRequest: SignUpRequest,
+        profileImage: MultipartFile?,
     ) {
-        requireNotNull(signUpRequest.agreedTermIds)
-        requireNotNull(signUpRequest.nickname)
-
         val socialId = obtainSocialId(signUpRequest.socialLoginType, socialAccessToken)
 
         if (userRepository.existsBySocialId(socialId)) {
@@ -44,15 +42,15 @@ class AuthCommandService(
         userRepository.save(user)
         userAgreedTermCommandService.storeUserAgreedTerms(user, signUpRequest.agreedTermIds)
 
-        if (signUpRequest.profileImage != null) {
-            val imageName = imageService.generateImageName(signUpRequest.profileImage)
+        if (profileImage != null) {
+            val imageName = imageService.generateImageName(profileImage)
             user.profile.changeProfileImageName(imageName)
-            imageService.upload(imageName, signUpRequest.profileImage) // 외부 저장소 롤백 어려움을 고려해 가장 아래에 배치
+            imageService.upload(imageName, profileImage)
         }
     }
 
     private fun obtainSocialId(
         socialLoginType: SocialLoginType,
-        socialAccessToken: SocialAccessToken,
+        socialAccessToken: String,
     ): String = "$socialLoginType ${authQueryService.requestKakaoUserInfo(socialAccessToken).id}"
 }

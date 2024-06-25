@@ -7,26 +7,27 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
+import io.mockk.spyk
 import io.mockk.verify
-import kr.weit.roadyfoody.auth.domain.SocialAccessToken
 import kr.weit.roadyfoody.auth.exception.UserAlreadyExistsException
 import kr.weit.roadyfoody.auth.fixture.TEST_SOCIAL_ACCESS_TOKEN
+import kr.weit.roadyfoody.auth.fixture.createTestImageFile
 import kr.weit.roadyfoody.auth.fixture.createTestKakaoUserResponse
 import kr.weit.roadyfoody.auth.fixture.createTestSignUpRequest
 import kr.weit.roadyfoody.global.service.ImageService
+import kr.weit.roadyfoody.support.utils.ImageFormat.WEBP
 import kr.weit.roadyfoody.term.service.TermCommandService
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.repository.UserRepository
 import kr.weit.roadyfoody.useragreedterm.service.UserAgreedTermCommandService
 import org.springframework.web.multipart.MultipartFile
-import java.util.UUID
 
 class AuthCommandServiceTest : BehaviorSpec({
     val authQueryService = mockk<AuthQueryService>()
     val termCommandService = mockk<TermCommandService>()
     val userAgreedTermCommandService = mockk<UserAgreedTermCommandService>()
     val userRepository = mockk<UserRepository>()
-    val imageService = mockk<ImageService>()
+    val imageService = spyk<ImageService>(ImageService(mockk()))
     val authCommandService =
         AuthCommandService(authQueryService, termCommandService, userAgreedTermCommandService, userRepository, imageService)
 
@@ -34,9 +35,8 @@ class AuthCommandServiceTest : BehaviorSpec({
 
     given("register 테스트") {
         beforeEach {
-            every { authQueryService.requestKakaoUserInfo(any<SocialAccessToken>()) } returns createTestKakaoUserResponse()
+            every { authQueryService.requestKakaoUserInfo(any<String>()) } returns createTestKakaoUserResponse()
             every { termCommandService.checkRequiredTermsOrThrow(any<Set<Long>>()) } just runs
-            every { imageService.generateImageName(any<MultipartFile>()) } returns UUID.randomUUID().toString()
             every { userRepository.save(any<User>()) } returns mockk<User>()
             every { userAgreedTermCommandService.storeUserAgreedTerms(any<User>(), any<Set<Long>>()) } just runs
             every { imageService.upload(any<String>(), any<MultipartFile>()) } just runs
@@ -44,9 +44,9 @@ class AuthCommandServiceTest : BehaviorSpec({
         `when`("프로필 이미지가 없으면 ") {
             every { userRepository.existsBySocialId(any<String>()) } returns false
             then("이미지를 업로드하지 않고 User 가 생성된다.") {
-                authCommandService.register(TEST_SOCIAL_ACCESS_TOKEN, createTestSignUpRequest(profileImage = null))
+                authCommandService.register(TEST_SOCIAL_ACCESS_TOKEN, createTestSignUpRequest(), null)
                 verify(exactly = 1) {
-                    authQueryService.requestKakaoUserInfo(any<SocialAccessToken>())
+                    authQueryService.requestKakaoUserInfo(any<String>())
                     userRepository.existsBySocialId(any<String>())
                     termCommandService.checkRequiredTermsOrThrow(any<Set<Long>>())
                     userRepository.save(any<User>())
@@ -62,9 +62,9 @@ class AuthCommandServiceTest : BehaviorSpec({
         `when`("프로필 이미지가 있으면") {
             every { userRepository.existsBySocialId(any<String>()) } returns false
             then("이미지를 업로드하고 User 가 생성된다.") {
-                authCommandService.register(TEST_SOCIAL_ACCESS_TOKEN, createTestSignUpRequest())
+                authCommandService.register(TEST_SOCIAL_ACCESS_TOKEN, createTestSignUpRequest(), createTestImageFile(WEBP))
                 verify(exactly = 1) {
-                    authQueryService.requestKakaoUserInfo(any<SocialAccessToken>())
+                    authQueryService.requestKakaoUserInfo(any<String>())
                     userRepository.existsBySocialId(any<String>())
                     termCommandService.checkRequiredTermsOrThrow(any<Set<Long>>())
                     imageService.generateImageName(any<MultipartFile>())
@@ -79,10 +79,10 @@ class AuthCommandServiceTest : BehaviorSpec({
             every { userRepository.existsBySocialId(any<String>()) } returns true
             then("UserAlreadyExistsException 예외가 발생한다.") {
                 shouldThrow<UserAlreadyExistsException> {
-                    authCommandService.register(TEST_SOCIAL_ACCESS_TOKEN, createTestSignUpRequest())
+                    authCommandService.register(TEST_SOCIAL_ACCESS_TOKEN, createTestSignUpRequest(), createTestImageFile(WEBP))
                 }
                 verify(exactly = 1) {
-                    authQueryService.requestKakaoUserInfo(any<SocialAccessToken>())
+                    authQueryService.requestKakaoUserInfo(any<String>())
                     userRepository.existsBySocialId(any<String>())
                 }
                 verify(exactly = 0) {
