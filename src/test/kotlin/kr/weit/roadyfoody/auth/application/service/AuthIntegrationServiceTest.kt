@@ -20,6 +20,7 @@ import kr.weit.roadyfoody.support.annotation.ServiceIntegrateTest
 import kr.weit.roadyfoody.support.utils.ImageFormat.WEBP
 import kr.weit.roadyfoody.term.fixture.createTestTerms
 import kr.weit.roadyfoody.term.repository.TermRepository
+import kr.weit.roadyfoody.user.fixture.TEST_USER_NICKNAME
 import kr.weit.roadyfoody.user.fixture.TEST_USER_SOCIAL_ID
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import kr.weit.roadyfoody.user.repository.UserRepository
@@ -112,6 +113,27 @@ class AuthIntegrationServiceTest(
                         authCommandService.register(
                             TEST_SOCIAL_ACCESS_TOKEN,
                             createTestSignUpRequest(termIdSet = validTermIdSet),
+                            null,
+                        )
+                    }
+                    verify(exactly = 1) { authQueryService.requestKakaoUserInfo(any<String>()) }
+                }
+            }
+        }
+
+        given("중복된 닉네임인 경우") {
+            beforeContainer {
+                userRepository.save(createTestUser(nickname = TEST_USER_NICKNAME))
+            }
+            afterContainer {
+                userRepository.deleteAll()
+            }
+            `when`("회원가입을 요청하면") {
+                then("UserAlreadyExistsException 을 던진다") {
+                    shouldThrow<UserAlreadyExistsException> {
+                        authCommandService.register(
+                            TEST_SOCIAL_ACCESS_TOKEN,
+                            createTestSignUpRequest(nickname = TEST_USER_NICKNAME, termIdSet = validTermIdSet),
                             null,
                         )
                     }
