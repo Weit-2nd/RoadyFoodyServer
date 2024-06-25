@@ -2,7 +2,9 @@ package kr.weit.roadyfoody.global.client
 
 import kr.weit.roadyfoody.auth.presentation.client.KakaoLoginClientInterface
 import kr.weit.roadyfoody.common.exception.RestClientException
-import kr.weit.roadyfoody.tourism.presentation.client.TourismClientInterface
+import kr.weit.roadyfoody.search.address.config.KakaoProperties
+import kr.weit.roadyfoody.search.address.presentation.client.KakaoAddressClientInterface
+import kr.weit.roadyfoody.search.tourism.presentation.client.TourismClientInterface
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -27,6 +29,7 @@ class RestClientConfig {
         private const val READ_TIME = 5L
         private const val TOURISM_URL = "http://apis.data.go.kr/B551011/KorService1"
         private const val KAKAO_LOGIN_URL = "https://kapi.kakao.com"
+        private const val KAKAO_ADDRESS_URL = "https://dapi.kakao.com"
     }
 
     private val log: Logger = LoggerFactory.getLogger(RestClientConfig::class.java)
@@ -40,6 +43,12 @@ class RestClientConfig {
     }
 
     @Bean
+    fun kakaoAddressClientInterface(kakaoProperties: KakaoProperties): KakaoAddressClientInterface {
+        var headers = mapOf("Authorization" to "KakaoAK ${kakaoProperties.apiKey}")
+        return createClient(KAKAO_ADDRESS_URL, KakaoAddressClientInterface::class.java, headers)
+    }
+
+    @Bean
     fun kakaoLoginClientInterface(): KakaoLoginClientInterface {
         return createClient(KAKAO_LOGIN_URL, KakaoLoginClientInterface::class.java)
     }
@@ -47,6 +56,7 @@ class RestClientConfig {
     private fun <T> createClient(
         baseUrl: String,
         clientClass: Class<T>,
+        headers: Map<String, String>? = null,
     ): T {
         val restClientBuilder =
             RestClient.builder()
@@ -62,6 +72,10 @@ class RestClientConfig {
                         .build(),
                 ),
             )
+        }
+
+        headers?.forEach { (key, value) ->
+            restClientBuilder.defaultHeader(key, value)
         }
 
         restClientBuilder
