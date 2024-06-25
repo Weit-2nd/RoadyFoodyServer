@@ -22,13 +22,13 @@ class FoodSpotsService(
     fun createReport(
         userId: Long,
         reportRequest: ReportRequest,
-        photos: List<MultipartFile>?,
+        photos: List<MultipartFile>,
     ) {
         val user = userRepository.getByUserId(userId)
         val foodStoreInfo = reportRequest.toFoodSpotsEntity()
         foodSpotsRepository.save(foodStoreInfo)
         val foodStoreHistory = reportRequest.toFoodSpotsHistoryEntity(foodStoreInfo, user)
         foodSpotsHistoryRepository.save(foodStoreHistory)
-        photos?.map { CompletableFuture.supplyAsync { imageService.upload(imageService.generateImageName(it), it) } }?.forEach { it.join() }
+        photos.map { CompletableFuture.supplyAsync { imageService.upload(imageService.generateImageName(it), it) } }.forEach { it.join() }
     }
 }
