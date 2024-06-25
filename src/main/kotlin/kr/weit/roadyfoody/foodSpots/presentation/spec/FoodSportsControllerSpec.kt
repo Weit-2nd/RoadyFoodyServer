@@ -22,7 +22,6 @@ interface FoodSportsControllerSpec {
     @Operation(
         description = "음식점 정보 리포트 API",
         parameters = [
-            Parameter(name = "userId", description = "유저 ID", required = true, example = "1"),
             Parameter(name = "reportRequest", description = "음식점 정보", required = true),
             Parameter(
                 name = "reportPhotos",
@@ -147,6 +146,6 @@ interface FoodSportsControllerSpec {
         reportRequest: ReportRequest,
         @Size(max = 3, message = "이미지는 최대 3개까지 업로드할 수 있습니다.")
         @WebPImageList
-        reportPhotos: List<MultipartFile>?,
+        reportPhotos: List<MultipartFile>,
     )
 }
