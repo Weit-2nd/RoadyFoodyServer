@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import kr.weit.roadyfoody.auth.dto.DuplicatedNicknameResponse
 import kr.weit.roadyfoody.auth.dto.SignUpRequest
 import kr.weit.roadyfoody.common.exception.ErrorResponse
 import kr.weit.roadyfoody.global.swagger.v1.SwaggerTag
@@ -137,4 +138,13 @@ interface AuthControllerSpec {
         @WebPImage
         profileImage: MultipartFile?,
     )
+
+    @Operation(
+        summary = "닉네임 중복 검사 API",
+        description = "회원가입 시 사용할 닉네임이 중복되는지 검사합니다.",
+        parameters = [
+            Parameter(name = "nickname", description = "닉네임", required = true, example = "테스트닉네임입니다"),
+        ],
+    )
+    fun checkDuplicatedNickname(nickname: String): DuplicatedNicknameResponse
 }
