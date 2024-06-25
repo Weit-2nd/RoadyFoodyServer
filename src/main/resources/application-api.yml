@@ -1,8 +1,17 @@
 client:
   tour:
-    apiKey: test
     mobileApp: 로디푸디
     mobileOs: AND
     contentTypeId: 15
+
+
+
+---
+spring:
+  config.activate.on-profile: test
+
+client:
+  tour:
+    apiKey: test
   kakao:
     apiKey: test
