@@ -36,6 +36,9 @@ class AuthCommandService(
             log.error("UserAlreadyExistsException={}", socialId)
             throw UserAlreadyExistsException()
         }
+        if (userRepository.existsByProfileNickname(signUpRequest.nickname)) {
+            throw UserAlreadyExistsException()
+        }
         termCommandService.checkRequiredTermsOrThrow(signUpRequest.agreedTermIds)
 
         val user = User.of(socialId, signUpRequest.nickname)

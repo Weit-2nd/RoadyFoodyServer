@@ -43,11 +43,13 @@ class AuthCommandServiceTest : BehaviorSpec({
         }
         `when`("프로필 이미지가 없으면 ") {
             every { userRepository.existsBySocialId(any<String>()) } returns false
+            every { userRepository.existsByProfileNickname(any<String>()) } returns false
             then("이미지를 업로드하지 않고 User 가 생성된다.") {
                 authCommandService.register(TEST_SOCIAL_ACCESS_TOKEN, createTestSignUpRequest(), null)
                 verify(exactly = 1) {
                     authQueryService.requestKakaoUserInfo(any<String>())
                     userRepository.existsBySocialId(any<String>())
+                    userRepository.existsByProfileNickname(any<String>())
                     termCommandService.checkRequiredTermsOrThrow(any<Set<Long>>())
                     userRepository.save(any<User>())
                     userAgreedTermCommandService.storeUserAgreedTerms(any<User>(), any<Set<Long>>())
@@ -61,11 +63,17 @@ class AuthCommandServiceTest : BehaviorSpec({
 
         `when`("프로필 이미지가 있으면") {
             every { userRepository.existsBySocialId(any<String>()) } returns false
+            every { userRepository.existsByProfileNickname(any<String>()) } returns false
             then("이미지를 업로드하고 User 가 생성된다.") {
-                authCommandService.register(TEST_SOCIAL_ACCESS_TOKEN, createTestSignUpRequest(), createTestImageFile(WEBP))
+                authCommandService.register(
+                    TEST_SOCIAL_ACCESS_TOKEN,
+                    createTestSignUpRequest(),
+                    createTestImageFile(WEBP),
+                )
                 verify(exactly = 1) {
                     authQueryService.requestKakaoUserInfo(any<String>())
                     userRepository.existsBySocialId(any<String>())
+                    userRepository.existsByProfileNickname(any<String>())
                     termCommandService.checkRequiredTermsOrThrow(any<Set<Long>>())
                     imageService.generateImageName(any<MultipartFile>())
                     userRepository.save(any<User>())
@@ -77,13 +85,45 @@ class AuthCommandServiceTest : BehaviorSpec({
 
         `when`("이미 가입된 사용자가 있으면") {
             every { userRepository.existsBySocialId(any<String>()) } returns true
+            every { userRepository.existsByProfileNickname(any<String>()) } returns false
             then("UserAlreadyExistsException 예외가 발생한다.") {
                 shouldThrow<UserAlreadyExistsException> {
-                    authCommandService.register(TEST_SOCIAL_ACCESS_TOKEN, createTestSignUpRequest(), createTestImageFile(WEBP))
+                    authCommandService.register(
+                        TEST_SOCIAL_ACCESS_TOKEN,
+                        createTestSignUpRequest(),
+                        createTestImageFile(WEBP),
+                    )
                 }
                 verify(exactly = 1) {
                     authQueryService.requestKakaoUserInfo(any<String>())
                     userRepository.existsBySocialId(any<String>())
+                }
+                verify(exactly = 0) {
+                    userRepository.existsByProfileNickname(any<String>())
+                    termCommandService.checkRequiredTermsOrThrow(any<Set<Long>>())
+                    imageService.generateImageName(any<MultipartFile>())
+                    userRepository.save(any<User>())
+                    userAgreedTermCommandService.storeUserAgreedTerms(any<User>(), any<Set<Long>>())
+                    imageService.upload(any<String>(), any<MultipartFile>())
+                }
+            }
+        }
+
+        `when`("중복된 닉네임이라면") {
+            every { userRepository.existsBySocialId(any<String>()) } returns false
+            every { userRepository.existsByProfileNickname(any<String>()) } returns true
+            then("UserAlreadyExistsException 예외가 발생한다.") {
+                shouldThrow<UserAlreadyExistsException> {
+                    authCommandService.register(
+                        TEST_SOCIAL_ACCESS_TOKEN,
+                        createTestSignUpRequest(),
+                        createTestImageFile(WEBP),
+                    )
+                }
+                verify(exactly = 1) {
+                    authQueryService.requestKakaoUserInfo(any<String>())
+                    userRepository.existsBySocialId(any<String>())
+                    userRepository.existsByProfileNickname(any<String>())
                 }
                 verify(exactly = 0) {
                     termCommandService.checkRequiredTermsOrThrow(any<Set<Long>>())

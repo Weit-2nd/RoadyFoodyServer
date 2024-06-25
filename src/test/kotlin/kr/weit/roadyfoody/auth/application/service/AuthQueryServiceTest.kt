@@ -12,11 +12,13 @@ import kr.weit.roadyfoody.auth.fixture.TEST_SOCIAL_ACCESS_TOKEN
 import kr.weit.roadyfoody.auth.fixture.createTestKakaoUserResponse
 import kr.weit.roadyfoody.auth.presentation.client.KakaoClientInterface
 import kr.weit.roadyfoody.common.exception.RestClientException
+import kr.weit.roadyfoody.user.repository.UserRepository
 
 class AuthQueryServiceTest :
     BehaviorSpec({
         val kakaoClientInterface = mockk<KakaoClientInterface>()
-        val authQueryService = AuthQueryService(kakaoClientInterface)
+        val userRepository = mockk<UserRepository>()
+        val authQueryService = AuthQueryService(kakaoClientInterface, userRepository)
 
         afterEach { clearAllMocks() }
 
@@ -47,6 +49,24 @@ class AuthQueryServiceTest :
                         }
                     exception shouldBe InvalidTokenException()
                     verify(exactly = 1) { kakaoClientInterface.requestUserInfo(TEST_SOCIAL_ACCESS_TOKEN) }
+                }
+            }
+        }
+
+        given("checkDuplicatedNickname 테스트") {
+            `when`("닉네임이 중복되면") {
+                every { userRepository.existsByProfileNickname(any()) } returns true
+                then("true 를 반환한다") {
+                    authQueryService.checkDuplicatedNickname("중복닉네임") shouldBe true
+                    verify(exactly = 1) { userRepository.existsByProfileNickname("중복닉네임") }
+                }
+            }
+
+            `when`("닉네임이 중복되지 않으면") {
+                every { userRepository.existsByProfileNickname(any()) } returns false
+                then("false 를 반환한다") {
+                    authQueryService.checkDuplicatedNickname("중복되지않는닉네임") shouldBe false
+                    verify(exactly = 1) { userRepository.existsByProfileNickname("중복되지않는닉네임") }
                 }
             }
         }
