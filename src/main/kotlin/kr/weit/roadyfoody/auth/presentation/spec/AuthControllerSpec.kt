@@ -145,6 +145,27 @@ interface AuthControllerSpec {
         parameters = [
             Parameter(name = "nickname", description = "닉네임", required = true, example = "테스트닉네임입니다"),
         ],
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "요청 성공",
+                content = [
+                    Content(
+                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                        schema = Schema(implementation = DuplicatedNicknameResponse::class),
+                        examples = [
+                            ExampleObject(
+                                value = """
+                        {
+                            "isDuplicated": true
+                        }
+                        """,
+                            ),
+                        ],
+                    ),
+                ],
+            ),
+        ],
     )
     fun checkDuplicatedNickname(nickname: String): DuplicatedNicknameResponse
 }
