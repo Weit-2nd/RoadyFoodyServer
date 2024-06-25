@@ -1,9 +1,10 @@
 package kr.weit.roadyfoody.global.config
 
-import kr.weit.roadyfoody.tourism.config.TourismProperties
+import kr.weit.roadyfoody.search.address.config.KakaoProperties
+import kr.weit.roadyfoody.search.tourism.config.TourismProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration
 
-@EnableConfigurationProperties(TourismProperties::class, S3Properties::class)
+@EnableConfigurationProperties(TourismProperties::class, S3Properties::class, KakaoProperties::class)
 @Configuration
 class EnablePropertiesConfig
