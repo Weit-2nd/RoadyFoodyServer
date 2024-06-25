@@ -6,4 +6,5 @@ object SwaggerTag {
     const val TERM: String = "A. 약관 API"
     const val AUTH: String = "B. 인증 API"
     const val TOURISM: String = "C. 관광지 검색 API"
+    const val FOOD_SPOTS: String = "D. 음식점 리포트 API"
 }
