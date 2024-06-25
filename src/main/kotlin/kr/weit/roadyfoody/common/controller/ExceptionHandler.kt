@@ -23,6 +23,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.WebRequest
+import org.springframework.web.method.annotation.HandlerMethodValidationException
 import org.springframework.web.multipart.support.MissingServletRequestPartException
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
@@ -108,6 +109,13 @@ class ExceptionHandler(
         return getInvalidRequestResponse(ex.message, HttpStatus.UNSUPPORTED_MEDIA_TYPE)
     }
 
+    override fun handleHandlerMethodValidationException(
+        ex: HandlerMethodValidationException,
+        headers: HttpHeaders,
+        status: HttpStatusCode,
+        request: WebRequest,
+    ): ResponseEntity<Any>? = getInvalidRequestResponse(ex.messages().joinToString())
+
     @ExceptionHandler(
         IllegalArgumentException::class,
         IllegalStateException::class,
@@ -152,6 +160,11 @@ class ExceptionHandler(
     private fun MethodArgumentNotValidException.messages(): List<String> {
         return bindingResult.fieldErrors.map { "${it.field}: ${it.defaultMessage.orEmpty()}" }
     }
+
+    private fun HandlerMethodValidationException.messages(): List<String> =
+        this.allErrors.map {
+            it.defaultMessage.orEmpty()
+        }
 
     private fun getInvalidRequestResponse(
         errorMessage: String?,
