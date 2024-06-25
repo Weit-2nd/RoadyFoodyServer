@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile
 import kotlin.reflect.KClass
 
 @Constraint(validatedBy = [WebPImageValidator::class])
-@Target(AnnotationTarget.FIELD)
+@Target(AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class WebPImage(
     val message: String = "webp 형식이 아닙니다.",
