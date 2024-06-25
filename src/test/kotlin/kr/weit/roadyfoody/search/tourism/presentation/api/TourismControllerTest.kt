@@ -27,7 +27,8 @@ class TourismControllerTest(
             `when`("키워드로 관광지 검색 요청을 보내면") {
                 every { tourismService.searchTourism(2, "강원") } returns createSearchResponses()
                 then("200 상태 번호와 SearchResponses 반환한다.") {
-                    mockMvc.perform(get("$requestPath/search?numOfRows=2&keyword=강원"))
+                    mockMvc
+                        .perform(get("$requestPath/search?numOfRows=2&keyword=강원"))
                         .andExpect(status().isOk)
                         .andExpect(
                             content().json(

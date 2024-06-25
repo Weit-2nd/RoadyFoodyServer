@@ -49,12 +49,17 @@ dependencies {
     implementation("com.linecorp.kotlin-jdsl:jpql-dsl:3.4.1")
     implementation("com.linecorp.kotlin-jdsl:jpql-render:3.4.1")
     implementation("com.linecorp.kotlin-jdsl:spring-data-jpa-support:3.4.1")
+    implementation("com.linecorp.kotlin-jdsl:hibernate-kotlin-jdsl-jakarta:2.2.1.RELEASE")
     implementation("org.hibernate.orm:hibernate-spatial:6.5.2.Final")
 
     // Secret & Config
     implementation(platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.1.1"))
     implementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store:3.1.1")
     implementation("org.springframework.cloud:spring-cloud-starter-bootstrap:4.1.2")
+
+    // utils
+    implementation("org.apache.tika:tika-core:2.9.1")
+    implementation("com.sksamuel.scrimage:scrimage-webp:4.1.3")
 
     // Test
     testImplementation(platform("org.junit:junit-bom:5.10.2"))
