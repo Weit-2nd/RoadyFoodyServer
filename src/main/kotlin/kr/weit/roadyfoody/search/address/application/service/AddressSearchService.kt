@@ -6,6 +6,8 @@ import kr.weit.roadyfoody.search.address.application.dto.AddressSearchResponses
 import kr.weit.roadyfoody.search.address.config.KakaoProperties
 import kr.weit.roadyfoody.search.address.presentation.client.KakaoAddressClientInterface
 import org.springframework.stereotype.Service
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 const val KAKAO_AK = "KakaoAK "
 
@@ -18,8 +20,7 @@ class AddressSearchService(
         keyword: String,
         size: Int,
     ): AddressSearchResponses {
-        var encodedKeyword = keyword.replace(" ", "")
-
+        val encodedKeyword: String = URLEncoder.encode(keyword.trim(), StandardCharsets.UTF_8)
         val originalResponse = kakaoAddressClientInterface.searchAddress(encodedKeyword, size)
         return convertResponse(originalResponse)
     }
