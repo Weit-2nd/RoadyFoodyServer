@@ -107,7 +107,7 @@ class AuthControllerTest(
 
         given("GET $requestPath/check-nickname") {
             `when`("중복되지 않는 닉네임을 전달하면") {
-                every { authQueryService.checkDuplicatedNickname(any()) } returns false
+                every { authQueryService.checkDuplicatedNickname(any()) } returns DuplicatedNicknameResponse(false)
                 then("내용이 false 인 응답을 반환한다") {
                     mockMvc.perform(
                         get("$requestPath/check-nickname")
@@ -123,7 +123,7 @@ class AuthControllerTest(
             }
 
             `when`("중복되는 닉네임을 전달하면") {
-                every { authQueryService.checkDuplicatedNickname(any()) } returns true
+                every { authQueryService.checkDuplicatedNickname(any()) } returns DuplicatedNicknameResponse(true)
                 then("내용이 true 인 응답을 반환한다") {
                     mockMvc.perform(
                         get("$requestPath/check-nickname")

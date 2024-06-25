@@ -46,7 +46,5 @@ class AuthController(
     @GetMapping("/check-nickname")
     override fun checkDuplicatedNickname(
         @RequestParam nickname: String,
-    ): DuplicatedNicknameResponse {
-        return DuplicatedNicknameResponse(authQueryService.checkDuplicatedNickname(nickname))
-    }
+    ): DuplicatedNicknameResponse = authQueryService.checkDuplicatedNickname(nickname)
 }
