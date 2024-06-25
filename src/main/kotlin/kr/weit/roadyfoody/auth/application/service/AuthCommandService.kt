@@ -8,8 +8,6 @@ import kr.weit.roadyfoody.user.domain.SocialLoginType
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.repository.UserRepository
 import kr.weit.roadyfoody.useragreedterm.service.UserAgreedTermCommandService
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
@@ -22,8 +20,6 @@ class AuthCommandService(
     private val userRepository: UserRepository,
     private val imageService: ImageService,
 ) {
-    private val log: Logger = LoggerFactory.getLogger(AuthCommandService::class.java)
-
     @Transactional
     fun register(
         socialAccessToken: String,
@@ -32,11 +28,9 @@ class AuthCommandService(
     ) {
         val socialId = obtainSocialId(signUpRequest.socialLoginType, socialAccessToken)
 
-        if (userRepository.existsBySocialId(socialId)) {
-            log.error("UserAlreadyExistsException={}", socialId)
-            throw UserAlreadyExistsException()
-        }
-        if (userRepository.existsByProfileNickname(signUpRequest.nickname)) {
+        if (userRepository.existsBySocialId(socialId) ||
+            userRepository.existsByProfileNickname(signUpRequest.nickname)
+        ) {
             throw UserAlreadyExistsException()
         }
         termCommandService.checkRequiredTermsOrThrow(signUpRequest.agreedTermIds)
