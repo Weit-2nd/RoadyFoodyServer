@@ -1,6 +1,7 @@
 package kr.weit.roadyfoody.global.client
 
 import kr.weit.roadyfoody.common.exception.RestClientException
+import kr.weit.roadyfoody.search.address.config.KakaoProperties
 import kr.weit.roadyfoody.search.address.presentation.client.KakaoAddressClientInterface
 import kr.weit.roadyfoody.search.tourism.presentation.client.TourismClientInterface
 import org.slf4j.Logger
@@ -10,6 +11,7 @@ import org.springframework.boot.web.client.ClientHttpRequestFactories
 import org.springframework.boot.web.client.ClientHttpRequestFactorySettings
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.client.JdkClientHttpRequestFactory
 import org.springframework.web.client.RestClient
@@ -21,7 +23,7 @@ import java.time.Duration
 import java.util.concurrent.Executors
 
 @Configuration
-class RestClientConfig {
+class RestClientConfig() {
     companion object {
         private const val CONNECT_TIME = 1L
         private const val READ_TIME = 5L
@@ -40,13 +42,15 @@ class RestClientConfig {
     }
 
     @Bean
-    fun dapiClientInterface(): KakaoAddressClientInterface {
-        return createClient(KAKAO_ADDRESS_URL, KakaoAddressClientInterface::class.java)
+    fun kakaoAddressClientInterface(kakaoProperties: KakaoProperties): KakaoAddressClientInterface {
+        var headers = mapOf("Authorization" to "KakaoAK ${kakaoProperties.apiKey}")
+        return createClient(KAKAO_ADDRESS_URL, KakaoAddressClientInterface::class.java, headers)
     }
 
     private fun <T> createClient(
         baseUrl: String,
         clientClass: Class<T>,
+        headers: Map<String, String>? = null,
     ): T {
         val restClientBuilder =
             RestClient.builder()
@@ -61,6 +65,13 @@ class RestClientConfig {
                         .executor(Executors.newVirtualThreadPerTaskExecutor())
                         .build(),
                 ),
+            )
+        }
+
+        if (headers != null) {
+            restClientBuilder.defaultHeader(
+                HttpHeaders.AUTHORIZATION,
+                headers.get(HttpHeaders.AUTHORIZATION)!!,
             )
         }
 

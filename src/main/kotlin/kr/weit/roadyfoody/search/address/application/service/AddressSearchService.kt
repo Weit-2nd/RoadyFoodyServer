@@ -20,8 +20,7 @@ class AddressSearchService(
     ): AddressSearchResponses {
         var encodedKeyword = keyword.replace(" ", "")
 
-        val originalResponse = kakaoAddressClientInterface.searchAddress(KAKAO_AK + kakaoProperties.apiKey, encodedKeyword, size)
-
+        val originalResponse = kakaoAddressClientInterface.searchAddress(encodedKeyword, size)
         return convertResponse(originalResponse)
     }
 

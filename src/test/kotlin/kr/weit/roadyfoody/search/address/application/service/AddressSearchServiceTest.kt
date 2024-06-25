@@ -23,7 +23,6 @@ class AddressSearchServiceTest :
 
                 every {
                     kakaoAddressClientInterface.searchAddress(
-                        KAKAO_AK + kakaoProperties.apiKey,
                         KEYWORD,
                         TEN,
                     )
@@ -58,7 +57,6 @@ class AddressSearchServiceTest :
 
                 every {
                     kakaoAddressClientInterface.searchAddress(
-                        KAKAO_AK + kakaoProperties.apiKey,
                         KEYWORD,
                         TEN,
                     )
