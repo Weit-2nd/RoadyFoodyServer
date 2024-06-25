@@ -1,7 +1,8 @@
 package kr.weit.roadyfoody.global.client
 
 import kr.weit.roadyfoody.common.exception.RestClientException
-import kr.weit.roadyfoody.tourism.presentation.client.TourismClientInterface
+import kr.weit.roadyfoody.search.address.presentation.client.DapiClientInterface
+import kr.weit.roadyfoody.search.tourism.presentation.client.TourismClientInterface
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -25,6 +26,7 @@ class RestClientConfig {
         private const val CONNECT_TIME = 1L
         private const val READ_TIME = 5L
         private const val TOURISM_URL = "http://apis.data.go.kr/B551011/KorService1"
+        private const val DAPI_URL = "https://dapi.kakao.com"
     }
 
     private val log: Logger = LoggerFactory.getLogger(RestClientConfig::class.java)
@@ -35,6 +37,11 @@ class RestClientConfig {
     @Bean
     fun tourismClientInterface(): TourismClientInterface {
         return createClient(TOURISM_URL, TourismClientInterface::class.java)
+    }
+
+    @Bean
+    fun dapiClientInterface(): DapiClientInterface {
+        return createClient(DAPI_URL, DapiClientInterface::class.java)
     }
 
     private fun <T> createClient(
