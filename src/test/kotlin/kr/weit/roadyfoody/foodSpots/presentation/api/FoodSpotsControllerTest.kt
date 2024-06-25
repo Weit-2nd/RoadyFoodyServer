@@ -78,6 +78,36 @@ class FoodSpotsControllerTest(
                             ).andExpect(status().isBadRequest)
                     }
                 }
+
+                reportRequest = createTestReportRequest(longitude = 190.0)
+                `when`("경도가 범위를 벗어난 경우") {
+                    then("400을 반환") {
+                        mockMvc
+                            .perform(
+                                multipartWithAuth(requestPath)
+                                    .file(createFoodSpotsRequestFile(objectMapper.writeValueAsBytes(reportRequest).inputStream())),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+
+                reportRequest = createTestReportRequest(latitude = -190.0)
+                `when`("위도가 범위를 벗어난 경우") {
+                    then("400을 반환") {
+                        mockMvc
+                            .perform(
+                                multipartWithAuth(requestPath)
+                                    .file(
+                                        createFoodSpotsRequestFile(
+                                            objectMapper
+                                                .writeValueAsBytes(
+                                                    reportRequest,
+                                                ).inputStream(),
+                                        ),
+                                    ),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+
                 reportRequest = createTestReportRequest()
                 reportPhotos = createMockPhotoList(ImageFormat.WEBP) + createMockPhotoList(ImageFormat.WEBP)
                 `when`("이미지가 3개 초과인 경우") {
