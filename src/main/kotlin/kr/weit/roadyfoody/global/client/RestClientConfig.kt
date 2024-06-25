@@ -2,7 +2,9 @@ package kr.weit.roadyfoody.global.client
 
 import kr.weit.roadyfoody.auth.presentation.client.KakaoClientInterface
 import kr.weit.roadyfoody.common.exception.RestClientException
-import kr.weit.roadyfoody.tourism.presentation.client.TourismClientInterface
+import kr.weit.roadyfoody.search.address.config.KakaoProperties
+import kr.weit.roadyfoody.search.address.presentation.client.KakaoAddressClientInterface
+import kr.weit.roadyfoody.search.tourism.presentation.client.TourismClientInterface
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -10,6 +12,7 @@ import org.springframework.boot.web.client.ClientHttpRequestFactories
 import org.springframework.boot.web.client.ClientHttpRequestFactorySettings
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.client.JdkClientHttpRequestFactory
 import org.springframework.web.client.RestClient
@@ -21,12 +24,13 @@ import java.time.Duration
 import java.util.concurrent.Executors
 
 @Configuration
-class RestClientConfig {
+class RestClientConfig() {
     companion object {
         private const val CONNECT_TIME = 1L
         private const val READ_TIME = 5L
         private const val TOURISM_URL = "http://apis.data.go.kr/B551011/KorService1"
         private const val KAKAO_URL = "https://kapi.kakao.com"
+        private const val KAKAO_ADDRESS_URL = "https://dapi.kakao.com"
     }
 
     private val log: Logger = LoggerFactory.getLogger(RestClientConfig::class.java)
@@ -44,9 +48,16 @@ class RestClientConfig {
         return createClient(KAKAO_URL, KakaoClientInterface::class.java)
     }
 
+    @Bean
+    fun kakaoAddressClientInterface(kakaoProperties: KakaoProperties): KakaoAddressClientInterface {
+        var headers = mapOf("Authorization" to "KakaoAK ${kakaoProperties.apiKey}")
+        return createClient(KAKAO_ADDRESS_URL, KakaoAddressClientInterface::class.java, headers)
+    }
+
     private fun <T> createClient(
         baseUrl: String,
         clientClass: Class<T>,
+        headers: Map<String, String>? = null,
     ): T {
         val restClientBuilder =
             RestClient.builder()
@@ -61,6 +72,13 @@ class RestClientConfig {
                         .executor(Executors.newVirtualThreadPerTaskExecutor())
                         .build(),
                 ),
+            )
+        }
+
+        if (headers != null) {
+            restClientBuilder.defaultHeader(
+                HttpHeaders.AUTHORIZATION,
+                headers.get(HttpHeaders.AUTHORIZATION)!!,
             )
         }
 

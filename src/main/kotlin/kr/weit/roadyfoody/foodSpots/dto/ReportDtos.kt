@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:filename")
+
 package kr.weit.roadyfoody.foodSpots.dto
 
 import jakarta.validation.constraints.NotBlank
