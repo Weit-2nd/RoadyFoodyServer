@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.useragreedterm.service
+package kr.weit.roadyfoody.useragreedterm.application.service
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.clearAllMocks

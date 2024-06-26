@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.useragreedterm.service
+package kr.weit.roadyfoody.useragreedterm.application.service
 
 import kr.weit.roadyfoody.term.repository.TermRepository
 import kr.weit.roadyfoody.user.domain.User

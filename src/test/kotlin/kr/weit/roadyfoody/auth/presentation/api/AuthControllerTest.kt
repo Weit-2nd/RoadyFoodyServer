@@ -10,10 +10,10 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
+import kr.weit.roadyfoody.auth.application.dto.DuplicatedNicknameResponse
+import kr.weit.roadyfoody.auth.application.dto.SignUpRequest
 import kr.weit.roadyfoody.auth.application.service.AuthCommandService
 import kr.weit.roadyfoody.auth.application.service.AuthQueryService
-import kr.weit.roadyfoody.auth.dto.DuplicatedNicknameResponse
-import kr.weit.roadyfoody.auth.dto.SignUpRequest
 import kr.weit.roadyfoody.auth.fixture.PROFILE_IMAGE_FILE_NAME
 import kr.weit.roadyfoody.auth.fixture.SIGN_UP_REQUEST_FILE_NAME
 import kr.weit.roadyfoody.auth.fixture.TEST_BEARER_TOKEN

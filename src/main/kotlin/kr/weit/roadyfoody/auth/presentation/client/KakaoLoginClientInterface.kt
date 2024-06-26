@@ -1,6 +1,6 @@
 package kr.weit.roadyfoody.auth.presentation.client
 
-import kr.weit.roadyfoody.auth.dto.KakaoUserResponse
+import kr.weit.roadyfoody.auth.application.dto.KakaoUserResponse
 import kr.weit.roadyfoody.common.annotation.ClientInterface
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.web.bind.annotation.RequestHeader

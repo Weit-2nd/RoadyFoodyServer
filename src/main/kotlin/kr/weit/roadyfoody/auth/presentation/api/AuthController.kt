@@ -1,10 +1,10 @@
 package kr.weit.roadyfoody.auth.presentation.api
 
 import jakarta.validation.Valid
+import kr.weit.roadyfoody.auth.application.dto.DuplicatedNicknameResponse
+import kr.weit.roadyfoody.auth.application.dto.SignUpRequest
 import kr.weit.roadyfoody.auth.application.service.AuthCommandService
 import kr.weit.roadyfoody.auth.application.service.AuthQueryService
-import kr.weit.roadyfoody.auth.dto.DuplicatedNicknameResponse
-import kr.weit.roadyfoody.auth.dto.SignUpRequest
 import kr.weit.roadyfoody.auth.presentation.spec.AuthControllerSpec
 import kr.weit.roadyfoody.global.validator.MaxFileSize
 import kr.weit.roadyfoody.global.validator.WebPImage
