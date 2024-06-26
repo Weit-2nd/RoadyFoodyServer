@@ -59,6 +59,16 @@ interface AuthControllerSpec {
                         """,
                             ),
                             ExampleObject(
+                                name = "Max Size Exceeded",
+                                summary = "최대 사진 크기 초과",
+                                value = """
+                        {
+                            "code": -10000,
+                            "errorMessage": "파일 사이즈가 초과하였습니다."
+                        }
+                        """,
+                            ),
+                            ExampleObject(
                                 name = "Invalid Nickname Input",
                                 summary = "미충족 닉네임 입력",
                                 value = """
@@ -144,6 +154,27 @@ interface AuthControllerSpec {
         description = "회원가입 시 사용할 닉네임이 중복되는지 검사합니다.",
         parameters = [
             Parameter(name = "nickname", description = "닉네임", required = true, example = "테스트닉네임입니다"),
+        ],
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "요청 성공",
+                content = [
+                    Content(
+                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                        schema = Schema(implementation = DuplicatedNicknameResponse::class),
+                        examples = [
+                            ExampleObject(
+                                value = """
+                        {
+                            "isDuplicated": true
+                        }
+                        """,
+                            ),
+                        ],
+                    ),
+                ],
+            ),
         ],
     )
     fun checkDuplicatedNickname(nickname: String): DuplicatedNicknameResponse

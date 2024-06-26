@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.service.annotation.GetExchange
 
 @ClientInterface
-interface KakaoClientInterface {
+interface KakaoLoginClientInterface {
     @GetExchange("/v2/user/me")
     fun requestUserInfo(
         @RequestHeader(AUTHORIZATION) socialAccessToken: String,

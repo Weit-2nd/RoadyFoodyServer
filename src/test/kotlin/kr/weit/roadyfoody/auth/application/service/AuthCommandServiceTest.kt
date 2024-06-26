@@ -11,11 +11,11 @@ import io.mockk.spyk
 import io.mockk.verify
 import kr.weit.roadyfoody.auth.exception.UserAlreadyExistsException
 import kr.weit.roadyfoody.auth.fixture.TEST_SOCIAL_ACCESS_TOKEN
-import kr.weit.roadyfoody.auth.fixture.createTestImageFile
 import kr.weit.roadyfoody.auth.fixture.createTestKakaoUserResponse
 import kr.weit.roadyfoody.auth.fixture.createTestSignUpRequest
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.support.utils.ImageFormat.WEBP
+import kr.weit.roadyfoody.support.utils.createTestImageFile
 import kr.weit.roadyfoody.term.service.TermCommandService
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.repository.UserRepository
