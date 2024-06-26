@@ -32,6 +32,6 @@ class FoodSpotsController(
         @Size(max = 3, message = "이미지는 최대 3개까지 업로드할 수 있습니다.")
         @WebPImageList
         @RequestPart(required = false)
-        reportPhotos: List<MultipartFile>,
+        reportPhotos: List<MultipartFile>?,
     ) = foodSpotsService.createReport(userId, reportRequest, reportPhotos)
 }

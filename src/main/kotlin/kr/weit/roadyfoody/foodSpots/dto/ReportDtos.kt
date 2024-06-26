@@ -4,15 +4,13 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
-import kr.weit.roadyfoody.foodSpots.domain.FoodSpots.Companion.SRID_WGS84
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
 import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_REGEX_DESC
 import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_REGEX_STR
 import kr.weit.roadyfoody.foodSpots.validator.Latitude
 import kr.weit.roadyfoody.foodSpots.validator.Longitude
+import kr.weit.roadyfoody.global.utils.CoordinateUtils.Companion.createCoordinate
 import kr.weit.roadyfoody.user.domain.User
-import org.locationtech.jts.geom.Coordinate
-import org.locationtech.jts.geom.GeometryFactory
 
 data class ReportRequest(
     @field:Pattern(regexp = FOOD_SPOTS_NAME_REGEX_STR, message = FOOD_SPOTS_NAME_REGEX_DESC)
@@ -34,7 +32,7 @@ data class ReportRequest(
     fun toFoodSpotsEntity() =
         FoodSpots(
             name = name,
-            point = GeometryFactory().createPoint(Coordinate(longitude, latitude)).also { it.srid = SRID_WGS84 },
+            point = createCoordinate(longitude, latitude),
             foodTruck = foodTruck,
             open = open,
             storeClosure = closed,
@@ -47,7 +45,7 @@ data class ReportRequest(
         name = name,
         foodSpots = foodSpots,
         user = user,
-        point = GeometryFactory().createPoint(Coordinate(longitude, latitude)).also { it.srid = SRID_WGS84 },
+        point = createCoordinate(longitude, latitude),
         foodTruck = foodTruck,
         open = open,
         storeClosure = closed,

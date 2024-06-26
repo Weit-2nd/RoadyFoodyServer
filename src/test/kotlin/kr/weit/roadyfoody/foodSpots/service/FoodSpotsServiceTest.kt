@@ -43,7 +43,7 @@ class FoodSpotsServiceTest :
                 `when`("정상적인 데이터만 들어올 경우") {
                     every { userRepository.findById(TEST_USER_ID) } returns Optional.of(user)
                     then("정상적으로 저장되어야 한다.") {
-                        foodSpotsService.createReport(TEST_USER_ID, createTestReportRequest(), emptyList())
+                        foodSpotsService.createReport(TEST_USER_ID, createTestReportRequest(), null)
                     }
                 }
 

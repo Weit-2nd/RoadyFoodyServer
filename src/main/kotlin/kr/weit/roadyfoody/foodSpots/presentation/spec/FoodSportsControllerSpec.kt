@@ -114,22 +114,32 @@ interface FoodSportsControllerSpec {
                             """,
                             ),
                             ExampleObject(
-                                name = "Invalid Image type",
-                                summary = "WEBP 이외의 이미지 입력",
-                                value = """
-                        {
-                            "code": -10000,
-                            "errorMessage": "하나 이상의 이미지가 webp 형식이 아닙니다."
-                        }
-                        """,
-                            ),
-                            ExampleObject(
                                 name = "Too Many Images",
                                 summary = "이미지가 3개 초과인 경우",
                                 value = """
                         {
                             "code": -10000,
                             "errorMessage": "이미지는 최대 3개까지 업로드할 수 있습니다."
+                        }
+                        """,
+                            ),
+                            ExampleObject(
+                                name = "Invalid Image type",
+                                summary = "WEBP 이외의 이미지 입력",
+                                value = """
+                        {
+                            "code": -10000,
+                            "errorMessage": "하나 이상의 파일이 잘못 되었습니다."
+                        }
+                        """,
+                            ),
+                            ExampleObject(
+                                name = "Too large image",
+                                summary = "이미지 용량이 1MB 초과인 경우",
+                                value = """
+                        {
+                            "code": -10000,
+                            "errorMessage": "하나 이상의 파일이 잘못 되었습니다."
                         }
                         """,
                             ),
@@ -146,6 +156,6 @@ interface FoodSportsControllerSpec {
         reportRequest: ReportRequest,
         @Size(max = 3, message = "이미지는 최대 3개까지 업로드할 수 있습니다.")
         @WebPImageList
-        reportPhotos: List<MultipartFile>,
+        reportPhotos: List<MultipartFile>?,
     )
 }
