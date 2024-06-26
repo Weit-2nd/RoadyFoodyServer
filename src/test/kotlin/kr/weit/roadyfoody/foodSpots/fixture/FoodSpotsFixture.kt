@@ -11,10 +11,7 @@ import kr.weit.roadyfoody.user.fixture.createTestUser
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.GeometryFactory
 import org.locationtech.jts.geom.Point
-import org.springframework.http.MediaType
-import org.springframework.mock.web.MockMultipartFile
 import org.springframework.web.multipart.MultipartFile
-import java.io.InputStream
 
 const val TEST_FOOD_SPOT_ID = 1L
 const val TEST_FOOD_SPOT_NAME = "testFoodSpot"
@@ -30,6 +27,7 @@ const val TEST_FOOD_SPOT_OPEN = true
 const val TEST_FOOD_SPOT_STORE_CLOSURE = false
 const val TEST_PHOTO_NAME = "test_photo_name"
 const val TEST_FOOD_SPOTS_REQUEST_NAME = "reportRequest"
+const val TEST_FOOD_SPOTS_REQUEST_PHOTO = "reportPhotos"
 
 fun createTestFoodSpot(id: Long = TEST_FOOD_SPOT_ID) =
     FoodSpots(id, TEST_FOOD_SPOT_NAME, TEST_FOOD_SPOT_FOOD_TRUCK, TEST_FOOD_SPOT_OPEN, TEST_FOOD_SPOT_STORE_CLOSURE, TEST_FOOD_SPOT_POINT)
@@ -69,17 +67,4 @@ fun createMockPhotoList(
     listOf(
         createTestImageFile(format),
         createTestImageFile(format, name),
-    )
-
-fun createFoodSpotsRequestFile(
-    contentStream: InputStream,
-    name: String = TEST_FOOD_SPOTS_REQUEST_NAME,
-    originalFileName: String? = TEST_FOOD_SPOTS_REQUEST_NAME,
-    contentType: String? = MediaType.APPLICATION_JSON_VALUE,
-): MockMultipartFile =
-    MockMultipartFile(
-        name,
-        originalFileName,
-        contentType,
-        contentStream,
     )

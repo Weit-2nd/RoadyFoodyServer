@@ -4,7 +4,9 @@ import jakarta.validation.Constraint
 import jakarta.validation.ConstraintValidator
 import jakarta.validation.ConstraintValidatorContext
 import jakarta.validation.Payload
-import org.apache.tika.Tika
+import kr.weit.roadyfoody.global.validator.MaxFileSize
+import kr.weit.roadyfoody.global.validator.MaxFileSizeValidator
+import kr.weit.roadyfoody.global.validator.WebPImageValidator
 import org.springframework.web.multipart.MultipartFile
 import kotlin.reflect.KClass
 
@@ -12,29 +14,27 @@ import kotlin.reflect.KClass
 @Target(AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class WebPImageList(
-    val message: String = "하나 이상의 파일이 webp 형식이 아닙니다.",
-    val maxFileSize: Long = 1 * 1024 * 1024,
+    val message: String = "하나 이상의 파일이 잘못 되었습니다.",
     val groups: Array<KClass<*>> = [],
     val payload: Array<KClass<out Payload>> = [],
 )
 
-class WebPImageListValidator : ConstraintValidator<WebPImageList, List<MultipartFile>?> {
-    private val tika = Tika()
-
-    private var maxFileSize: Long = 0
+class WebPImageListValidator : ConstraintValidator<WebPImageList, List<MultipartFile>> {
+    private val webPImageValidator = WebPImageValidator()
+    private var maxFileSizeValidator = MaxFileSizeValidator()
 
     override fun initialize(constraintAnnotation: WebPImageList) {
-        maxFileSize = constraintAnnotation.maxFileSize
+        maxFileSizeValidator.initialize(MaxFileSize())
     }
 
     override fun isValid(
         files: List<MultipartFile>?,
-        context: ConstraintValidatorContext?,
+        context: ConstraintValidatorContext,
     ): Boolean {
         if (files == null) return true
 
         for (file in files) {
-            if (tika.detect(file.inputStream) != "image/webp" || file.size > maxFileSize) {
+            if (!(maxFileSizeValidator.isValid(file, context) && webPImageValidator.isValid(file, context))) {
                 return false
             }
         }

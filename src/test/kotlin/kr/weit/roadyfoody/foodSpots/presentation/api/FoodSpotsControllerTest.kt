@@ -4,17 +4,26 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.runs
+import io.mockk.verify
+import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_REQUEST_NAME
+import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_REQUEST_PHOTO
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOT_NAME_EMPTY
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOT_NAME_INVALID_STR
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOT_NAME_TOO_LONG
-import kr.weit.roadyfoody.foodSpots.fixture.createFoodSpotsRequestFile
 import kr.weit.roadyfoody.foodSpots.fixture.createMockPhotoList
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportRequest
 import kr.weit.roadyfoody.foodSpots.service.FoodSpotsService
 import kr.weit.roadyfoody.support.annotation.ControllerTest
 import kr.weit.roadyfoody.support.utils.ImageFormat
+import kr.weit.roadyfoody.support.utils.ImageFormat.WEBP
+import kr.weit.roadyfoody.support.utils.createMultipartFile
+import kr.weit.roadyfoody.support.utils.createTestImageFile
 import kr.weit.roadyfoody.support.utils.multipartWithAuth
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
@@ -30,7 +39,7 @@ class FoodSpotsControllerTest(
 
             given("POST $requestPath Test") {
                 var reportRequest = createTestReportRequest()
-                var reportPhotos = createMockPhotoList(ImageFormat.WEBP)
+                var reportPhotos = createMockPhotoList(WEBP)
                 every {
                     foodSpotsService.createReport(any(), any(), any())
                 } returns Unit
@@ -39,8 +48,12 @@ class FoodSpotsControllerTest(
                         mockMvc
                             .perform(
                                 multipartWithAuth(requestPath)
-                                    .file(createFoodSpotsRequestFile(objectMapper.writeValueAsBytes(reportRequest).inputStream()))
-                                    .file("reportPhotos", reportPhotos[0].bytes)
+                                    .file(
+                                        createMultipartFile(
+                                            TEST_FOOD_SPOTS_REQUEST_NAME,
+                                            objectMapper.writeValueAsBytes(reportRequest).inputStream(),
+                                        ),
+                                    ).file("reportPhotos", reportPhotos[0].bytes)
                                     .file("reportPhotos", reportPhotos[1].bytes),
                             ).andExpect(status().isCreated)
                     }
@@ -52,7 +65,12 @@ class FoodSpotsControllerTest(
                         mockMvc
                             .perform(
                                 multipartWithAuth(requestPath)
-                                    .file(createFoodSpotsRequestFile(objectMapper.writeValueAsBytes(reportRequest).inputStream())),
+                                    .file(
+                                        createMultipartFile(
+                                            TEST_FOOD_SPOTS_REQUEST_NAME,
+                                            objectMapper.writeValueAsBytes(reportRequest).inputStream(),
+                                        ),
+                                    ),
                             ).andExpect(status().isBadRequest)
                     }
                 }
@@ -63,7 +81,12 @@ class FoodSpotsControllerTest(
                         mockMvc
                             .perform(
                                 multipartWithAuth(requestPath)
-                                    .file(createFoodSpotsRequestFile(objectMapper.writeValueAsBytes(reportRequest).inputStream())),
+                                    .file(
+                                        createMultipartFile(
+                                            TEST_FOOD_SPOTS_REQUEST_NAME,
+                                            objectMapper.writeValueAsBytes(reportRequest).inputStream(),
+                                        ),
+                                    ),
                             ).andExpect(status().isBadRequest)
                     }
                 }
@@ -74,7 +97,12 @@ class FoodSpotsControllerTest(
                         mockMvc
                             .perform(
                                 multipartWithAuth(requestPath)
-                                    .file(createFoodSpotsRequestFile(objectMapper.writeValueAsBytes(reportRequest).inputStream())),
+                                    .file(
+                                        createMultipartFile(
+                                            TEST_FOOD_SPOTS_REQUEST_NAME,
+                                            objectMapper.writeValueAsBytes(reportRequest).inputStream(),
+                                        ),
+                                    ),
                             ).andExpect(status().isBadRequest)
                     }
                 }
@@ -85,7 +113,12 @@ class FoodSpotsControllerTest(
                         mockMvc
                             .perform(
                                 multipartWithAuth(requestPath)
-                                    .file(createFoodSpotsRequestFile(objectMapper.writeValueAsBytes(reportRequest).inputStream())),
+                                    .file(
+                                        createMultipartFile(
+                                            TEST_FOOD_SPOTS_REQUEST_NAME,
+                                            objectMapper.writeValueAsBytes(reportRequest).inputStream(),
+                                        ),
+                                    ),
                             ).andExpect(status().isBadRequest)
                     }
                 }
@@ -97,11 +130,9 @@ class FoodSpotsControllerTest(
                             .perform(
                                 multipartWithAuth(requestPath)
                                     .file(
-                                        createFoodSpotsRequestFile(
-                                            objectMapper
-                                                .writeValueAsBytes(
-                                                    reportRequest,
-                                                ).inputStream(),
+                                        createMultipartFile(
+                                            TEST_FOOD_SPOTS_REQUEST_NAME,
+                                            objectMapper.writeValueAsBytes(reportRequest).inputStream(),
                                         ),
                                     ),
                             ).andExpect(status().isBadRequest)
@@ -109,14 +140,18 @@ class FoodSpotsControllerTest(
                 }
 
                 reportRequest = createTestReportRequest()
-                reportPhotos = createMockPhotoList(ImageFormat.WEBP) + createMockPhotoList(ImageFormat.WEBP)
+                reportPhotos = createMockPhotoList(WEBP) + createMockPhotoList(WEBP)
                 `when`("이미지가 3개 초과인 경우") {
                     then("400을 반환") {
                         mockMvc
                             .perform(
                                 multipartWithAuth(requestPath)
-                                    .file(createFoodSpotsRequestFile(objectMapper.writeValueAsBytes(reportRequest).inputStream()))
-                                    .file("reportPhotos", reportPhotos[0].bytes)
+                                    .file(
+                                        createMultipartFile(
+                                            TEST_FOOD_SPOTS_REQUEST_NAME,
+                                            objectMapper.writeValueAsBytes(reportRequest).inputStream(),
+                                        ),
+                                    ).file("reportPhotos", reportPhotos[0].bytes)
                                     .file("reportPhotos", reportPhotos[1].bytes)
                                     .file("reportPhotos", reportPhotos[2].bytes)
                                     .file("reportPhotos", reportPhotos[3].bytes),
@@ -130,10 +165,35 @@ class FoodSpotsControllerTest(
                         mockMvc
                             .perform(
                                 multipartWithAuth(requestPath)
-                                    .file(createFoodSpotsRequestFile(objectMapper.writeValueAsBytes(reportRequest).inputStream()))
-                                    .file("reportPhotos", reportPhotos[0].bytes)
+                                    .file(
+                                        createMultipartFile(
+                                            TEST_FOOD_SPOTS_REQUEST_NAME,
+                                            objectMapper.writeValueAsBytes(reportRequest).inputStream(),
+                                        ),
+                                    ).file("reportPhotos", reportPhotos[0].bytes)
                                     .file("reportPhotos", reportPhotos[1].bytes),
                             ).andExpect(status().isBadRequest)
+                    }
+                }
+
+                `when`("파일의 크기가 1MB를 초과하면") {
+                    val mockFile: MockMultipartFile = mockk<MockMultipartFile>()
+                    every { mockFile.size } returns 1024 * 1024 + 1
+                    every { mockFile.name } returns TEST_FOOD_SPOTS_REQUEST_PHOTO
+                    every { mockFile.inputStream } returns createTestImageFile(WEBP).inputStream
+                    every { foodSpotsService.createReport(any(), any(), any()) } just runs
+                    then("400을 반환") {
+                        mockMvc
+                            .perform(
+                                multipartWithAuth(requestPath)
+                                    .file(
+                                        createMultipartFile(
+                                            TEST_FOOD_SPOTS_REQUEST_NAME,
+                                            objectMapper.writeValueAsBytes(reportRequest).inputStream(),
+                                        ),
+                                    ).file(mockFile),
+                            ).andExpect(status().isBadRequest)
+                        verify(exactly = 0) { foodSpotsService.createReport(any(), any(), any()) }
                     }
                 }
             }
