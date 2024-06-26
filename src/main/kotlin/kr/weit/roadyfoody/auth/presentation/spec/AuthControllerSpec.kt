@@ -59,6 +59,16 @@ interface AuthControllerSpec {
                         """,
                             ),
                             ExampleObject(
+                                name = "Max Size Exceeded",
+                                summary = "최대 사진 크기 초과",
+                                value = """
+                        {
+                            "code": -10000,
+                            "errorMessage": "파일 사이즈가 초과하였습니다."
+                        }
+                        """,
+                            ),
+                            ExampleObject(
                                 name = "Invalid Nickname Input",
                                 summary = "미충족 닉네임 입력",
                                 value = """

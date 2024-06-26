@@ -6,11 +6,11 @@ import io.kotest.matchers.string.shouldEndWith
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kr.weit.roadyfoody.auth.fixture.createTestImageFile
 import kr.weit.roadyfoody.support.utils.ImageFormat.GIF
 import kr.weit.roadyfoody.support.utils.ImageFormat.JPEG
 import kr.weit.roadyfoody.support.utils.ImageFormat.PNG
 import kr.weit.roadyfoody.support.utils.ImageFormat.WEBP
+import kr.weit.roadyfoody.support.utils.createTestImageFile
 import kr.weit.roadyfoody.user.fixture.TEST_USER_PROFILE_IMAGE_NAME
 import java.io.InputStream
 

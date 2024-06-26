@@ -1,12 +1,12 @@
 package kr.weit.roadyfoody.foodSpots.fixture
 
-import kr.weit.roadyfoody.auth.fixture.createTestImageFile
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots.Companion.SRID_WGS84
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
 import kr.weit.roadyfoody.foodSpots.dto.ReportRequest
 import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_MAX_LENGTH
 import kr.weit.roadyfoody.support.utils.ImageFormat
+import kr.weit.roadyfoody.support.utils.createTestImageFile
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.GeometryFactory

@@ -5,11 +5,11 @@ import io.kotest.data.forAll
 import io.kotest.data.row
 import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
-import kr.weit.roadyfoody.auth.fixture.createTestImageFile
 import kr.weit.roadyfoody.support.utils.ImageFormat.GIF
 import kr.weit.roadyfoody.support.utils.ImageFormat.JPEG
 import kr.weit.roadyfoody.support.utils.ImageFormat.PNG
 import kr.weit.roadyfoody.support.utils.ImageFormat.WEBP
+import kr.weit.roadyfoody.support.utils.createTestImageFile
 
 class WebPValidatorTest(
     private val webPValidator: WebPImageValidator = WebPImageValidator(),
