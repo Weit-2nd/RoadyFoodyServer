@@ -2,11 +2,11 @@ package kr.weit.roadyfoody.global.utils
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldBeIn
-import kr.weit.roadyfoody.auth.fixture.createTestImageFile
 import kr.weit.roadyfoody.support.utils.ImageFormat.GIF
 import kr.weit.roadyfoody.support.utils.ImageFormat.JPEG
 import kr.weit.roadyfoody.support.utils.ImageFormat.PNG
 import kr.weit.roadyfoody.support.utils.ImageFormat.WEBP
+import kr.weit.roadyfoody.support.utils.createTestImageFile
 
 class MimeUtilsTest :
     BehaviorSpec({
