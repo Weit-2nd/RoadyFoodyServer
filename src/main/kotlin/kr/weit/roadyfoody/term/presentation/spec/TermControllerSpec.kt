@@ -15,10 +15,14 @@ import org.springframework.http.MediaType
 
 @Tag(name = SwaggerTag.TERM)
 interface TermControllerSpec {
-    @Operation(description = "모든 약관의 간략한 정보 (약관 ID, 약관 제목, 필수여부) 반환 API")
+    @Operation(
+        summary = "모든 약관 간략 정보 조회 API",
+        description = "모든 약관의 간략한 정보 (약관 ID, 약관 제목, 필수여부) 반환 API",
+    )
     fun getAllSummaryTerms(): SummaryTermsResponse
 
     @Operation(
+        summary = "단일 약관 상세 정보 조회 API",
         description = "단일 약관의 상세 정보 반환 API",
         parameters = [
             Parameter(name = "termId", description = "요청 약관 ID", required = true, example = "1"),
