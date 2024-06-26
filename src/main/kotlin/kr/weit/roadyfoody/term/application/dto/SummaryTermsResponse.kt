@@ -1,33 +1,27 @@
-package kr.weit.roadyfoody.term.application.service.dto
+package kr.weit.roadyfoody.term.application.dto
 
 import kr.weit.roadyfoody.term.domain.Term
 
 data class SummaryTermsResponse(
-    val allTermsSize: Int,
-    val requiredTermsSize: Int,
-    val optionalTermsSize: Int,
     val terms: List<SummaryTermResponse>,
 ) {
     companion object {
-        fun from(terms: List<Term>): SummaryTermsResponse {
-            val requiredTermsSize = terms.count { it.required }
-            return SummaryTermsResponse(
-                terms.size,
-                requiredTermsSize,
-                terms.size - requiredTermsSize,
+        fun from(terms: List<Term>): SummaryTermsResponse =
+            SummaryTermsResponse(
                 terms.map { SummaryTermResponse.from(it) },
             )
-        }
     }
 }
 
 data class SummaryTermResponse(
+    val id: Long,
     val title: String,
     val isRequired: Boolean,
 ) {
     companion object {
         fun from(term: Term): SummaryTermResponse =
             SummaryTermResponse(
+                term.id,
                 term.title,
                 term.required,
             )
