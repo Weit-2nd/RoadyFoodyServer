@@ -12,12 +12,12 @@ import io.mockk.every
 import io.mockk.verify
 import kr.weit.roadyfoody.auth.exception.UserAlreadyExistsException
 import kr.weit.roadyfoody.auth.fixture.TEST_SOCIAL_ACCESS_TOKEN
-import kr.weit.roadyfoody.auth.fixture.createTestImageFile
 import kr.weit.roadyfoody.auth.fixture.createTestKakaoUserResponse
 import kr.weit.roadyfoody.auth.fixture.createTestSignUpRequest
 import kr.weit.roadyfoody.global.config.S3Properties
 import kr.weit.roadyfoody.support.annotation.ServiceIntegrateTest
 import kr.weit.roadyfoody.support.utils.ImageFormat.WEBP
+import kr.weit.roadyfoody.support.utils.createTestImageFile
 import kr.weit.roadyfoody.term.fixture.createTestTerms
 import kr.weit.roadyfoody.term.repository.TermRepository
 import kr.weit.roadyfoody.user.fixture.TEST_USER_NICKNAME

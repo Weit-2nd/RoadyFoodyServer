@@ -17,7 +17,6 @@ import kr.weit.roadyfoody.auth.dto.SignUpRequest
 import kr.weit.roadyfoody.auth.fixture.PROFILE_IMAGE_FILE_NAME
 import kr.weit.roadyfoody.auth.fixture.SIGN_UP_REQUEST_FILE_NAME
 import kr.weit.roadyfoody.auth.fixture.TEST_BEARER_TOKEN
-import kr.weit.roadyfoody.auth.fixture.createTestImageFile
 import kr.weit.roadyfoody.auth.fixture.createTestSignUpRequest
 import kr.weit.roadyfoody.support.annotation.ControllerTest
 import kr.weit.roadyfoody.support.utils.ImageFormat.GIF
@@ -25,6 +24,7 @@ import kr.weit.roadyfoody.support.utils.ImageFormat.JPEG
 import kr.weit.roadyfoody.support.utils.ImageFormat.PNG
 import kr.weit.roadyfoody.support.utils.ImageFormat.WEBP
 import kr.weit.roadyfoody.support.utils.createMultipartFile
+import kr.weit.roadyfoody.support.utils.createTestImageFile
 import kr.weit.roadyfoody.user.fixture.TEST_USER_NICKNAME
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.HttpHeaders.AUTHORIZATION
