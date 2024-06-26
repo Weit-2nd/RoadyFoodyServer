@@ -13,6 +13,7 @@ import kr.weit.roadyfoody.term.fixture.TEST_NONEXISTENT_TERM_ID
 import kr.weit.roadyfoody.term.fixture.createTestDetailedTermResponse
 import kr.weit.roadyfoody.term.fixture.createTestSummaryTermsResponse
 import kr.weit.roadyfoody.term.fixture.createTestTermIdSet
+import kr.weit.roadyfoody.term.fixture.createTestTerms
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
@@ -30,14 +31,14 @@ class TermControllerTest(
 
         given("GET $requestPath 테스트") {
             `when`("정상적인 요청을 보내면") {
-                every { termQueryService.getAllSummaryTerms() } returns createTestSummaryTermsResponse()
+                every { termQueryService.getAllSummaryTerms() } returns createTestSummaryTermsResponse(createTestTerms())
                 then("200 상태번호와 SummaryTermsResponse 를 반환한다.") {
                     mockMvc
                         .perform(get(requestPath))
                         .andExpect(status().isOk)
                         .andExpect(
                             content().json(
-                                objectMapper.writeValueAsString(createTestSummaryTermsResponse()),
+                                objectMapper.writeValueAsString(createTestSummaryTermsResponse(createTestTerms())),
                             ),
                         )
                     verify(exactly = 1) { termQueryService.getAllSummaryTerms() }
