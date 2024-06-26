@@ -1,8 +1,8 @@
 package kr.weit.roadyfoody.term.presentation.api
 
+import kr.weit.roadyfoody.term.application.dto.DetailedTermResponse
+import kr.weit.roadyfoody.term.application.dto.SummaryTermsResponse
 import kr.weit.roadyfoody.term.application.service.TermQueryService
-import kr.weit.roadyfoody.term.application.service.dto.DetailedTermResponse
-import kr.weit.roadyfoody.term.application.service.dto.SummaryTermsResponse
 import kr.weit.roadyfoody.term.presentation.spec.TermControllerSpec
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable

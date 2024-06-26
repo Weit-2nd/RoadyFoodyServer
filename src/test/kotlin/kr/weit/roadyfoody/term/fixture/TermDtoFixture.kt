@@ -1,7 +1,7 @@
 package kr.weit.roadyfoody.term.fixture
 
-import kr.weit.roadyfoody.term.application.service.dto.DetailedTermResponse
-import kr.weit.roadyfoody.term.application.service.dto.SummaryTermsResponse
+import kr.weit.roadyfoody.term.application.dto.DetailedTermResponse
+import kr.weit.roadyfoody.term.application.dto.SummaryTermsResponse
 
 fun createTestSummaryTermsResponse() = SummaryTermsResponse.from(createTestTerms())
 

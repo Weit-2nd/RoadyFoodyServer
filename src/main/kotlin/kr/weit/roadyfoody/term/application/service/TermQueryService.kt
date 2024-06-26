@@ -1,7 +1,7 @@
 package kr.weit.roadyfoody.term.application.service
 
-import kr.weit.roadyfoody.term.application.service.dto.DetailedTermResponse
-import kr.weit.roadyfoody.term.application.service.dto.SummaryTermsResponse
+import kr.weit.roadyfoody.term.application.dto.DetailedTermResponse
+import kr.weit.roadyfoody.term.application.dto.SummaryTermsResponse
 import kr.weit.roadyfoody.term.repository.TermRepository
 import kr.weit.roadyfoody.term.repository.getByTermId
 import org.springframework.stereotype.Service

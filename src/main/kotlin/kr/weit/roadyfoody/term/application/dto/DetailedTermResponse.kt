@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.term.application.service.dto
+package kr.weit.roadyfoody.term.application.dto
 
 import kr.weit.roadyfoody.term.domain.Term
 

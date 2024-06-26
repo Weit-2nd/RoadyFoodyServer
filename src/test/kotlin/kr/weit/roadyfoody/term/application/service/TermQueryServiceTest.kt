@@ -6,7 +6,7 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kr.weit.roadyfoody.term.application.service.dto.DetailedTermResponse
+import kr.weit.roadyfoody.term.application.dto.DetailedTermResponse
 import kr.weit.roadyfoody.term.exception.TermNotFoundException
 import kr.weit.roadyfoody.term.fixture.TEST_NONEXISTENT_TERM_ID
 import kr.weit.roadyfoody.term.fixture.TEST_OPTIONAL_TERMS_SIZE

@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.term.controller
+package kr.weit.roadyfoody.term.presentation.api
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
@@ -13,7 +13,6 @@ import kr.weit.roadyfoody.term.fixture.TEST_NONEXISTENT_TERM_ID
 import kr.weit.roadyfoody.term.fixture.createTestDetailedTermResponse
 import kr.weit.roadyfoody.term.fixture.createTestSummaryTermsResponse
 import kr.weit.roadyfoody.term.fixture.createTestTermIdSet
-import kr.weit.roadyfoody.term.presentation.api.TermController
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
