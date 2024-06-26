@@ -19,7 +19,7 @@ class TermCommandServiceTest :
         val termRepository = mockk<TermRepository>()
         val termCommandService = TermCommandService(termRepository)
 
-        afterTest { clearAllMocks() }
+        afterEach { clearAllMocks() }
 
         given("checkRequiredTermsOrThrow 테스트") {
             `when`("모든 필수 약관 ($TEST_REQUIRED_TERMS_SIZE 개) 과 모든 선택 약관을 전달받으면") {

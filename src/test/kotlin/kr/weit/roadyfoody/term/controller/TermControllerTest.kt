@@ -1,11 +1,11 @@
 package kr.weit.roadyfoody.term.controller
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
 import io.mockk.verify
 import kr.weit.roadyfoody.common.exception.ErrorResponse
-import kr.weit.roadyfoody.global.jsonmapper.ObjectMapperProvider
 import kr.weit.roadyfoody.support.annotation.ControllerTest
 import kr.weit.roadyfoody.term.application.service.TermQueryService
 import kr.weit.roadyfoody.term.exception.TermNotFoundException
@@ -23,7 +23,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @ControllerTest
 @WebMvcTest(TermController::class)
 class TermControllerTest(
-    private val objectMapperProvider: ObjectMapperProvider,
+    private val objectMapper: ObjectMapper,
     @MockkBean val termQueryService: TermQueryService,
     private val mockMvc: MockMvc,
 ) : BehaviorSpec({
@@ -38,7 +38,7 @@ class TermControllerTest(
                         .andExpect(status().isOk)
                         .andExpect(
                             content().json(
-                                objectMapperProvider.objectMapper.writeValueAsString(createTestSummaryTermsResponse()),
+                                objectMapper.writeValueAsString(createTestSummaryTermsResponse()),
                             ),
                         )
                     verify(exactly = 1) { termQueryService.getAllSummaryTerms() }
@@ -56,7 +56,7 @@ class TermControllerTest(
                         .andExpect(status().isOk)
                         .andExpect(
                             content().json(
-                                objectMapperProvider.objectMapper.writeValueAsString(
+                                objectMapper.writeValueAsString(
                                     createTestDetailedTermResponse(createTestTermIdSet().first()),
                                 ),
                             ),
@@ -74,7 +74,7 @@ class TermControllerTest(
                         .andExpect(status().`is`(termNotFoundEx.errorCode.httpStatus.value()))
                         .andExpect(
                             content().json(
-                                objectMapperProvider.objectMapper.writeValueAsString(
+                                objectMapper.writeValueAsString(
                                     ErrorResponse.of(termNotFoundEx.errorCode, termNotFoundEx.message),
                                 ),
                             ),

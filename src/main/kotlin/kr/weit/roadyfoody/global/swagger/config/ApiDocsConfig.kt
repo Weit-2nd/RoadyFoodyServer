@@ -9,6 +9,7 @@ import org.springdoc.core.models.GroupedOpenApi
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
+import org.springframework.http.HttpHeaders.AUTHORIZATION
 
 @Profile("sandbox")
 @Configuration
@@ -37,19 +38,30 @@ class ApiDocsConfig {
             .version("1.0.0")
     }
 
-    // TODO 회원가입 기능 개발 후 수정 혹은 삭제 고려
     private fun createSecurityComponents(): Components {
-        return Components().addSecuritySchemes(
-            "userIdHeader",
-            SecurityScheme()
-                .type(SecurityScheme.Type.APIKEY)
-                .`in`(SecurityScheme.In.HEADER)
-                .name("userId"),
-        )
+        return Components()
+            .addSecuritySchemes(
+                AUTHORIZATION,
+                SecurityScheme()
+                    .type(SecurityScheme.Type.HTTP)
+                    .scheme("bearer")
+                    .`in`(SecurityScheme.In.HEADER)
+                    .name(AUTHORIZATION),
+            )
+            // TODO 회원가입 기능 개발 후 수정 혹은 삭제 고려
+            .addSecuritySchemes(
+                "userIdHeader",
+                SecurityScheme()
+                    .type(SecurityScheme.Type.APIKEY)
+                    .`in`(SecurityScheme.In.HEADER)
+                    .name("userId"),
+            )
     }
 
-    // TODO 회원가입 기능 개발 후 수정 혹은 삭제 고려
     private fun createSecurityRequirement(): SecurityRequirement {
-        return SecurityRequirement().addList("userIdHeader")
+        return SecurityRequirement()
+            .addList(AUTHORIZATION)
+            // TODO 회원가입 기능 개발 후 수정 혹은 삭제 고려
+            .addList("userIdHeader")
     }
 }
