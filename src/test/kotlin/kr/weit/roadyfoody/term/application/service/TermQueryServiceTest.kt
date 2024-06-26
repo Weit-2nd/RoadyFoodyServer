@@ -14,7 +14,6 @@ import kr.weit.roadyfoody.term.fixture.TEST_REQUIRED_TERMS_SIZE
 import kr.weit.roadyfoody.term.fixture.createTestSummaryTermsResponse
 import kr.weit.roadyfoody.term.fixture.createTestTermIdSet
 import kr.weit.roadyfoody.term.fixture.createTestTerms
-import kr.weit.roadyfoody.term.fixture.createTestZerosSummaryTermsResponse
 import kr.weit.roadyfoody.term.repository.TermRepository
 import kr.weit.roadyfoody.term.repository.getByTermId
 import org.junit.jupiter.api.assertThrows
@@ -30,7 +29,7 @@ class TermQueryServiceTest :
             `when`("필수 약관이 $TEST_REQUIRED_TERMS_SIZE 개 , 선택 약관이 $TEST_OPTIONAL_TERMS_SIZE 개 존재할 시") {
                 every { termRepository.findAll() } returns createTestTerms()
                 then("SummaryTermsResponse 를 반환한다.") {
-                    termQueryService.getAllSummaryTerms() shouldBeEqual createTestSummaryTermsResponse()
+                    termQueryService.getAllSummaryTerms() shouldBeEqual createTestSummaryTermsResponse(createTestTerms())
                     verify(exactly = 1) { termRepository.findAll() }
                 }
             }
@@ -38,7 +37,7 @@ class TermQueryServiceTest :
             `when`("약관이 존재하지 않을 시") {
                 every { termRepository.findAll() } returns emptyList()
                 then("내용이 0인 SummaryTermsResponse 를 반환한다.") {
-                    termQueryService.getAllSummaryTerms() shouldBeEqual createTestZerosSummaryTermsResponse()
+                    termQueryService.getAllSummaryTerms() shouldBeEqual createTestSummaryTermsResponse(emptyList())
                     verify(exactly = 1) { termRepository.findAll() }
                 }
             }
