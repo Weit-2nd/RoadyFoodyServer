@@ -17,7 +17,7 @@ fun headWithAuth(url: String) = head(url).withAuth()
 
 fun postWithAuth(url: String) = post(url).withAuth()
 
-fun multipartWithAuth(url: String) = multipart(url).withAuth()
+fun multipartWithAuth(url: String) = multipart(url).apply { header("userid", 1) }
 
 fun patchWithAuth(url: String) = patch(url).withAuth()
 

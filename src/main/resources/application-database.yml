@@ -7,6 +7,8 @@ spring:
     open-in-view: false
     properties:
       hibernate:
+        spatial:
+          connection_finder: kr.weit.roadyfoody.foodSpots.config.ConnectionFinder
         default_batch_fetch_size: 100 # 나중에 부족하시면 늘려주세요!
   datasource:
     driver-class-name: oracle.jdbc.OracleDriver
