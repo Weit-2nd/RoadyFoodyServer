@@ -46,4 +46,5 @@ private val PERMITTED_URL_PATTERNS =
         "/actuator/prometheus",
         "/api/v1/terms/**",
         "/api/v1/auth/**",
+        "/api/v1/food-spots/**",
     )
