@@ -1,7 +1,7 @@
 package kr.weit.roadyfoody.auth.fixture
 
-import kr.weit.roadyfoody.auth.dto.KakaoUserResponse
-import kr.weit.roadyfoody.auth.dto.SignUpRequest
+import kr.weit.roadyfoody.auth.application.dto.KakaoUserResponse
+import kr.weit.roadyfoody.auth.application.dto.SignUpRequest
 import kr.weit.roadyfoody.term.fixture.createTestRequiredTermIdSet
 import kr.weit.roadyfoody.user.domain.SocialLoginType
 import kr.weit.roadyfoody.user.fixture.TEST_SOCIAL_ID

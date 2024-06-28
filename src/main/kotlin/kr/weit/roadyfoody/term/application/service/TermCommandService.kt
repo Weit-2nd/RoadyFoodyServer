@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.term.service
+package kr.weit.roadyfoody.term.application.service
 
 import kr.weit.roadyfoody.term.repository.TermRepository
 import kr.weit.roadyfoody.useragreedterm.exception.RequiredTermNotAgreedException

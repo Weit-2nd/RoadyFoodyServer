@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.term.service
+package kr.weit.roadyfoody.term.application.service
 
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrow

@@ -1,13 +1,13 @@
 package kr.weit.roadyfoody.auth.application.service
 
-import kr.weit.roadyfoody.auth.dto.SignUpRequest
+import kr.weit.roadyfoody.auth.application.dto.SignUpRequest
 import kr.weit.roadyfoody.auth.exception.UserAlreadyExistsException
 import kr.weit.roadyfoody.global.service.ImageService
-import kr.weit.roadyfoody.term.service.TermCommandService
+import kr.weit.roadyfoody.term.application.service.TermCommandService
 import kr.weit.roadyfoody.user.domain.SocialLoginType
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.repository.UserRepository
-import kr.weit.roadyfoody.useragreedterm.service.UserAgreedTermCommandService
+import kr.weit.roadyfoody.useragreedterm.application.service.UserAgreedTermCommandService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile

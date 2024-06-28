@@ -16,10 +16,10 @@ import kr.weit.roadyfoody.auth.fixture.createTestSignUpRequest
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.support.utils.ImageFormat.WEBP
 import kr.weit.roadyfoody.support.utils.createTestImageFile
-import kr.weit.roadyfoody.term.service.TermCommandService
+import kr.weit.roadyfoody.term.application.service.TermCommandService
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.repository.UserRepository
-import kr.weit.roadyfoody.useragreedterm.service.UserAgreedTermCommandService
+import kr.weit.roadyfoody.useragreedterm.application.service.UserAgreedTermCommandService
 import org.springframework.web.multipart.MultipartFile
 
 class AuthCommandServiceTest : BehaviorSpec({
