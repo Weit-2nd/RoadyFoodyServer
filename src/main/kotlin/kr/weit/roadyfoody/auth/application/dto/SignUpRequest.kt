@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.auth.dto
+package kr.weit.roadyfoody.auth.application.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Pattern

@@ -8,8 +8,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
-import kr.weit.roadyfoody.auth.dto.DuplicatedNicknameResponse
-import kr.weit.roadyfoody.auth.dto.SignUpRequest
+import kr.weit.roadyfoody.auth.application.dto.DuplicatedNicknameResponse
+import kr.weit.roadyfoody.auth.application.dto.SignUpRequest
 import kr.weit.roadyfoody.common.exception.ErrorResponse
 import kr.weit.roadyfoody.global.swagger.v1.SwaggerTag
 import kr.weit.roadyfoody.global.validator.MaxFileSize

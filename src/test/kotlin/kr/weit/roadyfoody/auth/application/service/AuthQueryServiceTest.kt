@@ -7,7 +7,7 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kr.weit.roadyfoody.auth.dto.DuplicatedNicknameResponse
+import kr.weit.roadyfoody.auth.application.dto.DuplicatedNicknameResponse
 import kr.weit.roadyfoody.auth.exception.InvalidTokenException
 import kr.weit.roadyfoody.auth.fixture.TEST_SOCIAL_ACCESS_TOKEN
 import kr.weit.roadyfoody.auth.fixture.createTestKakaoUserResponse

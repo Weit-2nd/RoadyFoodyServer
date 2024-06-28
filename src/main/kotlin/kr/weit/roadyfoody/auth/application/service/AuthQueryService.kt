@@ -1,7 +1,7 @@
 package kr.weit.roadyfoody.auth.application.service
 
-import kr.weit.roadyfoody.auth.dto.DuplicatedNicknameResponse
-import kr.weit.roadyfoody.auth.dto.KakaoUserResponse
+import kr.weit.roadyfoody.auth.application.dto.DuplicatedNicknameResponse
+import kr.weit.roadyfoody.auth.application.dto.KakaoUserResponse
 import kr.weit.roadyfoody.auth.exception.InvalidTokenException
 import kr.weit.roadyfoody.auth.presentation.client.KakaoLoginClientInterface
 import kr.weit.roadyfoody.user.repository.UserRepository
