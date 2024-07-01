@@ -57,7 +57,7 @@ class AuthController(
     override fun signIn(
         @RequestHeader(AUTHORIZATION) socialAccessToken: String?,
     ): ServiceTokensResponse {
-        requireNotNull(socialAccessToken) { "AccessToken 이 존재하지 않습니다." }
+        requireNotNull(socialAccessToken) { "SocialAccessToken 이 존재하지 않습니다." }
         return authCommandService.login(socialAccessToken)
     }
 
