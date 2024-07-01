@@ -40,12 +40,16 @@ class CustomFoodSpotsHistoryRepositoryImpl(
             select(entity(FoodSpotsHistory::class))
             from(entity(FoodSpotsHistory::class))
             where(
-                if (lastId != null) {
-                    col(FoodSpotsHistory::id).lessThan(lastId)
-                } else {
-                    PredicateSpec.empty
-                },
+                and(
+                    if (lastId != null) {
+                        col(FoodSpotsHistory::id).lessThan(lastId)
+                    } else {
+                        PredicateSpec.empty
+                    },
+                    col(FoodSpotsHistory::user).equal(user),
+                ),
             )
+            orderBy(col(FoodSpotsHistory::id).desc())
             limit(size + 1)
         }
 }

@@ -92,16 +92,16 @@ data class ReportHistoriesResponse(
 }
 
 data class ReportPhotoResponse(
-    @Schema(description = "리포트 사진 ID")
-    val reportPhotoId: Long,
+    @Schema(description = "리포트 사진 ID", example = "1")
+    val id: Long,
     @Schema(description = "리포트 사진 이름")
-    val reportPhotoName: String,
+    val name: String,
     @Schema(description = "리포트 사진 URL")
-    val reportPhotoUrl: String,
+    val url: String,
 ) {
     constructor(reportPhoto: FoodSpotsPhoto, url: String) : this(
-        reportPhotoId = reportPhoto.id,
-        reportPhotoName = reportPhoto.fileName,
-        reportPhotoUrl = url,
+        id = reportPhoto.id,
+        name = reportPhoto.fileName,
+        url = url,
     )
 }

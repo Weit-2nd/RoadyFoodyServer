@@ -21,9 +21,9 @@ import java.util.concurrent.CompletableFuture
 class FoodSpotsService(
     private val foodSpotsRepository: FoodSpotsRepository,
     private val foodSpotsHistoryRepository: FoodSpotsHistoryRepository,
+    private val foodSpotsPhotoRepository: FoodSpotsPhotoRepository,
     private val userRepository: UserRepository,
     private val imageService: ImageService,
-    private val foodSpotsPhotoRepository: FoodSpotsPhotoRepository,
 ) {
     @Transactional
     fun createReport(
