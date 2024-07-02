@@ -5,7 +5,6 @@ import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
-import jakarta.persistence.Index
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.SequenceGenerator
@@ -21,9 +20,6 @@ import kr.weit.roadyfoody.common.domain.BaseTimeEntity
             columnNames = ["food_spots_id", "food_categories_id"],
             name = "food_spots_food_categories_unique_constraint",
         ),
-    ],
-    indexes = [
-        Index(name = "food_spots_id_food_categories_id_index", columnList = "food_spots_id, food_categories_id"),
     ],
 )
 @SequenceGenerator(
