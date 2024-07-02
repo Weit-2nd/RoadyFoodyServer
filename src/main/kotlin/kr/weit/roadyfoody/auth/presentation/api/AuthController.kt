@@ -6,15 +6,17 @@ import kr.weit.roadyfoody.auth.application.dto.ServiceTokensResponse
 import kr.weit.roadyfoody.auth.application.dto.SignUpRequest
 import kr.weit.roadyfoody.auth.application.service.AuthCommandService
 import kr.weit.roadyfoody.auth.application.service.AuthQueryService
+import kr.weit.roadyfoody.auth.exception.MissingSocialAccessTokenException
 import kr.weit.roadyfoody.auth.presentation.spec.AuthControllerSpec
 import kr.weit.roadyfoody.auth.security.LoginUser
-import kr.weit.roadyfoody.auth.security.jwt.isNotBearerToken
+import kr.weit.roadyfoody.auth.security.jwt.isBearerToken
 import kr.weit.roadyfoody.auth.security.jwt.removeBearer
 import kr.weit.roadyfoody.global.validator.MaxFileSize
 import kr.weit.roadyfoody.global.validator.WebPImage
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpStatus.CREATED
+import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -44,7 +46,7 @@ class AuthController(
         @RequestPart(required = false)
         profileImage: MultipartFile?,
     ) {
-        requireNotNull(socialAccessToken) { "socialAccessToken 이 존재하지 않습니다." }
+        socialAccessToken ?: throw MissingSocialAccessTokenException()
         authCommandService.register(socialAccessToken, signUpRequest, profileImage)
     }
 
@@ -56,22 +58,22 @@ class AuthController(
     @GetMapping
     override fun signIn(
         @RequestHeader(AUTHORIZATION) socialAccessToken: String?,
-    ): ServiceTokensResponse {
-        requireNotNull(socialAccessToken) { "SocialAccessToken 이 존재하지 않습니다." }
-        return authCommandService.login(socialAccessToken)
-    }
+    ): ServiceTokensResponse =
+        authCommandService.login(
+            socialAccessToken
+                ?: throw MissingSocialAccessTokenException(),
+        )
 
     @GetMapping("/refresh")
     override fun refresh(
         @RequestHeader(AUTHORIZATION) refreshToken: String?,
     ): ServiceTokensResponse {
         requireNotNull(refreshToken) { "RefreshToken 이 존재하지 않습니다." }
-        if (refreshToken.isNotBearerToken()) {
-            throw IllegalArgumentException("RefreshToken 의 형식이 올바르지 않습니다.")
-        }
+        require(refreshToken.isBearerToken()) { "RefreshToken 의 형식이 올바르지 않습니다." }
         return authCommandService.reissueTokens(refreshToken.removeBearer())
     }
 
+    @ResponseStatus(NO_CONTENT)
     @PostMapping("/sign-out")
     override fun signOut(
         @LoginUser user: User,

@@ -41,16 +41,6 @@ interface AuthControllerSpec {
                         schema = Schema(implementation = ErrorResponse::class),
                         examples = [
                             ExampleObject(
-                                name = "Invalid Social Access Token",
-                                summary = "SocialAccessToken 미입력",
-                                value = """
-                        {
-                            "code": -10000,
-                            "errorMessage": "socialAccessToken 가 존재하지 않습니다."
-                        }
-                        """,
-                            ),
-                            ExampleObject(
                                 name = "Invalid Image Input",
                                 summary = "WEBP 이외의 이미지 입력",
                                 value = """
@@ -101,6 +91,16 @@ interface AuthControllerSpec {
                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                         schema = Schema(implementation = ErrorResponse::class),
                         examples = [
+                            ExampleObject(
+                                name = "Missing Social Access Token",
+                                summary = "SocialAccessToken 미입력",
+                                value = """
+                        {
+                            "code": -10000,
+                            "errorMessage": "SocialAccessToken 이 존재하지 않습니다."
+                        }
+                        """,
+                            ),
                             ExampleObject(
                                 value = """
                         {
@@ -190,8 +190,8 @@ interface AuthControllerSpec {
                 description = "로그인 성공",
             ),
             ApiResponse(
-                responseCode = "400",
-                description = "로그인 실패",
+                responseCode = "401",
+                description = "유효하지 않은 토큰으로 요청",
                 content = [
                     Content(
                         mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -202,23 +202,11 @@ interface AuthControllerSpec {
                                 summary = "SocialAccessToken 미입력",
                                 value = """
                         {
-                            "code": -10000,
-                            "errorMessage": "socialAccessToken 이 존재하지 않습니다."
+                            "code": -10001,
+                            "errorMessage": "SocialAccessToken 이 존재하지 않습니다."
                         }
                         """,
                             ),
-                        ],
-                    ),
-                ],
-            ),
-            ApiResponse(
-                responseCode = "401",
-                description = "유효하지 않은 토큰으로 요청",
-                content = [
-                    Content(
-                        mediaType = MediaType.APPLICATION_JSON_VALUE,
-                        schema = Schema(implementation = ErrorResponse::class),
-                        examples = [
                             ExampleObject(
                                 name = "Invalid Social Access Token",
                                 summary = "유효하지 않는 SocialAccessToken",
@@ -289,7 +277,7 @@ interface AuthControllerSpec {
                         """,
                             ),
                             ExampleObject(
-                                name = "Invalid Token Format",
+                                name = "Invalid Refresh Token Format",
                                 summary = "RefreshToken 형식 오류",
                                 value = """
                         {
@@ -298,35 +286,13 @@ interface AuthControllerSpec {
                         }
                         """,
                             ),
-                        ],
-                    ),
-                ],
-            ),
-            ApiResponse(
-                responseCode = "401",
-                description = "유효하지 않은 토큰으로 요청",
-                content = [
-                    Content(
-                        mediaType = MediaType.APPLICATION_JSON_VALUE,
-                        schema = Schema(implementation = ErrorResponse::class),
-                        examples = [
                             ExampleObject(
-                                name = "Invalid Token",
-                                summary = "유효하지 않은 토큰",
+                                name = "Invalid Refresh Token",
+                                summary = "유효하지 않은 RefreshToken",
                                 value = """
                         {
-                            "code": -10001,
-                            "errorMessage": "유효하지 않은 토큰입니다."
-                        }
-                        """,
-                            ),
-                            ExampleObject(
-                                name = "Invalid Token",
-                                summary = "유효하지 않은 토큰",
-                                value = """
-                        {
-                            "code": -10001,
-                            "errorMessage": "인증된 사용자를 찾을 수 없습니다."
+                            "code": -10000,
+                            "errorMessage": "RefreshToken 이 유효하지 않습니다."
                         }
                         """,
                             ),
@@ -346,7 +312,7 @@ interface AuthControllerSpec {
         description = "Authorization 헤더에 AccessToken(Bearer)을 넣어 로그아웃을 진행합니다.",
         responses = [
             ApiResponse(
-                responseCode = "200",
+                responseCode = "204",
                 description = "로그아웃 성공",
             ),
             ApiResponse(
@@ -358,10 +324,22 @@ interface AuthControllerSpec {
                         schema = Schema(implementation = ErrorResponse::class),
                         examples = [
                             ExampleObject(
+                                name = "Unauthenticated Access",
+                                summary = "인증되지 않은 접근",
                                 value = """
                         {
                             "code": -10001,
                             "errorMessage": "인증정보가 없습니다."
+                        }
+                        """,
+                            ),
+                            ExampleObject(
+                                name = "Authenticated User Not Found",
+                                summary = "존재하지 않는 사용자",
+                                value = """
+                        {
+                            "code": -10001,
+                            "errorMessage": "인증된 사용자를 찾을 수 없습니다."
                         }
                         """,
                             ),
