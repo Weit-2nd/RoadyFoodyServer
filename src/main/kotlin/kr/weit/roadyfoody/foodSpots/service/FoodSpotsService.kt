@@ -49,10 +49,10 @@ class FoodSpotsService(
             foodSpotsHistoryRepository.getHistoriesByUser(user, size, lastId).map {
                 val reportPhotoResponse =
                     foodSpotsPhotoRepository.getByHistoryId(it.id).map { photo ->
-                        ReportPhotoResponse(photo, imageService.downloadUrl(photo.fileName))
+                        ReportPhotoResponse(photo, imageService.getDownloadUrl(photo.fileName))
                     }
                 ReportHistoriesResponse(it, reportPhotoResponse)
             }
-        return SliceResponse(size, reportResponse)
+        return SliceResponse(reportResponse)
     }
 }

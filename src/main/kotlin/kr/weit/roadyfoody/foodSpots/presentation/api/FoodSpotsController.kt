@@ -12,6 +12,7 @@ import kr.weit.roadyfoody.foodSpots.validator.WebPImageList
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
@@ -40,9 +41,9 @@ class FoodSpotsController(
         reportPhotos: List<MultipartFile>?,
     ) = foodSpotsService.createReport(userId, reportRequest, reportPhotos)
 
-    @GetMapping("/histories")
+    @GetMapping("/histories/{userId}")
     override fun getReportHistories(
-        @RequestHeader
+        @PathVariable("userId")
         userId: Long,
         @Positive(message = "조회할 개수는 양수여야 합니다.")
         @RequestParam(defaultValue = "10", required = false)
