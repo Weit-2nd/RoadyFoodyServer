@@ -2,7 +2,7 @@ package kr.weit.roadyfoody.auth.security
 
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.repository.UserRepository
-import kr.weit.roadyfoody.user.repository.getBySocialId
+import kr.weit.roadyfoody.user.repository.getByUserId
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -11,10 +11,9 @@ import org.springframework.stereotype.Service
 @Service
 class CustomUserDetailService(
     private val userRepository: UserRepository,
-) :
-    UserDetailsService {
-    override fun loadUserByUsername(socialId: String): UserDetails {
-        return SecurityUser(userRepository.getBySocialId(socialId))
+) : UserDetailsService {
+    override fun loadUserByUsername(userIdStr: String): UserDetails {
+        return SecurityUser(userRepository.getByUserId(userIdStr.toLong()))
     }
 }
 
