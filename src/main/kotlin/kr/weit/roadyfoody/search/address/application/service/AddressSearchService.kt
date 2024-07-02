@@ -22,8 +22,8 @@ class AddressSearchService(
         keyword: String,
         size: Int,
     ): AddressSearchResponses {
-        require(keyword.length >= 60) { throw RoadyFoodyBadRequestException(ErrorCode.SEARCH_KEYWORD_LENGTH_LONG) }
-        require(keyword.length < 2) { throw RoadyFoodyBadRequestException(ErrorCode.SEARCH_KEYWORD_LENGTH_SHORT) }
+        require(keyword.length <= 60) { throw RoadyFoodyBadRequestException(ErrorCode.SEARCH_KEYWORD_LENGTH_LONG) }
+        require(keyword.length >= 2) { throw RoadyFoodyBadRequestException(ErrorCode.SEARCH_KEYWORD_LENGTH_SHORT) }
 
         val encodedKeyword: String = URLEncoder.encode(keyword.trim(), StandardCharsets.UTF_8)
         val originalResponse = kakaoAddressClientInterface.searchAddress(encodedKeyword, size)
