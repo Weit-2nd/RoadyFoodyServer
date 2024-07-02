@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import kr.weit.roadyfoody.auth.security.CustomUserDetailService
 import kr.weit.roadyfoody.auth.security.jwt.JwtUtil
-import kr.weit.roadyfoody.auth.security.jwt.isNotBearerToken
+import kr.weit.roadyfoody.auth.security.jwt.isBearerToken
 import kr.weit.roadyfoody.auth.security.jwt.removeBearer
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -23,15 +23,15 @@ class JwtFilter(
         filterChain: FilterChain,
     ) {
         val bearerToken = request.getHeader(AUTHORIZATION)
-        if (bearerToken.isNullOrBlank() || bearerToken.isNotBearerToken()) {
+        if (bearerToken.isNullOrBlank() || !bearerToken.isBearerToken()) {
             filterChain.doFilter(request, response)
             return
         }
 
         val token = bearerToken.removeBearer()
         if (jwtUtil.validateToken(jwtUtil.accessKey, token)) {
-            val socialId = jwtUtil.getSocialId(jwtUtil.accessKey, token)
-            val securityUser = customUserDetailService.loadUserByUsername(socialId)
+            val userIdStr = jwtUtil.getUserId(jwtUtil.accessKey, token).toString()
+            val securityUser = customUserDetailService.loadUserByUsername(userIdStr)
             val authentication = UsernamePasswordAuthenticationToken(securityUser, null, securityUser.authorities)
             SecurityContextHolder.getContext().authentication = authentication
         }
