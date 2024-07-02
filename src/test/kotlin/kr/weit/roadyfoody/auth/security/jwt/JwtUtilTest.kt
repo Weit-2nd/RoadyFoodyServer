@@ -122,7 +122,7 @@ class JwtUtilTest : BehaviorSpec({
 
     given("getUserId 메서드") {
         `when`("유효한 AccessToken 을 전달하면") {
-            then("UserIdStr 이 반환된다") {
+            then("UserId 가 반환된다") {
                 val accessToken = jwtUtil.generateAccessToken(TEST_USER_ID)
                 val actual = jwtUtil.getUserId(jwtUtil.accessKey, accessToken)
                 actual.shouldNotBeNull()
