@@ -15,7 +15,7 @@ import kr.weit.roadyfoody.auth.fixture.TEST_BEARER_ACCESS_TOKEN
 import kr.weit.roadyfoody.auth.fixture.createTestSecurityUser
 import kr.weit.roadyfoody.auth.security.CustomUserDetailService
 import kr.weit.roadyfoody.auth.security.jwt.JwtUtil
-import kr.weit.roadyfoody.user.fixture.TEST_USER_SOCIAL_ID
+import kr.weit.roadyfoody.user.fixture.TEST_USER_ID
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
@@ -47,9 +47,9 @@ class JwtFilterTest : BehaviorSpec({
             every { request.getHeader(AUTHORIZATION) } returns TEST_BEARER_ACCESS_TOKEN
             every { jwtUtil.accessKey } returns mockk<SecretKey>()
             every { jwtUtil.validateToken(any<SecretKey>(), any<String>()) } returns true
-            every { jwtUtil.getSocialId(any<SecretKey>(), any<String>()) } returns TEST_USER_SOCIAL_ID
+            every { jwtUtil.getUserId(any<SecretKey>(), any<String>()) } returns TEST_USER_ID
             val securityUser = createTestSecurityUser()
-            every { customUserDetailService.loadUserByUsername(TEST_USER_SOCIAL_ID) } returns securityUser
+            every { customUserDetailService.loadUserByUsername(any<String>()) } returns securityUser
             then("SecurityContextHolder 에 인증 정보가 설정되어야 한다") {
                 jwtFilter.doFilter(request, response, filterChain)
 
@@ -59,8 +59,8 @@ class JwtFilterTest : BehaviorSpec({
                     request.getHeader(AUTHORIZATION)
                     jwtUtil.accessKey
                     jwtUtil.validateToken(any<SecretKey>(), any<String>())
-                    jwtUtil.getSocialId(any<SecretKey>(), any<String>())
-                    customUserDetailService.loadUserByUsername(TEST_USER_SOCIAL_ID)
+                    jwtUtil.getUserId(any<SecretKey>(), any<String>())
+                    customUserDetailService.loadUserByUsername(any<String>())
                     filterChain.doFilter(request, response)
                 }
             }

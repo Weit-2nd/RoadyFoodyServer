@@ -10,7 +10,6 @@ import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.spyk
 import io.mockk.verify
-import kr.weit.roadyfoody.auth.exception.InvalidTokenException
 import kr.weit.roadyfoody.auth.exception.UserAlreadyExistsException
 import kr.weit.roadyfoody.auth.exception.UserNotRegisteredException
 import kr.weit.roadyfoody.auth.fixture.TEST_ACCESS_TOKEN
@@ -27,11 +26,12 @@ import kr.weit.roadyfoody.support.utils.ImageFormat.WEBP
 import kr.weit.roadyfoody.support.utils.createTestImageFile
 import kr.weit.roadyfoody.term.application.service.TermCommandService
 import kr.weit.roadyfoody.user.domain.User
-import kr.weit.roadyfoody.user.fixture.TEST_USER_SOCIAL_ID
+import kr.weit.roadyfoody.user.fixture.TEST_USER_ID
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import kr.weit.roadyfoody.user.repository.UserRepository
 import kr.weit.roadyfoody.useragreedterm.application.service.UserAgreedTermCommandService
 import org.springframework.web.multipart.MultipartFile
+import java.util.Optional
 import javax.crypto.SecretKey
 
 class AuthCommandServiceTest : BehaviorSpec({
@@ -152,38 +152,38 @@ class AuthCommandServiceTest : BehaviorSpec({
     given("login 테스트") {
         `when`("가입된 사용자가 있으면") {
             every { authQueryService.requestKakaoUserInfo(any<String>()) } returns createTestKakaoUserResponse()
-            every { userRepository.existsBySocialId(any<String>()) } returns true
+            every { userRepository.findBySocialId(any<String>()) } returns createTestUser()
             every { jwtUtil.accessTokenExpirationTime } returns 1000
-            every { jwtUtil.generateAccessToken(any<String>(), any<Long>()) } returns TEST_ACCESS_TOKEN
+            every { jwtUtil.generateAccessToken(any<Long>(), any<Long>()) } returns TEST_ACCESS_TOKEN
             every { jwtUtil.generateRotateId() } returns TEST_ROTATE_ID
             every { jwtUtil.refreshTokenExpirationTime } returns 5 * 1000
-            every { jwtUtil.generateRefreshToken(any<String>(), any<String>(), any<Long>()) } returns TEST_REFRESH_TOKEN
-            every { jwtUtil.storeCachedRefreshTokenRotateId(any<String>(), any<String>()) } just runs
+            every { jwtUtil.generateRefreshToken(any<Long>(), any<String>(), any<Long>()) } returns TEST_REFRESH_TOKEN
+            every { jwtUtil.storeCachedRefreshTokenRotateId(any<Long>(), any<String>()) } just runs
             then("ServiceTokensResponse 가 반환된다.") {
                 val response = authCommandService.login(TEST_SOCIAL_ACCESS_TOKEN)
                 response.accessToken shouldBe TEST_ACCESS_TOKEN
                 response.refreshToken shouldBe TEST_REFRESH_TOKEN
                 verify(exactly = 1) {
                     authQueryService.requestKakaoUserInfo(any<String>())
-                    userRepository.existsBySocialId(any<String>())
-                    jwtUtil.generateAccessToken(any<String>(), any<Long>())
+                    userRepository.findBySocialId(any<String>())
+                    jwtUtil.generateAccessToken(any<Long>(), any<Long>())
                     jwtUtil.generateRotateId()
-                    jwtUtil.generateRefreshToken(any<String>(), any<String>(), any<Long>())
-                    jwtUtil.storeCachedRefreshTokenRotateId(any<String>(), any<String>())
+                    jwtUtil.generateRefreshToken(any<Long>(), any<String>(), any<Long>())
+                    jwtUtil.storeCachedRefreshTokenRotateId(any<Long>(), any<String>())
                 }
             }
         }
 
         `when`("가입된 사용자가 없으면") {
             every { authQueryService.requestKakaoUserInfo(any<String>()) } returns createTestKakaoUserResponse()
-            every { userRepository.existsBySocialId(any<String>()) } returns false
+            every { userRepository.findBySocialId(any<String>()) } returns null
             then("UserNotRegisteredException 예외가 발생한다.") {
                 shouldThrow<UserNotRegisteredException> {
                     authCommandService.login(TEST_SOCIAL_ACCESS_TOKEN)
                 }
                 verify(exactly = 1) {
                     authQueryService.requestKakaoUserInfo(any<String>())
-                    userRepository.existsBySocialId(any<String>())
+                    userRepository.findBySocialId(any<String>())
                 }
             }
         }
@@ -194,13 +194,14 @@ class AuthCommandServiceTest : BehaviorSpec({
         `when`("유효한 refreshToken 이면") {
             every { jwtUtil.validateToken(any<SecretKey>(), any<String>()) } returns true
             every { jwtUtil.validateCachedRefreshTokenRotateId(any<String>()) } returns true
-            every { jwtUtil.getSocialId(any<SecretKey>(), any<String>()) } returns TEST_USER_SOCIAL_ID
+            every { jwtUtil.getUserId(any<SecretKey>(), any<String>()) } returns TEST_USER_ID
+            every { userRepository.findById(any<Long>()) } returns Optional.of(createTestUser())
             every { jwtUtil.accessTokenExpirationTime } returns 1000
-            every { jwtUtil.generateAccessToken(any<String>(), any<Long>()) } returns TEST_ACCESS_TOKEN
+            every { jwtUtil.generateAccessToken(any<Long>(), any<Long>()) } returns TEST_ACCESS_TOKEN
             every { jwtUtil.generateRotateId() } returns TEST_ROTATE_ID
             every { jwtUtil.refreshTokenExpirationTime } returns 5 * 1000
-            every { jwtUtil.generateRefreshToken(any<String>(), any<String>(), any<Long>()) } returns TEST_REFRESH_TOKEN
-            every { jwtUtil.storeCachedRefreshTokenRotateId(any<String>(), any<String>()) } just runs
+            every { jwtUtil.generateRefreshToken(any<Long>(), any<String>(), any<Long>()) } returns TEST_REFRESH_TOKEN
+            every { jwtUtil.storeCachedRefreshTokenRotateId(any<Long>(), any<String>()) } just runs
             then("ServiceTokensResponse 가 반환된다.") {
                 val actual = authCommandService.reissueTokens(TEST_BEARER_REFRESH_TOKEN)
                 actual.accessToken shouldBe TEST_ACCESS_TOKEN
@@ -208,11 +209,12 @@ class AuthCommandServiceTest : BehaviorSpec({
                 verify(exactly = 1) {
                     jwtUtil.validateToken(any<SecretKey>(), any<String>())
                     jwtUtil.validateCachedRefreshTokenRotateId(any<String>())
-                    jwtUtil.getSocialId(any<SecretKey>(), any<String>())
-                    jwtUtil.generateAccessToken(any<String>(), any<Long>())
+                    jwtUtil.getUserId(any<SecretKey>(), any<String>())
+                    userRepository.findById(any<Long>())
+                    jwtUtil.generateAccessToken(any<Long>(), any<Long>())
                     jwtUtil.generateRotateId()
-                    jwtUtil.generateRefreshToken(any<String>(), any<String>(), any<Long>())
-                    jwtUtil.storeCachedRefreshTokenRotateId(any<String>(), any<String>())
+                    jwtUtil.generateRefreshToken(any<Long>(), any<String>(), any<Long>())
+                    jwtUtil.storeCachedRefreshTokenRotateId(any<Long>(), any<String>())
                 }
                 verify(exactly = 2) { jwtUtil.refreshKey }
             }
@@ -220,8 +222,8 @@ class AuthCommandServiceTest : BehaviorSpec({
 
         `when`("유효하지 않은 refreshToken 이면") {
             every { jwtUtil.validateToken(any<SecretKey>(), any<String>()) } returns false
-            then("InvalidTokenException 예외가 발생한다.") {
-                shouldThrow<InvalidTokenException> {
+            then("IllegalArgumentException 예외가 발생한다.") {
+                shouldThrow<IllegalArgumentException> {
                     authCommandService.reissueTokens(TEST_BEARER_ACCESS_TOKEN)
                 }
                 verify(exactly = 1) {
@@ -234,8 +236,8 @@ class AuthCommandServiceTest : BehaviorSpec({
         `when`("일치하지 않은 refreshTokenRotateId 이면") {
             every { jwtUtil.validateToken(any<SecretKey>(), any<String>()) } returns true
             every { jwtUtil.validateCachedRefreshTokenRotateId(any<String>()) } returns false
-            then("InvalidTokenException 예외가 발생한다.") {
-                shouldThrow<InvalidTokenException> {
+            then("IllegalArgumentException 예외가 발생한다.") {
+                shouldThrow<IllegalArgumentException> {
                     authCommandService.reissueTokens(TEST_BEARER_REFRESH_TOKEN)
                 }
                 verify(exactly = 1) {
@@ -249,10 +251,10 @@ class AuthCommandServiceTest : BehaviorSpec({
 
     given("logout 테스트") {
         `when`("로그아웃 요청이 들어오면") {
-            every { jwtUtil.removeCachedRefreshToken(any<String>()) } just runs
+            every { jwtUtil.removeCachedRefreshToken(any<Long>()) } just runs
             then("jwtUtil.removeCachedRefreshToken 이 호출된다.") {
                 authCommandService.logout(createTestUser())
-                verify(exactly = 1) { jwtUtil.removeCachedRefreshToken(any<String>()) }
+                verify(exactly = 1) { jwtUtil.removeCachedRefreshToken(any<Long>()) }
             }
         }
     }

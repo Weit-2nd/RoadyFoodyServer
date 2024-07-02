@@ -28,25 +28,25 @@ class JwtUtil(
     val log: Logger = LoggerFactory.getLogger(JwtUtil::class.java)
 
     fun generateAccessToken(
-        socialId: String,
+        userId: Long,
         expirationTime: Long = accessTokenExpirationTime,
     ): String =
         generateJwtToken(
             mapOf(
-                "socialId" to socialId,
+                "userId" to userId.toString(),
             ),
             expirationTime,
             accessKey,
         )
 
     fun generateRefreshToken(
-        socialId: String,
+        userId: Long,
         rotateId: String,
         expirationTime: Long = refreshTokenExpirationTime,
     ): String =
         generateJwtToken(
             mapOf(
-                "socialId" to socialId,
+                "userId" to userId.toString(),
                 "rotateId" to rotateId,
             ),
             expirationTime,
@@ -54,21 +54,21 @@ class JwtUtil(
         )
 
     fun storeCachedRefreshTokenRotateId(
-        socialId: String,
+        userId: Long,
         rotateId: String,
     ) {
         redisTemplate.opsForValue().set(
-            getRefreshTokenCacheKey(socialId),
+            getRefreshTokenCacheKey(userId),
             rotateId,
         )
-        redisTemplate.expire(getRefreshTokenCacheKey(socialId), jwtProperties.refreshTokenExpirationTime, TimeUnit.MILLISECONDS)
+        redisTemplate.expire(getRefreshTokenCacheKey(userId), jwtProperties.refreshTokenExpirationTime, TimeUnit.MILLISECONDS)
     }
 
     companion object {
         private const val REFRESH_TOKEN_CACHE_PREFIX = "rofo:refresh-token-cache:"
 
-        fun getRefreshTokenCacheKey(socialId: String): String {
-            return REFRESH_TOKEN_CACHE_PREFIX.plus(socialId)
+        fun getRefreshTokenCacheKey(userId: Long): String {
+            return REFRESH_TOKEN_CACHE_PREFIX.plus(userId)
         }
     }
 
@@ -91,20 +91,20 @@ class JwtUtil(
     fun generateRotateId(): String = UUID.randomUUID().toString()
 
     fun validateCachedRefreshTokenRotateId(token: String): Boolean {
-        if (!redisTemplate.hasKey(getRefreshTokenCacheKey(getSocialId(refreshKey, token)))) {
+        if (!redisTemplate.hasKey(getRefreshTokenCacheKey(getUserId(refreshKey, token)))) {
             return false
         }
-        val cachedRotateId = redisTemplate.opsForValue().get(getRefreshTokenCacheKey(getSocialId(refreshKey, token)))
+        val cachedRotateId = redisTemplate.opsForValue().get(getRefreshTokenCacheKey(getUserId(refreshKey, token)))
         val rotateIdInToken = getRotateId(token)
         return cachedRotateId == rotateIdInToken
     }
 
     fun getRotateId(token: String): String = parseClaims(refreshKey, token).get("rotateId", String::class.java)
 
-    fun getSocialId(
+    fun getUserId(
         key: SecretKey,
         token: String,
-    ): String = parseClaims(key, token).get("socialId", String::class.java)
+    ): Long = parseClaims(key, token).get("userId", String::class.java).toLong()
 
     fun validateToken(
         key: SecretKey,
@@ -131,11 +131,11 @@ class JwtUtil(
         .parseSignedClaims(token)
         .payload
 
-    fun removeCachedRefreshToken(socialId: String) {
-        redisTemplate.delete(getRefreshTokenCacheKey(socialId))
+    fun removeCachedRefreshToken(userId: Long) {
+        redisTemplate.delete(getRefreshTokenCacheKey(userId))
     }
 }
 
-fun String.isNotBearerToken(): Boolean = !this.startsWith("Bearer ")
+fun String.isBearerToken(): Boolean = this.startsWith("Bearer ")
 
 fun String.removeBearer(): String = this.removePrefix("Bearer ")

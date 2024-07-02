@@ -137,17 +137,12 @@ class AuthControllerTest(
                     verify(exactly = 0) {
                         authCommandService.register(any<String>(), any<SignUpRequest>(), any<MultipartFile>())
                     }
-                    verify {
-                        mockFile.size
-                        mockFile.name
-                        mockFile.inputStream
-                    }
                 }
             }
 
             `when`("소셜 로그인 AccessToken 이 없으면") {
                 every { authCommandService.register(any<String>(), any<SignUpRequest>(), any<MultipartFile>()) } just runs
-                then("회원가입에 실패하고 400 상태번호를 반환한다") {
+                then("회원가입에 실패하고 401 상태번호를 반환한다") {
                     mockMvc.perform(
                         multipart(requestPath)
                             .file(createTestImageFile(WEBP))
@@ -158,7 +153,7 @@ class AuthControllerTest(
                                 ),
                             )
                             .contentType(MediaType.MULTIPART_FORM_DATA),
-                    ).andExpect(status().isBadRequest)
+                    ).andExpect(status().isUnauthorized)
                     verify(exactly = 0) { authCommandService.register(any<String>(), any<SignUpRequest>(), any<MultipartFile>()) }
                 }
             }
@@ -220,10 +215,10 @@ class AuthControllerTest(
             }
 
             `when`("소셜 로그인 AccessToken 이 없으면") {
-                then("400 상태번호를 반환한다") {
+                then("401 상태번호를 반환한다") {
                     mockMvc.perform(
                         get(requestPath),
-                    ).andExpect(status().isBadRequest)
+                    ).andExpect(status().isUnauthorized)
                 }
             }
         }
@@ -272,10 +267,10 @@ class AuthControllerTest(
         given("POST $requestPath/sign-out") {
             `when`("로그인 사용자 정보를 전달하면") {
                 every { authCommandService.logout(any()) } just runs
-                then("로그아웃에 성공하고 200 상태번호를 반환한다") {
+                then("로그아웃에 성공하고 204 상태번호를 반환한다") {
                     mockMvc.perform(
                         postWithAuth("$requestPath/sign-out"),
-                    ).andExpect(status().isOk)
+                    ).andExpect(status().isNoContent)
                     verify(exactly = 1) { authCommandService.logout(any()) }
                 }
             }

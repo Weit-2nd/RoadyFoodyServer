@@ -2,7 +2,6 @@ package kr.weit.roadyfoody.auth.application.service
 
 import kr.weit.roadyfoody.auth.application.dto.ServiceTokensResponse
 import kr.weit.roadyfoody.auth.application.dto.SignUpRequest
-import kr.weit.roadyfoody.auth.exception.InvalidTokenException
 import kr.weit.roadyfoody.auth.exception.UserAlreadyExistsException
 import kr.weit.roadyfoody.auth.exception.UserNotRegisteredException
 import kr.weit.roadyfoody.auth.security.jwt.JwtUtil
@@ -11,6 +10,7 @@ import kr.weit.roadyfoody.term.application.service.TermCommandService
 import kr.weit.roadyfoody.user.domain.SocialLoginType
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.repository.UserRepository
+import kr.weit.roadyfoody.user.repository.getByUserId
 import kr.weit.roadyfoody.useragreedterm.application.service.UserAgreedTermCommandService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -53,13 +53,14 @@ class AuthCommandService(
 
     fun login(socialAccessToken: String): ServiceTokensResponse {
         val userSocialId = obtainUserSocialId(SocialLoginType.KAKAO, socialAccessToken)
-        if (!userRepository.existsBySocialId(userSocialId)) {
-            throw UserNotRegisteredException()
-        }
-        val accessToken = jwtUtil.generateAccessToken(userSocialId)
+        val user =
+            userRepository.findBySocialId(userSocialId)
+                ?: throw UserNotRegisteredException()
+
+        val accessToken = jwtUtil.generateAccessToken(user.id)
         val rotateId = jwtUtil.generateRotateId()
-        val refreshToken = jwtUtil.generateRefreshToken(userSocialId, rotateId)
-        jwtUtil.storeCachedRefreshTokenRotateId(userSocialId, rotateId)
+        val refreshToken = jwtUtil.generateRefreshToken(user.id, rotateId)
+        jwtUtil.storeCachedRefreshTokenRotateId(user.id, rotateId)
         return ServiceTokensResponse(accessToken, refreshToken)
     }
 
@@ -69,20 +70,22 @@ class AuthCommandService(
     ): String = "$socialLoginType ${authQueryService.requestKakaoUserInfo(socialAccessToken).id}"
 
     fun reissueTokens(refreshToken: String): ServiceTokensResponse {
-        if (!jwtUtil.validateToken(jwtUtil.refreshKey, refreshToken) ||
-            !jwtUtil.validateCachedRefreshTokenRotateId(refreshToken)
+        require(
+            jwtUtil.validateToken(jwtUtil.refreshKey, refreshToken) &&
+                jwtUtil.validateCachedRefreshTokenRotateId(refreshToken),
         ) {
-            throw InvalidTokenException()
+            "RefreshToken 이 유효하지 않습니다."
         }
-        val socialId = jwtUtil.getSocialId(jwtUtil.refreshKey, refreshToken)
-        val newAccessToken = jwtUtil.generateAccessToken(socialId)
+        val userId = jwtUtil.getUserId(jwtUtil.refreshKey, refreshToken)
+        val user = userRepository.getByUserId(userId)
+        val newAccessToken = jwtUtil.generateAccessToken(user.id)
         val rotateId = jwtUtil.generateRotateId()
-        val newRefreshToken = jwtUtil.generateRefreshToken(socialId, rotateId)
-        jwtUtil.storeCachedRefreshTokenRotateId(socialId, rotateId)
+        val newRefreshToken = jwtUtil.generateRefreshToken(user.id, rotateId)
+        jwtUtil.storeCachedRefreshTokenRotateId(user.id, rotateId)
         return ServiceTokensResponse(newAccessToken, newRefreshToken)
     }
 
     fun logout(user: User) {
-        jwtUtil.removeCachedRefreshToken(user.socialId)
+        jwtUtil.removeCachedRefreshToken(user.id)
     }
 }
