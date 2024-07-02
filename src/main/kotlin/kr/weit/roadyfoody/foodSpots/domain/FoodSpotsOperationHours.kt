@@ -6,7 +6,6 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.IdClass
-import jakarta.persistence.Index
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.SequenceGenerator
@@ -16,9 +15,6 @@ import kr.weit.roadyfoody.common.domain.BaseModifiableEntity
 @Entity
 @Table(
     name = "food_spots_operation_hours",
-    indexes = [
-        Index(name = "food_spots_id_day_of_week_index", columnList = "food_spots_id, day_of_week"),
-    ],
 )
 @SequenceGenerator(
     name = "FOOD_SPOTS_OPERATION_HOURS_SEQ_GENERATOR",
