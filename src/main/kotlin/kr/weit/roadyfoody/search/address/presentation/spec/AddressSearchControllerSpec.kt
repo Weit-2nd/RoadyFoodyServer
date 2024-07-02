@@ -38,8 +38,8 @@ interface AddressSearchControllerSpec {
     @ApiErrorCodeExamples(
         [
             ErrorCode.REST_CLIENT_ERROR,
-            ErrorCode.SEARCH_KEYWORD_LENGTH_SHORT,
-            ErrorCode.SEARCH_KEYWORD_LENGTH_LONG,
+            ErrorCode.SIZE_NON_POSITIVE,
+            ErrorCode.SEARCH_KEYWORD_LENGTH,
         ],
     )
     fun searchAddress(

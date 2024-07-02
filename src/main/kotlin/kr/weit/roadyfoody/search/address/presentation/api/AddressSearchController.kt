@@ -1,5 +1,7 @@
 package kr.weit.roadyfoody.search.address.presentation.api
 
+import jakarta.validation.constraints.Positive
+import jakarta.validation.constraints.Size
 import kr.weit.roadyfoody.search.address.application.dto.AddressSearchResponses
 import kr.weit.roadyfoody.search.address.application.service.AddressSearchService
 import kr.weit.roadyfoody.search.address.presentation.spec.AddressSearchControllerSpec
