@@ -9,6 +9,7 @@ import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_LAST_ID
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_PHOTO_URL
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_SIZE
 import kr.weit.roadyfoody.foodSpots.fixture.createMockPhotoList
+import kr.weit.roadyfoody.foodSpots.fixture.createMockSliceFoodHistory
 import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodHistory
 import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodSpot
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsPhoto
@@ -70,13 +71,12 @@ class FoodSpotsServiceTest :
                 every { userRepository.findById(TEST_USER_ID) } returns Optional.of(user)
                 every {
                     foodSpotsHistoryRepository.getHistoriesByUser(user, TEST_FOOD_SPOTS_SIZE, TEST_FOOD_SPOTS_LAST_ID)
-                } returns
-                    listOf(createMockTestFoodHistory())
+                } returns createMockSliceFoodHistory()
                 every { foodSpotsPhotoRepository.getByHistoryId(any()) } returns
                     listOf(
                         createTestFoodSpotsPhoto(),
                     )
-                every { imageService.downloadUrl(any()) } returns TEST_FOOD_SPOTS_PHOTO_URL
+                every { imageService.getDownloadUrl(any()) } returns TEST_FOOD_SPOTS_PHOTO_URL
                 `when`("정상적인 데이터가 들어올 경우") {
                     then("정상적으로 조회되어야 한다.") {
                         foodSpotsService.getReportHistories(

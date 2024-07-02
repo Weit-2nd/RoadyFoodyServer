@@ -18,6 +18,7 @@ import kr.weit.roadyfoody.foodSpots.utils.SliceReportHistories
 import kr.weit.roadyfoody.foodSpots.validator.WebPImageList
 import kr.weit.roadyfoody.global.swagger.v1.SwaggerTag
 import org.springframework.http.MediaType
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RequestPart
@@ -161,6 +162,7 @@ interface FoodSportsControllerSpec {
     @Operation(
         description = "음식점 정보 리스트 조회 API",
         parameters = [
+            Parameter(name = "userId", description = "유저 ID", required = true, example = "1"),
             Parameter(name = "size", description = "조회할 개수", required = false, example = "10"),
             Parameter(name = "lastId", description = "마지막으로 조회된 ID", required = false, example = "1"),
         ],
@@ -211,10 +213,32 @@ interface FoodSportsControllerSpec {
                     ),
                 ],
             ),
+            ApiResponse(
+                responseCode = "404",
+                description = "리포트 리스트 조회 실패",
+                content = [
+                    Content(
+                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                        schema = Schema(implementation = ErrorResponse::class),
+                        examples = [
+                            ExampleObject(
+                                name = "Not Found User",
+                                summary = "유저를 찾을 수 없음",
+                                value = """
+                                {
+                                    "code": -10009,
+                                    "errorMessage": "10 ID 의 사용자는 존재하지 않습니다."
+                                }
+                            """,
+                            ),
+                        ],
+                    ),
+                ],
+            ),
         ],
     )
     fun getReportHistories(
-        @RequestHeader
+        @PathVariable("userId")
         userId: Long,
         @Positive(message = "조회할 개수는 양수여야 합니다.")
         @RequestParam(defaultValue = "10", required = false)

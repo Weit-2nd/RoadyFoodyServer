@@ -1,11 +1,11 @@
 package kr.weit.roadyfoody.foodSpots.repository
 
-import com.linecorp.kotlinjdsl.QueryFactory
-import com.linecorp.kotlinjdsl.listQuery
-import com.linecorp.kotlinjdsl.query.spec.predicate.PredicateSpec
-import com.linecorp.kotlinjdsl.querydsl.expression.col
+import com.linecorp.kotlinjdsl.support.spring.data.jpa.repository.KotlinJdslJpqlExecutor
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
+import kr.weit.roadyfoody.global.utils.getSlice
 import kr.weit.roadyfoody.user.domain.User
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Slice
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
@@ -13,7 +13,7 @@ fun FoodSpotsHistoryRepository.getHistoriesByUser(
     user: User,
     size: Int,
     lastId: Long?,
-): List<FoodSpotsHistory> = findSliceByUser(user, size, lastId)
+): Slice<FoodSpotsHistory> = findSliceByUser(user, size, lastId)
 
 @Repository
 interface FoodSpotsHistoryRepository :
@@ -25,31 +25,29 @@ interface CustomFoodSpotsHistoryRepository {
         user: User,
         size: Int,
         lastId: Long?,
-    ): List<FoodSpotsHistory>
+    ): Slice<FoodSpotsHistory>
 }
 
 class CustomFoodSpotsHistoryRepositoryImpl(
-    private val queryFactory: QueryFactory,
+    private val kotlinJdslJpqlExecutor: KotlinJdslJpqlExecutor,
 ) : CustomFoodSpotsHistoryRepository {
     override fun findSliceByUser(
         user: User,
         size: Int,
         lastId: Long?,
-    ): List<FoodSpotsHistory> =
-        queryFactory.listQuery {
+    ): Slice<FoodSpotsHistory> {
+        val pageable = Pageable.ofSize(size)
+        return kotlinJdslJpqlExecutor.getSlice(pageable) {
             select(entity(FoodSpotsHistory::class))
-            from(entity(FoodSpotsHistory::class))
-            where(
-                and(
+                .from(entity(FoodSpotsHistory::class))
+                .whereAnd(
                     if (lastId != null) {
-                        col(FoodSpotsHistory::id).lessThan(lastId)
+                        path(FoodSpotsHistory::id).lessThan(lastId)
                     } else {
-                        PredicateSpec.empty
+                        null
                     },
-                    col(FoodSpotsHistory::user).equal(user),
-                ),
-            )
-            orderBy(col(FoodSpotsHistory::id).desc())
-            limit(size + 1)
+                    path(FoodSpotsHistory::user).equal(user),
+                ).orderBy(path(FoodSpotsHistory::id).desc())
         }
+    }
 }

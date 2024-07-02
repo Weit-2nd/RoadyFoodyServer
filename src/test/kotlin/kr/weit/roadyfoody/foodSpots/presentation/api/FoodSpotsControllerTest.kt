@@ -9,6 +9,7 @@ import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
 import kr.weit.roadyfoody.common.dto.SliceResponse
+import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_HAS_NEXT
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_LAST_ID
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_REQUEST_NAME
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_REQUEST_PHOTO
@@ -27,6 +28,7 @@ import kr.weit.roadyfoody.support.utils.createMultipartFile
 import kr.weit.roadyfoody.support.utils.createTestImageFile
 import kr.weit.roadyfoody.support.utils.getWithAuth
 import kr.weit.roadyfoody.support.utils.multipartWithAuth
+import kr.weit.roadyfoody.user.fixture.TEST_USER_ID
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.web.servlet.MockMvc
@@ -203,11 +205,11 @@ class FoodSpotsControllerTest(
                 }
             }
 
-            given("GET $requestPath/histories Test") {
+            given("GET $requestPath/histories/{userId} Test") {
                 val response =
                     SliceResponse(
-                        TEST_FOOD_SPOTS_SIZE,
                         listOf(createTestReportHistoriesResponse()),
+                        TEST_FOOD_SPOTS_HAS_NEXT,
                     )
                 every {
                     foodSpotsService.getReportHistories(any(), any(), any())
@@ -216,7 +218,7 @@ class FoodSpotsControllerTest(
                     then("해당 유저의 리포트 이력을 반환한다.") {
                         mockMvc
                             .perform(
-                                getWithAuth("$requestPath/histories")
+                                getWithAuth("$requestPath/histories/$TEST_USER_ID")
                                     .param("size", TEST_FOOD_SPOTS_SIZE.toString())
                                     .param("lastId", TEST_FOOD_SPOTS_LAST_ID.toString()),
                             ).andExpect(status().isOk)
@@ -230,7 +232,7 @@ class FoodSpotsControllerTest(
                     then("기본값으로 해당 유저의 리포트 이력을 반환한다.") {
                         mockMvc
                             .perform(
-                                getWithAuth("$requestPath/histories"),
+                                getWithAuth("$requestPath/histories/$TEST_USER_ID"),
                             ).andExpect(status().isOk)
                     }
                 }
@@ -239,7 +241,7 @@ class FoodSpotsControllerTest(
                     then("400을 반환") {
                         mockMvc
                             .perform(
-                                getWithAuth("$requestPath/histories")
+                                getWithAuth("$requestPath/histories/$TEST_USER_ID")
                                     .param("size", "0"),
                             ).andExpect(status().isBadRequest)
                     }
@@ -249,7 +251,7 @@ class FoodSpotsControllerTest(
                     then("400을 반환") {
                         mockMvc
                             .perform(
-                                getWithAuth("$requestPath/histories")
+                                getWithAuth("$requestPath/histories/$TEST_USER_ID")
                                     .param("lastId", "-1"),
                             ).andExpect(status().isBadRequest)
                     }

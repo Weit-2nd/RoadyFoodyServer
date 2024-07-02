@@ -15,6 +15,9 @@ import kr.weit.roadyfoody.user.fixture.createTestUser
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.GeometryFactory
 import org.locationtech.jts.geom.Point
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Slice
+import org.springframework.data.domain.SliceImpl
 import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
 
@@ -35,6 +38,7 @@ const val TEST_FOOD_SPOTS_REQUEST_PHOTO = "reportPhotos"
 const val TEST_FOOD_SPOTS_SIZE = 10
 const val TEST_FOOD_SPOTS_LAST_ID = 1L
 const val TEST_FOOD_SPOTS_PHOTO_URL = "test_url"
+const val TEST_FOOD_SPOTS_HAS_NEXT = false
 
 fun createMockTestFoodSpot(id: Long = 0L) = MockTestFoodSpot(id)
 
@@ -42,6 +46,13 @@ fun createMockTestFoodHistory(
     user: User = createTestUser(0L),
     foodSpots: FoodSpots = createMockTestFoodSpot(),
 ) = MockTestFoodSpotsHistory(user = user, foodSpots = foodSpots)
+
+fun createMockSliceFoodHistory(): Slice<FoodSpotsHistory> =
+    SliceImpl(
+        listOf(createMockTestFoodHistory()),
+        Pageable.ofSize(TEST_FOOD_SPOTS_SIZE),
+        TEST_FOOD_SPOTS_HAS_NEXT,
+    )
 
 fun createTestFoodSpots(
     id: Long = 0L,
@@ -93,21 +104,14 @@ fun createMockPhotoList(
 
 fun createTestReportPhotoResponse(
     id: Long = 0L,
-    name: String = TEST_PHOTO_NAME,
     url: String = TEST_FOOD_SPOTS_PHOTO_URL,
-) = ReportPhotoResponse(id, name, url)
+) = ReportPhotoResponse(id, url)
 
 fun createTestReportHistoriesResponse(
     foodSpotsHistory: FoodSpotsHistory = createMockTestFoodHistory(),
     reportPhotoResponse: List<ReportPhotoResponse> = listOf(createTestReportPhotoResponse()),
 ) = ReportHistoriesResponse(
-    foodSpotsHistory.id,
-    foodSpotsHistory.user.id,
-    foodSpotsHistory.foodSpots.id,
-    foodSpotsHistory.name,
-    foodSpotsHistory.point.x,
-    foodSpotsHistory.point.y,
-    foodSpotsHistory.createdDateTime,
+    foodSpotsHistory,
     reportPhotoResponse,
 )
 
