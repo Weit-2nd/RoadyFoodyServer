@@ -9,9 +9,6 @@ fun UserRepository.getByUserId(userId: Long): User = findById(userId).orElseThro
 fun UserRepository.getByNickname(nickname: String): User =
     findByProfileNickname(nickname) ?: throw UserNotFoundException("$nickname 닉네임의 사용자는 존재하지 않습니다.")
 
-fun UserRepository.getBySocialId(socialId: String): User =
-    findBySocialId(socialId) ?: throw UserNotFoundException("$socialId 소셜 ID 의 사용자는 존재하지 않습니다.")
-
 interface UserRepository : JpaRepository<User, Long> {
     fun findByProfileNickname(nickname: String): User?
 
