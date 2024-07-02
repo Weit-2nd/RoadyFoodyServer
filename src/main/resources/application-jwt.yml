@@ -1,0 +1,7 @@
+spring:
+  config.activate.on-profile: test
+jwt:
+  access-key: u8n7DubrMkgKdEwz+UEx23+gDMMl1BcS/mRPW1qolmk=
+  access-token-expiration-time: 100000
+  refresh-key: RqOhoR4o6tXej2hkH2jFHsjop4p5Y7euk2KCLB3dBe0=
+  refresh-token-expiration-time:  1000000

@@ -4,8 +4,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(prefix = "jwt")
 class JwtProperties(
-    val accessKey: String = generateHmac256Key(),
-    val refreshKey: String = generateHmac256Key(),
-    val accessTokenExpirationTime: Long = 5 * 60 * 1000,
-    val refreshTokenExpirationTime: Long = 30 * 60 * 1000,
+    val accessKey: String,
+    val refreshKey: String,
+    val accessTokenExpirationTime: Long,
+    val refreshTokenExpirationTime: Long,
 )
