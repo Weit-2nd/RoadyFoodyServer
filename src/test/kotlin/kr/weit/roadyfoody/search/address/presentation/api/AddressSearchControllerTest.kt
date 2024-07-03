@@ -1,10 +1,10 @@
 package kr.weit.roadyfoody.search.address.presentation.api
-
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
 import io.mockk.verify
+import kr.weit.roadyfoody.global.TEST_KEYWORD
 import kr.weit.roadyfoody.search.address.application.service.AddressSearchService
 import kr.weit.roadyfoody.search.address.fixture.AddressFixture.createSearchResponses
 import kr.weit.roadyfoody.support.annotation.ControllerTest
@@ -25,9 +25,14 @@ class AddressSearchControllerTest(
 
         given("GET $requestPath/search 테스트") {
             `when`("키워드로 주소 검색 요청을 보내면") {
-                every { addressSearchService.searchAddress("주소", 2) } returns createSearchResponses()
+                every { addressSearchService.searchAddress(TEST_KEYWORD, 2) } returns createSearchResponses()
                 then("200 상태 번호와 AddressSearchResponses 반환한다.") {
-                    mockMvc.perform(get("$requestPath/search?keyword=주소&numOfRows=2"))
+                    mockMvc
+                        .perform(
+                            get("$requestPath/search")
+                                .param("keyword", TEST_KEYWORD)
+                                .param("numOfRows", "2"),
+                        )
                         .andExpect(status().isOk)
                         .andExpect(
                             content().json(
@@ -36,7 +41,38 @@ class AddressSearchControllerTest(
                                 ),
                             ),
                         )
-                    verify(exactly = 1) { addressSearchService.searchAddress("주소", 2) }
+                    verify(exactly = 1) { addressSearchService.searchAddress(TEST_KEYWORD, 2) }
+                }
+            }
+            `when`("numOfRows가 양수가 아닌 경우") {
+                then("400을 반환") {
+                    mockMvc
+                        .perform(
+                            get("$requestPath/search")
+                                .param("keyword", "주소")
+                                .param("numOfRows", "0"),
+                        ).andExpect(status().isBadRequest)
+                }
+            }
+            `when`("keyword 길이가 2자 미만인 경우") {
+                then("400을 반환") {
+                    mockMvc
+                        .perform(
+                            get("$requestPath/search")
+                                .param("keyword", "a")
+                                .param("numOfRows", "2"),
+                        ).andExpect(status().isBadRequest)
+                }
+            }
+
+            `when`("keyword 길이가 60자 초과인 경우") {
+                then("400을 반환") {
+                    mockMvc
+                        .perform(
+                            get("$requestPath/search")
+                                .param("keyword", "a".repeat(61))
+                                .param("numOfRows", "2"),
+                        ).andExpect(status().isBadRequest)
                 }
             }
         }

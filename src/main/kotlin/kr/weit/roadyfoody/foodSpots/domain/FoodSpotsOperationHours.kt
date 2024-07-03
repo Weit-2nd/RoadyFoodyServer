@@ -13,7 +13,9 @@ import jakarta.persistence.Table
 import kr.weit.roadyfoody.common.domain.BaseModifiableEntity
 
 @Entity
-@Table(name = "food_spots_operation_hours")
+@Table(
+    name = "food_spots_operation_hours",
+)
 @SequenceGenerator(
     name = "FOOD_SPOTS_OPERATION_HOURS_SEQ_GENERATOR",
     sequenceName = "FOOD_SPOTS_OPERATION_HOURS_SEQ",
