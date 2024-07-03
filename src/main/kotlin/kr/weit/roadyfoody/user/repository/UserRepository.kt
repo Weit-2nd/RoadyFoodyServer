@@ -12,6 +12,8 @@ fun UserRepository.getByNickname(nickname: String): User =
 interface UserRepository : JpaRepository<User, Long> {
     fun findByProfileNickname(nickname: String): User?
 
+    fun findBySocialId(socialId: String): User?
+
     fun existsByProfileNickname(nickname: String): Boolean
 
     fun existsBySocialId(socialId: String): Boolean

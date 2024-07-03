@@ -1,12 +1,16 @@
 package kr.weit.roadyfoody.auth.application.service
 
+import kr.weit.roadyfoody.auth.application.dto.ServiceTokensResponse
 import kr.weit.roadyfoody.auth.application.dto.SignUpRequest
 import kr.weit.roadyfoody.auth.exception.UserAlreadyExistsException
+import kr.weit.roadyfoody.auth.exception.UserNotRegisteredException
+import kr.weit.roadyfoody.auth.security.jwt.JwtUtil
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.term.application.service.TermCommandService
 import kr.weit.roadyfoody.user.domain.SocialLoginType
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.repository.UserRepository
+import kr.weit.roadyfoody.user.repository.getByUserId
 import kr.weit.roadyfoody.useragreedterm.application.service.UserAgreedTermCommandService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -19,6 +23,7 @@ class AuthCommandService(
     private val userAgreedTermCommandService: UserAgreedTermCommandService,
     private val userRepository: UserRepository,
     private val imageService: ImageService,
+    private val jwtUtil: JwtUtil,
 ) {
     @Transactional
     fun register(
@@ -26,7 +31,7 @@ class AuthCommandService(
         signUpRequest: SignUpRequest,
         profileImage: MultipartFile?,
     ) {
-        val socialId = obtainSocialId(signUpRequest.socialLoginType, socialAccessToken)
+        val socialId = obtainUserSocialId(signUpRequest.socialLoginType, socialAccessToken)
 
         if (userRepository.existsBySocialId(socialId) ||
             userRepository.existsByProfileNickname(signUpRequest.nickname)
@@ -46,8 +51,41 @@ class AuthCommandService(
         }
     }
 
-    private fun obtainSocialId(
+    fun login(socialAccessToken: String): ServiceTokensResponse {
+        val userSocialId = obtainUserSocialId(SocialLoginType.KAKAO, socialAccessToken)
+        val user =
+            userRepository.findBySocialId(userSocialId)
+                ?: throw UserNotRegisteredException()
+
+        val accessToken = jwtUtil.generateAccessToken(user.id)
+        val rotateId = jwtUtil.generateRotateId()
+        val refreshToken = jwtUtil.generateRefreshToken(user.id, rotateId)
+        jwtUtil.storeCachedRefreshTokenRotateId(user.id, rotateId)
+        return ServiceTokensResponse(accessToken, refreshToken)
+    }
+
+    private fun obtainUserSocialId(
         socialLoginType: SocialLoginType,
         socialAccessToken: String,
     ): String = "$socialLoginType ${authQueryService.requestKakaoUserInfo(socialAccessToken).id}"
+
+    fun reissueTokens(refreshToken: String): ServiceTokensResponse {
+        require(
+            jwtUtil.validateToken(jwtUtil.refreshKey, refreshToken) &&
+                jwtUtil.validateCachedRefreshTokenRotateId(refreshToken),
+        ) {
+            "RefreshToken 이 유효하지 않습니다."
+        }
+        val userId = jwtUtil.getUserId(jwtUtil.refreshKey, refreshToken)
+        val user = userRepository.getByUserId(userId)
+        val newAccessToken = jwtUtil.generateAccessToken(user.id)
+        val rotateId = jwtUtil.generateRotateId()
+        val newRefreshToken = jwtUtil.generateRefreshToken(user.id, rotateId)
+        jwtUtil.storeCachedRefreshTokenRotateId(user.id, rotateId)
+        return ServiceTokensResponse(newAccessToken, newRefreshToken)
+    }
+
+    fun logout(user: User) {
+        jwtUtil.removeCachedRefreshToken(user.id)
+    }
 }

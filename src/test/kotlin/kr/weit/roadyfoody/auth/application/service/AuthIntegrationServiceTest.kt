@@ -4,28 +4,33 @@ import com.ninjasquad.springmockk.MockkBean
 import io.awspring.cloud.s3.S3Template
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.verify
+import kr.weit.roadyfoody.auth.application.dto.ServiceTokensResponse
 import kr.weit.roadyfoody.auth.exception.UserAlreadyExistsException
 import kr.weit.roadyfoody.auth.fixture.TEST_SOCIAL_ACCESS_TOKEN
 import kr.weit.roadyfoody.auth.fixture.createTestKakaoUserResponse
 import kr.weit.roadyfoody.auth.fixture.createTestSignUpRequest
+import kr.weit.roadyfoody.auth.security.jwt.JwtUtil.Companion.getRefreshTokenCacheKey
 import kr.weit.roadyfoody.global.config.S3Properties
 import kr.weit.roadyfoody.support.annotation.ServiceIntegrateTest
 import kr.weit.roadyfoody.support.utils.ImageFormat.WEBP
 import kr.weit.roadyfoody.support.utils.createTestImageFile
 import kr.weit.roadyfoody.term.fixture.createTestTerms
 import kr.weit.roadyfoody.term.repository.TermRepository
+import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.fixture.TEST_USER_NICKNAME
 import kr.weit.roadyfoody.user.fixture.TEST_USER_SOCIAL_ID
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import kr.weit.roadyfoody.user.repository.UserRepository
 import kr.weit.roadyfoody.user.repository.getByNickname
 import kr.weit.roadyfoody.useragreedterm.exception.RequiredTermNotAgreedException
+import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.transaction.annotation.Transactional
 
 @Transactional
@@ -37,6 +42,7 @@ class AuthIntegrationServiceTest(
     private val termRepository: TermRepository,
     @MockkBean private val authQueryService: AuthQueryService,
     private val authCommandService: AuthCommandService,
+    private val redisTemplate: StringRedisTemplate,
 ) : BehaviorSpec({
         lateinit var validTermIdSet: Set<Long>
         beforeSpec {
@@ -101,11 +107,8 @@ class AuthIntegrationServiceTest(
         }
 
         given("이미 가입된 사용자인 경우") {
-            beforeContainer {
+            beforeEach {
                 userRepository.save(createTestUser(socialId = TEST_USER_SOCIAL_ID))
-            }
-            afterContainer {
-                userRepository.deleteAll()
             }
             `when`("회원가입을 요청하면") {
                 then("UserAlreadyExistsException 을 던진다") {
@@ -122,11 +125,8 @@ class AuthIntegrationServiceTest(
         }
 
         given("중복된 닉네임인 경우") {
-            beforeContainer {
+            beforeEach {
                 userRepository.save(createTestUser(nickname = TEST_USER_NICKNAME))
-            }
-            afterContainer {
-                userRepository.deleteAll()
             }
             `when`("회원가입을 요청하면") {
                 then("UserAlreadyExistsException 을 던진다") {
@@ -138,6 +138,86 @@ class AuthIntegrationServiceTest(
                         )
                     }
                     verify(exactly = 1) { authQueryService.requestKakaoUserInfo(any<String>()) }
+                }
+            }
+        }
+
+        given("login 메소드") {
+            `when`("유효한 socialAccessToken 을 전달하면") {
+                then("로그인이 성공한다") {
+                    authCommandService.register(TEST_SOCIAL_ACCESS_TOKEN, createTestSignUpRequest(termIdSet = validTermIdSet), null)
+                    val tokensResponse = authCommandService.login(TEST_SOCIAL_ACCESS_TOKEN)
+                    val user = userRepository.getByNickname(TEST_USER_NICKNAME)
+                    val isStored = redisTemplate.hasKey(getRefreshTokenCacheKey(user.id))
+                    tokensResponse.shouldNotBeNull()
+                    isStored.shouldBeTrue()
+                    verify(exactly = 2) { authQueryService.requestKakaoUserInfo(any<String>()) }
+                }
+            }
+        }
+
+        given("reissueTokens 메소드") {
+            lateinit var tokensResponse: ServiceTokensResponse
+            lateinit var user: User
+            beforeEach {
+                authCommandService.register(TEST_SOCIAL_ACCESS_TOKEN, createTestSignUpRequest(termIdSet = validTermIdSet), null)
+                tokensResponse = authCommandService.login(TEST_SOCIAL_ACCESS_TOKEN)
+                user = userRepository.getByNickname(TEST_USER_NICKNAME)
+            }
+            afterEach { redisTemplate.delete(getRefreshTokenCacheKey(user.id)) }
+            `when`("유효한 refreshToken 을 전달하면") {
+                then("토큰 재발급이 성공한다") {
+                    val reissuedTokensResponse = authCommandService.reissueTokens(tokensResponse.refreshToken)
+                    val isStored = redisTemplate.hasKey(getRefreshTokenCacheKey(user.id))
+                    reissuedTokensResponse.shouldNotBeNull()
+                    isStored.shouldBeTrue()
+                    verify(exactly = 2) { authQueryService.requestKakaoUserInfo(any<String>()) }
+                }
+            }
+
+            `when`("캐시된 RotateId 가 소멸한 뒤 RefreshToken 을 전달하면") {
+                then("IllegalArgumentException 을 던진다") {
+                    redisTemplate.delete(getRefreshTokenCacheKey(user.id))
+                    shouldThrow<IllegalArgumentException> {
+                        authCommandService.reissueTokens(tokensResponse.refreshToken)
+                    }
+                    val isStored = redisTemplate.hasKey(getRefreshTokenCacheKey(user.id))
+                    isStored.shouldBeFalse()
+                    verify(exactly = 2) { authQueryService.requestKakaoUserInfo(any<String>()) }
+                }
+            }
+
+            `when`("이미 한 번 사용된 refreshToken 을 전달하면") {
+                then("IllegalArgumentException 을 던진다") {
+                    val prevReissuedTokensResponse = authCommandService.reissueTokens(tokensResponse.refreshToken)
+                    authCommandService.reissueTokens(prevReissuedTokensResponse.refreshToken)
+                    shouldThrow<IllegalArgumentException> {
+                        authCommandService.reissueTokens(prevReissuedTokensResponse.refreshToken)
+                    }
+                    verify(exactly = 2) { authQueryService.requestKakaoUserInfo(any<String>()) }
+                }
+            }
+        }
+
+        given("logout 메소드") {
+            `when`("Refresh Token 이 캐시에 저장되어있다면") {
+                then("이를 제거하고 로그아웃이 성공한다") {
+                    authCommandService.register(TEST_SOCIAL_ACCESS_TOKEN, createTestSignUpRequest(termIdSet = validTermIdSet), null)
+                    authCommandService.login(TEST_SOCIAL_ACCESS_TOKEN)
+                    val user = userRepository.getByNickname(TEST_USER_NICKNAME)
+                    authCommandService.logout(user)
+                    val actual = redisTemplate.hasKey(getRefreshTokenCacheKey(user.id))
+                    actual.shouldBeFalse()
+                    verify(exactly = 2) { authQueryService.requestKakaoUserInfo(any<String>()) }
+                }
+            }
+
+            `when`("Refresh Token 이 캐시에 저장되어있지 않다면") {
+                then("아무런 동작을 하지 않는다") {
+                    val user = userRepository.save(createTestUser())
+                    authCommandService.logout(user)
+                    val actual = redisTemplate.hasKey(getRefreshTokenCacheKey(user.id))
+                    actual.shouldBeFalse()
                 }
             }
         }
