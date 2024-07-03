@@ -16,7 +16,10 @@ import org.locationtech.jts.geom.Point
 @Entity
 @Table(
     name = "food_spots",
-    indexes = [Index(name = "food_spots_point_index", columnList = "point")],
+    indexes = [
+        Index(name = "food_spots_point_index", columnList = "point"),
+        Index(name = "food_spots_name_index", columnList = "name"),
+    ],
 )
 @SequenceGenerator(name = "FOOD_SPOTS_SEQ_GENERATOR", sequenceName = "FOOD_SPOTS_SEQ", initialValue = 1, allocationSize = 1)
 class FoodSpots(

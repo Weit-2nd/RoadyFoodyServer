@@ -146,4 +146,95 @@ class ApiDocsConfig {
         apiResponse.content = content
         responses.addApiResponse(exampleHolder.code.toString(), apiResponse)
     }
+
+    @Bean
+    fun customize(): OperationCustomizer {
+        return OperationCustomizer { operation: Operation, handlerMethod: HandlerMethod ->
+            val apiErrorCodeExamples = handlerMethod.getMethodAnnotation(ApiErrorCodeExamples::class.java)
+            val apiErrorCodeExample = handlerMethod.getMethodAnnotation(ApiErrorCodeExample::class.java)
+
+            apiErrorCodeExamples?.run {
+                generateErrorCodeResponseExample(operation, apiErrorCodeExamples.value)
+            }
+
+            apiErrorCodeExample?.run {
+                generateErrorCodeResponseExample(operation, apiErrorCodeExample.value)
+            }
+
+            operation
+        }
+    }
+
+    // apiErrorCodeExamples 에서 받은 ErrorCode 배열을 통해 ErrorResponse Example을 생성
+    private fun generateErrorCodeResponseExample(
+        operation: Operation,
+        errorCodes: Array<ErrorCode>,
+    ) {
+        val responses = operation.responses
+
+        val statusWithExampleHolders =
+            errorCodes.map { errorCode ->
+                ExampleHolder(
+                    holder = getSwaggerExample(errorCode),
+                    code = errorCode.httpStatus.value(),
+                    name = errorCode.name,
+                )
+            }.groupBy { it.code }
+
+        addExamplesToResponses(responses, statusWithExampleHolders)
+    }
+
+    // apiErrorCodeExample 에서 받은 ErrorCode를 통해 ErrorResponse Example을 생성
+    private fun generateErrorCodeResponseExample(
+        operation: Operation,
+        errorCode: ErrorCode,
+    ) {
+        val responses = operation.responses
+        val exampleHolder =
+            ExampleHolder(
+                holder = getSwaggerExample(errorCode),
+                name = errorCode.name,
+                code = errorCode.httpStatus.value(),
+            )
+        addExamplesToResponses(responses, exampleHolder)
+    }
+
+    private fun getSwaggerExample(errorCode: ErrorCode): Example {
+        val errorResponseDto = ErrorResponse.of(errorCode, errorCode.errorMessage)
+        val example = Example()
+        example.value = errorResponseDto
+        return example
+    }
+
+    private fun addExamplesToResponses(
+        responses: ApiResponses,
+        statusWithExampleHolders: Map<Int, List<ExampleHolder>>,
+    ) {
+        statusWithExampleHolders.forEach { (status, v) ->
+            val content = Content()
+            val mediaType = MediaType()
+            val apiResponse = ApiResponse()
+
+            v.forEach { exampleHolder ->
+                mediaType.addExamples(exampleHolder.name, exampleHolder.holder)
+            }
+            content.addMediaType("application/json", mediaType)
+            apiResponse.content = content
+            responses.addApiResponse(status.toString(), apiResponse)
+        }
+    }
+
+    private fun addExamplesToResponses(
+        responses: ApiResponses,
+        exampleHolder: ExampleHolder,
+    ) {
+        val content = Content()
+        val mediaType = MediaType()
+        val apiResponse = ApiResponse()
+
+        mediaType.addExamples(exampleHolder.name, exampleHolder.holder)
+        content.addMediaType("application/json", mediaType)
+        apiResponse.content = content
+        responses.addApiResponse(exampleHolder.code.toString(), apiResponse)
+    }
 }

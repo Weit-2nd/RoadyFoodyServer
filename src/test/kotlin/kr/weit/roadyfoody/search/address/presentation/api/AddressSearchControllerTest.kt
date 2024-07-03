@@ -1,5 +1,4 @@
 package kr.weit.roadyfoody.search.address.presentation.api
-
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.BehaviorSpec
