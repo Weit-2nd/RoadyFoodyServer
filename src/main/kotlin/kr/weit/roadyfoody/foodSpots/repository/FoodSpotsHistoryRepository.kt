@@ -7,7 +7,6 @@ import kr.weit.roadyfoody.user.domain.User
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.stereotype.Repository
 
 fun FoodSpotsHistoryRepository.getHistoriesByUser(
     user: User,
@@ -15,7 +14,6 @@ fun FoodSpotsHistoryRepository.getHistoriesByUser(
     lastId: Long?,
 ): Slice<FoodSpotsHistory> = findSliceByUser(user, size, lastId)
 
-@Repository
 interface FoodSpotsHistoryRepository :
     JpaRepository<FoodSpotsHistory, Long>,
     CustomFoodSpotsHistoryRepository
