@@ -8,6 +8,7 @@ import kr.weit.roadyfoody.foodSpots.dto.ReportHistoriesResponse
 import kr.weit.roadyfoody.foodSpots.dto.ReportPhotoResponse
 import kr.weit.roadyfoody.foodSpots.dto.ReportRequest
 import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_MAX_LENGTH
+import kr.weit.roadyfoody.global.utils.CoordinateUtils
 import kr.weit.roadyfoody.support.utils.ImageFormat
 import kr.weit.roadyfoody.support.utils.createTestImageFile
 import kr.weit.roadyfoody.user.domain.User
@@ -115,6 +116,35 @@ fun createTestReportHistoriesResponse(
     reportPhotoResponse,
 )
 
+fun createTestFoodSpotsForDistance(): List<FoodSpots> =
+    listOf(
+        createTestFoodSpots(
+            id = 1L,
+            name = "Food Spot 1 - 100m",
+            point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE + 0.001, TEST_FOOD_SPOT_LATITUDE),
+        ),
+        createTestFoodSpots(
+            id = 2L,
+            name = "Food Spot 2 - 300m",
+            point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE, TEST_FOOD_SPOT_LATITUDE + 0.003),
+        ),
+        createTestFoodSpots(
+            id = 3L,
+            name = "Food Spot 3 - 500m",
+            point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE + 0.005, TEST_FOOD_SPOT_LATITUDE),
+        ),
+        createTestFoodSpots(
+            id = 4L,
+            name = "Food Spot 4 - 800m",
+            point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE - 0.008, TEST_FOOD_SPOT_LATITUDE),
+        ),
+        createTestFoodSpots(
+            id = 5L,
+            name = "Food Spot 5 - 1km",
+            point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE, TEST_FOOD_SPOT_LATITUDE + 0.01),
+        ),
+    )
+
 class MockTestFoodSpot(
     id: Long = 0L,
     name: String = TEST_FOOD_SPOT_NAME,
@@ -125,6 +155,15 @@ class MockTestFoodSpot(
 ) : FoodSpots(id, name, foodTruck, open, closed, point) {
     override var createdDateTime: LocalDateTime = LocalDateTime.now()
     override var updatedDateTime: LocalDateTime = LocalDateTime.now()
+
+    companion object {
+        fun createPoint(
+            longitude: Double,
+            latitude: Double,
+        ): Point {
+            return CoordinateUtils.createCoordinate(longitude, latitude)
+        }
+    }
 }
 
 class MockTestFoodSpotsHistory(
