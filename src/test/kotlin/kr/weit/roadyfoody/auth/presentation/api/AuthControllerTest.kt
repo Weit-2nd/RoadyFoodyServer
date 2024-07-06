@@ -149,7 +149,7 @@ class AuthControllerTest(
             }
 
             `when`("소셜 로그인 AccessToken 이 없으면") {
-                every { authCommandService.register(any<String>(), any<SignUpRequest>(), any<MultipartFile>()) } returns tokensResponse
+                every { authCommandService.register(any<String>(), any<SignUpRequest>(), any<MultipartFile>()) } returns mockk()
                 then("회원가입에 실패하고 401 상태번호를 반환한다") {
                     mockMvc.perform(
                         multipart(requestPath)
