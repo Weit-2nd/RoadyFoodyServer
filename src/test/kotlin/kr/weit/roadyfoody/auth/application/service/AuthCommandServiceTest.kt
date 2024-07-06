@@ -14,7 +14,6 @@ import kr.weit.roadyfoody.auth.exception.UserAlreadyExistsException
 import kr.weit.roadyfoody.auth.exception.UserNotRegisteredException
 import kr.weit.roadyfoody.auth.fixture.TEST_ACCESS_TOKEN
 import kr.weit.roadyfoody.auth.fixture.TEST_BEARER_ACCESS_TOKEN
-import kr.weit.roadyfoody.auth.fixture.TEST_BEARER_REFRESH_TOKEN
 import kr.weit.roadyfoody.auth.fixture.TEST_REFRESH_TOKEN
 import kr.weit.roadyfoody.auth.fixture.TEST_ROTATE_ID
 import kr.weit.roadyfoody.auth.fixture.TEST_SOCIAL_ACCESS_TOKEN
@@ -53,11 +52,17 @@ class AuthCommandServiceTest : BehaviorSpec({
             every { userRepository.save(any<User>()) } returns mockk<User>()
             every { userAgreedTermCommandService.storeUserAgreedTerms(any<User>(), any<Set<Long>>()) } just runs
             every { imageService.upload(any<String>(), any<MultipartFile>()) } just runs
+            every { jwtUtil.accessTokenExpirationTime } returns 1000
+            every { jwtUtil.generateAccessToken(any<Long>(), any<Long>()) } returns TEST_ACCESS_TOKEN
+            every { jwtUtil.generateRotateId() } returns TEST_ROTATE_ID
+            every { jwtUtil.refreshTokenExpirationTime } returns 5 * 1000
+            every { jwtUtil.generateRefreshToken(any<Long>(), any<String>(), any<Long>()) } returns TEST_REFRESH_TOKEN
+            every { jwtUtil.storeCachedRefreshTokenRotateId(any<Long>(), any<String>()) } just runs
         }
         `when`("프로필 이미지가 없으면 ") {
             every { userRepository.existsBySocialId(any<String>()) } returns false
             every { userRepository.existsByProfileNickname(any<String>()) } returns false
-            then("이미지를 업로드하지 않고 User 가 생성된다.") {
+            then("이미지 없이 User 를 생성하고 ServiceTokensResponse 을 반환한다.") {
                 authCommandService.register(TEST_SOCIAL_ACCESS_TOKEN, createTestSignUpRequest(), null)
                 verify(exactly = 1) {
                     authQueryService.requestKakaoUserInfo(any<String>())
@@ -66,6 +71,12 @@ class AuthCommandServiceTest : BehaviorSpec({
                     termCommandService.checkRequiredTermsOrThrow(any<Set<Long>>())
                     userRepository.save(any<User>())
                     userAgreedTermCommandService.storeUserAgreedTerms(any<User>(), any<Set<Long>>())
+                    jwtUtil.accessTokenExpirationTime
+                    jwtUtil.generateAccessToken(any<Long>(), any<Long>())
+                    jwtUtil.generateRotateId()
+                    jwtUtil.refreshTokenExpirationTime
+                    jwtUtil.generateRefreshToken(any<Long>(), any<String>(), any<Long>())
+                    jwtUtil.storeCachedRefreshTokenRotateId(any<Long>(), any<String>())
                 }
                 verify(exactly = 0) {
                     imageService.generateImageName(any<MultipartFile>())
@@ -77,7 +88,7 @@ class AuthCommandServiceTest : BehaviorSpec({
         `when`("프로필 이미지가 있으면") {
             every { userRepository.existsBySocialId(any<String>()) } returns false
             every { userRepository.existsByProfileNickname(any<String>()) } returns false
-            then("이미지를 업로드하고 User 가 생성된다.") {
+            then("이미지를 업로드하고 User 를 생성한 뒤 ServiceTokensResponse 을 반환한다.") {
                 authCommandService.register(
                     TEST_SOCIAL_ACCESS_TOKEN,
                     createTestSignUpRequest(),
@@ -92,6 +103,12 @@ class AuthCommandServiceTest : BehaviorSpec({
                     userRepository.save(any<User>())
                     userAgreedTermCommandService.storeUserAgreedTerms(any<User>(), any<Set<Long>>())
                     imageService.upload(any<String>(), any<MultipartFile>())
+                    jwtUtil.accessTokenExpirationTime
+                    jwtUtil.generateAccessToken(any<Long>(), any<Long>())
+                    jwtUtil.generateRotateId()
+                    jwtUtil.refreshTokenExpirationTime
+                    jwtUtil.generateRefreshToken(any<Long>(), any<String>(), any<Long>())
+                    jwtUtil.storeCachedRefreshTokenRotateId(any<Long>(), any<String>())
                 }
             }
         }
@@ -118,6 +135,12 @@ class AuthCommandServiceTest : BehaviorSpec({
                     userRepository.save(any<User>())
                     userAgreedTermCommandService.storeUserAgreedTerms(any<User>(), any<Set<Long>>())
                     imageService.upload(any<String>(), any<MultipartFile>())
+                    jwtUtil.accessTokenExpirationTime
+                    jwtUtil.generateAccessToken(any<Long>(), any<Long>())
+                    jwtUtil.generateRotateId()
+                    jwtUtil.refreshTokenExpirationTime
+                    jwtUtil.generateRefreshToken(any<Long>(), any<String>(), any<Long>())
+                    jwtUtil.storeCachedRefreshTokenRotateId(any<Long>(), any<String>())
                 }
             }
         }
@@ -144,6 +167,12 @@ class AuthCommandServiceTest : BehaviorSpec({
                     userRepository.save(any<User>())
                     userAgreedTermCommandService.storeUserAgreedTerms(any<User>(), any<Set<Long>>())
                     imageService.upload(any<String>(), any<MultipartFile>())
+                    jwtUtil.accessTokenExpirationTime
+                    jwtUtil.generateAccessToken(any<Long>(), any<Long>())
+                    jwtUtil.generateRotateId()
+                    jwtUtil.refreshTokenExpirationTime
+                    jwtUtil.generateRefreshToken(any<Long>(), any<String>(), any<Long>())
+                    jwtUtil.storeCachedRefreshTokenRotateId(any<Long>(), any<String>())
                 }
             }
         }
@@ -203,7 +232,7 @@ class AuthCommandServiceTest : BehaviorSpec({
             every { jwtUtil.generateRefreshToken(any<Long>(), any<String>(), any<Long>()) } returns TEST_REFRESH_TOKEN
             every { jwtUtil.storeCachedRefreshTokenRotateId(any<Long>(), any<String>()) } just runs
             then("ServiceTokensResponse 가 반환된다.") {
-                val actual = authCommandService.reissueTokens(TEST_BEARER_REFRESH_TOKEN)
+                val actual = authCommandService.reissueTokens(TEST_REFRESH_TOKEN)
                 actual.accessToken shouldBe TEST_ACCESS_TOKEN
                 actual.refreshToken shouldBe TEST_REFRESH_TOKEN
                 verify(exactly = 1) {
@@ -238,7 +267,7 @@ class AuthCommandServiceTest : BehaviorSpec({
             every { jwtUtil.validateCachedRefreshTokenRotateId(any<String>()) } returns false
             then("IllegalArgumentException 예외가 발생한다.") {
                 shouldThrow<IllegalArgumentException> {
-                    authCommandService.reissueTokens(TEST_BEARER_REFRESH_TOKEN)
+                    authCommandService.reissueTokens(TEST_REFRESH_TOKEN)
                 }
                 verify(exactly = 1) {
                     jwtUtil.refreshKey
