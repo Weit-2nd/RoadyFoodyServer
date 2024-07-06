@@ -16,7 +16,6 @@ import kr.weit.roadyfoody.auth.application.service.AuthCommandService
 import kr.weit.roadyfoody.auth.application.service.AuthQueryService
 import kr.weit.roadyfoody.auth.fixture.PROFILE_IMAGE_FILE_NAME
 import kr.weit.roadyfoody.auth.fixture.SIGN_UP_REQUEST_FILE_NAME
-import kr.weit.roadyfoody.auth.fixture.TEST_BEARER_REFRESH_TOKEN
 import kr.weit.roadyfoody.auth.fixture.TEST_BEARER_SOCIAL_ACCESS_TOKEN
 import kr.weit.roadyfoody.auth.fixture.TEST_REFRESH_TOKEN
 import kr.weit.roadyfoody.auth.fixture.createTestSignUpRequest
@@ -53,9 +52,10 @@ class AuthControllerTest(
         val requestPath = "/api/v1/auth"
 
         given("POST $requestPath") {
+            val tokensResponse = createTestTokensResponse()
             `when`("WEBP 이미지 프로필 사진을 업로드하면") {
-                every { authCommandService.register(any<String>(), any<SignUpRequest>(), any<MultipartFile>()) } just runs
-                then("회원가입에 성공하고 201 상태번호를 반환한다") {
+                every { authCommandService.register(any<String>(), any<SignUpRequest>(), any<MultipartFile>()) } returns tokensResponse
+                then("201 상태번호와 ServiceTokensResponse 를 반환한다") {
                     mockMvc.perform(
                         multipart(requestPath)
                             .file(createTestImageFile(WEBP))
@@ -67,14 +67,18 @@ class AuthControllerTest(
                             )
                             .header(AUTHORIZATION, TEST_BEARER_SOCIAL_ACCESS_TOKEN)
                             .contentType(MediaType.MULTIPART_FORM_DATA),
-                    ).andExpect(status().isCreated)
+                    )
+                        .andExpect(status().isCreated)
+                        .andExpect(
+                            content().json(objectMapper.writeValueAsString(tokensResponse)),
+                        )
                     verify(exactly = 1) { authCommandService.register(any<String>(), any<SignUpRequest>(), any<MultipartFile>()) }
                 }
             }
 
             `when`("프로필사진을 업로드하지 않아도") {
-                every { authCommandService.register(any<String>(), any<SignUpRequest>(), any<MultipartFile>()) } just runs
-                then("회원가입에 성공하고 201 상태번호를 반환한다") {
+                every { authCommandService.register(any<String>(), any<SignUpRequest>(), any<MultipartFile>()) } returns tokensResponse
+                then("201 상태번호와 ServiceTokensResponse 를 반환한다") {
                     mockMvc.perform(
                         multipart(requestPath)
                             .file(
@@ -85,13 +89,17 @@ class AuthControllerTest(
                             )
                             .header(AUTHORIZATION, TEST_BEARER_SOCIAL_ACCESS_TOKEN)
                             .contentType(MediaType.MULTIPART_FORM_DATA),
-                    ).andExpect(status().isCreated)
+                    )
+                        .andExpect(status().isCreated)
+                        .andExpect(
+                            content().json(objectMapper.writeValueAsString(tokensResponse)),
+                        )
                     verify(exactly = 1) { authCommandService.register(any<String>(), any<SignUpRequest>(), any<MultipartFile>()) }
                 }
             }
 
             `when`("WEBP 이미지가 아닌 프로필 사진을 업로드하면") {
-                every { authCommandService.register(any<String>(), any<SignUpRequest>(), any<MultipartFile>()) } just runs
+                every { authCommandService.register(any<String>(), any<SignUpRequest>(), any<MultipartFile>()) } returns mockk()
                 then("회원가입에 실패하고 400 상태번호를 반환한다") {
                     forAll(
                         row(JPEG),
@@ -116,7 +124,7 @@ class AuthControllerTest(
             }
 
             `when`("파일의 크기가 1MB를 초과하면") {
-                every { authCommandService.register(any<String>(), any<SignUpRequest>(), any<MultipartFile>()) } just runs
+                every { authCommandService.register(any<String>(), any<SignUpRequest>(), any<MultipartFile>()) } returns mockk()
                 val mockFile: MockMultipartFile = mockk<MockMultipartFile>()
                 every { mockFile.size } returns 1024 * 1024 + 1
                 every { mockFile.name } returns PROFILE_IMAGE_FILE_NAME
@@ -141,7 +149,7 @@ class AuthControllerTest(
             }
 
             `when`("소셜 로그인 AccessToken 이 없으면") {
-                every { authCommandService.register(any<String>(), any<SignUpRequest>(), any<MultipartFile>()) } just runs
+                every { authCommandService.register(any<String>(), any<SignUpRequest>(), any<MultipartFile>()) } returns tokensResponse
                 then("회원가입에 실패하고 401 상태번호를 반환한다") {
                     mockMvc.perform(
                         multipart(requestPath)
@@ -230,7 +238,7 @@ class AuthControllerTest(
                 then("200 상태번호와 ServiceTokensResponse 를 반환한다") {
                     mockMvc.perform(
                         get("$requestPath/refresh")
-                            .header(AUTHORIZATION, TEST_BEARER_REFRESH_TOKEN),
+                            .param("token", TEST_REFRESH_TOKEN),
                     )
                         .andExpect(status().isOk)
                         .andExpect {
@@ -247,17 +255,6 @@ class AuthControllerTest(
                 then("400 상태번호를 반환한다") {
                     mockMvc.perform(
                         get("$requestPath/refresh"),
-                    ).andExpect(status().isBadRequest)
-                    verify(exactly = 0) { authCommandService.reissueTokens(any()) }
-                }
-            }
-
-            `when`("Bearer 토큰이 아니라면") {
-                every { authCommandService.reissueTokens(any()) } returns mockk()
-                then("400 상태번호를 반환한다") {
-                    mockMvc.perform(
-                        get("$requestPath/refresh")
-                            .header(AUTHORIZATION, TEST_REFRESH_TOKEN),
                     ).andExpect(status().isBadRequest)
                     verify(exactly = 0) { authCommandService.reissueTokens(any()) }
                 }
