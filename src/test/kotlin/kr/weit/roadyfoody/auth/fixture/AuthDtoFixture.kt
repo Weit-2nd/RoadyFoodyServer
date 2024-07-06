@@ -37,7 +37,6 @@ val TEST_ACCESS_TOKEN = generateHmac256Key()
 val TEST_REFRESH_TOKEN = generateHmac256Key()
 
 val TEST_BEARER_ACCESS_TOKEN = "Bearer $TEST_ACCESS_TOKEN"
-val TEST_BEARER_REFRESH_TOKEN = "Bearer $TEST_REFRESH_TOKEN"
 
 fun createTestTokensResponse(): ServiceTokensResponse =
     ServiceTokensResponse(
