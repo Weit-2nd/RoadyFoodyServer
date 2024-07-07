@@ -2,7 +2,11 @@ package kr.weit.roadyfoody.common.exception
 
 import org.springframework.http.HttpStatus
 
-enum class ErrorCode(val httpStatus: HttpStatus, val code: Int, val errorMessage: String) {
+enum class ErrorCode(
+    val httpStatus: HttpStatus,
+    val code: Int,
+    val errorMessage: String,
+) {
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, -10000, "Invalid request"),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, -10001, "Unauthorized"),
     FORBIDDEN(HttpStatus.FORBIDDEN, -10002, "Forbidden"),
@@ -16,6 +20,16 @@ enum class ErrorCode(val httpStatus: HttpStatus, val code: Int, val errorMessage
 
     // Bad Request -10000으로 코드 통일
     SIZE_NON_POSITIVE(HttpStatus.BAD_REQUEST, -10000, "조회할 개수는 양수여야 합니다."),
+    LAST_ID_NON_POSITIVE(HttpStatus.BAD_REQUEST, -10000, "마지막 ID는 양수여야 합니다."),
+    INVALID_LENGTH_FOOD_SPOTS_NAME(HttpStatus.BAD_REQUEST, -10000, "상호명은 1자 이상 20자 이하 한글, 영문, 숫자, 특수문자 여야 합니다."),
+    INVALID_CHARACTERS_FOOD_SPOTS_NAME(HttpStatus.BAD_REQUEST, -10000, "설명은 1자 이상 100자 이하로 입력해주세요."),
+    LATITUDE_TOO_HIGH(HttpStatus.BAD_REQUEST, -10000, "경도는 180 이하여야 합니다."),
+    LATITUDE_TOO_LOW(HttpStatus.BAD_REQUEST, -10000, "경도는 -180 이상이어야 합니다."),
+    LONGITUDE_TOO_HIGH(HttpStatus.BAD_REQUEST, -10000, "위도는 180 이하여야 합니다."),
+    LONGITUDE_TOO_LOW(HttpStatus.BAD_REQUEST, -10000, "위도는 -180 이상이어야 합니다."),
+    IMAGES_TOO_MANY(HttpStatus.BAD_REQUEST, -10000, "이미지는 최대 3개까지 업로드할 수 있습니다."),
+    INVALID_IMAGE_TYPE(HttpStatus.BAD_REQUEST, -10000, "하나 이상의 파일이 잘못 되었습니다."),
+    IMAGES_SIZE_TOO_LARGE(HttpStatus.BAD_REQUEST, -10000, "하나 이상의 파일이 잘못 되었습니다."),
 
     // Search API error 11000대
     REST_CLIENT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, -11000, "외부 API 호출 중 에러 발생"),
