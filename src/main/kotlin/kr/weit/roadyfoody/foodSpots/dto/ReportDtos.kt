@@ -18,7 +18,11 @@ import kr.weit.roadyfoody.user.domain.User
 import java.time.LocalDateTime
 
 data class ReportRequest(
-    @Schema(description = "상호명 : $FOOD_SPOTS_NAME_REGEX_DESC", example = "명륜진사갈비 본사")
+    @Schema(
+        description =
+            "상호명 : $FOOD_SPOTS_NAME_REGEX_DESC\t(허용된 특수문자 : 마침표 (.) 쉼표 (,) 작은따옴표 (') 가운데점 (·) 앰퍼샌드 (&) 하이픈 (-))",
+        example = "명륜진사갈비 본사",
+    )
     @field:Pattern(regexp = FOOD_SPOTS_NAME_REGEX_STR, message = FOOD_SPOTS_NAME_REGEX_DESC)
     @field:NotBlank(message = "상호명은 필수입니다.")
     val name: String,
@@ -47,6 +51,8 @@ data class ReportRequest(
             foodTruck = foodTruck,
             open = open,
             storeClosure = closed,
+            foodCategoriesList = mutableListOf(),
+            operationHoursList = mutableListOf(),
         )
 
     fun toFoodSpotsHistoryEntity(
@@ -60,6 +66,8 @@ data class ReportRequest(
         foodTruck = foodTruck,
         open = open,
         storeClosure = closed,
+        foodCategoriesList = mutableListOf(),
+        operationHoursList = mutableListOf(),
     )
 }
 
