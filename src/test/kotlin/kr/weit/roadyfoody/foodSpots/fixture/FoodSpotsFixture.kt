@@ -1,7 +1,9 @@
 package kr.weit.roadyfoody.foodSpots.fixture
 
+import kr.weit.roadyfoody.foodSpots.domain.FoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots.Companion.SRID_WGS84
+import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
 import kr.weit.roadyfoody.foodSpots.dto.ReportHistoriesResponse
@@ -62,7 +64,19 @@ fun createTestFoodSpots(
     open: Boolean = TEST_FOOD_SPOT_OPEN,
     storeClosure: Boolean = TEST_FOOD_SPOT_STORE_CLOSURE,
     point: Point = TEST_FOOD_SPOT_POINT,
+    foodCategories: MutableList<FoodSpotsFoodCategory> = mutableListOf(),
 ) = FoodSpots(id, name, foodTruck, open, storeClosure, point)
+
+fun createTestFoodSpotsFoodCategory(
+    id: Long = 0L,
+    foodSpots: FoodSpots = createTestFoodSpots(),
+    foodCategory: FoodCategory = createTestFoodCategory(),
+) = FoodSpotsFoodCategory(id, foodSpots, foodCategory)
+
+fun createTestFoodCategory(
+    id: Long = 0L,
+    name: String = "Category 1",
+) = FoodCategory(id, name)
 
 fun createTestFoodHistory(
     id: Long = 0L,
@@ -115,6 +129,25 @@ fun createTestReportHistoriesResponse(
     foodSpotsHistory,
     reportPhotoResponse,
 )
+
+fun createTestFoodCategories(): List<FoodCategory> =
+    listOf(
+        createTestFoodCategory(1L, "포장마차"),
+        createTestFoodCategory(2L, "붕어빵"),
+        createTestFoodCategory(3L, "고기"),
+        createTestFoodCategory(4L, "술"),
+    )
+
+fun createTestFoodSpotsFoodCategory(): List<FoodSpotsFoodCategory> =
+    listOf(
+        createTestFoodSpotsFoodCategory(1L, createTestFoodSpots(1L), createTestFoodCategory(1L)),
+        createTestFoodSpotsFoodCategory(2L, createTestFoodSpots(2L), createTestFoodCategory(2L)),
+        createTestFoodSpotsFoodCategory(3L, createTestFoodSpots(1L), createTestFoodCategory(2L)),
+        createTestFoodSpotsFoodCategory(4L, createTestFoodSpots(2L), createTestFoodCategory(3L)),
+        createTestFoodSpotsFoodCategory(5L, createTestFoodSpots(3L), createTestFoodCategory(1L)),
+        createTestFoodSpotsFoodCategory(6L, createTestFoodSpots(3L), createTestFoodCategory(2L)),
+        createTestFoodSpotsFoodCategory(7L, createTestFoodSpots(3L), createTestFoodCategory(3L)),
+    )
 
 fun createTestFoodSpotsForDistance(): List<FoodSpots> =
     listOf(

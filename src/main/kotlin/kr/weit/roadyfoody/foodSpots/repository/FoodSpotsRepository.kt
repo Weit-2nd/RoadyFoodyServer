@@ -1,10 +1,16 @@
 package kr.weit.roadyfoody.foodSpots.repository
 
+import com.linecorp.kotlinjdsl.dsl.jpql.jpql
+import com.linecorp.kotlinjdsl.querymodel.jpql.expression.Expressions
 import com.linecorp.kotlinjdsl.querymodel.jpql.expression.Expressions.customExpression
 import com.linecorp.kotlinjdsl.querymodel.jpql.path.Paths.path
 import com.linecorp.kotlinjdsl.querymodel.jpql.predicate.Predicates.customPredicate
+import com.linecorp.kotlinjdsl.querymodel.jpql.select.SelectQuery
 import com.linecorp.kotlinjdsl.support.spring.data.jpa.repository.KotlinJdslJpqlExecutor
+import kr.weit.roadyfoody.common.domain.query.SearchDsl
+import kr.weit.roadyfoody.foodSpots.domain.FoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
+import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface FoodSpotsRepository : JpaRepository<FoodSpots, Long>, CustomFoodSpotsRepository
@@ -14,6 +20,8 @@ interface CustomFoodSpotsRepository {
         centerLongitude: Double,
         centerLatitude: Double,
         radius: Int,
+        name: String?,
+        categoryIds: List<Long>,
     ): List<FoodSpots>
 }
 
@@ -25,41 +33,83 @@ class CustomFoodSpotsRepositoryImpl(
         centerLongitude: Double,
         centerLatitude: Double,
         radius: Int,
+        name: String?,
+        categoryIds: List<Long>,
     ): List<FoodSpots> {
-        val distanceClause = "distance=$radius"
-        val sdoGeometry = "SDO_GEOMETRY(2001, 4326, SDO_POINT_TYPE($centerLatitude, $centerLongitude, NULL), NULL, NULL)"
-        val sdoWithinDistanceClause = "SDO_WITHIN_DISTANCE({0}, $sdoGeometry, '$distanceClause')"
-        val sdoDistanceClause = "SDO_GEOM.SDO_DISTANCE({0}, $sdoGeometry, 1)"
+        // todo : name 검색 현재 불가합니다.(CONTAIN 함수 인식을 못함) 수정 필요
+        // todo limit을 위한 size 추가 고려
+        if (name != null) {
+            val wildCardName = "%$name%"
 
-        val sdoWithinDistance =
-            customExpression(
-                String::class,
-                sdoWithinDistanceClause,
-                listOf(
-                    path(FoodSpots::point),
-                ),
-            )
+            val containsNameExpression =
+                customExpression(
+                    Int::class,
+                    "CONTAINS({0}, {1})",
+                    listOf(Expressions.stringLiteral(path(FoodSpots::name).toString()), Expressions.stringLiteral(wildCardName)),
+                )
 
-        val sdoWithinDistancePredicate =
-            customPredicate(
-                "{0}  || '' = 'TRUE'",
-                listOf(sdoWithinDistance),
-            )
+            val containsNamePredicate =
+                customPredicate(
+                    "{0}>0",
+                    listOf(containsNameExpression),
+                )
+        }
 
-        val sdoDistance =
-            customExpression(
-                Double::class,
-                sdoDistanceClause,
-                listOf(path(FoodSpots::point)),
-            )
+        val filteringFoodSpotIds: List<Long> = filteringByCategoryIds(categoryIds)
+
+        val targetQuery: SelectQuery<FoodSpots> =
+            jpql(SearchDsl) {
+                select(entity(FoodSpots::class))
+                    .from(entity(FoodSpots::class))
+                    .where(
+                        and(
+                            entity(FoodSpots::class).withinDistance(radius, centerLongitude, centerLatitude),
+                            when {
+                                categoryIds.isNotEmpty() -> entity(FoodSpots::class).foodSpotIdIn(filteringFoodSpotIds)
+                                else -> null
+                            },
+                        ),
+                    ).orderBy(entity(FoodSpots::class).getDistance(centerLongitude, centerLatitude).asc())
+            }
+        return executor.findAll {
+            targetQuery
+        } as List<FoodSpots>
+    }
+
+    private fun filteringByCategoryIds(categoryIds: List<Long>): List<Long> {
+        val query: SelectQuery<Long> =
+            when (categoryIds.isNotEmpty()) {
+                true ->
+                    jpql(SearchDsl) {
+                        selectDistinctNew<Long>(
+                            path(FoodSpotsFoodCategory::foodSpots)(FoodSpots::id),
+                        ).from(
+                            entity(FoodSpotsFoodCategory::class),
+                        ).where(
+                            entity(FoodSpotsFoodCategory::class).foodCategoryIn(categoryIds),
+                        ).groupBy(
+                            path(FoodSpotsFoodCategory::foodSpots)(FoodSpots::id),
+                        ).having(
+                            count(path(FoodSpotsFoodCategory::foodCategory)(FoodCategory::id))
+                                .greaterThanOrEqualTo(categoryIds.size.toLong()),
+                        ).orderBy(
+                            path(FoodSpotsFoodCategory::foodSpots)(FoodSpots::id).desc(),
+                        )
+                    }
+                else ->
+                    jpql(SearchDsl) {
+                        selectDistinctNew<Long>(
+                            path(FoodSpotsFoodCategory::foodSpots)(FoodSpots::id),
+                        ).from(
+                            entity(FoodSpotsFoodCategory::class),
+                        ).orderBy(
+                            path(FoodSpotsFoodCategory::foodSpots)(FoodSpots::id).desc(),
+                        )
+                    }
+            }
 
         return executor.findAll {
-            select(entity(FoodSpots::class))
-                .from(entity(FoodSpots::class))
-                .whereAnd(
-                    path(FoodSpots::point).isNotNull(),
-                    sdoWithinDistancePredicate,
-                ).orderBy(sdoDistance.asc())
-        } as List<FoodSpots>
+            query
+        } as List<Long>
     }
 }
