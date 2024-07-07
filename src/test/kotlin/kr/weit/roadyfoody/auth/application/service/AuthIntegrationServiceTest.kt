@@ -66,33 +66,31 @@ class AuthIntegrationServiceTest(
             s3Template.deleteBucket(s3Properties.bucket)
         }
 
-        given("프로필 사진이 존재하는 경우") {
-            `when`("회원가입을 요청하면") {
+        given("register 테스트") {
+            `when`("프로필 사진이 존재하는 경우") {
                 then("회원가입이 성공한다") {
                     val signUpRequest = createTestSignUpRequest(termIdSet = validTermIdSet)
-                    authCommandService.register(TEST_SOCIAL_ACCESS_TOKEN, signUpRequest, createTestImageFile(WEBP))
+                    val tokensResponse = authCommandService.register(TEST_SOCIAL_ACCESS_TOKEN, signUpRequest, createTestImageFile(WEBP))
                     val profileImageName = userRepository.getByNickname(signUpRequest.nickname).profile.profileImageName
+                    tokensResponse.shouldNotBeNull()
                     profileImageName.shouldNotBeNull()
                     s3Template.objectExists(s3Properties.bucket, profileImageName).shouldBeTrue()
                     verify(exactly = 1) { authQueryService.requestKakaoUserInfo(any<String>()) }
                 }
             }
-        }
 
-        given("프로필 사진이 존재하지 않는 경우") {
-            `when`("회원가입을 요청하면") {
+            `when`("프로필 사진이 존재하지 않는 경우") {
                 then("회원가입이 성공한다") {
                     val signUpRequest = createTestSignUpRequest(termIdSet = validTermIdSet)
-                    authCommandService.register(TEST_SOCIAL_ACCESS_TOKEN, signUpRequest, null)
+                    val tokensResponse = authCommandService.register(TEST_SOCIAL_ACCESS_TOKEN, signUpRequest, null)
                     val profileImageName = userRepository.getByNickname(signUpRequest.nickname).profile.profileImageName
+                    tokensResponse.shouldNotBeNull()
                     profileImageName.shouldBeNull()
                     verify(exactly = 1) { authQueryService.requestKakaoUserInfo(any<String>()) }
                 }
             }
-        }
 
-        given("필수약관을 동의하지 않은 경우") {
-            `when`("회원가입을 요청하면") {
+            `when`("필수약관을 동의하지 않은 경우") {
                 then("RequiredTermNotAgreedException 을 던진다") {
                     shouldThrow<RequiredTermNotAgreedException> {
                         authCommandService.register(
@@ -104,14 +102,10 @@ class AuthIntegrationServiceTest(
                     verify(exactly = 1) { authQueryService.requestKakaoUserInfo(any<String>()) }
                 }
             }
-        }
 
-        given("이미 가입된 사용자인 경우") {
-            beforeEach {
-                userRepository.save(createTestUser(socialId = TEST_USER_SOCIAL_ID))
-            }
-            `when`("회원가입을 요청하면") {
+            `when`("이미 가입된 사용자인 경우") {
                 then("UserAlreadyExistsException 을 던진다") {
+                    userRepository.save(createTestUser(socialId = TEST_USER_SOCIAL_ID))
                     shouldThrow<UserAlreadyExistsException> {
                         authCommandService.register(
                             TEST_SOCIAL_ACCESS_TOKEN,
@@ -122,14 +116,10 @@ class AuthIntegrationServiceTest(
                     verify(exactly = 1) { authQueryService.requestKakaoUserInfo(any<String>()) }
                 }
             }
-        }
 
-        given("중복된 닉네임인 경우") {
-            beforeEach {
-                userRepository.save(createTestUser(nickname = TEST_USER_NICKNAME))
-            }
-            `when`("회원가입을 요청하면") {
+            `when`("중복된 닉네임인 경우") {
                 then("UserAlreadyExistsException 을 던진다") {
+                    userRepository.save(createTestUser(nickname = TEST_USER_NICKNAME))
                     shouldThrow<UserAlreadyExistsException> {
                         authCommandService.register(
                             TEST_SOCIAL_ACCESS_TOKEN,
@@ -142,7 +132,7 @@ class AuthIntegrationServiceTest(
             }
         }
 
-        given("login 메소드") {
+        given("login 테스트") {
             `when`("유효한 socialAccessToken 을 전달하면") {
                 then("로그인이 성공한다") {
                     authCommandService.register(TEST_SOCIAL_ACCESS_TOKEN, createTestSignUpRequest(termIdSet = validTermIdSet), null)
@@ -156,7 +146,7 @@ class AuthIntegrationServiceTest(
             }
         }
 
-        given("reissueTokens 메소드") {
+        given("reissueTokens 테스트") {
             lateinit var tokensResponse: ServiceTokensResponse
             lateinit var user: User
             beforeEach {
@@ -199,7 +189,7 @@ class AuthIntegrationServiceTest(
             }
         }
 
-        given("logout 메소드") {
+        given("logout 테스트") {
             `when`("Refresh Token 이 캐시에 저장되어있다면") {
                 then("이를 제거하고 로그아웃이 성공한다") {
                     authCommandService.register(TEST_SOCIAL_ACCESS_TOKEN, createTestSignUpRequest(termIdSet = validTermIdSet), null)
