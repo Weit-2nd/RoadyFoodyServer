@@ -2,11 +2,14 @@ package kr.weit.roadyfoody.foodSpots.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
+import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
+import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHours
 import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_REGEX_DESC
 import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_REGEX_STR
 import kr.weit.roadyfoody.foodSpots.validator.Latitude
@@ -37,6 +40,11 @@ data class ReportRequest(
     @Schema(description = "폐업 여부", example = "false")
     @NotNull(message = "폐업 여부는 필수입니다.")
     val closed: Boolean,
+    @Schema(description = "음식 카테고리", example = "한식")
+    @NotEmpty(message = "음식 카테고리는 필수입니다.")
+    val foodCategories: Set<Long>,
+    @Schema(description = "운영시간 리스트")
+    val operationHours: List<OperationHoursRequest>,
 ) {
     fun toFoodSpotsEntity() =
         FoodSpots(
@@ -59,7 +67,28 @@ data class ReportRequest(
         open = open,
         storeClosure = closed,
     )
+
+    fun toOperationHoursEntity(foodSpotsHistory: FoodSpotsHistory) =
+        operationHours.map {
+            ReportOperationHours(
+                foodSpotsHistory = foodSpotsHistory,
+                dayOfWeek = it.dayOfWeek,
+                openingHours = it.openingHours,
+                closingHours = it.closingHours,
+            )
+        }
 }
+
+data class OperationHoursRequest(
+    @Schema(description = "요일", example = "MON")
+    val dayOfWeek: DayOfWeek,
+    @Schema(description = "오픈 시간", example = "09:00")
+    @field:Pattern(regexp = "^([01]\\d|2[0-4]):([0-5]\\d)$", message = "오픈 시간은 01:00부터 24:00까지의 형식이어야 합니다.")
+    val openingHours: String,
+    @Schema(description = "마감 시간", example = "24:00")
+    @field:Pattern(regexp = "^([01]\\d|2[0-4]):([0-5]\\d)$", message = "마감 시간은 01:00부터 24:00까지의 형식이어야 합니다.")
+    val closingHours: String,
+)
 
 data class ReportHistoriesResponse(
     @Schema(description = "리포트 이력 ID", example = "1")

@@ -2,7 +2,11 @@ package kr.weit.roadyfoody.common.exception
 
 import org.springframework.http.HttpStatus
 
-enum class ErrorCode(val httpStatus: HttpStatus, val code: Int, val errorMessage: String) {
+enum class ErrorCode(
+    val httpStatus: HttpStatus,
+    val code: Int,
+    val errorMessage: String,
+) {
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, -10000, "Invalid request"),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, -10001, "Unauthorized"),
     FORBIDDEN(HttpStatus.FORBIDDEN, -10002, "Forbidden"),
@@ -13,6 +17,7 @@ enum class ErrorCode(val httpStatus: HttpStatus, val code: Int, val errorMessage
     PAYLOAD_TOO_LARGE(HttpStatus.PAYLOAD_TOO_LARGE, -10008, "Payload too large"),
     NOT_FOUND_USER(HttpStatus.NOT_FOUND, -10009, "Not found user"),
     NOT_FOUND_TERM(HttpStatus.NOT_FOUND, -10010, "Not found term"),
+    NOT_FOUND_FOOD_CATEGORY(HttpStatus.NOT_FOUND, -10011, "Not found food category"),
 
     // Bad Request -10000으로 코드 통일
     SIZE_NON_POSITIVE(HttpStatus.BAD_REQUEST, -10000, "조회할 개수는 양수여야 합니다."),

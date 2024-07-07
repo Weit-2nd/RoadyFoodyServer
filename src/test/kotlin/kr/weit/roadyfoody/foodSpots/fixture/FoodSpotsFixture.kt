@@ -1,9 +1,12 @@
 package kr.weit.roadyfoody.foodSpots.fixture
 
+import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
+import kr.weit.roadyfoody.foodSpots.domain.FoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots.Companion.SRID_WGS84
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
+import kr.weit.roadyfoody.foodSpots.dto.OperationHoursRequest
 import kr.weit.roadyfoody.foodSpots.dto.ReportHistoriesResponse
 import kr.weit.roadyfoody.foodSpots.dto.ReportPhotoResponse
 import kr.weit.roadyfoody.foodSpots.dto.ReportRequest
@@ -39,6 +42,7 @@ const val TEST_FOOD_SPOTS_SIZE = 10
 const val TEST_FOOD_SPOTS_LAST_ID = 1L
 const val TEST_FOOD_SPOTS_PHOTO_URL = "test_url"
 const val TEST_FOOD_SPOTS_HAS_NEXT = false
+const val TEST_INVALID_FOOD_CATEGORY_ID = -1L
 
 fun createMockTestFoodSpot(id: Long = 0L) = MockTestFoodSpot(id)
 
@@ -84,6 +88,8 @@ fun createTestReportRequest(
     foodTruck: Boolean = TEST_FOOD_SPOT_FOOD_TRUCK,
     open: Boolean = TEST_FOOD_SPOT_OPEN,
     storeClosure: Boolean = TEST_FOOD_SPOT_STORE_CLOSURE,
+    foodCategories: Set<Long> = setOf(TEST_INVALID_FOOD_CATEGORY_ID),
+    operationHours: List<OperationHoursRequest> = listOf(createOperationHoursRequest(), createOperationHoursRequest(DayOfWeek.FRI)),
 ) = ReportRequest(
     name,
     longitude,
@@ -91,6 +97,8 @@ fun createTestReportRequest(
     foodTruck,
     open,
     storeClosure,
+    foodCategories,
+    operationHours,
 )
 
 fun createMockPhotoList(
@@ -114,6 +122,12 @@ fun createTestReportHistoriesResponse(
     foodSpotsHistory,
     reportPhotoResponse,
 )
+
+fun createOperationHoursRequest(
+    dayOfWeek: DayOfWeek = DayOfWeek.MON,
+    openingHours: String = "00:00",
+    closingHours: String = "23:59",
+) = OperationHoursRequest(dayOfWeek, openingHours, closingHours)
 
 class MockTestFoodSpot(
     id: Long = 0L,
@@ -139,3 +153,5 @@ class MockTestFoodSpotsHistory(
 ) : FoodSpotsHistory(id, foodSpots, user, name, foodTruck, open, closed, point) {
     override var createdDateTime: LocalDateTime = LocalDateTime.now()
 }
+
+fun createTestFoodCategory(name: String) = FoodCategory(name = name)

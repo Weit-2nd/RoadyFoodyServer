@@ -5,10 +5,13 @@ import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.dto.ReportHistoriesResponse
 import kr.weit.roadyfoody.foodSpots.dto.ReportPhotoResponse
 import kr.weit.roadyfoody.foodSpots.dto.ReportRequest
+import kr.weit.roadyfoody.foodSpots.repository.FoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsPhotoRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
+import kr.weit.roadyfoody.foodSpots.repository.ReportOperationHoursRepository
 import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
+import kr.weit.roadyfoody.foodSpots.repository.getFoodCategories
 import kr.weit.roadyfoody.foodSpots.repository.getHistoriesByUser
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.user.repository.UserRepository
@@ -23,6 +26,8 @@ class FoodSpotsService(
     private val foodSpotsHistoryRepository: FoodSpotsHistoryRepository,
     private val foodSpotsPhotoRepository: FoodSpotsPhotoRepository,
     private val userRepository: UserRepository,
+    private val reportOperationHoursRepository: ReportOperationHoursRepository,
+    private val foodCategoryRepository: FoodCategoryRepository,
     private val imageService: ImageService,
 ) {
     @Transactional
@@ -32,11 +37,21 @@ class FoodSpotsService(
         photos: List<MultipartFile>?,
     ) {
         val user = userRepository.getByUserId(userId)
-        val foodStoreInfo = reportRequest.toFoodSpotsEntity()
-        foodSpotsRepository.save(foodStoreInfo)
-        val foodStoreHistory = reportRequest.toFoodSpotsHistoryEntity(foodStoreInfo, user)
+        val foodSpotsInfo = reportRequest.toFoodSpotsEntity()
+        foodSpotsRepository.save(foodSpotsInfo)
+        val foodStoreHistory = reportRequest.toFoodSpotsHistoryEntity(foodSpotsInfo, user)
         foodSpotsHistoryRepository.save(foodStoreHistory)
-        photos?.map { CompletableFuture.supplyAsync { imageService.upload(imageService.generateImageName(it), it) } }?.forEach { it.join() }
+        val foodCategories = foodCategoryRepository.getFoodCategories(reportRequest.foodCategories)
+        val foodSpotsOperationHours = reportRequest.toOperationHoursEntity(foodStoreHistory)
+        photos
+            ?.map {
+                CompletableFuture.supplyAsync {
+                    imageService.upload(
+                        imageService.generateImageName(it),
+                        it,
+                    )
+                }
+            }?.forEach { it.join() }
     }
 
     fun getReportHistories(
