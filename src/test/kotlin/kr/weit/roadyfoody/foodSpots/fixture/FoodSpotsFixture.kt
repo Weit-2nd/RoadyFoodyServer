@@ -11,6 +11,9 @@ import kr.weit.roadyfoody.foodSpots.dto.ReportPhotoResponse
 import kr.weit.roadyfoody.foodSpots.dto.ReportRequest
 import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_MAX_LENGTH
 import kr.weit.roadyfoody.global.utils.CoordinateUtils
+import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponse
+import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponses
+import kr.weit.roadyfoody.search.foodSpots.dto.OperationStatus
 import kr.weit.roadyfoody.support.utils.ImageFormat
 import kr.weit.roadyfoody.support.utils.createTestImageFile
 import kr.weit.roadyfoody.user.domain.User
@@ -205,4 +208,27 @@ class MockTestFoodSpotsHistory(
     point: Point = TEST_FOOD_SPOT_POINT,
 ) : FoodSpotsHistory(id, foodSpots, user, name, foodTruck, open, closed, point) {
     override var createdDateTime: LocalDateTime = LocalDateTime.now()
+}
+
+fun createFoodSpotsSearchResponses(): FoodSpotsSearchResponses  {
+    return FoodSpotsSearchResponses(
+        listOf(
+            FoodSpotsSearchResponse(
+                id = 1L,
+                name = "name",
+                longitude = 1.0,
+                latitude = 1.0,
+                open = OperationStatus.OPEN,
+                foodCategories = listOf("category1", "category2"),
+            ),
+            FoodSpotsSearchResponse(
+                id = 2L,
+                name = "name",
+                longitude = 1.0,
+                latitude = 1.0,
+                open = OperationStatus.OPEN,
+                foodCategories = listOf("category1", "category2"),
+            ),
+        ),
+    )
 }
