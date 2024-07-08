@@ -40,5 +40,5 @@ data class FoodSpotsSearchQuery(
     val centerLatitude: Double,
     val radius: Int,
     val name: String?,
-    val categoryIds: List<Long>?,
+    val categoryIds: List<Long>,
 )
