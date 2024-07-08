@@ -3,6 +3,7 @@ package kr.weit.roadyfoody.search.foodSpots.application
 import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
+import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchQuery
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponse
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponses
 import kr.weit.roadyfoody.search.foodSpots.dto.OperationStatus
@@ -18,20 +19,14 @@ class FoodSpotsSearchService(
     private val foodSpotsRepository: FoodSpotsRepository,
 ) {
     @Transactional
-    fun searchFoodSpots(
-        centerLongitude: Double,
-        centerLatitude: Double,
-        radius: Int,
-        name: String?,
-        categoryIds: List<Long>?,
-    ): FoodSpotsSearchResponses {
+    fun searchFoodSpots(foodSpotsSearchQuery: FoodSpotsSearchQuery): FoodSpotsSearchResponses {
         val result: List<FoodSpots> =
             foodSpotsRepository.findFoodSpotsByPointWithinRadius(
-                centerLongitude,
-                centerLatitude,
-                radius,
-                name,
-                categoryIds ?: emptyList(),
+                foodSpotsSearchQuery.centerLongitude,
+                foodSpotsSearchQuery.centerLatitude,
+                foodSpotsSearchQuery.radius,
+                foodSpotsSearchQuery.name,
+                foodSpotsSearchQuery.categoryIds ?: emptyList(),
             )
 
         val today = LocalDate.now()
