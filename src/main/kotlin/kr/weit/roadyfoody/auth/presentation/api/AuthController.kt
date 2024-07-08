@@ -76,4 +76,12 @@ class AuthController(
     ) {
         authCommandService.logout(user)
     }
+
+    @ResponseStatus(NO_CONTENT)
+    @PostMapping("/withdraw")
+    override fun withdraw(
+        @LoginUser user: User,
+    ) {
+        authCommandService.leave(user)
+    }
 }
