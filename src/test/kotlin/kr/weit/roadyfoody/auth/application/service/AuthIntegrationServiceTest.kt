@@ -24,6 +24,7 @@ import kr.weit.roadyfoody.support.utils.createTestImageFile
 import kr.weit.roadyfoody.term.fixture.createTestTerms
 import kr.weit.roadyfoody.term.repository.TermRepository
 import kr.weit.roadyfoody.user.domain.User
+import kr.weit.roadyfoody.user.exception.UserNotFoundException
 import kr.weit.roadyfoody.user.fixture.TEST_USER_NICKNAME
 import kr.weit.roadyfoody.user.fixture.TEST_USER_SOCIAL_ID
 import kr.weit.roadyfoody.user.fixture.createTestUser
@@ -208,6 +209,21 @@ class AuthIntegrationServiceTest(
                     authCommandService.logout(user)
                     val actual = redisTemplate.hasKey(getRefreshTokenCacheKey(user.id))
                     actual.shouldBeFalse()
+                }
+            }
+        }
+
+        given("leave 테스트") {
+            `when`("회원탈퇴를 요청하면") {
+                then("회원탈퇴가 성공한다") {
+                    val signUpRequest = createTestSignUpRequest(termIdSet = validTermIdSet)
+                    authCommandService.register(TEST_SOCIAL_ACCESS_TOKEN, signUpRequest, null)
+                    val user = userRepository.getByNickname(signUpRequest.nickname)
+                    authCommandService.leave(user)
+                    shouldThrow<UserNotFoundException> { userRepository.getByNickname(signUpRequest.nickname) }
+                    val isStored = redisTemplate.hasKey(getRefreshTokenCacheKey(user.id))
+                    isStored.shouldBeFalse()
+                    verify(exactly = 1) { authQueryService.requestKakaoUserInfo(any<String>()) }
                 }
             }
         }

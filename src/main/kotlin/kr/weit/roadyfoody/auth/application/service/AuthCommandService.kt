@@ -2,6 +2,7 @@ package kr.weit.roadyfoody.auth.application.service
 
 import kr.weit.roadyfoody.auth.application.dto.ServiceTokensResponse
 import kr.weit.roadyfoody.auth.application.dto.SignUpRequest
+import kr.weit.roadyfoody.auth.application.event.AuthLeaveEvent
 import kr.weit.roadyfoody.auth.exception.UserAlreadyExistsException
 import kr.weit.roadyfoody.auth.exception.UserNotRegisteredException
 import kr.weit.roadyfoody.auth.security.jwt.JwtUtil
@@ -12,6 +13,7 @@ import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.repository.UserRepository
 import kr.weit.roadyfoody.user.repository.getByUserId
 import kr.weit.roadyfoody.useragreedterm.application.service.UserAgreedTermCommandService
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
@@ -24,6 +26,7 @@ class AuthCommandService(
     private val userRepository: UserRepository,
     private val imageService: ImageService,
     private val jwtUtil: JwtUtil,
+    private val applicationEventPublisher: ApplicationEventPublisher,
 ) {
     @Transactional
     fun register(
@@ -89,5 +92,10 @@ class AuthCommandService(
 
     fun logout(user: User) {
         jwtUtil.removeCachedRefreshToken(user.id)
+    }
+
+    @Transactional
+    fun leave(user: User) {
+        applicationEventPublisher.publishEvent(AuthLeaveEvent(user.id))
     }
 }
