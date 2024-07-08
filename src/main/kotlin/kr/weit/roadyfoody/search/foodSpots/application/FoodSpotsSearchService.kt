@@ -31,10 +31,10 @@ class FoodSpotsSearchService(
 
         val today = LocalDate.now()
         val dayOfWeekValue = today.get(ChronoField.DAY_OF_WEEK)
-        val dayOfWeek: DayOfWeek = DayOfWeek.of(dayOfWeekValue)
+        val dayOfWeek = DayOfWeek.of(dayOfWeekValue)
 
         val now = LocalTime.now()
-        val format: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+        val format = DateTimeFormatter.ofPattern("HH:mm")
 
         val foodSpotsSearchResponses =
             result.map { it ->
@@ -42,14 +42,15 @@ class FoodSpotsSearchService(
                 if (it.open) {
                     it.foodSpotsOperationHours.map {
                         if (it.dayOfWeek == dayOfWeek) {
-                            if (now.isAfter(
-                                    LocalTime.parse(it.openingHours, format),
-                                ) && now.isBefore(LocalTime.parse(it.closingHours, format))
-                            ) {
-                                openValue = OperationStatus.OPEN
-                            } else {
-                                openValue = OperationStatus.CLOSED
-                            }
+                            openValue =
+                                if (now.isAfter(
+                                        LocalTime.parse(it.openingHours, format),
+                                    ) && now.isBefore(LocalTime.parse(it.closingHours, format))
+                                ) {
+                                    OperationStatus.OPEN
+                                } else {
+                                    OperationStatus.CLOSED
+                                }
                         }
                     }
                 } else {
