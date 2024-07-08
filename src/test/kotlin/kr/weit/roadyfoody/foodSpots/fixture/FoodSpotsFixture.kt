@@ -7,6 +7,7 @@ import kr.weit.roadyfoody.foodSpots.domain.FoodSpots.Companion.SRID_WGS84
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
 import kr.weit.roadyfoody.foodSpots.dto.OperationHoursRequest
+import kr.weit.roadyfoody.foodSpots.dto.ReportCategoryResponse
 import kr.weit.roadyfoody.foodSpots.dto.ReportHistoriesResponse
 import kr.weit.roadyfoody.foodSpots.dto.ReportPhotoResponse
 import kr.weit.roadyfoody.foodSpots.dto.ReportRequest
@@ -115,12 +116,19 @@ fun createTestReportPhotoResponse(
     url: String = TEST_FOOD_SPOTS_PHOTO_URL,
 ) = ReportPhotoResponse(id, url)
 
+fun createTestReportCategoryResponse(
+    id: Long = 0L,
+    name: String = "testCategory",
+) = ReportCategoryResponse(id, name)
+
 fun createTestReportHistoriesResponse(
     foodSpotsHistory: FoodSpotsHistory = createMockTestFoodHistory(),
     reportPhotoResponse: List<ReportPhotoResponse> = listOf(createTestReportPhotoResponse()),
+    reportCategoryResponse: List<ReportCategoryResponse> = listOf(createTestReportCategoryResponse()),
 ) = ReportHistoriesResponse(
     foodSpotsHistory,
     reportPhotoResponse,
+    reportCategoryResponse,
 )
 
 fun createOperationHoursRequest(

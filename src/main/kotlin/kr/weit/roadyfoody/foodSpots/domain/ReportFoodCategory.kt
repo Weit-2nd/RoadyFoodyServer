@@ -31,4 +31,14 @@ class ReportFoodCategory(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "food_categories_id")
     val foodCategory: FoodCategory,
-) : BaseTimeEntity()
+) : BaseTimeEntity() {
+    companion object {
+        fun of(
+            foodSpotsHistory: FoodSpotsHistory,
+            foodCategory: FoodCategory,
+        ) = ReportFoodCategory(
+            foodSpotsHistory = foodSpotsHistory,
+            foodCategory = foodCategory,
+        )
+    }
+}
