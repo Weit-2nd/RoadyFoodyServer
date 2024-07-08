@@ -11,6 +11,8 @@ CREATE TABLE report_operation_hours
 ALTER TABLE report_operation_hours
     ADD CONSTRAINT FK_REPORT_OPERATION_HOURS_ON_FOOD_SPOTS_HISTORY FOREIGN KEY (food_spots_history_id) REFERENCES food_spots_histories (id);
 
+CREATE INDEX report_operation_hours_food_spots_history_id_index ON report_operation_hours (food_spots_history_id);
+
 CREATE SEQUENCE report_food_categories_seq START WITH 1 INCREMENT BY 1;
 
 CREATE TABLE report_food_categories
@@ -27,3 +29,7 @@ ALTER TABLE report_food_categories
 
 ALTER TABLE report_food_categories
     ADD CONSTRAINT FK_REPORT_FOOD_CATEGORIES_ON_FOOD_SPOTS_HISTORY FOREIGN KEY (food_spots_history_id) REFERENCES food_spots_histories (id);
+
+CREATE INDEX report_food_categories_food_categories_id_index ON report_food_categories (food_categories_id);
+
+CREATE INDEX report_food_categories_food_spots_history_id_index ON report_food_categories (food_spots_history_id);
