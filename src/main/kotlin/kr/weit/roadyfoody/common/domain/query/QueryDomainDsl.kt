@@ -21,7 +21,7 @@ class SearchDsl : Jpql() {
         return path(FoodSpots::id).`in`(ids)
     }
 
-    fun Entity<FoodSpots>.withinDistance(
+    fun withinDistance(
         radius: Int,
         centerLongitude: Double,
         centerLatitude: Double,
@@ -48,7 +48,7 @@ class SearchDsl : Jpql() {
         return sdoWithinDistancePredicate
     }
 
-    fun Entity<FoodSpots>.getDistance(
+    fun getDistance(
         centerLongitude: Double,
         centerLatitude: Double,
     ): Expression<Double> {

@@ -63,13 +63,13 @@ class CustomFoodSpotsRepositoryImpl(
                     .from(entity(FoodSpots::class))
                     .where(
                         and(
-                            entity(FoodSpots::class).withinDistance(radius, centerLongitude, centerLatitude),
+                            withinDistance(radius, centerLongitude, centerLatitude),
                             when {
                                 categoryIds.isNotEmpty() -> entity(FoodSpots::class).foodSpotIdIn(filteringFoodSpotIds)
                                 else -> null
                             },
                         ),
-                    ).orderBy(entity(FoodSpots::class).getDistance(centerLongitude, centerLatitude).asc())
+                    ).orderBy(getDistance(centerLongitude, centerLatitude).asc())
             }
         return executor.findAll {
             targetQuery
