@@ -14,7 +14,7 @@ import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsForDistance
 import kr.weit.roadyfoody.support.annotation.RepositoryTest
 
 @RepositoryTest
-class FoodSpotsRepositoryTest(
+class FoodSpotsRepositoryTes(
     private val foodSpotsRepository: FoodSpotsRepository,
     private val foodSpotsFoodCategoryRepository: FoodSpotsFoodCategoryRepository,
     private val foodCategoryRepository: FoodCategoryRepository,
@@ -23,11 +23,10 @@ class FoodSpotsRepositoryTest(
         lateinit var foodSpotsFoodCategory: List<FoodSpotsFoodCategory>
         lateinit var foodCategory: List<FoodCategory>
 
-        beforeSpec {
+        beforeEach {
             foodSpots = foodSpotsRepository.saveAll(createTestFoodSpotsForDistance())
-            foodCategory = foodCategoryRepository.saveAll(createTestFoodCategories())
-            foodSpotsFoodCategory = foodSpotsFoodCategoryRepository.saveAll(createTestFoodSpotsFoodCategory())
         }
+
         context("현재 좌표를 기반으로 FoodSpots(가게) 조회") {
             expect("거리 이내 가게 조회한다.") {
                 val expected =
@@ -57,19 +56,27 @@ class FoodSpotsRepositoryTest(
 //                expected.get(0).name shouldBe "Food Spot 1 - 100m"
 //            }
             expect("카테고리별로 거리 이내 가게를 조회한다.") {
-
+                foodCategory = foodCategoryRepository.saveAll(createTestFoodCategories())
+                foodSpotsFoodCategory =
+                    foodSpotsFoodCategoryRepository.saveAll(
+                        listOf(
+                            createTestFoodSpotsFoodCategory(foodSpots = foodSpots[4], foodCategory = foodCategory[0]),
+                            createTestFoodSpotsFoodCategory(foodSpots = foodSpots[4], foodCategory = foodCategory[1]),
+                            createTestFoodSpotsFoodCategory(foodSpots = foodSpots[3], foodCategory = foodCategory[3]),
+                            createTestFoodSpotsFoodCategory(foodSpots = foodSpots[3], foodCategory = foodCategory[1]),
+                        ),
+                    )
                 val expected =
                     foodSpotsRepository.findFoodSpotsByPointWithinRadius(
                         centerLatitude = TEST_FOOD_SPOT_LATITUDE,
                         centerLongitude = TEST_FOOD_SPOT_LONGITUDE,
                         radius = 500,
                         name = null,
-                        categoryIds = listOf(1L, 2L),
+                        categoryIds = listOf(foodCategory[0].id, foodCategory[1].id),
                     )
 
-                expected.shouldHaveSize(2)
-                expected.get(0).name shouldBe "Food Spot 1 - 100m"
-                expected.get(1).name shouldBe "Food Spot 3 - 500m"
+                expected.shouldHaveSize(1)
+                expected.get(0).name shouldBe foodSpots[4].name
             }
         }
     })
