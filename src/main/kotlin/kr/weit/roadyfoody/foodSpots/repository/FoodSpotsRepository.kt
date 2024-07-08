@@ -11,6 +11,7 @@ import kr.weit.roadyfoody.common.domain.query.SearchDsl
 import kr.weit.roadyfoody.foodSpots.domain.FoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
+import kr.weit.roadyfoody.global.utils.findList
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface FoodSpotsRepository : JpaRepository<FoodSpots, Long>, CustomFoodSpotsRepository
@@ -64,16 +65,15 @@ class CustomFoodSpotsRepositoryImpl(
                     .where(
                         and(
                             withinDistance(radius, centerLongitude, centerLatitude),
-                            when {
-                                categoryIds.isNotEmpty() -> entity(FoodSpots::class).foodSpotIdIn(filteringFoodSpotIds)
-                                else -> null
+                            filteringFoodSpotIds.takeIf { categoryIds.isNotEmpty() }?.let {
+                                entity(FoodSpots::class).foodSpotIdIn(it)
                             },
                         ),
                     ).orderBy(getDistance(centerLongitude, centerLatitude).asc())
             }
-        return executor.findAll {
+        return executor.findList {
             targetQuery
-        } as List<FoodSpots>
+        }
     }
 
     private fun filteringByCategoryIds(categoryIds: List<Long>): List<Long> {

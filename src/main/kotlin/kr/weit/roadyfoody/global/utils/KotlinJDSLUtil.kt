@@ -30,3 +30,5 @@ fun <T : Any> KotlinJdslJpqlExecutor.getPage(
         pageable,
         init,
     ) as Page<T>
+
+fun <T : Any> KotlinJdslJpqlExecutor.findList(init: Jpql.() -> JpqlQueryable<SelectQuery<T>>): List<T> = findAll(init) as List<T>
