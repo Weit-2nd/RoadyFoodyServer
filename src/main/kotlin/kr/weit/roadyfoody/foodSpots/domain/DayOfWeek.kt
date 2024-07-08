@@ -11,6 +11,6 @@ enum class DayOfWeek(val num: Int) {
     ;
 
     companion object {
-        fun of(num: Int): DayOfWeek = values().first { it.num == num }
+        fun of(num: Int): DayOfWeek = entries.first { it.num == num }
     }
 }

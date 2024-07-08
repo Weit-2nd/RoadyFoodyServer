@@ -155,14 +155,6 @@ fun createTestFoodSpotsFoodCategory(): List<FoodSpotsFoodCategory> =
 fun createTestFoodSpotsForDistance(): List<FoodSpots> =
     listOf(
         createTestFoodSpots(
-            name = "Food Spot 4 - 800m",
-            point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE - 0.008, TEST_FOOD_SPOT_LATITUDE),
-        ),
-        createTestFoodSpots(
-            name = "Food Spot 5 - 1km",
-            point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE, TEST_FOOD_SPOT_LATITUDE + 0.01),
-        ),
-        createTestFoodSpots(
             name = "Food Spot 1 - 100m",
             point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE + 0.001, TEST_FOOD_SPOT_LATITUDE),
         ),
@@ -173,6 +165,14 @@ fun createTestFoodSpotsForDistance(): List<FoodSpots> =
         createTestFoodSpots(
             name = "Food Spot 3 - 500m",
             point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE + 0.005, TEST_FOOD_SPOT_LATITUDE),
+        ),
+        createTestFoodSpots(
+            name = "Food Spot 4 - 800m",
+            point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE - 0.008, TEST_FOOD_SPOT_LATITUDE),
+        ),
+        createTestFoodSpots(
+            name = "Food Spot 5 - 1km",
+            point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE, TEST_FOOD_SPOT_LATITUDE + 0.01),
         ),
     )
 
@@ -210,7 +210,7 @@ class MockTestFoodSpotsHistory(
     override var createdDateTime: LocalDateTime = LocalDateTime.now()
 }
 
-fun createFoodSpotsSearchResponses(): FoodSpotsSearchResponses  {
+fun createFoodSpotsSearchResponses(): FoodSpotsSearchResponses {
     return FoodSpotsSearchResponses(
         listOf(
             FoodSpotsSearchResponse(

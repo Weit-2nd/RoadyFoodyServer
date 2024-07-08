@@ -60,8 +60,8 @@ class FoodSpotsRepositoryTes(
                 foodSpotsFoodCategory =
                     foodSpotsFoodCategoryRepository.saveAll(
                         listOf(
-                            createTestFoodSpotsFoodCategory(foodSpots = foodSpots[4], foodCategory = foodCategory[0]),
-                            createTestFoodSpotsFoodCategory(foodSpots = foodSpots[4], foodCategory = foodCategory[1]),
+                            createTestFoodSpotsFoodCategory(foodSpots = foodSpots[0], foodCategory = foodCategory[0]),
+                            createTestFoodSpotsFoodCategory(foodSpots = foodSpots[0], foodCategory = foodCategory[1]),
                             createTestFoodSpotsFoodCategory(foodSpots = foodSpots[3], foodCategory = foodCategory[3]),
                             createTestFoodSpotsFoodCategory(foodSpots = foodSpots[3], foodCategory = foodCategory[1]),
                         ),
@@ -76,7 +76,7 @@ class FoodSpotsRepositoryTes(
                     )
 
                 expected.shouldHaveSize(1)
-                expected.get(0).name shouldBe foodSpots[4].name
+                expected.get(0).name shouldBe foodSpots[0].name
             }
         }
     })
