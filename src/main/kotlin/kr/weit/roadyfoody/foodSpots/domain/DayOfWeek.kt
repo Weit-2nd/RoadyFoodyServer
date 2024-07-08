@@ -8,4 +8,9 @@ enum class DayOfWeek(val num: Int) {
     FRI(4),
     SAT(5),
     SUN(6),
+    ;
+
+    companion object {
+        fun of(num: Int): DayOfWeek = values().first { it.num == num }
+    }
 }
