@@ -43,7 +43,7 @@ class FoodSpotsSearchService(
 
         val foodSpotsSearchResponses =
             result.map { it ->
-                var openValue: OperationStatus = OperationStatus.TEMPORARILY_CLOSED
+                var openValue: OperationStatus = OperationStatus.OPEN
                 if (it.open) {
                     it.foodSpotsOperationHours.map {
                         if (it.dayOfWeek == dayOfWeek) {
@@ -57,6 +57,8 @@ class FoodSpotsSearchService(
                             }
                         }
                     }
+                } else {
+                    OperationStatus.TEMPORARILY_CLOSED
                 }
                 FoodSpotsSearchResponse(
                     id = it.id,
