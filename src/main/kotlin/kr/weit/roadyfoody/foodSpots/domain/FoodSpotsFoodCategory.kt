@@ -33,7 +33,7 @@ class FoodSpotsFoodCategory(
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "FOOD_SPOTS_FOOD_CATEGORIES_SEQ_GENERATOR")
     val id: Long = 0L,
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "food_spots_id")
+    @JoinColumn(name = "food_spots_id", nullable = false, updatable = false)
     val foodSpots: FoodSpots,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "food_categories_id")
