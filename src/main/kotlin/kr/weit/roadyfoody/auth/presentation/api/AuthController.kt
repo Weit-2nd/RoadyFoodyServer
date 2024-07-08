@@ -9,8 +9,6 @@ import kr.weit.roadyfoody.auth.application.service.AuthQueryService
 import kr.weit.roadyfoody.auth.exception.MissingSocialAccessTokenException
 import kr.weit.roadyfoody.auth.presentation.spec.AuthControllerSpec
 import kr.weit.roadyfoody.auth.security.LoginUser
-import kr.weit.roadyfoody.auth.security.jwt.isBearerToken
-import kr.weit.roadyfoody.auth.security.jwt.removeBearer
 import kr.weit.roadyfoody.global.validator.MaxFileSize
 import kr.weit.roadyfoody.global.validator.WebPImage
 import kr.weit.roadyfoody.user.domain.User
@@ -45,9 +43,9 @@ class AuthController(
         @WebPImage
         @RequestPart(required = false)
         profileImage: MultipartFile?,
-    ) {
-        socialAccessToken ?: throw MissingSocialAccessTokenException()
-        authCommandService.register(socialAccessToken, signUpRequest, profileImage)
+    ): ServiceTokensResponse {
+        requireNotNull(socialAccessToken) { throw MissingSocialAccessTokenException() }
+        return authCommandService.register(socialAccessToken, signUpRequest, profileImage)
     }
 
     @GetMapping("/check-nickname")
@@ -58,19 +56,17 @@ class AuthController(
     @GetMapping
     override fun signIn(
         @RequestHeader(AUTHORIZATION) socialAccessToken: String?,
-    ): ServiceTokensResponse =
-        authCommandService.login(
-            socialAccessToken
-                ?: throw MissingSocialAccessTokenException(),
-        )
+    ): ServiceTokensResponse {
+        requireNotNull(socialAccessToken) { throw MissingSocialAccessTokenException() }
+        return authCommandService.login(socialAccessToken)
+    }
 
     @GetMapping("/refresh")
     override fun refresh(
-        @RequestHeader(AUTHORIZATION) refreshToken: String?,
+        @RequestParam("token") refreshToken: String?,
     ): ServiceTokensResponse {
         requireNotNull(refreshToken) { "RefreshToken 이 존재하지 않습니다." }
-        require(refreshToken.isBearerToken()) { "RefreshToken 의 형식이 올바르지 않습니다." }
-        return authCommandService.reissueTokens(refreshToken.removeBearer())
+        return authCommandService.reissueTokens(refreshToken)
     }
 
     @ResponseStatus(NO_CONTENT)

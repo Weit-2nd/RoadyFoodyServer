@@ -2,6 +2,7 @@ package kr.weit.roadyfoody.auth.presentation.spec
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.media.Schema
@@ -96,7 +97,7 @@ interface AuthControllerSpec {
                                 summary = "SocialAccessToken 미입력",
                                 value = """
                         {
-                            "code": -10000,
+                            "code": -10001,
                             "errorMessage": "SocialAccessToken 이 존재하지 않습니다."
                         }
                         """,
@@ -142,14 +143,13 @@ interface AuthControllerSpec {
         signUpRequest: SignUpRequest,
         @Schema(
             description = "프로필 이미지. 최대 1MB, WEBP 형식만 가능합니다. 이미지가 없을 시 하단 체크박스는 해제해주세요.",
-            required = false,
             type = "string",
             format = "binary",
         )
         @MaxFileSize
         @WebPImage
         profileImage: MultipartFile?,
-    )
+    ): ServiceTokensResponse
 
     @Operation(
         summary = "닉네임 중복 검사 API",
@@ -277,16 +277,6 @@ interface AuthControllerSpec {
                         """,
                             ),
                             ExampleObject(
-                                name = "Invalid Refresh Token Format",
-                                summary = "RefreshToken 형식 오류",
-                                value = """
-                        {
-                            "code": -10000,
-                            "errorMessage": "RefreshToken 의 형식이 올바르지 않습니다."
-                        }
-                        """,
-                            ),
-                            ExampleObject(
                                 name = "Invalid Refresh Token",
                                 summary = "유효하지 않은 RefreshToken",
                                 value = """
@@ -303,7 +293,12 @@ interface AuthControllerSpec {
         ],
     )
     fun refresh(
-        @Parameter(hidden = true)
+        @Parameter(
+            name = "token",
+            description = "리프레시 토큰 (Bearer 같은 형식 표기없이 전달해주세요. 예: eyJhbGciOiJ9.eyJzdWIiOiJ0ZXN0QGdtYWlsLmNvbSIsImV4cCI6MTY0NzQwNjQwNn0.1",
+            required = true,
+            `in` = ParameterIn.QUERY,
+        )
         refreshToken: String?,
     ): ServiceTokensResponse
 
