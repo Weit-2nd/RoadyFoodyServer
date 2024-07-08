@@ -1,6 +1,7 @@
 package kr.weit.roadyfoody.search.foodSpots.application
 
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -81,7 +82,7 @@ class FoodSpotsSearchServiceTest :
                 } returns emptyList()
                 then("빈 리스트를 반환한다.") {
                     val foodSpotsSearchResponses = foodSpotsSearchService.searchFoodSpots(query)
-                    foodSpotsSearchResponses.items.shouldHaveSize(0)
+                    foodSpotsSearchResponses.items.shouldBeEmpty()
                     verify(exactly = 1) { foodSpotsRepository.findFoodSpotsByPointWithinRadius(0.0, 0.0, 1000, null, emptyList()) }
                 }
             }
