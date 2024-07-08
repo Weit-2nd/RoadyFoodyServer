@@ -5,7 +5,9 @@ import jakarta.validation.constraints.NotNull
 import kr.weit.roadyfoody.foodSpots.validator.Latitude
 import kr.weit.roadyfoody.foodSpots.validator.Longitude
 import kr.weit.roadyfoody.global.utils.FilteringConverter
+import org.springdoc.core.annotations.ParameterObject
 
+@ParameterObject
 data class FoodSpotsSearchCondition(
     @field:NotNull(message = "경도는 필수입니다.")
     @field:Longitude

@@ -9,7 +9,6 @@ import kr.weit.roadyfoody.global.swagger.ApiErrorCodeExamples
 import kr.weit.roadyfoody.global.swagger.v1.SwaggerTag
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponses
-import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.ModelAttribute
 
 @Tag(name = SwaggerTag.SEARCH)
@@ -34,6 +33,6 @@ interface FoodSpotsSearchControllerSpec {
         ],
     )
     fun searchFoodSpots(
-        @ParameterObject @ModelAttribute @Valid foodSpotsSearchCondition: FoodSpotsSearchCondition,
+        @ModelAttribute @Valid foodSpotsSearchCondition: FoodSpotsSearchCondition,
     ): FoodSpotsSearchResponses
 }
