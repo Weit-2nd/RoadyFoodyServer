@@ -3,6 +3,7 @@ package kr.weit.roadyfoody.auth.application.service
 import kr.weit.roadyfoody.auth.application.dto.ServiceTokensResponse
 import kr.weit.roadyfoody.auth.application.dto.SignUpRequest
 import kr.weit.roadyfoody.auth.application.event.AuthLeaveEvent
+import kr.weit.roadyfoody.auth.exception.InvalidRefreshTokenException
 import kr.weit.roadyfoody.auth.exception.UserAlreadyExistsException
 import kr.weit.roadyfoody.auth.exception.UserNotRegisteredException
 import kr.weit.roadyfoody.auth.security.jwt.JwtUtil
@@ -75,7 +76,7 @@ class AuthCommandService(
             jwtUtil.validateToken(jwtUtil.refreshKey, refreshToken) &&
                 jwtUtil.validateCachedRefreshTokenRotateId(refreshToken),
         ) {
-            "RefreshToken 이 유효하지 않습니다."
+            throw InvalidRefreshTokenException()
         }
         val userId = jwtUtil.getUserId(jwtUtil.refreshKey, refreshToken)
         val user = userRepository.getByUserId(userId)

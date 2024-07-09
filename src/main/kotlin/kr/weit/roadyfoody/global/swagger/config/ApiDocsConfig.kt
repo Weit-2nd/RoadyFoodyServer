@@ -70,6 +70,8 @@ class ApiDocsConfig {
                 generateErrorCodeResponseExample(operation, apiErrorCodeExample.value)
             }
 
+            hideParameterByType(operation, "User")
+
             operation
         }
     }
@@ -120,9 +122,9 @@ class ApiDocsConfig {
         statusWithExampleHolders: Map<Int, List<ExampleHolder>>,
     ) {
         statusWithExampleHolders.forEach { (status, v) ->
-            val content = Content()
-            val mediaType = MediaType()
-            val apiResponse = ApiResponse()
+            val apiResponse = responses.getOrDefault(status.toString(), ApiResponse())
+            val content = apiResponse.content ?: Content()
+            val mediaType = content.getOrDefault("application/json", MediaType())
 
             v.forEach { exampleHolder ->
                 mediaType.addExamples(exampleHolder.name, exampleHolder.holder)
@@ -137,13 +139,23 @@ class ApiDocsConfig {
         responses: ApiResponses,
         exampleHolder: ExampleHolder,
     ) {
-        val content = Content()
-        val mediaType = MediaType()
-        val apiResponse = ApiResponse()
+        val apiResponse = responses.getOrDefault(exampleHolder.code.toString(), ApiResponse())
+        val content = apiResponse.content ?: Content()
+        val mediaType = content.getOrDefault("application/json", MediaType())
 
         mediaType.addExamples(exampleHolder.name, exampleHolder.holder)
         content.addMediaType("application/json", mediaType)
         apiResponse.content = content
         responses.addApiResponse(exampleHolder.code.toString(), apiResponse)
+    }
+
+    private fun hideParameterByType(
+        operation: Operation,
+        parameterType: String,
+    ) {
+        operation.parameters =
+            operation.parameters?.filterNot { parameter ->
+                parameter.schema?.`$ref`?.endsWith("/$parameterType") == true
+            }
     }
 }

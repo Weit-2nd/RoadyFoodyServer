@@ -1,5 +1,6 @@
 package kr.weit.roadyfoody.common.exception
 
+import kr.weit.roadyfoody.user.utils.NICKNAME_REGEX_DESC
 import org.springframework.http.HttpStatus
 
 enum class ErrorCode(
@@ -33,10 +34,23 @@ enum class ErrorCode(
     IMAGES_TOO_MANY(HttpStatus.BAD_REQUEST, -10000, "이미지는 최대 3개까지 업로드할 수 있습니다."),
     INVALID_IMAGE_TYPE(HttpStatus.BAD_REQUEST, -10000, "하나 이상의 파일이 잘못 되었습니다."),
     IMAGES_SIZE_TOO_LARGE(HttpStatus.BAD_REQUEST, -10000, "하나 이상의 파일이 잘못 되었습니다."),
+    INVALID_WEBP_IMAGE(HttpStatus.BAD_REQUEST, -10000, "webp 형식이 아닙니다."),
+    MAX_FILE_SIZE_EXCEEDED(HttpStatus.BAD_REQUEST, -10000, "파일 사이즈가 초과하였습니다."),
 
     // Search API error 11000대
     REST_CLIENT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, -11000, "외부 API 호출 중 에러 발생"),
     RETRIES_EXCEEDED_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, -11001, "외부 API 호출 재시도 횟수 초과"),
     SEARCH_KEYWORD_LENGTH(HttpStatus.BAD_REQUEST, -10000, "검색어는 2자 이상 60자 이하로 입력해주세요."),
     RADIUS_SIZE_TOO_SMALL(HttpStatus.BAD_REQUEST, -10000, "검색 반경은 500m 이상 4000m 이하로 입력해주세요."),
+
+    // Auth API error 12000대
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, -12000, "유효하지 않은 토큰입니다."),
+    MISSING_SOCIAL_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, -12001, "SocialAccessToken 이 존재하지 않습니다."),
+    USER_ALREADY_EXISTS(HttpStatus.CONFLICT, -12002, "이미 존재하는 유저입니다."),
+    INVALID_NICKNAME(HttpStatus.BAD_REQUEST, -10000, NICKNAME_REGEX_DESC),
+    USER_NOT_REGISTERED(HttpStatus.NOT_FOUND, -12003, "회원가입을 하지 않은 사용자입니다."),
+    MISSING_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, -10000, "RefreshToken 이 존재하지 않습니다."),
+    INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, -10000, "유효하지 않은 RefreshToken 입니다."),
+    UNAUTHENTICATED_ACCESS(HttpStatus.UNAUTHORIZED, -12004, "인증정보가 없습니다."),
+    AUTHENTICATED_USER_NOT_FOUND(HttpStatus.UNAUTHORIZED, -12005, "인증된 사용자를 찾을 수 없습니다."),
 }
