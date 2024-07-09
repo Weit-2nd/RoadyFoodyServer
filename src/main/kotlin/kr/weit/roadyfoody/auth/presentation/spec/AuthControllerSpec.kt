@@ -348,4 +348,51 @@ interface AuthControllerSpec {
         @Parameter(hidden = true)
         user: User,
     )
+
+    @Operation(
+        summary = "회원탈퇴 API",
+        description = "Authorization 헤더에 AccessToken(Bearer)을 넣어 회원탈퇴를 진행합니다.",
+        responses = [
+            ApiResponse(
+                responseCode = "204",
+                description = "회원탈퇴 성공",
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "유효하지 않은 토큰으로 요청",
+                content = [
+                    Content(
+                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                        schema = Schema(implementation = ErrorResponse::class),
+                        examples = [
+                            ExampleObject(
+                                name = "Unauthenticated Access",
+                                summary = "인증되지 않은 접근",
+                                value = """
+                        {
+                            "code": -10001,
+                            "errorMessage": "인증정보가 없습니다."
+                        }
+                        """,
+                            ),
+                            ExampleObject(
+                                name = "Authenticated User Not Found",
+                                summary = "존재하지 않는 사용자",
+                                value = """
+                        {
+                            "code": -10001,
+                            "errorMessage": "인증된 사용자를 찾을 수 없습니다."
+                        }
+                        """,
+                            ),
+                        ],
+                    ),
+                ],
+            ),
+        ],
+    )
+    fun withdraw(
+        @Parameter(hidden = true)
+        user: User,
+    )
 }
