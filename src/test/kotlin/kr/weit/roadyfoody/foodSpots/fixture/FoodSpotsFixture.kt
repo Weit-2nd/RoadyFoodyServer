@@ -161,23 +161,23 @@ fun createTestFoodSpotsFoodCategory(): List<FoodSpotsFoodCategory> =
 fun createTestFoodSpotsForDistance(): List<FoodSpots> =
     listOf(
         createTestFoodSpots(
-            name = "Food Spot 1 - 100m",
+            name = "FoodSpot1-100m",
             point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE + 0.001, TEST_FOOD_SPOT_LATITUDE),
         ),
         createTestFoodSpots(
-            name = "Food Spot 2 - 300m",
+            name = "FoodSpot2-300m",
             point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE, TEST_FOOD_SPOT_LATITUDE + 0.003),
         ),
         createTestFoodSpots(
-            name = "Food Spot 3 - 500m",
+            name = "FoodSpot3-500m",
             point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE + 0.005, TEST_FOOD_SPOT_LATITUDE),
         ),
         createTestFoodSpots(
-            name = "Food Spot 4 - 800m",
+            name = "FoodSpot4-800m",
             point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE - 0.008, TEST_FOOD_SPOT_LATITUDE),
         ),
         createTestFoodSpots(
-            name = "Food Spot 5 - 1km",
+            name = "FoodSpot5-1km",
             point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE, TEST_FOOD_SPOT_LATITUDE + 0.01),
         ),
     )
@@ -199,9 +199,7 @@ class MockTestFoodSpot(
         fun createPoint(
             longitude: Double,
             latitude: Double,
-        ): Point {
-            return CoordinateUtils.createCoordinate(longitude, latitude)
-        }
+        ): Point = CoordinateUtils.createCoordinate(longitude, latitude)
     }
 }
 
@@ -220,8 +218,8 @@ class MockTestFoodSpotsHistory(
     override var createdDateTime: LocalDateTime = LocalDateTime.now()
 }
 
-fun createFoodSpotsSearchResponses(): FoodSpotsSearchResponses {
-    return FoodSpotsSearchResponses(
+fun createFoodSpotsSearchResponses(): FoodSpotsSearchResponses =
+    FoodSpotsSearchResponses(
         listOf(
             FoodSpotsSearchResponse(
                 id = 1L,
@@ -241,4 +239,3 @@ fun createFoodSpotsSearchResponses(): FoodSpotsSearchResponses {
             ),
         ),
     )
-}

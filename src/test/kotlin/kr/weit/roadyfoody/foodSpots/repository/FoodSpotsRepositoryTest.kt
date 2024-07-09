@@ -39,9 +39,9 @@ class FoodSpotsRepositoryTes(
                     )
 
                 expected.shouldHaveSize(3)
-                expected[0].name shouldBe "Food Spot 1 - 100m"
-                expected[1].name shouldBe "Food Spot 2 - 300m"
-                expected[2].name shouldBe "Food Spot 3 - 500m"
+                expected[0].name shouldBe "FoodSpot1-100m"
+                expected[1].name shouldBe "FoodSpot2-300m"
+                expected[2].name shouldBe "FoodSpot3-500m"
             }
 //            expect("거리 이내 사용자 검색 조건(가게 이름)에 맞는 가게 조회한다.") {
 //                val expected =
