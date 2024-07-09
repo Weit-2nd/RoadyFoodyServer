@@ -1,6 +1,5 @@
 package kr.weit.roadyfoody.foodSpots.domain
 
-import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -38,9 +37,9 @@ class FoodSpots(
     var storeClosure: Boolean,
     @Column(columnDefinition = "SDO_GEOMETRY", nullable = false)
     var point: Point,
-    @OneToMany(mappedBy = "foodSpots", cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE], orphanRemoval = true)
+    @OneToMany(mappedBy = "foodSpots")
     val foodCategories: MutableList<FoodSpotsFoodCategory> = mutableListOf(),
-    @OneToMany(mappedBy = "foodSpots", cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE], orphanRemoval = true)
+    @OneToMany(mappedBy = "foodSpots")
     val foodSpotsOperationHours: MutableList<FoodSpotsOperationHours> = mutableListOf(),
 ) : BaseModifiableEntity() {
     init {

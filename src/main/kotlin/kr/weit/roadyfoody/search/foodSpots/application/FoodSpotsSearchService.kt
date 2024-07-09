@@ -45,7 +45,8 @@ class FoodSpotsSearchService(
                             openValue =
                                 if (now.isAfter(
                                         LocalTime.parse(it.openingHours, format),
-                                    ) && now.isBefore(LocalTime.parse(it.closingHours, format))
+                                    ) &&
+                                    now.isBefore(LocalTime.parse(it.closingHours, format))
                                 ) {
                                     OperationStatus.OPEN
                                 } else {
