@@ -12,6 +12,7 @@ import jakarta.persistence.Table
 import kr.weit.roadyfoody.common.domain.BaseModifiableEntity
 import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_REGEX
 import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_REGEX_DESC
+import kr.weit.roadyfoody.global.utils.CoordinateUtils.Companion.createCoordinate
 import org.locationtech.jts.geom.Point
 
 @Entity
@@ -50,4 +51,14 @@ class FoodSpots(
         // SRID_WGS84: WGS84 좌표계
         const val SRID_WGS84 = 4326
     }
+
+    constructor() : this(
+        name = "default Name",
+        foodTruck = false,
+        open = false,
+        storeClosure = false,
+        point = createCoordinate(0.0, 0.0),
+        operationHoursList = mutableListOf(),
+        foodCategoriesList = mutableListOf(),
+    )
 }

@@ -10,6 +10,8 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import kr.weit.roadyfoody.common.domain.BaseTimeEntity
+import kr.weit.roadyfoody.foodSpots.utils.OPERATION_HOURS_REGEX
+import kr.weit.roadyfoody.foodSpots.utils.OPERATION_HOURS_REGEX_DESC
 
 @Entity
 @Table(
@@ -29,4 +31,9 @@ class ReportOperationHours(
     val openingHours: String,
     @Column(nullable = false, length = 5)
     val closingHours: String,
-) : BaseTimeEntity()
+) : BaseTimeEntity() {
+    init {
+        require(OPERATION_HOURS_REGEX.matches(openingHours)) { OPERATION_HOURS_REGEX_DESC }
+        require(OPERATION_HOURS_REGEX.matches(closingHours)) { OPERATION_HOURS_REGEX_DESC }
+    }
+}

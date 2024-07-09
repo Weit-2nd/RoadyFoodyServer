@@ -2,6 +2,7 @@ package kr.weit.roadyfoody.foodSpots.presentation.api
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
+import io.kotest.common.ExperimentalKotest
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
 import io.mockk.just
@@ -17,7 +18,9 @@ import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_SIZE
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOT_NAME_EMPTY
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOT_NAME_INVALID_STR
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOT_NAME_TOO_LONG
+import kr.weit.roadyfoody.foodSpots.fixture.TEST_INVALID_TIME_FORMAT
 import kr.weit.roadyfoody.foodSpots.fixture.createMockPhotoList
+import kr.weit.roadyfoody.foodSpots.fixture.createOperationHoursRequest
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportHistoriesResponse
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportRequest
 import kr.weit.roadyfoody.foodSpots.service.FoodSpotsService
@@ -34,6 +37,7 @@ import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
+@OptIn(ExperimentalKotest::class)
 @WebMvcTest(FoodSpotsController::class)
 @ControllerTest
 class FoodSpotsControllerTest(
@@ -146,9 +150,8 @@ class FoodSpotsControllerTest(
                     }
                 }
 
-                reportRequest = createTestReportRequest()
-                reportPhotos = createMockPhotoList(WEBP) + createMockPhotoList(WEBP)
-                `when`("이미지가 3개 초과인 경우") {
+                reportRequest = createTestReportRequest(foodCategories = setOf())
+                `when`("음식 카테고리가 없는 경우") {
                     then("400을 반환") {
                         mockMvc
                             .perform(
@@ -158,102 +161,149 @@ class FoodSpotsControllerTest(
                                             TEST_FOOD_SPOTS_REQUEST_NAME,
                                             objectMapper.writeValueAsBytes(reportRequest).inputStream(),
                                         ),
-                                    ).file("reportPhotos", reportPhotos[0].bytes)
-                                    .file("reportPhotos", reportPhotos[1].bytes)
-                                    .file("reportPhotos", reportPhotos[2].bytes)
-                                    .file("reportPhotos", reportPhotos[3].bytes),
+                                    ),
                             ).andExpect(status().isBadRequest)
                     }
                 }
 
-                reportPhotos = createMockPhotoList(ImageFormat.JPEG)
-                `when`("이미지 형식이 webp가 아닌 경우") {
-                    then("400을 반환") {
-                        mockMvc
-                            .perform(
-                                multipartWithAuth(requestPath)
-                                    .file(
-                                        createMultipartFile(
-                                            TEST_FOOD_SPOTS_REQUEST_NAME,
-                                            objectMapper.writeValueAsBytes(reportRequest).inputStream(),
-                                        ),
-                                    ).file("reportPhotos", reportPhotos[0].bytes)
-                                    .file("reportPhotos", reportPhotos[1].bytes),
-                            ).andExpect(status().isBadRequest)
-                    }
-                }
-
-                `when`("파일의 크기가 1MB를 초과하면") {
-                    val mockFile: MockMultipartFile = mockk<MockMultipartFile>()
-                    every { mockFile.size } returns 1024 * 1024 + 1
-                    every { mockFile.name } returns TEST_FOOD_SPOTS_REQUEST_PHOTO
-                    every { mockFile.inputStream } returns createTestImageFile(WEBP).inputStream
-                    every { foodSpotsService.createReport(any(), any(), any()) } just runs
-                    then("400을 반환") {
-                        mockMvc
-                            .perform(
-                                multipartWithAuth(requestPath)
-                                    .file(
-                                        createMultipartFile(
-                                            TEST_FOOD_SPOTS_REQUEST_NAME,
-                                            objectMapper.writeValueAsBytes(reportRequest).inputStream(),
-                                        ),
-                                    ).file(mockFile),
-                            ).andExpect(status().isBadRequest)
-                        verify(exactly = 0) { foodSpotsService.createReport(any(), any(), any()) }
-                    }
-                }
-            }
-
-            given("GET $requestPath/histories/{userId} Test") {
-                val response =
-                    SliceResponse(
-                        listOf(createTestReportHistoriesResponse()),
-                        TEST_FOOD_SPOTS_HAS_NEXT,
+                reportRequest =
+                    createTestReportRequest(
+                        operationHours =
+                            listOf(
+                                createOperationHoursRequest(openingHours = TEST_INVALID_TIME_FORMAT),
+                            ),
                     )
-                every {
-                    foodSpotsService.getReportHistories(any(), any(), any())
-                } returns response
-                `when`("정상적인 요청이 들어올 경우") {
-                    then("해당 유저의 리포트 이력을 반환한다.") {
+                `when`("운영시간 형식이 잘못된 경우") {
+                    then("400을 반환") {
                         mockMvc
                             .perform(
-                                getWithAuth("$requestPath/histories/$TEST_USER_ID")
-                                    .param("size", TEST_FOOD_SPOTS_SIZE.toString())
-                                    .param("lastId", TEST_FOOD_SPOTS_LAST_ID.toString()),
-                            ).andExpect(status().isOk)
+                                multipartWithAuth(requestPath)
+                                    .file(
+                                        createMultipartFile(
+                                            TEST_FOOD_SPOTS_REQUEST_NAME,
+                                            objectMapper.writeValueAsBytes(reportRequest).inputStream(),
+                                        ),
+                                    ),
+                            ).apply {
+                                this.toString()
+                            }.andExpect(status().isBadRequest)
+                    }
+
+                    reportRequest = createTestReportRequest()
+                    reportPhotos = createMockPhotoList(WEBP) + createMockPhotoList(WEBP)
+                    `when`("이미지가 3개 초과인 경우") {
+                        then("400을 반환") {
+                            mockMvc
+                                .perform(
+                                    multipartWithAuth(requestPath)
+                                        .file(
+                                            createMultipartFile(
+                                                TEST_FOOD_SPOTS_REQUEST_NAME,
+                                                objectMapper
+                                                    .writeValueAsBytes(reportRequest)
+                                                    .inputStream(),
+                                            ),
+                                        ).file("reportPhotos", reportPhotos[0].bytes)
+                                        .file("reportPhotos", reportPhotos[1].bytes)
+                                        .file("reportPhotos", reportPhotos[2].bytes)
+                                        .file("reportPhotos", reportPhotos[3].bytes),
+                                ).andExpect(status().isBadRequest)
+                        }
+                    }
+
+                    reportPhotos = createMockPhotoList(ImageFormat.JPEG)
+                    `when`("이미지 형식이 webp가 아닌 경우") {
+                        then("400을 반환") {
+                            mockMvc
+                                .perform(
+                                    multipartWithAuth(requestPath)
+                                        .file(
+                                            createMultipartFile(
+                                                TEST_FOOD_SPOTS_REQUEST_NAME,
+                                                objectMapper
+                                                    .writeValueAsBytes(reportRequest)
+                                                    .inputStream(),
+                                            ),
+                                        ).file("reportPhotos", reportPhotos[0].bytes)
+                                        .file("reportPhotos", reportPhotos[1].bytes),
+                                ).andExpect(status().isBadRequest)
+                        }
+                    }
+
+                    `when`("파일의 크기가 1MB를 초과하면") {
+                        val mockFile: MockMultipartFile = mockk<MockMultipartFile>()
+                        every { mockFile.size } returns 1024 * 1024 + 1
+                        every { mockFile.name } returns TEST_FOOD_SPOTS_REQUEST_PHOTO
+                        every { mockFile.inputStream } returns createTestImageFile(WEBP).inputStream
+                        every { foodSpotsService.createReport(any(), any(), any()) } just runs
+                        then("400을 반환") {
+                            mockMvc
+                                .perform(
+                                    multipartWithAuth(requestPath)
+                                        .file(
+                                            createMultipartFile(
+                                                TEST_FOOD_SPOTS_REQUEST_NAME,
+                                                objectMapper
+                                                    .writeValueAsBytes(reportRequest)
+                                                    .inputStream(),
+                                            ),
+                                        ).file(mockFile),
+                                ).andExpect(status().isBadRequest)
+                            verify(exactly = 0) { foodSpotsService.createReport(any(), any(), any()) }
+                        }
                     }
                 }
 
-                `when`("size와 lastId가 없는 경우") {
+                given("GET $requestPath/histories/{userId} Test") {
+                    val response =
+                        SliceResponse(
+                            listOf(createTestReportHistoriesResponse()),
+                            TEST_FOOD_SPOTS_HAS_NEXT,
+                        )
                     every {
                         foodSpotsService.getReportHistories(any(), any(), any())
                     } returns response
-                    then("기본값으로 해당 유저의 리포트 이력을 반환한다.") {
-                        mockMvc
-                            .perform(
-                                getWithAuth("$requestPath/histories/$TEST_USER_ID"),
-                            ).andExpect(status().isOk)
+                    `when`("정상적인 요청이 들어올 경우") {
+                        then("해당 유저의 리포트 이력을 반환한다.") {
+                            mockMvc
+                                .perform(
+                                    getWithAuth("$requestPath/histories/$TEST_USER_ID")
+                                        .param("size", TEST_FOOD_SPOTS_SIZE.toString())
+                                        .param("lastId", TEST_FOOD_SPOTS_LAST_ID.toString()),
+                                ).andExpect(status().isOk)
+                        }
                     }
-                }
 
-                `when`("size가 양수가 아닌 경우") {
-                    then("400을 반환") {
-                        mockMvc
-                            .perform(
-                                getWithAuth("$requestPath/histories/$TEST_USER_ID")
-                                    .param("size", "0"),
-                            ).andExpect(status().isBadRequest)
+                    `when`("size와 lastId가 없는 경우") {
+                        every {
+                            foodSpotsService.getReportHistories(any(), any(), any())
+                        } returns response
+                        then("기본값으로 해당 유저의 리포트 이력을 반환한다.") {
+                            mockMvc
+                                .perform(
+                                    getWithAuth("$requestPath/histories/$TEST_USER_ID"),
+                                ).andExpect(status().isOk)
+                        }
                     }
-                }
 
-                `when`("lastId가 양수가 아닌 경우") {
-                    then("400을 반환") {
-                        mockMvc
-                            .perform(
-                                getWithAuth("$requestPath/histories/$TEST_USER_ID")
-                                    .param("lastId", "-1"),
-                            ).andExpect(status().isBadRequest)
+                    `when`("size가 양수가 아닌 경우") {
+                        then("400을 반환") {
+                            mockMvc
+                                .perform(
+                                    getWithAuth("$requestPath/histories/$TEST_USER_ID")
+                                        .param("size", "0"),
+                                ).andExpect(status().isBadRequest)
+                        }
+                    }
+
+                    `when`("lastId가 양수가 아닌 경우") {
+                        then("400을 반환") {
+                            mockMvc
+                                .perform(
+                                    getWithAuth("$requestPath/histories/$TEST_USER_ID")
+                                        .param("lastId", "-1"),
+                                ).andExpect(status().isBadRequest)
+                        }
                     }
                 }
             }
