@@ -40,12 +40,13 @@ class FoodSpotsSearchService(
             result.map { it ->
                 var openValue: OperationStatus = OperationStatus.OPEN
                 if (it.open) {
-                    it.foodSpotsOperationHours.map {
+                    it.operationHoursList.map {
                         if (it.dayOfWeek == dayOfWeek) {
                             openValue =
                                 if (now.isAfter(
                                         LocalTime.parse(it.openingHours, format),
-                                    ) && now.isBefore(LocalTime.parse(it.closingHours, format))
+                                    ) &&
+                                    now.isBefore(LocalTime.parse(it.closingHours, format))
                                 ) {
                                     OperationStatus.OPEN
                                 } else {
@@ -62,7 +63,7 @@ class FoodSpotsSearchService(
                     longitude = it.point.x,
                     latitude = it.point.y,
                     open = openValue,
-                    foodCategories = it.foodCategories.map { it.foodCategory.name },
+                    foodCategories = it.foodCategoriesList.map { it.foodCategory.name },
                 )
             }
 
