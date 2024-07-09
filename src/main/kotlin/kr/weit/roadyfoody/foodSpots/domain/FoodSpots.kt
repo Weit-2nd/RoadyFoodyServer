@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Index
+import jakarta.persistence.OneToMany
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
 import kr.weit.roadyfoody.common.domain.BaseModifiableEntity
@@ -36,6 +37,10 @@ class FoodSpots(
     var storeClosure: Boolean,
     @Column(columnDefinition = "SDO_GEOMETRY", nullable = false)
     var point: Point,
+    @OneToMany(mappedBy = "foodSpots")
+    val operationHoursList: MutableList<FoodSpotsOperationHours>,
+    @OneToMany(mappedBy = "foodSpots")
+    val foodCategoriesList: MutableList<FoodSpotsFoodCategory>,
 ) : BaseModifiableEntity() {
     init {
         require(FOOD_SPOTS_NAME_REGEX.matches(name)) { FOOD_SPOTS_NAME_REGEX_DESC }
