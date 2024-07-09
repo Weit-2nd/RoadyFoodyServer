@@ -37,16 +37,15 @@ interface TermControllerSpec {
                         schema = Schema(implementation = DetailedTermResponse::class),
                         examples = [
                             ExampleObject(
-                                name = "약관 상세 정보 반환 성공",
                                 summary = "약관 상세 정보 반환 성공",
                                 value = """
-                            {
-                                "id": 1,
-                                "title": "약관 제목",
-                                "isRequired": true,
-                                "content": "<html>약관 내용</html>"
-                            }
-                            """,
+                        {
+                            "id": 1,
+                            "title": "약관 제목",
+                            "isRequired": true,
+                            "content": "<html>약관 내용</html>"
+                        }
+                        """,
                             ),
                         ],
                     ),
@@ -54,15 +53,14 @@ interface TermControllerSpec {
             ),
             ApiResponse(
                 responseCode = "404",
-                description = "약관 상세 정보 반환 실패",
                 content = [
                     Content(
                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                         schema = Schema(implementation = ErrorResponse::class),
                         examples = [
                             ExampleObject(
-                                name = "약관 상세 정보 반환 실패",
-                                summary = "약관 상세 정보 반환 실패",
+                                name = "Term Not Found",
+                                summary = "TERM_NOT_FOUND",
                                 value = """
                         {
                             "code": -10010,
