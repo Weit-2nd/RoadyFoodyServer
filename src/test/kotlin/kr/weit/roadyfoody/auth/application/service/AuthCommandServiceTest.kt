@@ -10,6 +10,7 @@ import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.spyk
 import io.mockk.verify
+import kr.weit.roadyfoody.auth.exception.InvalidRefreshTokenException
 import kr.weit.roadyfoody.auth.exception.UserAlreadyExistsException
 import kr.weit.roadyfoody.auth.exception.UserNotRegisteredException
 import kr.weit.roadyfoody.auth.fixture.TEST_ACCESS_TOKEN
@@ -261,8 +262,8 @@ class AuthCommandServiceTest : BehaviorSpec({
 
         `when`("유효하지 않은 refreshToken 이면") {
             every { jwtUtil.validateToken(any<SecretKey>(), any<String>()) } returns false
-            then("IllegalArgumentException 예외가 발생한다.") {
-                shouldThrow<IllegalArgumentException> {
+            then("InvalidRefreshTokenException 예외가 발생한다.") {
+                shouldThrow<InvalidRefreshTokenException> {
                     authCommandService.reissueTokens(TEST_BEARER_ACCESS_TOKEN)
                 }
                 verify(exactly = 1) {
@@ -275,8 +276,8 @@ class AuthCommandServiceTest : BehaviorSpec({
         `when`("일치하지 않은 refreshTokenRotateId 이면") {
             every { jwtUtil.validateToken(any<SecretKey>(), any<String>()) } returns true
             every { jwtUtil.validateCachedRefreshTokenRotateId(any<String>()) } returns false
-            then("IllegalArgumentException 예외가 발생한다.") {
-                shouldThrow<IllegalArgumentException> {
+            then("InvalidRefreshTokenException 예외가 발생한다.") {
+                shouldThrow<InvalidRefreshTokenException> {
                     authCommandService.reissueTokens(TEST_REFRESH_TOKEN)
                 }
                 verify(exactly = 1) {

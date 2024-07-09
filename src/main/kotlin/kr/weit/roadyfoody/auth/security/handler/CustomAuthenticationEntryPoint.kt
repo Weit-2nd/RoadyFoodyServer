@@ -22,7 +22,10 @@ class CustomAuthenticationEntryPoint(
         response.status = HttpServletResponse.SC_UNAUTHORIZED
         objectMapper.writeValue(
             response?.outputStream,
-            ErrorResponse.of(ErrorCode.UNAUTHORIZED, "인증정보가 없습니다."),
+            ErrorResponse.of(
+                ErrorCode.UNAUTHENTICATED_ACCESS,
+                ErrorCode.UNAUTHENTICATED_ACCESS.errorMessage,
+            ),
         )
     }
 }

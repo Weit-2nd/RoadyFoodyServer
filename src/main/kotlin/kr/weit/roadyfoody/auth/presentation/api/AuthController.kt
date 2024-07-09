@@ -6,6 +6,7 @@ import kr.weit.roadyfoody.auth.application.dto.ServiceTokensResponse
 import kr.weit.roadyfoody.auth.application.dto.SignUpRequest
 import kr.weit.roadyfoody.auth.application.service.AuthCommandService
 import kr.weit.roadyfoody.auth.application.service.AuthQueryService
+import kr.weit.roadyfoody.auth.exception.MissingRefreshTokenException
 import kr.weit.roadyfoody.auth.exception.MissingSocialAccessTokenException
 import kr.weit.roadyfoody.auth.presentation.spec.AuthControllerSpec
 import kr.weit.roadyfoody.auth.security.LoginUser
@@ -65,7 +66,7 @@ class AuthController(
     override fun refresh(
         @RequestParam("token") refreshToken: String?,
     ): ServiceTokensResponse {
-        requireNotNull(refreshToken) { "RefreshToken 이 존재하지 않습니다." }
+        requireNotNull(refreshToken) { throw MissingRefreshTokenException() }
         return authCommandService.reissueTokens(refreshToken)
     }
 
