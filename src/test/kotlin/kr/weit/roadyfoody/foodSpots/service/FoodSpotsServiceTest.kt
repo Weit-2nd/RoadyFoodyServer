@@ -87,7 +87,7 @@ class FoodSpotsServiceTest :
                 every { reportFoodCategoryRepository.saveAll(any<List<ReportFoodCategory>>()) } returns
                     listOf(createTestReportFoodCategory())
                 every { foodSpotsCategoryRepository.saveAll(any<List<FoodSpotsFoodCategory>>()) } returns
-                    listOf(createTestFoodSpotsFoodCategory())
+                    createTestFoodSpotsFoodCategory()
                 every { foodSpotsPhotoRepository.saveAll(any<List<FoodSpotsPhoto>>()) } returns
                     listOf(createTestFoodSpotsPhoto())
                 every { executor.execute(any()) } answers {

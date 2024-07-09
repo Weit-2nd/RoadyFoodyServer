@@ -6,7 +6,7 @@ import kr.weit.roadyfoody.foodSpots.domain.FoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
 import kr.weit.roadyfoody.foodSpots.domain.ReportFoodCategory
-import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodCategory
+import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodCategories
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodHistory
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpots
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportFoodCategory
@@ -34,11 +34,7 @@ class ReportFoodCategoryRepositoryTest(
             foodSpotsHistory = foodSpotsHistoryRepository.save(createTestFoodHistory(user = user, foodSpots = foodSpots))
             categories =
                 foodCategoryRepository.saveAll(
-                    listOf(
-                        createTestFoodCategory("떡볶이"),
-                        createTestFoodCategory("붕어빵"),
-                        createTestFoodCategory("타코야끼"),
-                    ),
+                    createTestFoodCategories(),
                 )
             givenReportCategories =
                 reportFoodCategoryRepository.saveAll(

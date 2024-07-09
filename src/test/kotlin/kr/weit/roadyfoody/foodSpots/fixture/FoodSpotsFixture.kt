@@ -1,5 +1,7 @@
 package kr.weit.roadyfoody.foodSpots.fixture
 
+import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
+import kr.weit.roadyfoody.foodSpots.domain.FoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots.Companion.SRID_WGS84
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
@@ -54,7 +56,6 @@ const val TEST_FOOD_SPOTS_CATEGORY_ID = 1L
 const val TEST_OPERATION_HOURS_OPEN = "00:00"
 const val TEST_OPERATION_HOURS_CLOSE = "23:59"
 const val TEST_INVALID_TIME_FORMAT = "25:60"
-const val TEST_CATEGORY_NAME = "붕어빵"
 
 fun createMockTestFoodSpot(id: Long = 0L) = MockTestFoodSpot(id)
 
@@ -163,13 +164,6 @@ fun createOperationHoursRequest(
     closingHours: String = TEST_OPERATION_HOURS_CLOSE,
 ) = OperationHoursRequest(dayOfWeek, openingHours, closingHours)
 
-fun createTestFoodCategory(name: String = TEST_CATEGORY_NAME) = FoodCategory(name = name)
-
-fun createTestFoodSpotsFoodCategory(
-    foodSpots: FoodSpots = createTestFoodSpots(),
-    foodCategory: FoodCategory = createTestFoodCategory(),
-) = FoodSpotsFoodCategory(0L, foodSpots, foodCategory)
-
 fun createTestReportFoodCategory(
     foodSpotsHistory: FoodSpotsHistory = createTestFoodHistory(),
     foodCategory: FoodCategory = createTestFoodCategory(),
@@ -239,9 +233,9 @@ class MockTestFoodSpot(
     open: Boolean = TEST_FOOD_SPOT_OPEN,
     closed: Boolean = TEST_FOOD_SPOT_STORE_CLOSURE,
     point: Point = TEST_FOOD_SPOT_POINT,
-    operationHours: MutableList<FoodSpotsOperationHours> = mutableListOf(),
-    foodCategories: MutableList<FoodSpotsFoodCategory> = mutableListOf(),
-) : FoodSpots(id, name, foodTruck, open, closed, point, operationHours, foodCategories) {
+    operationHoursList: MutableList<FoodSpotsOperationHours> = mutableListOf(),
+    categoryList: MutableList<FoodSpotsFoodCategory> = mutableListOf(),
+) : FoodSpots(id, name, foodTruck, open, closed, point, operationHoursList, categoryList) {
     override var createdDateTime: LocalDateTime = LocalDateTime.now()
     override var updatedDateTime: LocalDateTime = LocalDateTime.now()
 
@@ -262,9 +256,9 @@ class MockTestFoodSpotsHistory(
     open: Boolean = TEST_FOOD_SPOT_OPEN,
     closed: Boolean = TEST_FOOD_SPOT_STORE_CLOSURE,
     point: Point = TEST_FOOD_SPOT_POINT,
-    operationHours: List<ReportOperationHours> = listOf(),
-    foodCategories: List<ReportFoodCategory> = listOf(),
-) : FoodSpotsHistory(id, foodSpots, user, name, foodTruck, open, closed, point, operationHours, foodCategories) {
+    operationHours: MutableList<ReportOperationHours> = mutableListOf(),
+    category: MutableList<ReportFoodCategory> = mutableListOf(),
+) : FoodSpotsHistory(id, foodSpots, user, name, foodTruck, open, closed, point, operationHours, category) {
     override var createdDateTime: LocalDateTime = LocalDateTime.now()
 }
 
