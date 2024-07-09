@@ -70,6 +70,8 @@ class ApiDocsConfig {
                 generateErrorCodeResponseExample(operation, apiErrorCodeExample.value)
             }
 
+            hideParameterByType(operation, "User")
+
             operation
         }
     }
@@ -145,5 +147,15 @@ class ApiDocsConfig {
         content.addMediaType("application/json", mediaType)
         apiResponse.content = content
         responses.addApiResponse(exampleHolder.code.toString(), apiResponse)
+    }
+
+    private fun hideParameterByType(
+        operation: Operation,
+        parameterType: String,
+    ) {
+        operation.parameters =
+            operation.parameters?.filterNot { parameter ->
+                parameter.schema?.`$ref`?.endsWith("/$parameterType") == true
+            }
     }
 }

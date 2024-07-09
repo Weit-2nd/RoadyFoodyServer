@@ -344,10 +344,7 @@ interface AuthControllerSpec {
             ),
         ],
     )
-    fun signOut(
-        @Parameter(hidden = true)
-        user: User,
-    )
+    fun signOut(user: User)
 
     @Operation(
         summary = "회원탈퇴 API",
@@ -391,8 +388,5 @@ interface AuthControllerSpec {
             ),
         ],
     )
-    fun withdraw(
-        @Parameter(hidden = true)
-        user: User,
-    )
+    fun withdraw(user: User)
 }
