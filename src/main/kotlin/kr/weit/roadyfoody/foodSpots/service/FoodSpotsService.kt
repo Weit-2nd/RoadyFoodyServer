@@ -3,7 +3,6 @@ package kr.weit.roadyfoody.foodSpots.service
 import jakarta.transaction.Transactional
 import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
-import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsOperationHoursId
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
 import kr.weit.roadyfoody.foodSpots.domain.ReportFoodCategory
 import kr.weit.roadyfoody.foodSpots.dto.ReportCategoryResponse
@@ -28,7 +27,6 @@ import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutorService
-import kotlin.jvm.optionals.getOrNull
 
 @Service
 class FoodSpotsService(
@@ -57,21 +55,8 @@ class FoodSpotsService(
         foodSpotsHistoryRepository.save(foodStoreHistory)
         val foodCategories = foodCategoryRepository.getFoodCategories(reportRequest.foodCategories)
         reportOperationHoursRepository.saveAll(reportRequest.toReportOperationHoursEntity(foodStoreHistory))
-        reportRequest.toOperationHoursEntity(foodSpotsInfo).forEach {
-            val operationHours =
-                foodSportsOperationHoursRepository.findById(
-                    FoodSpotsOperationHoursId(
-                        foodSpotsInfo,
-                        it.dayOfWeek,
-                    ),
-                )
-            operationHours.getOrNull()?.let { operationHoursRepository ->
-                operationHoursRepository.openingHours = it.openingHours
-                operationHoursRepository.closingHours = it.closingHours
-            } ?: foodSportsOperationHoursRepository.save(it)
-        }
+        foodSportsOperationHoursRepository.saveAll(reportRequest.toOperationHoursEntity(foodSpotsInfo))
         reportFoodCategoryRepository.saveAll(foodCategories.map { ReportFoodCategory.of(foodStoreHistory, it) })
-        foodSpotsCategoryRepository.deleteByFoodSpots(foodSpotsInfo)
         foodSpotsCategoryRepository.saveAll(foodCategories.map { FoodSpotsFoodCategory.of(foodSpotsInfo, it) })
 
         photos?.let {

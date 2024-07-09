@@ -5,4 +5,6 @@ import java.io.Serializable
 data class ReportOperationHoursId(
     val foodSpotsHistory: FoodSpotsHistory,
     val dayOfWeek: DayOfWeek,
-) : Serializable
+) : Serializable {
+    private constructor() : this(FoodSpotsHistory(), DayOfWeek.MON)
+}

@@ -3,18 +3,19 @@ package kr.weit.roadyfoody.foodSpots.presentation.api
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Positive
 import jakarta.validation.constraints.Size
+import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.dto.ReportHistoriesResponse
 import kr.weit.roadyfoody.foodSpots.dto.ReportRequest
 import kr.weit.roadyfoody.foodSpots.presentation.spec.FoodSportsControllerSpec
 import kr.weit.roadyfoody.foodSpots.service.FoodSpotsService
 import kr.weit.roadyfoody.foodSpots.validator.WebPImageList
+import kr.weit.roadyfoody.user.domain.User
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RequestPart
@@ -30,8 +31,8 @@ class FoodSpotsController(
     @ResponseStatus(CREATED)
     @PostMapping(consumes = [MULTIPART_FORM_DATA_VALUE])
     override fun createReport(
-        @RequestHeader
-        userId: Long,
+        @LoginUser
+        user: User,
         @Valid
         @RequestPart
         reportRequest: ReportRequest,
@@ -39,7 +40,7 @@ class FoodSpotsController(
         @WebPImageList
         @RequestPart(required = false)
         reportPhotos: List<MultipartFile>?,
-    ) = foodSpotsService.createReport(userId, reportRequest, reportPhotos)
+    ) = foodSpotsService.createReport(user.id, reportRequest, reportPhotos)
 
     @GetMapping("/histories/{userId}")
     override fun getReportHistories(
