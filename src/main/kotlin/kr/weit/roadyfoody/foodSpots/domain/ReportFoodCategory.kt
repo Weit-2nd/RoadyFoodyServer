@@ -31,6 +31,10 @@ class ReportFoodCategory(
     @ManyToOne
     @JoinColumn(name = "food_categories_id")
     val foodCategory: FoodCategory,
-) : BaseTimeEntity(){
-    constructor(foodSpotsHistory: FoodSpotsHistory,foodCategory: FoodCategory,id: Long=0L):this(id, foodSpotsHistory, foodCategory)
+) : BaseTimeEntity() {
+    constructor(
+        foodSpotsHistory: FoodSpotsHistory,
+        foodCategory: FoodCategory,
+        id: Long = 0L
+    ) : this(id, foodSpotsHistory, foodCategory)
 }

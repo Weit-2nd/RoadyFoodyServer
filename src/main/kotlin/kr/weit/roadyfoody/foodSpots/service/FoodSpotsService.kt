@@ -45,7 +45,7 @@ class FoodSpotsService(
 ) {
     @Transactional
     fun createReport(
-        user:User,
+        user: User,
         reportRequest: ReportRequest,
         photos: List<MultipartFile>?,
     ) {
