@@ -35,9 +35,9 @@ interface FoodSportsControllerSpec {
             ApiResponse(
                 responseCode = "201",
                 description = "리포트 성공",
-            )
-                ],
-            )
+            ),
+        ],
+    )
     @ApiErrorCodeExamples(
         [
             ErrorCode.INVALID_LENGTH_FOOD_SPOTS_NAME,

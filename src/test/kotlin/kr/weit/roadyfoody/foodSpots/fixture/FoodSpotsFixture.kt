@@ -132,10 +132,11 @@ fun createTestReportRequest(
 fun createMockPhotoList(
     format: ImageFormat,
     name: String = TEST_PHOTO_NAME,
-    size: Int = 2
-): List<MultipartFile> = List(size) {
-    createTestImageFile(format, name)
-}
+    size: Int = 2,
+): List<MultipartFile> =
+    List(size) {
+        createTestImageFile(format, name)
+    }
 
 fun createTestReportPhotoResponse(
     id: Long = 0L,

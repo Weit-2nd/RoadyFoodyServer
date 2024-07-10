@@ -38,6 +38,10 @@ class FoodSpotsFoodCategory(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "food_categories_id")
     val foodCategory: FoodCategory,
-) : BaseTimeEntity(){
-    constructor(foodSpots: FoodSpots,foodCategory: FoodCategory,id: Long=0L):this(id, foodSpots, foodCategory)
+) : BaseTimeEntity() {
+    constructor(foodSpots: FoodSpots, foodCategory: FoodCategory, id: Long = 0L) : this(
+        id,
+        foodSpots,
+        foodCategory
+    )
 }

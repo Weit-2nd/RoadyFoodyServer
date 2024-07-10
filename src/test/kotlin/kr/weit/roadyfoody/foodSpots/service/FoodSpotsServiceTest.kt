@@ -5,6 +5,8 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
+import java.util.Optional
+import java.util.concurrent.ExecutorService
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsOperationHours
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
@@ -41,8 +43,6 @@ import kr.weit.roadyfoody.user.exception.UserNotFoundException
 import kr.weit.roadyfoody.user.fixture.TEST_USER_ID
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import kr.weit.roadyfoody.user.repository.UserRepository
-import java.util.Optional
-import java.util.concurrent.ExecutorService
 
 class FoodSpotsServiceTest :
     BehaviorSpec(
@@ -110,7 +110,11 @@ class FoodSpotsServiceTest :
                     every { foodCategoryRepository.findFoodCategoryByIdIn(any()) } returns emptyList()
                     then("CategoriesNotFoundException이 발생한다.") {
                         shouldThrow<CategoriesNotFoundException> {
-                            foodSpotsService.createReport(createTestUser(), createTestReportRequest(), createMockPhotoList(ImageFormat.WEBP))
+                            foodSpotsService.createReport(
+                                createTestUser(),
+                                createTestReportRequest(),
+                                createMockPhotoList(ImageFormat.WEBP),
+                            )
                         }
                     }
                 }

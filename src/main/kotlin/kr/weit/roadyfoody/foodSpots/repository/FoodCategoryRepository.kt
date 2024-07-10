@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 fun FoodCategoryRepository.getFoodCategories(categoryIds: Set<Long>): List<FoodCategory> =
     findFoodCategoryByIdIn(categoryIds).also {
-        if (it.size!=categoryIds.size) throw CategoriesNotFoundException()
+        if (it.size != categoryIds.size) throw CategoriesNotFoundException()
     }
 
 interface FoodCategoryRepository : JpaRepository<FoodCategory, Long> {
