@@ -1,5 +1,6 @@
 package kr.weit.roadyfoody.foodSpots.fixture
 
+import java.time.LocalDateTime
 import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
@@ -27,7 +28,6 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.domain.SliceImpl
 import org.springframework.web.multipart.MultipartFile
-import java.time.LocalDateTime
 
 const val TEST_FOOD_SPOT_NAME = "testFoodSpot"
 const val TEST_FOOD_SPOT_NAME_EMPTY = ""
@@ -118,11 +118,10 @@ fun createTestReportRequest(
 fun createMockPhotoList(
     format: ImageFormat,
     name: String = TEST_PHOTO_NAME,
-): List<MultipartFile> =
-    listOf(
-        createTestImageFile(format),
-        createTestImageFile(format, name),
-    )
+    size: Int = 2
+): List<MultipartFile> = List(size) {
+    createTestImageFile(format, name)
+}
 
 fun createTestReportPhotoResponse(
     id: Long = 0L,

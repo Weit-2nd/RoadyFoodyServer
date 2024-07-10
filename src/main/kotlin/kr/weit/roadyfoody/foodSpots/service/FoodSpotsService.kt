@@ -1,6 +1,7 @@
 package kr.weit.roadyfoody.foodSpots.service
 
-import jakarta.transaction.Transactional
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutorService
 import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
@@ -21,13 +22,12 @@ import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
 import kr.weit.roadyfoody.foodSpots.repository.getFoodCategories
 import kr.weit.roadyfoody.foodSpots.repository.getHistoriesByUser
 import kr.weit.roadyfoody.global.service.ImageService
+import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.repository.UserRepository
 import kr.weit.roadyfoody.user.repository.getByUserId
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.ExecutorService
-import kr.weit.roadyfoody.user.domain.User
 
 @Service
 class FoodSpotsService(
@@ -79,7 +79,7 @@ class FoodSpotsService(
         }
     }
 
-@Transactional
+    @Transactional(readOnly = true)
     fun getReportHistories(
         userId: Long,
         size: Int,
