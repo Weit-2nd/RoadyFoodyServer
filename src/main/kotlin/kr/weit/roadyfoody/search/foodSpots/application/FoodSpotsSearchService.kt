@@ -63,7 +63,7 @@ class FoodSpotsSearchService(
                     longitude = it.point.x,
                     latitude = it.point.y,
                     open = openValue,
-                    foodCategories = it.foodCategoriesList.map { it.foodCategory.name },
+                    foodCategories = it.foodCategoryList.map { it.foodCategory.name },
                 )
             }
 
