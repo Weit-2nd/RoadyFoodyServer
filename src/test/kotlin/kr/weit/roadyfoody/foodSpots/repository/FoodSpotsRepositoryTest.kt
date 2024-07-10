@@ -24,6 +24,7 @@ class FoodSpotsRepositoryTes(
         lateinit var foodCategory: List<FoodCategory>
 
         beforeEach {
+            foodSpotsRepository.deleteAll()
             foodSpots = foodSpotsRepository.saveAll(createTestFoodSpotsForDistance())
         }
 
@@ -49,11 +50,14 @@ class FoodSpotsRepositoryTes(
 //                        centerLatitude = TEST_FOOD_SPOT_LATITUDE,
 //                        centerLongitude = TEST_FOOD_SPOT_LONGITUDE,
 //                        radius = 500,
-//                        name = "100m",
+//                        name = "100",
+//                        categoryIds = emptyList(),
 //                    )
 //
+//                print("-----------------${expected.size}")
+//
 //                expected.shouldHaveSize(1)
-//                expected.get(0).name shouldBe "Food Spot 1 - 100m"
+//                expected[0].name shouldBe "Food Spot 1 - 100m"
 //            }
             expect("카테고리별로 거리 이내 가게를 조회한다.") {
                 foodCategory = foodCategoryRepository.saveAll(createTestFoodCategories())
