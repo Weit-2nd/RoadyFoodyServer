@@ -95,22 +95,13 @@ class FoodSpotsServiceTest :
                 }
                 `when`("정상적인 데이터와 이미지가 들어올 경우") {
                     then("정상적으로 저장되어야 한다.") {
-                        foodSpotsService.createReport(TEST_USER_ID, createTestReportRequest(), createMockPhotoList(ImageFormat.WEBP))
+                        foodSpotsService.createReport(createTestUser(), createTestReportRequest(), createMockPhotoList(ImageFormat.WEBP))
                     }
                 }
 
                 `when`("정상적인 데이터만 들어올 경우") {
                     then("정상적으로 저장되어야 한다.") {
-                        foodSpotsService.createReport(TEST_USER_ID, createTestReportRequest(), null)
-                    }
-                }
-
-                `when`("사용자가 존재하지 않는 경우") {
-                    every { userRepository.findById(TEST_USER_ID) } returns Optional.empty()
-                    then("UserNotFoundException이 발생한다.") {
-                        shouldThrow<UserNotFoundException> {
-                            foodSpotsService.createReport(TEST_USER_ID, createTestReportRequest(), createMockPhotoList(ImageFormat.WEBP))
-                        }
+                        foodSpotsService.createReport(createTestUser(), createTestReportRequest(), null)
                     }
                 }
 
@@ -119,7 +110,7 @@ class FoodSpotsServiceTest :
                     every { foodCategoryRepository.findFoodCategoryByIdIn(any()) } returns emptyList()
                     then("CategoriesNotFoundException이 발생한다.") {
                         shouldThrow<CategoriesNotFoundException> {
-                            foodSpotsService.createReport(TEST_USER_ID, createTestReportRequest(), createMockPhotoList(ImageFormat.WEBP))
+                            foodSpotsService.createReport(createTestUser(), createTestReportRequest(), createMockPhotoList(ImageFormat.WEBP))
                         }
                     }
                 }

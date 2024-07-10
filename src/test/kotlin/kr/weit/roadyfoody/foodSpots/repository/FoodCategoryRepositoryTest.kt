@@ -24,20 +24,14 @@ class FoodCategoryRepositoryTest(
         }
 
         describe("getCategories 메소드는") {
-            context("존재하는 id 한 개 를 받는 경우") {
+            context("존재하는 id를 받는 경우") {
                 it("해당 id에 해당되는 카테고리들을 반환") {
                     val categories = foodCategoryRepository.getFoodCategories(setOf(givenCategories[0].id, givenCategories[1].id))
                     categories shouldBe listOf(givenCategories[0], givenCategories[1])
                 }
             }
 
-            context("존재하는 id와 존재하지 않는 id가 섞여있는 경우") {
-                it("존재하는 카테고리들을 반환") {
-                    val categories = foodCategoryRepository.getFoodCategories(setOf(givenCategories[0].id, TEST_INVALID_FOOD_CATEGORY_ID))
-                    categories shouldBe listOf(givenCategories[0])
-                }
-            }
-            context("존재하지 않는 id를 받는 경우") {
+            context("존재하지 않는 카테고리 id가 1개라도 있는 경우") {
                 it("CategoriesNotFoundException 예외를 던진다") {
                     shouldThrow<CategoriesNotFoundException> {
                         foodCategoryRepository.getFoodCategories(

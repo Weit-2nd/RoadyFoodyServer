@@ -35,31 +35,9 @@ interface FoodSportsControllerSpec {
             ApiResponse(
                 responseCode = "201",
                 description = "리포트 성공",
-            ),
-            ApiResponse(
-                responseCode = "404",
-                description = "리포트 실패",
-                content = [
-                    Content(
-                        mediaType = MediaType.APPLICATION_JSON_VALUE,
-                        schema = Schema(implementation = ErrorResponse::class),
-                        examples = [
-                            ExampleObject(
-                                name = "Not found user",
-                                summary = "NOT_FOUND_USER",
-                                value = """
-                                {
-                                    "code": -10009,
-                                    "errorMessage": "10 ID 의 사용자는 존재하지 않습니다."
-                                }
-                            """,
-                            ),
-                        ],
-                    ),
+            )
                 ],
-            ),
-        ],
-    )
+            )
     @ApiErrorCodeExamples(
         [
             ErrorCode.INVALID_LENGTH_FOOD_SPOTS_NAME,
