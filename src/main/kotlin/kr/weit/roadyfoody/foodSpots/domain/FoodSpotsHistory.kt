@@ -51,7 +51,7 @@ class FoodSpotsHistory(
     @OneToMany(mappedBy = "foodSpotsHistory")
     val operationHoursList: List<ReportOperationHours>,
     @OneToMany(mappedBy = "foodSpotsHistory")
-    val foodCategoriesList: List<ReportFoodCategory>,
+    val foodCategoryList: List<ReportFoodCategory>,
 ) : BaseTimeEntity() {
     constructor() : this(
         foodSpots = FoodSpots(),
@@ -62,6 +62,6 @@ class FoodSpotsHistory(
         storeClosure = false,
         point = createCoordinate(0.0, 0.0),
         operationHoursList = emptyList(),
-        foodCategoriesList = emptyList(),
+        foodCategoryList = emptyList(),
     )
 }
