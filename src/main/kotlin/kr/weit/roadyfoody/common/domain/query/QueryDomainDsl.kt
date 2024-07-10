@@ -17,9 +17,7 @@ class SearchDsl : Jpql() {
         override fun newInstance(): SearchDsl = SearchDsl()
     }
 
-    fun Entity<FoodSpots>.foodSpotIdIn(ids: List<Long>): Predicate {
-        return path(FoodSpots::id).`in`(ids)
-    }
+    fun Entity<FoodSpots>.foodSpotIdIn(ids: List<Long>): Predicate = path(FoodSpots::id).`in`(ids)
 
     fun withinDistance(
         radius: Int,
@@ -64,7 +62,17 @@ class SearchDsl : Jpql() {
         )
     }
 
-    fun Entity<FoodSpotsFoodCategory>.foodCategoryIn(values: List<Long>): Predicate {
-        return path(FoodSpotsFoodCategory::foodCategory)(FoodCategory::id).`in`(values)
-    }
+    fun containsName(name: String): Expression<Int> =
+        Expressions
+            .customExpression(
+                Int::class,
+                "myContains({0}, {1})",
+                listOf(
+                    path(FoodSpots::name),
+                    Expressions.stringLiteral("%$name%"),
+                ),
+            )
+
+    fun Entity<FoodSpotsFoodCategory>.foodCategoryIn(values: List<Long>): Predicate =
+        path(FoodSpotsFoodCategory::foodCategory)(FoodCategory::id).`in`(values)
 }

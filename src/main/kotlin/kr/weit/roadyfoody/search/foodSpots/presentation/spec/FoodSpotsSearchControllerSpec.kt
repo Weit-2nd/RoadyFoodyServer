@@ -19,7 +19,7 @@ interface FoodSpotsSearchControllerSpec {
             Parameter(name = "centerLongitude", description = "지도 중심 경도", required = true, example = "127.074667"),
             Parameter(name = "centerLatitude", description = "지도 중심 위도", required = true, example = "37.147030"),
             Parameter(name = "radius", description = "검색 반경", required = true, example = "500"),
-            Parameter(name = "name", description = "가게 이름 - 현재 작동 안합니다.", required = false, example = "pot2"),
+            Parameter(name = "name", description = "가게 이름.", required = false, example = "pot2"),
             Parameter(name = "categoryIds", description = "음식 카테고리 ID 리스트", required = false, example = "[1,2]"),
         ],
     )
