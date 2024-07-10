@@ -41,7 +41,7 @@ class FoodSpots(
     @OneToMany(mappedBy = "foodSpots")
     val operationHoursList: MutableList<FoodSpotsOperationHours>,
     @OneToMany(mappedBy = "foodSpots")
-    val foodCategoriesList: MutableList<FoodSpotsFoodCategory>,
+    val foodCategoryList: MutableList<FoodSpotsFoodCategory>,
 ) : BaseModifiableEntity() {
     init {
         require(FOOD_SPOTS_NAME_REGEX.matches(name)) { FOOD_SPOTS_NAME_REGEX_DESC }
@@ -59,6 +59,6 @@ class FoodSpots(
         storeClosure = false,
         point = createCoordinate(0.0, 0.0),
         operationHoursList = mutableListOf(),
-        foodCategoriesList = mutableListOf(),
+        foodCategoryList = mutableListOf(),
     )
 }

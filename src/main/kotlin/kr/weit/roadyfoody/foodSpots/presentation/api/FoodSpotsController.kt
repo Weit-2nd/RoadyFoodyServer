@@ -40,7 +40,7 @@ class FoodSpotsController(
         @WebPImageList
         @RequestPart(required = false)
         reportPhotos: List<MultipartFile>?,
-    ) = foodSpotsService.createReport(user.id, reportRequest, reportPhotos)
+    ) = foodSpotsService.createReport(user, reportRequest, reportPhotos)
 
     @GetMapping("/histories/{userId}")
     override fun getReportHistories(
