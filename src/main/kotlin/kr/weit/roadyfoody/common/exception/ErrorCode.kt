@@ -42,7 +42,6 @@ enum class ErrorCode(
     RETRIES_EXCEEDED_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, -11001, "외부 API 호출 재시도 횟수 초과"),
     SEARCH_KEYWORD_LENGTH(HttpStatus.BAD_REQUEST, -10000, "검색어는 1자 이상 60자 이하로 입력해주세요."),
     RADIUS_SIZE_TOO_SMALL(HttpStatus.BAD_REQUEST, -10000, "검색 반경은 500m 이상 4000m 이하로 입력해주세요."),
-    SEARCH_KEYWORD_LENGTH(HttpStatus.BAD_REQUEST, -10000, "검색어는 2자 이상 60자 이하로 입력해주세요."),
 
     // Auth API error 12000대
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, -12000, "유효하지 않은 토큰입니다."),
@@ -54,5 +53,4 @@ enum class ErrorCode(
     INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, -10000, "유효하지 않은 RefreshToken 입니다."),
     UNAUTHENTICATED_ACCESS(HttpStatus.UNAUTHORIZED, -12004, "인증정보가 없습니다."),
     AUTHENTICATED_USER_NOT_FOUND(HttpStatus.UNAUTHORIZED, -12005, "인증된 사용자를 찾을 수 없습니다."),
-
 }
