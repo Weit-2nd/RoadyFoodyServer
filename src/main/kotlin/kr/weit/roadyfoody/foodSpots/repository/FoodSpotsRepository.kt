@@ -56,13 +56,13 @@ class CustomFoodSpotsRepositoryImpl(
                             name.isNullOrBlank() -> null
                             else ->
                                 customExpression(
-                                    Boolean::class,
+                                    Int::class,
                                     "myContains({0}, {1})",
                                     listOf(
                                         path(FoodSpots::name),
                                         Expressions.stringLiteral("%$name%"),
                                     ),
-                                ).eq(true)
+                                ).greaterThan(0)
                         },
                     ).orderBy(getDistance(centerLongitude, centerLatitude).asc())
             }

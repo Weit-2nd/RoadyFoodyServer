@@ -9,7 +9,7 @@ class CustomFunctionContributor : FunctionContributor {
     override fun contributeFunctions(functionContributions: FunctionContributions) {
         functionContributions.functionRegistry.register(
             "myContains",
-            StandardSQLFunction("contains", StandardBasicTypes.BOOLEAN),
+            StandardSQLFunction("contains", StandardBasicTypes.INTEGER),
         )
     }
 }

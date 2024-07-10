@@ -20,7 +20,7 @@ class FoodSpotsSearchServiceTest :
         afterEach { clearAllMocks() }
 
         given("searchFoodSpots 테스트") {
-            val query: FoodSpotsSearchCondition =
+            val query =
                 FoodSpotsSearchCondition(
                     centerLongitude = 0.0,
                     centerLatitude = 0.0,
