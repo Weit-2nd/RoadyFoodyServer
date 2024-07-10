@@ -22,4 +22,8 @@ class ImageService(
         val extension = MimeUtils.getFileExtension(file)
         return "${UUID.randomUUID()}$extension"
     }
+
+    fun remove(name: String) {
+        storageService.delete(name)
+    }
 }

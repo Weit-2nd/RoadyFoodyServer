@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Positive
 import jakarta.validation.constraints.Size
+import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.ErrorResponse
@@ -19,9 +20,9 @@ import kr.weit.roadyfoody.foodSpots.utils.SliceReportHistories
 import kr.weit.roadyfoody.foodSpots.validator.WebPImageList
 import kr.weit.roadyfoody.global.swagger.ApiErrorCodeExamples
 import kr.weit.roadyfoody.global.swagger.v1.SwaggerTag
+import kr.weit.roadyfoody.user.domain.User
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.multipart.MultipartFile
@@ -45,14 +46,17 @@ interface FoodSportsControllerSpec {
             ErrorCode.LATITUDE_TOO_LOW,
             ErrorCode.LONGITUDE_TOO_HIGH,
             ErrorCode.LONGITUDE_TOO_LOW,
+            ErrorCode.NO_CATEGORY_SELECTED,
+            ErrorCode.INVALID_FORMAT_OPERATION_HOURS,
             ErrorCode.IMAGES_TOO_MANY,
             ErrorCode.INVALID_IMAGE_TYPE,
             ErrorCode.IMAGES_SIZE_TOO_LARGE,
+            ErrorCode.NOT_FOUND_FOOD_CATEGORY,
         ],
     )
     fun createReport(
-        @RequestHeader
-        userId: Long,
+        @LoginUser
+        user: User,
         @Valid
         @RequestPart
         reportRequest: ReportRequest,

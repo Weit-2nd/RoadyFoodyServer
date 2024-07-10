@@ -1,7 +1,6 @@
 package kr.weit.roadyfoody.auth.security
 
-import kr.weit.roadyfoody.common.exception.BaseException
-import kr.weit.roadyfoody.common.exception.ErrorCode
+import kr.weit.roadyfoody.auth.exception.AuthenticatedUserNotFoundException
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.core.MethodParameter
 import org.springframework.security.core.context.SecurityContextHolder
@@ -26,6 +25,3 @@ class LoginUserResolver : HandlerMethodArgumentResolver {
         return (authentication as? SecurityUser)?.user ?: throw AuthenticatedUserNotFoundException()
     }
 }
-
-class AuthenticatedUserNotFoundException(message: String = "인증된 사용자를 찾을 수 없습니다.") :
-    BaseException(ErrorCode.UNAUTHORIZED, message)

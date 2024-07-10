@@ -12,12 +12,23 @@ import jakarta.validation.Valid
 import kr.weit.roadyfoody.auth.application.dto.DuplicatedNicknameResponse
 import kr.weit.roadyfoody.auth.application.dto.ServiceTokensResponse
 import kr.weit.roadyfoody.auth.application.dto.SignUpRequest
+import kr.weit.roadyfoody.common.exception.ErrorCode.AUTHENTICATED_USER_NOT_FOUND
+import kr.weit.roadyfoody.common.exception.ErrorCode.INVALID_NICKNAME
+import kr.weit.roadyfoody.common.exception.ErrorCode.INVALID_REFRESH_TOKEN
+import kr.weit.roadyfoody.common.exception.ErrorCode.INVALID_TOKEN
+import kr.weit.roadyfoody.common.exception.ErrorCode.INVALID_WEBP_IMAGE
+import kr.weit.roadyfoody.common.exception.ErrorCode.MAX_FILE_SIZE_EXCEEDED
+import kr.weit.roadyfoody.common.exception.ErrorCode.MISSING_REFRESH_TOKEN
+import kr.weit.roadyfoody.common.exception.ErrorCode.MISSING_SOCIAL_ACCESS_TOKEN
+import kr.weit.roadyfoody.common.exception.ErrorCode.UNAUTHENTICATED_ACCESS
+import kr.weit.roadyfoody.common.exception.ErrorCode.USER_ALREADY_EXISTS
+import kr.weit.roadyfoody.common.exception.ErrorCode.USER_NOT_REGISTERED
 import kr.weit.roadyfoody.common.exception.ErrorResponse
+import kr.weit.roadyfoody.global.swagger.ApiErrorCodeExamples
 import kr.weit.roadyfoody.global.swagger.v1.SwaggerTag
 import kr.weit.roadyfoody.global.validator.MaxFileSize
 import kr.weit.roadyfoody.global.validator.WebPImage
 import kr.weit.roadyfoody.user.domain.User
-import kr.weit.roadyfoody.user.utils.NICKNAME_REGEX_DESC
 import kr.weit.roadyfoody.useragreedterm.exception.ERROR_MSG_PREFIX
 import kr.weit.roadyfoody.useragreedterm.exception.ERROR_MSG_SUFFIX
 import org.springframework.http.MediaType
@@ -35,78 +46,18 @@ interface AuthControllerSpec {
             ),
             ApiResponse(
                 responseCode = "400",
-                description = "회원가입 실패",
                 content = [
                     Content(
                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                         schema = Schema(implementation = ErrorResponse::class),
                         examples = [
                             ExampleObject(
-                                name = "Invalid Image Input",
-                                summary = "WEBP 이외의 이미지 입력",
+                                name = "Not Enough Required Term IDs",
+                                summary = "NOT_ENOUGH_REQUIRED_TERM_IDS",
                                 value = """
                         {
                             "code": -10000,
-                            "errorMessage": "profileImage: webp 형식이 아닙니다."
-                        }
-                        """,
-                            ),
-                            ExampleObject(
-                                name = "Max Size Exceeded",
-                                summary = "최대 사진 크기 초과",
-                                value = """
-                        {
-                            "code": -10000,
-                            "errorMessage": "파일 사이즈가 초과하였습니다."
-                        }
-                        """,
-                            ),
-                            ExampleObject(
-                                name = "Invalid Nickname Input",
-                                summary = "미충족 닉네임 입력",
-                                value = """
-                        {
-                            "code": -10000,
-                            "errorMessage": "$NICKNAME_REGEX_DESC"
-                        }
-                        """,
-                            ),
-                            ExampleObject(
-                                name = "Not Enough Required TermIds",
-                                summary = "필수약관 미동의",
-                                value = """
-                        {
-                            "code": -10000,
-                            "errorMessage": "$ERROR_MSG_PREFIX $ERROR_MSG_SUFFIX"
-                        }
-                        """,
-                            ),
-                        ],
-                    ),
-                ],
-            ), ApiResponse(
-                responseCode = "401",
-                description = "유효하지 않은 토큰으로 요청",
-                content = [
-                    Content(
-                        mediaType = MediaType.APPLICATION_JSON_VALUE,
-                        schema = Schema(implementation = ErrorResponse::class),
-                        examples = [
-                            ExampleObject(
-                                name = "Missing Social Access Token",
-                                summary = "SocialAccessToken 미입력",
-                                value = """
-                        {
-                            "code": -10001,
-                            "errorMessage": "SocialAccessToken 이 존재하지 않습니다."
-                        }
-                        """,
-                            ),
-                            ExampleObject(
-                                value = """
-                        {
-                            "code": -10001,
-                            "errorMessage": "유효하지 않은 토큰입니다."
+                            "errorMessage": "$ERROR_MSG_PREFIX 1, 2 $ERROR_MSG_SUFFIX"
                         }
                         """,
                             ),
@@ -114,26 +65,16 @@ interface AuthControllerSpec {
                     ),
                 ],
             ),
-            ApiResponse(
-                responseCode = "409",
-                description = "중복된 회원가입 요청",
-                content = [
-                    Content(
-                        mediaType = MediaType.APPLICATION_JSON_VALUE,
-                        schema = Schema(implementation = ErrorResponse::class),
-                        examples = [
-                            ExampleObject(
-                                value = """
-                        {
-                            "code": -10005,
-                            "errorMessage": "이미 존재하는 유저입니다."
-                        }
-                        """,
-                            ),
-                        ],
-                    ),
-                ],
-            ),
+        ],
+    )
+    @ApiErrorCodeExamples(
+        [
+            INVALID_WEBP_IMAGE,
+            MAX_FILE_SIZE_EXCEEDED,
+            INVALID_NICKNAME,
+            MISSING_SOCIAL_ACCESS_TOKEN,
+            INVALID_TOKEN,
+            USER_ALREADY_EXISTS,
         ],
     )
     fun signUp(
@@ -161,21 +102,6 @@ interface AuthControllerSpec {
             ApiResponse(
                 responseCode = "200",
                 description = "요청 성공",
-                content = [
-                    Content(
-                        mediaType = MediaType.APPLICATION_JSON_VALUE,
-                        schema = Schema(implementation = DuplicatedNicknameResponse::class),
-                        examples = [
-                            ExampleObject(
-                                value = """
-                        {
-                            "isDuplicated": true
-                        }
-                        """,
-                            ),
-                        ],
-                    ),
-                ],
             ),
         ],
     )
@@ -189,60 +115,13 @@ interface AuthControllerSpec {
                 responseCode = "200",
                 description = "로그인 성공",
             ),
-            ApiResponse(
-                responseCode = "401",
-                description = "유효하지 않은 토큰으로 요청",
-                content = [
-                    Content(
-                        mediaType = MediaType.APPLICATION_JSON_VALUE,
-                        schema = Schema(implementation = ErrorResponse::class),
-                        examples = [
-                            ExampleObject(
-                                name = "Missing Social Access Token",
-                                summary = "SocialAccessToken 미입력",
-                                value = """
-                        {
-                            "code": -10001,
-                            "errorMessage": "SocialAccessToken 이 존재하지 않습니다."
-                        }
-                        """,
-                            ),
-                            ExampleObject(
-                                name = "Invalid Social Access Token",
-                                summary = "유효하지 않는 SocialAccessToken",
-                                value = """
-                        {
-                            "code": -10001,
-                            "errorMessage": "유효하지 않은 토큰입니다."
-                        }
-                        """,
-                            ),
-                        ],
-                    ),
-                ],
-            ),
-            ApiResponse(
-                responseCode = "404",
-                description = "유저 정보 없음",
-                content = [
-                    Content(
-                        mediaType = MediaType.APPLICATION_JSON_VALUE,
-                        schema = Schema(implementation = ErrorResponse::class),
-                        examples = [
-                            ExampleObject(
-                                name = "Not Registered User",
-                                summary = "미가입 유저",
-                                value = """
-                        {
-                            "code": -10009,
-                            "errorMessage": "회원가입을 하지 않은 사용자입니다."
-                        }
-                        """,
-                            ),
-                        ],
-                    ),
-                ],
-            ),
+        ],
+    )
+    @ApiErrorCodeExamples(
+        [
+            MISSING_SOCIAL_ACCESS_TOKEN,
+            INVALID_TOKEN,
+            USER_NOT_REGISTERED,
         ],
     )
     fun signIn(
@@ -258,38 +137,12 @@ interface AuthControllerSpec {
                 responseCode = "200",
                 description = "요청 성공",
             ),
-            ApiResponse(
-                responseCode = "400",
-                description = "요청 실패",
-                content = [
-                    Content(
-                        mediaType = MediaType.APPLICATION_JSON_VALUE,
-                        schema = Schema(implementation = ErrorResponse::class),
-                        examples = [
-                            ExampleObject(
-                                name = "Missing Refresh Token",
-                                summary = "RefreshToken 미입력",
-                                value = """
-                        {
-                            "code": -10000,
-                            "errorMessage": "RefreshToken 이 존재하지 않습니다."
-                        }
-                        """,
-                            ),
-                            ExampleObject(
-                                name = "Invalid Refresh Token",
-                                summary = "유효하지 않은 RefreshToken",
-                                value = """
-                        {
-                            "code": -10000,
-                            "errorMessage": "RefreshToken 이 유효하지 않습니다."
-                        }
-                        """,
-                            ),
-                        ],
-                    ),
-                ],
-            ),
+        ],
+    )
+    @ApiErrorCodeExamples(
+        [
+            MISSING_REFRESH_TOKEN,
+            INVALID_REFRESH_TOKEN,
         ],
     )
     fun refresh(
@@ -310,42 +163,31 @@ interface AuthControllerSpec {
                 responseCode = "204",
                 description = "로그아웃 성공",
             ),
+        ],
+    )
+    @ApiErrorCodeExamples(
+        [
+            UNAUTHENTICATED_ACCESS,
+            AUTHENTICATED_USER_NOT_FOUND,
+        ],
+    )
+    fun signOut(user: User)
+
+    @Operation(
+        summary = "회원탈퇴 API",
+        description = "Authorization 헤더에 AccessToken(Bearer)을 넣어 회원탈퇴를 진행합니다.",
+        responses = [
             ApiResponse(
-                responseCode = "401",
-                description = "유효하지 않은 토큰으로 요청",
-                content = [
-                    Content(
-                        mediaType = MediaType.APPLICATION_JSON_VALUE,
-                        schema = Schema(implementation = ErrorResponse::class),
-                        examples = [
-                            ExampleObject(
-                                name = "Unauthenticated Access",
-                                summary = "인증되지 않은 접근",
-                                value = """
-                        {
-                            "code": -10001,
-                            "errorMessage": "인증정보가 없습니다."
-                        }
-                        """,
-                            ),
-                            ExampleObject(
-                                name = "Authenticated User Not Found",
-                                summary = "존재하지 않는 사용자",
-                                value = """
-                        {
-                            "code": -10001,
-                            "errorMessage": "인증된 사용자를 찾을 수 없습니다."
-                        }
-                        """,
-                            ),
-                        ],
-                    ),
-                ],
+                responseCode = "204",
+                description = "회원탈퇴 성공",
             ),
         ],
     )
-    fun signOut(
-        @Parameter(hidden = true)
-        user: User,
+    @ApiErrorCodeExamples(
+        [
+            UNAUTHENTICATED_ACCESS,
+            AUTHENTICATED_USER_NOT_FOUND,
+        ],
     )
+    fun withdraw(user: User)
 }
