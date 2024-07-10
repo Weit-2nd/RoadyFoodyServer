@@ -2,7 +2,11 @@ package kr.weit.roadyfoody.common.exception
 
 import org.springframework.http.HttpStatus
 
-enum class ErrorCode(val httpStatus: HttpStatus, val code: Int, val errorMessage: String) {
+enum class ErrorCode(
+    val httpStatus: HttpStatus,
+    val code: Int,
+    val errorMessage: String,
+) {
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, -10000, "Invalid request"),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, -10001, "Unauthorized"),
     FORBIDDEN(HttpStatus.FORBIDDEN, -10002, "Forbidden"),
@@ -24,6 +28,6 @@ enum class ErrorCode(val httpStatus: HttpStatus, val code: Int, val errorMessage
     // Search API error 11000대
     REST_CLIENT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, -11000, "외부 API 호출 중 에러 발생"),
     RETRIES_EXCEEDED_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, -11001, "외부 API 호출 재시도 횟수 초과"),
-    SEARCH_KEYWORD_LENGTH(HttpStatus.BAD_REQUEST, -10000, "검색어는 2자 이상 60자 이하로 입력해주세요."),
+    SEARCH_KEYWORD_LENGTH(HttpStatus.BAD_REQUEST, -10000, "검색어는 1자 이상 60자 이하로 입력해주세요."),
     RADIUS_SIZE_TOO_SMALL(HttpStatus.BAD_REQUEST, -10000, "검색 반경은 500m 이상 4000m 이하로 입력해주세요."),
 }
