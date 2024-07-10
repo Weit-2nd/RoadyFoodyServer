@@ -27,7 +27,8 @@ class TourismControllerTest(
             `when`("키워드로 관광지 검색 요청을 보내면") {
                 every { tourismService.searchTourism(2, "강원") } returns createSearchResponses()
                 then("200 상태 번호와 SearchResponses 반환한다.") {
-                    mockMvc.perform(get("$requestPath/search?numOfRows=2&keyword=강원"))
+                    mockMvc
+                        .perform(get("$requestPath/search?numOfRows=2&keyword=강원"))
                         .andExpect(status().isOk)
                         .andExpect(
                             content().json(
@@ -39,12 +40,12 @@ class TourismControllerTest(
                     verify(exactly = 1) { tourismService.searchTourism(2, "강원") }
                 }
             }
-            `when`("keyword 길이가 2자 미만인 경우") {
+            `when`("keyword 길이가 1자 미만인 경우") {
                 then("400을 반환") {
                     mockMvc
                         .perform(
                             get("$requestPath/search")
-                                .param("keyword", "a")
+                                .param("keyword", "")
                                 .param("numOfRows", "2"),
                         ).andExpect(status().isBadRequest)
                 }
