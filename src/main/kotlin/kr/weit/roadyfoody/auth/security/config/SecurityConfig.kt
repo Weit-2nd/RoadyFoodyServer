@@ -54,4 +54,8 @@ val PERMITTED_URL_PATTERNS =
         "/api/v1/food-spots/**",
     )
 
-val NOT_PERMITTED_URL_PATTERNS = arrayOf("/api/v1/auth/sign-out")
+val NOT_PERMITTED_URL_PATTERNS =
+    arrayOf(
+        "/api/v1/auth/sign-out",
+        "/api/v1/auth/withdraw",
+    )

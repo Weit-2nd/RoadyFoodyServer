@@ -282,4 +282,26 @@ class AuthControllerTest(
                 }
             }
         }
+
+        given("POST $requestPath/withdraw") {
+            `when`("로그인 사용자 정보를 전달하면") {
+                every { authCommandService.leave(any()) } just runs
+                then("탈퇴에 성공하고 204 상태번호를 반환한다") {
+                    mockMvc.perform(
+                        postWithAuth("$requestPath/withdraw"),
+                    ).andExpect(status().isNoContent)
+                    verify(exactly = 1) { authCommandService.leave(any()) }
+                }
+            }
+
+            `when`("로그인 사용자 정보가 없으면") {
+                every { authCommandService.leave(any()) } just runs
+                then("401 상태번호를 반환한다") {
+                    mockMvc.perform(
+                        post("$requestPath/withdraw"),
+                    ).andExpect(status().isUnauthorized)
+                    verify(exactly = 0) { authCommandService.leave(any()) }
+                }
+            }
+        }
     })

@@ -10,6 +10,7 @@ import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.spyk
 import io.mockk.verify
+import kr.weit.roadyfoody.auth.exception.InvalidRefreshTokenException
 import kr.weit.roadyfoody.auth.exception.UserAlreadyExistsException
 import kr.weit.roadyfoody.auth.exception.UserNotRegisteredException
 import kr.weit.roadyfoody.auth.fixture.TEST_ACCESS_TOKEN
@@ -29,6 +30,7 @@ import kr.weit.roadyfoody.user.fixture.TEST_USER_ID
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import kr.weit.roadyfoody.user.repository.UserRepository
 import kr.weit.roadyfoody.useragreedterm.application.service.UserAgreedTermCommandService
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.web.multipart.MultipartFile
 import java.util.Optional
 import javax.crypto.SecretKey
@@ -40,8 +42,17 @@ class AuthCommandServiceTest : BehaviorSpec({
     val userRepository = mockk<UserRepository>()
     val imageService = spyk<ImageService>(ImageService(mockk()))
     val jwtUtil = mockk<JwtUtil>()
+    val applicationEventPublisher = mockk<ApplicationEventPublisher>()
     val authCommandService =
-        AuthCommandService(authQueryService, termCommandService, userAgreedTermCommandService, userRepository, imageService, jwtUtil)
+        AuthCommandService(
+            authQueryService,
+            termCommandService,
+            userAgreedTermCommandService,
+            userRepository,
+            imageService,
+            jwtUtil,
+            applicationEventPublisher,
+        )
 
     afterEach { clearAllMocks() }
 
@@ -251,8 +262,8 @@ class AuthCommandServiceTest : BehaviorSpec({
 
         `when`("유효하지 않은 refreshToken 이면") {
             every { jwtUtil.validateToken(any<SecretKey>(), any<String>()) } returns false
-            then("IllegalArgumentException 예외가 발생한다.") {
-                shouldThrow<IllegalArgumentException> {
+            then("InvalidRefreshTokenException 예외가 발생한다.") {
+                shouldThrow<InvalidRefreshTokenException> {
                     authCommandService.reissueTokens(TEST_BEARER_ACCESS_TOKEN)
                 }
                 verify(exactly = 1) {
@@ -265,8 +276,8 @@ class AuthCommandServiceTest : BehaviorSpec({
         `when`("일치하지 않은 refreshTokenRotateId 이면") {
             every { jwtUtil.validateToken(any<SecretKey>(), any<String>()) } returns true
             every { jwtUtil.validateCachedRefreshTokenRotateId(any<String>()) } returns false
-            then("IllegalArgumentException 예외가 발생한다.") {
-                shouldThrow<IllegalArgumentException> {
+            then("InvalidRefreshTokenException 예외가 발생한다.") {
+                shouldThrow<InvalidRefreshTokenException> {
                     authCommandService.reissueTokens(TEST_REFRESH_TOKEN)
                 }
                 verify(exactly = 1) {
