@@ -11,12 +11,14 @@ import io.swagger.v3.oas.models.responses.ApiResponse
 import io.swagger.v3.oas.models.responses.ApiResponses
 import io.swagger.v3.oas.models.security.SecurityRequirement
 import io.swagger.v3.oas.models.security.SecurityScheme
+import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.ErrorResponse
 import kr.weit.roadyfoody.global.swagger.ApiErrorCodeExample
 import kr.weit.roadyfoody.global.swagger.ApiErrorCodeExamples
 import kr.weit.roadyfoody.global.swagger.ExampleHolder
 import org.springdoc.core.customizers.OperationCustomizer
+import org.springdoc.core.utils.SpringDocUtils
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders.AUTHORIZATION
@@ -24,6 +26,10 @@ import org.springframework.web.method.HandlerMethod
 
 @Configuration
 class ApiDocsConfig {
+    init {
+        SpringDocUtils.getConfig().addAnnotationsToIgnore(LoginUser::class.java)
+    }
+
     @Bean
     fun openAPI(): OpenAPI {
         return OpenAPI()
@@ -69,8 +75,6 @@ class ApiDocsConfig {
             apiErrorCodeExample?.run {
                 generateErrorCodeResponseExample(operation, apiErrorCodeExample.value)
             }
-
-            hideParameterByType(operation, "User")
 
             operation
         }
@@ -147,15 +151,5 @@ class ApiDocsConfig {
         content.addMediaType("application/json", mediaType)
         apiResponse.content = content
         responses.addApiResponse(exampleHolder.code.toString(), apiResponse)
-    }
-
-    private fun hideParameterByType(
-        operation: Operation,
-        parameterType: String,
-    ) {
-        operation.parameters =
-            operation.parameters?.filterNot { parameter ->
-                parameter.schema?.`$ref`?.endsWith("/$parameterType") == true
-            }
     }
 }
