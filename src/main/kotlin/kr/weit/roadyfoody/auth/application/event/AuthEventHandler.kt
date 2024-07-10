@@ -15,6 +15,7 @@ class AuthEventHandler(
     private val imageService: ImageService,
     private val jwtUtil: JwtUtil,
 ) {
+    // TODO : 각 도메인 개발 상황에 따라 기능을 추가해주세요.
     @EventListener(AuthLeaveEvent::class)
     fun handleAuthLeaveEvent(event: AuthLeaveEvent) {
         val user = userRepository.getByUserId(event.userId)
