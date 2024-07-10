@@ -11,6 +11,8 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
 import kr.weit.roadyfoody.common.domain.BaseModifiableEntity
+import kr.weit.roadyfoody.foodSpots.utils.OPERATION_HOURS_REGEX
+import kr.weit.roadyfoody.foodSpots.utils.OPERATION_HOURS_REGEX_DESC
 
 @Entity
 @Table(
@@ -33,7 +35,12 @@ class FoodSpotsOperationHours(
     @Column(nullable = false, length = 1)
     val dayOfWeek: DayOfWeek,
     @Column(nullable = false, length = 5)
-    val openingHours: String,
+    var openingHours: String,
     @Column(nullable = false, length = 5)
-    val closingHours: String,
-) : BaseModifiableEntity()
+    var closingHours: String,
+) : BaseModifiableEntity() {
+    init {
+        require(OPERATION_HOURS_REGEX.matches(openingHours)) { OPERATION_HOURS_REGEX_DESC }
+        require(OPERATION_HOURS_REGEX.matches(closingHours)) { OPERATION_HOURS_REGEX_DESC }
+    }
+}

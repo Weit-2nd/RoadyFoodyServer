@@ -11,12 +11,14 @@ import io.swagger.v3.oas.models.responses.ApiResponse
 import io.swagger.v3.oas.models.responses.ApiResponses
 import io.swagger.v3.oas.models.security.SecurityRequirement
 import io.swagger.v3.oas.models.security.SecurityScheme
+import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.ErrorResponse
 import kr.weit.roadyfoody.global.swagger.ApiErrorCodeExample
 import kr.weit.roadyfoody.global.swagger.ApiErrorCodeExamples
 import kr.weit.roadyfoody.global.swagger.ExampleHolder
 import org.springdoc.core.customizers.OperationCustomizer
+import org.springdoc.core.utils.SpringDocUtils
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders.AUTHORIZATION
@@ -24,6 +26,10 @@ import org.springframework.web.method.HandlerMethod
 
 @Configuration
 class ApiDocsConfig {
+    init {
+        SpringDocUtils.getConfig().addAnnotationsToIgnore(LoginUser::class.java)
+    }
+
     @Bean
     fun openAPI(): OpenAPI {
         return OpenAPI()
@@ -120,9 +126,9 @@ class ApiDocsConfig {
         statusWithExampleHolders: Map<Int, List<ExampleHolder>>,
     ) {
         statusWithExampleHolders.forEach { (status, v) ->
-            val content = Content()
-            val mediaType = MediaType()
-            val apiResponse = ApiResponse()
+            val apiResponse = responses.getOrDefault(status.toString(), ApiResponse())
+            val content = apiResponse.content ?: Content()
+            val mediaType = content.getOrDefault("application/json", MediaType())
 
             v.forEach { exampleHolder ->
                 mediaType.addExamples(exampleHolder.name, exampleHolder.holder)
@@ -137,9 +143,9 @@ class ApiDocsConfig {
         responses: ApiResponses,
         exampleHolder: ExampleHolder,
     ) {
-        val content = Content()
-        val mediaType = MediaType()
-        val apiResponse = ApiResponse()
+        val apiResponse = responses.getOrDefault(exampleHolder.code.toString(), ApiResponse())
+        val content = apiResponse.content ?: Content()
+        val mediaType = content.getOrDefault("application/json", MediaType())
 
         mediaType.addExamples(exampleHolder.name, exampleHolder.holder)
         content.addMediaType("application/json", mediaType)
