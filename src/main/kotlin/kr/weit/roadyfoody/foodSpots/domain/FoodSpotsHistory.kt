@@ -9,6 +9,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.Index
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
+import jakarta.persistence.OneToMany
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
 import kr.weit.roadyfoody.common.domain.BaseTimeEntity
@@ -46,4 +47,8 @@ class FoodSpotsHistory(
     val storeClosure: Boolean,
     @Column(columnDefinition = "SDO_GEOMETRY", nullable = false, updatable = false)
     val point: Point,
+    @OneToMany(mappedBy = "foodSpotsHistory")
+    val operationHoursList: List<ReportOperationHours>,
+    @OneToMany(mappedBy = "foodSpotsHistory")
+    val foodCategoriesList: List<ReportFoodCategory>,
 ) : BaseTimeEntity()
