@@ -5,7 +5,10 @@ import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots.Companion.SRID_WGS84
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
+import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsOperationHours
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
+import kr.weit.roadyfoody.foodSpots.domain.ReportFoodCategory
+import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHours
 import kr.weit.roadyfoody.foodSpots.dto.ReportHistoriesResponse
 import kr.weit.roadyfoody.foodSpots.dto.ReportPhotoResponse
 import kr.weit.roadyfoody.foodSpots.dto.ReportRequest
@@ -67,8 +70,9 @@ fun createTestFoodSpots(
     open: Boolean = TEST_FOOD_SPOT_OPEN,
     storeClosure: Boolean = TEST_FOOD_SPOT_STORE_CLOSURE,
     point: Point = TEST_FOOD_SPOT_POINT,
-    foodCategories: MutableList<FoodSpotsFoodCategory> = mutableListOf(),
-) = FoodSpots(id, name, foodTruck, open, storeClosure, point)
+    operationHours: MutableList<FoodSpotsOperationHours> = mutableListOf(),
+    category: MutableList<FoodSpotsFoodCategory> = mutableListOf(),
+) = FoodSpots(id, name, foodTruck, open, storeClosure, point, operationHours, category)
 
 fun createTestFoodSpotsFoodCategory(
     id: Long = 0L,
@@ -90,7 +94,9 @@ fun createTestFoodHistory(
     open: Boolean = TEST_FOOD_SPOT_OPEN,
     storeClosure: Boolean = TEST_FOOD_SPOT_STORE_CLOSURE,
     point: Point = TEST_FOOD_SPOT_POINT,
-) = FoodSpotsHistory(id, foodSpots, user, name, foodTruck, open, storeClosure, point)
+    operationHours: MutableList<ReportOperationHours> = mutableListOf(),
+    category: MutableList<ReportFoodCategory> = mutableListOf(),
+) = FoodSpotsHistory(id, foodSpots, user, name, foodTruck, open, storeClosure, point, operationHours, category)
 
 fun createTestFoodSpotsPhoto(foodSpotsHistory: FoodSpotsHistory = createTestFoodHistory()) =
     FoodSpotsPhoto(0L, foodSpotsHistory, TEST_PHOTO_NAME)
@@ -190,7 +196,9 @@ class MockTestFoodSpot(
     open: Boolean = TEST_FOOD_SPOT_OPEN,
     closed: Boolean = TEST_FOOD_SPOT_STORE_CLOSURE,
     point: Point = TEST_FOOD_SPOT_POINT,
-) : FoodSpots(id, name, foodTruck, open, closed, point) {
+    operationHoursList: MutableList<FoodSpotsOperationHours> = mutableListOf(),
+    categoryList: MutableList<FoodSpotsFoodCategory> = mutableListOf(),
+) : FoodSpots(id, name, foodTruck, open, closed, point, operationHoursList, categoryList) {
     override var createdDateTime: LocalDateTime = LocalDateTime.now()
     override var updatedDateTime: LocalDateTime = LocalDateTime.now()
 
@@ -211,7 +219,9 @@ class MockTestFoodSpotsHistory(
     open: Boolean = TEST_FOOD_SPOT_OPEN,
     closed: Boolean = TEST_FOOD_SPOT_STORE_CLOSURE,
     point: Point = TEST_FOOD_SPOT_POINT,
-) : FoodSpotsHistory(id, foodSpots, user, name, foodTruck, open, closed, point) {
+    operationHours: MutableList<ReportOperationHours> = mutableListOf(),
+    category: MutableList<ReportFoodCategory> = mutableListOf(),
+) : FoodSpotsHistory(id, foodSpots, user, name, foodTruck, open, closed, point, operationHours, category) {
     override var createdDateTime: LocalDateTime = LocalDateTime.now()
 }
 

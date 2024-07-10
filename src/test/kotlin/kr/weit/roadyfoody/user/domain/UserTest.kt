@@ -19,11 +19,14 @@ class UserTest :
                 then("User 을 반환한다.") {
                     forAll(
                         row(TEST_MIN_LENGTH_NICKNAME),
+                        row("ㄱ".repeat(NICKNAME_MIN_LENGTH)),
+                        row("testㄱㄴㄷ"),
                         row("ABCDEF"),
                         row("123456"),
                         row("테스터테스터"),
                         row("tester1234"),
                         row("테스터테스터123456"),
+                        row("ㄱ".repeat(NICKNAME_MAX_LENGTH)),
                         row(TEST_MAX_LENGTH_NICKNAME),
                     ) {
                             nickname ->

@@ -38,9 +38,9 @@ class FoodSpots(
     @Column(columnDefinition = "SDO_GEOMETRY", nullable = false)
     var point: Point,
     @OneToMany(mappedBy = "foodSpots")
-    val foodCategories: MutableList<FoodSpotsFoodCategory> = mutableListOf(),
+    val operationHoursList: MutableList<FoodSpotsOperationHours>,
     @OneToMany(mappedBy = "foodSpots")
-    val foodSpotsOperationHours: MutableList<FoodSpotsOperationHours> = mutableListOf(),
+    val foodCategoriesList: MutableList<FoodSpotsFoodCategory>,
 ) : BaseModifiableEntity() {
     init {
         require(FOOD_SPOTS_NAME_REGEX.matches(name)) { FOOD_SPOTS_NAME_REGEX_DESC }

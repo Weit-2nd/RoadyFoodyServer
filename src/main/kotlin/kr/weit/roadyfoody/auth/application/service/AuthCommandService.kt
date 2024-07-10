@@ -30,7 +30,7 @@ class AuthCommandService(
         socialAccessToken: String,
         signUpRequest: SignUpRequest,
         profileImage: MultipartFile?,
-    ) {
+    ): ServiceTokensResponse {
         val socialId = obtainUserSocialId(signUpRequest.socialLoginType, socialAccessToken)
 
         if (userRepository.existsBySocialId(socialId) ||
@@ -49,6 +49,8 @@ class AuthCommandService(
             user.profile.changeProfileImageName(imageName)
             imageService.upload(imageName, profileImage)
         }
+
+        return makeTokens(user.id)
     }
 
     fun login(socialAccessToken: String): ServiceTokensResponse {
@@ -57,11 +59,7 @@ class AuthCommandService(
             userRepository.findBySocialId(userSocialId)
                 ?: throw UserNotRegisteredException()
 
-        val accessToken = jwtUtil.generateAccessToken(user.id)
-        val rotateId = jwtUtil.generateRotateId()
-        val refreshToken = jwtUtil.generateRefreshToken(user.id, rotateId)
-        jwtUtil.storeCachedRefreshTokenRotateId(user.id, rotateId)
-        return ServiceTokensResponse(accessToken, refreshToken)
+        return makeTokens(user.id)
     }
 
     private fun obtainUserSocialId(
@@ -78,11 +76,15 @@ class AuthCommandService(
         }
         val userId = jwtUtil.getUserId(jwtUtil.refreshKey, refreshToken)
         val user = userRepository.getByUserId(userId)
-        val newAccessToken = jwtUtil.generateAccessToken(user.id)
+        return makeTokens(user.id)
+    }
+
+    private fun makeTokens(userId: Long): ServiceTokensResponse {
+        val accessToken = jwtUtil.generateAccessToken(userId)
         val rotateId = jwtUtil.generateRotateId()
-        val newRefreshToken = jwtUtil.generateRefreshToken(user.id, rotateId)
-        jwtUtil.storeCachedRefreshTokenRotateId(user.id, rotateId)
-        return ServiceTokensResponse(newAccessToken, newRefreshToken)
+        val refreshToken = jwtUtil.generateRefreshToken(userId, rotateId)
+        jwtUtil.storeCachedRefreshTokenRotateId(userId, rotateId)
+        return ServiceTokensResponse(accessToken, refreshToken)
     }
 
     fun logout(user: User) {
