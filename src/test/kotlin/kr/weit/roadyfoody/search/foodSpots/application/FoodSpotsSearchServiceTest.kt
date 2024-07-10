@@ -8,9 +8,9 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kr.weit.roadyfoody.foodSpots.fixture.MockTestFoodSpot
-import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsForDistance
+import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodSpotList
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
-import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchQuery
+import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
 
 class FoodSpotsSearchServiceTest :
     BehaviorSpec({
@@ -20,8 +20,8 @@ class FoodSpotsSearchServiceTest :
         afterEach { clearAllMocks() }
 
         given("searchFoodSpots 테스트") {
-            val query: FoodSpotsSearchQuery =
-                FoodSpotsSearchQuery(
+            val query: FoodSpotsSearchCondition =
+                FoodSpotsSearchCondition(
                     centerLongitude = 0.0,
                     centerLatitude = 0.0,
                     radius = 1000,
@@ -37,17 +37,17 @@ class FoodSpotsSearchServiceTest :
                         null,
                         emptyList(),
                     )
-                } returns createTestFoodSpotsForDistance()
+                } returns createMockTestFoodSpotList()
                 then("거리 이내 음식점을 반환한다.") {
 
                     val foodSpotsSearchResponses = foodSpotsSearchService.searchFoodSpots(query)
-                    foodSpotsSearchResponses.items.shouldHaveSize(5)
+                    foodSpotsSearchResponses.items.shouldHaveSize(3)
                     verify(exactly = 1) { foodSpotsRepository.findFoodSpotsByPointWithinRadius(0.0, 0.0, 1000, null, emptyList()) }
                 }
             }
             `when`("정상적으로 카테고리 별 거리 이내 음식점을 반환한다.") {
                 val categoryQuery =
-                    FoodSpotsSearchQuery(
+                    FoodSpotsSearchCondition(
                         centerLongitude = 0.0,
                         centerLatitude = 0.0,
                         radius = 1000,

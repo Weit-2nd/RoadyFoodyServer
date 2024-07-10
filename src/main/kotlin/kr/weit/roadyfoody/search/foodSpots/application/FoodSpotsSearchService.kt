@@ -3,7 +3,7 @@ package kr.weit.roadyfoody.search.foodSpots.application
 import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
-import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchQuery
+import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponse
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponses
 import kr.weit.roadyfoody.search.foodSpots.dto.OperationStatus
@@ -18,8 +18,8 @@ import java.time.temporal.ChronoField
 class FoodSpotsSearchService(
     private val foodSpotsRepository: FoodSpotsRepository,
 ) {
-    @Transactional
-    fun searchFoodSpots(foodSpotsSearchQuery: FoodSpotsSearchQuery): FoodSpotsSearchResponses {
+    @Transactional(readOnly = true)
+    fun searchFoodSpots(foodSpotsSearchQuery: FoodSpotsSearchCondition): FoodSpotsSearchResponses {
         val result: List<FoodSpots> =
             foodSpotsRepository.findFoodSpotsByPointWithinRadius(
                 foodSpotsSearchQuery.centerLongitude,
@@ -55,7 +55,7 @@ class FoodSpotsSearchService(
                         }
                     }
                 } else {
-                    OperationStatus.TEMPORARILY_CLOSED
+                    openValue = OperationStatus.TEMPORARILY_CLOSED
                 }
                 FoodSpotsSearchResponse(
                     id = it.id,
@@ -64,6 +64,7 @@ class FoodSpotsSearchService(
                     latitude = it.point.y,
                     open = openValue,
                     foodCategories = it.foodCategories.map { it.foodCategory.name },
+                    createdDateTime = it.createdDateTime,
                 )
             }
 

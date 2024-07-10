@@ -176,6 +176,13 @@ fun createTestFoodSpotsForDistance(): List<FoodSpots> =
         ),
     )
 
+fun createMockTestFoodSpotList(): List<FoodSpots> =
+    listOf(
+        createMockTestFoodSpot(1L),
+        createMockTestFoodSpot(2L),
+        createMockTestFoodSpot(3L),
+    )
+
 class MockTestFoodSpot(
     id: Long = 0L,
     name: String = TEST_FOOD_SPOT_NAME,
@@ -191,9 +198,7 @@ class MockTestFoodSpot(
         fun createPoint(
             longitude: Double,
             latitude: Double,
-        ): Point {
-            return CoordinateUtils.createCoordinate(longitude, latitude)
-        }
+        ): Point = CoordinateUtils.createCoordinate(longitude, latitude)
     }
 }
 
@@ -210,8 +215,8 @@ class MockTestFoodSpotsHistory(
     override var createdDateTime: LocalDateTime = LocalDateTime.now()
 }
 
-fun createFoodSpotsSearchResponses(): FoodSpotsSearchResponses {
-    return FoodSpotsSearchResponses(
+fun createFoodSpotsSearchResponses(): FoodSpotsSearchResponses =
+    FoodSpotsSearchResponses(
         listOf(
             FoodSpotsSearchResponse(
                 id = 1L,
@@ -220,6 +225,7 @@ fun createFoodSpotsSearchResponses(): FoodSpotsSearchResponses {
                 latitude = 1.0,
                 open = OperationStatus.OPEN,
                 foodCategories = listOf("category1", "category2"),
+                createdDateTime = LocalDateTime.of(2024, 1, 1, 1, 1),
             ),
             FoodSpotsSearchResponse(
                 id = 2L,
@@ -228,7 +234,7 @@ fun createFoodSpotsSearchResponses(): FoodSpotsSearchResponses {
                 latitude = 1.0,
                 open = OperationStatus.OPEN,
                 foodCategories = listOf("category1", "category2"),
+                createdDateTime = LocalDateTime.of(2024, 1, 1, 1, 1),
             ),
         ),
     )
-}
