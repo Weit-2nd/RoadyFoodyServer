@@ -28,24 +28,26 @@ class FoodSpotsSearchControllerTest(
                 foodSpotsSearchService.searchFoodSpots(any())
             } returns createFoodSpotsSearchResponses()
             `when`("정상적인 요청이 들어온 경우") {
-
-                mockMvc.perform(
-                    get("$requestPath/search")
-                        .contentType("application/json")
-                        .param("centerLongitude", "127.074667")
-                        .param("centerLatitude", "37.147030")
-                        .param("radius", "500")
-                        .param("name", "pot2")
-                        .param("categoryIds", "1,2"),
-                )
-                    .andExpect(status().isOk)
-                    .andExpect(
-                        content().json(
-                            objectMapper.writeValueAsString(
-                                createFoodSpotsSearchResponses(),
+                then("가게를 조회합니다.") {
+                    mockMvc
+                        .perform(
+                            get("$requestPath/search")
+                                .contentType("application/json")
+                                .param("centerLongitude", "127.074667")
+                                .param("centerLatitude", "37.147030")
+                                .param("radius", "500")
+                                .param("name", "pot2")
+                                .param("categoryIds", "1")
+                                .param("categoryIds", "2"),
+                        ).andExpect(status().isOk)
+                        .andExpect(
+                            content().json(
+                                objectMapper.writeValueAsString(
+                                    createFoodSpotsSearchResponses(),
+                                ),
                             ),
-                        ),
-                    )
+                        )
+                }
             }
         }
     })

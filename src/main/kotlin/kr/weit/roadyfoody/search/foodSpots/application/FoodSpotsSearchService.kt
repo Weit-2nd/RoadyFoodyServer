@@ -3,7 +3,7 @@ package kr.weit.roadyfoody.search.foodSpots.application
 import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
-import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchQuery
+import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponse
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponses
 import kr.weit.roadyfoody.search.foodSpots.dto.OperationStatus
@@ -18,8 +18,8 @@ import java.time.temporal.ChronoField
 class FoodSpotsSearchService(
     private val foodSpotsRepository: FoodSpotsRepository,
 ) {
-    @Transactional
-    fun searchFoodSpots(foodSpotsSearchQuery: FoodSpotsSearchQuery): FoodSpotsSearchResponses {
+    @Transactional(readOnly = true)
+    fun searchFoodSpots(foodSpotsSearchQuery: FoodSpotsSearchCondition): FoodSpotsSearchResponses {
         val result: List<FoodSpots> =
             foodSpotsRepository.findFoodSpotsByPointWithinRadius(
                 foodSpotsSearchQuery.centerLongitude,
@@ -30,19 +30,20 @@ class FoodSpotsSearchService(
             )
 
         val today = LocalDate.now()
-        val dayOfWeekValue = today.get(ChronoField.DAY_OF_WEEK)
+        val dayOfWeekValue = today.get(ChronoField.DAY_OF_WEEK) - 1
         val dayOfWeek = DayOfWeek.of(dayOfWeekValue)
 
         val now = LocalTime.now()
         val format = DateTimeFormatter.ofPattern("HH:mm")
 
         val foodSpotsSearchResponses =
-            result.map { it ->
-                var openValue: OperationStatus = OperationStatus.OPEN
-                if (it.open) {
-                    it.operationHoursList.map {
-                        if (it.dayOfWeek == dayOfWeek) {
-                            openValue =
+            result.map { foodSpots ->
+                val openValue: OperationStatus =
+                    if (foodSpots.open) {
+                        foodSpots.operationHoursList
+                            .firstOrNull {
+                                it.dayOfWeek == dayOfWeek
+                            }?.let {
                                 if (now.isAfter(
                                         LocalTime.parse(it.openingHours, format),
                                     ) &&
@@ -52,18 +53,18 @@ class FoodSpotsSearchService(
                                 } else {
                                     OperationStatus.CLOSED
                                 }
-                        }
+                            } ?: OperationStatus.CLOSED
+                    } else {
+                        OperationStatus.TEMPORARILY_CLOSED
                     }
-                } else {
-                    OperationStatus.TEMPORARILY_CLOSED
-                }
                 FoodSpotsSearchResponse(
-                    id = it.id,
-                    name = it.name,
-                    longitude = it.point.x,
-                    latitude = it.point.y,
+                    id = foodSpots.id,
+                    name = foodSpots.name,
+                    longitude = foodSpots.point.x,
+                    latitude = foodSpots.point.y,
                     open = openValue,
-                    foodCategories = it.foodCategoryList.map { it.foodCategory.name },
+                    foodCategories = foodSpots.foodCategoryList.map { it.foodCategory.name },
+                    createdDateTime = foodSpots.createdDateTime,
                 )
             }
 

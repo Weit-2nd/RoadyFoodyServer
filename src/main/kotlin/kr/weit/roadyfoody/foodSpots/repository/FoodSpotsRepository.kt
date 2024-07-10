@@ -1,10 +1,7 @@
 package kr.weit.roadyfoody.foodSpots.repository
 
 import com.linecorp.kotlinjdsl.dsl.jpql.jpql
-import com.linecorp.kotlinjdsl.querymodel.jpql.expression.Expressions
-import com.linecorp.kotlinjdsl.querymodel.jpql.expression.Expressions.customExpression
 import com.linecorp.kotlinjdsl.querymodel.jpql.path.Paths.path
-import com.linecorp.kotlinjdsl.querymodel.jpql.predicate.Predicates.customPredicate
 import com.linecorp.kotlinjdsl.querymodel.jpql.select.SelectQuery
 import com.linecorp.kotlinjdsl.support.spring.data.jpa.repository.KotlinJdslJpqlExecutor
 import kr.weit.roadyfoody.common.domain.query.SearchDsl
@@ -14,7 +11,9 @@ import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
 import kr.weit.roadyfoody.global.utils.findList
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface FoodSpotsRepository : JpaRepository<FoodSpots, Long>, CustomFoodSpotsRepository
+interface FoodSpotsRepository :
+    JpaRepository<FoodSpots, Long>,
+    CustomFoodSpotsRepository
 
 interface CustomFoodSpotsRepository {
     fun findFoodSpotsByPointWithinRadius(
@@ -37,38 +36,20 @@ class CustomFoodSpotsRepositoryImpl(
         name: String?,
         categoryIds: List<Long>,
     ): List<FoodSpots> {
-        // todo : name 검색 현재 불가합니다.(CONTAIN 함수 인식을 못함) 수정 필요
-        // todo limit을 위한 size 추가 고려
-        if (name != null) {
-            val wildCardName = "%$name%"
-
-            val containsNameExpression =
-                customExpression(
-                    Int::class,
-                    "CONTAINS({0}, {1})",
-                    listOf(Expressions.stringLiteral(path(FoodSpots::name).toString()), Expressions.stringLiteral(wildCardName)),
-                )
-
-            val containsNamePredicate =
-                customPredicate(
-                    "{0}>0",
-                    listOf(containsNameExpression),
-                )
-        }
-
         val filteringFoodSpotIds: List<Long> = filteringByCategoryIds(categoryIds)
 
         val targetQuery: SelectQuery<FoodSpots> =
             jpql(SearchDsl) {
                 select(entity(FoodSpots::class))
                     .from(entity(FoodSpots::class))
-                    .where(
-                        and(
-                            withinDistance(radius, centerLongitude, centerLatitude),
-                            filteringFoodSpotIds.takeIf { categoryIds.isNotEmpty() }?.let {
-                                entity(FoodSpots::class).foodSpotIdIn(it)
-                            },
-                        ),
+                    .whereAnd(
+                        withinDistance(radius, centerLongitude, centerLatitude),
+                        filteringFoodSpotIds.takeIf { categoryIds.isNotEmpty() }?.let {
+                            entity(FoodSpots::class).foodSpotIdIn(it)
+                        },
+                        name.takeIf { !it.isNullOrBlank() }?.let {
+                            containsName(it).greaterThan(0)
+                        },
                     ).orderBy(getDistance(centerLongitude, centerLatitude).asc())
             }
         return executor.findList {
@@ -78,38 +59,33 @@ class CustomFoodSpotsRepositoryImpl(
 
     private fun filteringByCategoryIds(categoryIds: List<Long>): List<Long> {
         val query: SelectQuery<Long> =
-            when (categoryIds.isNotEmpty()) {
-                true ->
-                    jpql(SearchDsl) {
-                        selectDistinctNew<Long>(
-                            path(FoodSpotsFoodCategory::foodSpots)(FoodSpots::id),
-                        ).from(
-                            entity(FoodSpotsFoodCategory::class),
-                        ).where(
+            jpql(SearchDsl) {
+                val baseQuery =
+                    selectDistinctNew<Long>(
+                        path(FoodSpotsFoodCategory::foodSpots)(FoodSpots::id),
+                    ).from(
+                        entity(FoodSpotsFoodCategory::class),
+                    )
+
+                if (categoryIds.isNotEmpty()) {
+                    baseQuery
+                        .where(
                             entity(FoodSpotsFoodCategory::class).foodCategoryIn(categoryIds),
                         ).groupBy(
                             path(FoodSpotsFoodCategory::foodSpots)(FoodSpots::id),
                         ).having(
                             count(path(FoodSpotsFoodCategory::foodCategory)(FoodCategory::id))
                                 .greaterThanOrEqualTo(categoryIds.size.toLong()),
-                        ).orderBy(
-                            path(FoodSpotsFoodCategory::foodSpots)(FoodSpots::id).desc(),
                         )
-                    }
-                else ->
-                    jpql(SearchDsl) {
-                        selectDistinctNew<Long>(
-                            path(FoodSpotsFoodCategory::foodSpots)(FoodSpots::id),
-                        ).from(
-                            entity(FoodSpotsFoodCategory::class),
-                        ).orderBy(
-                            path(FoodSpotsFoodCategory::foodSpots)(FoodSpots::id).desc(),
-                        )
-                    }
+                } else {
+                    baseQuery
+                }.orderBy(
+                    path(FoodSpotsFoodCategory::foodSpots)(FoodSpots::id).desc(),
+                )
             }
 
-        return executor.findAll {
+        return executor.findList {
             query
-        } as List<Long>
+        }
     }
 }

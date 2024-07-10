@@ -14,5 +14,5 @@ class FoodSpotsSearchController(
 ) : FoodSpotsSearchControllerSpec {
     @GetMapping("/search")
     override fun searchFoodSpots(foodSpotsSearchCondition: FoodSpotsSearchCondition) =
-        foodSpotsSearchService.searchFoodSpots(foodSpotsSearchCondition.toQuery())
+        foodSpotsSearchService.searchFoodSpots(foodSpotsSearchCondition)
 }

@@ -12,3 +12,4 @@ fun FoodCategoryRepository.getFoodCategories(categoryIds: Set<Long>): List<FoodC
 interface FoodCategoryRepository : JpaRepository<FoodCategory, Long> {
     fun findFoodCategoryByIdIn(categoryIds: Set<Long>): List<FoodCategory>
 }
+

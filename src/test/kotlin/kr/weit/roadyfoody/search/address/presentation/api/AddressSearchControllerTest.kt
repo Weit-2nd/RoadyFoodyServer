@@ -32,8 +32,7 @@ class AddressSearchControllerTest(
                             get("$requestPath/search")
                                 .param("keyword", TEST_KEYWORD)
                                 .param("numOfRows", "2"),
-                        )
-                        .andExpect(status().isOk)
+                        ).andExpect(status().isOk)
                         .andExpect(
                             content().json(
                                 objectMapper.writeValueAsString(
@@ -54,12 +53,12 @@ class AddressSearchControllerTest(
                         ).andExpect(status().isBadRequest)
                 }
             }
-            `when`("keyword 길이가 2자 미만인 경우") {
+            `when`("keyword 길이가 1자 미만인 경우") {
                 then("400을 반환") {
                     mockMvc
                         .perform(
                             get("$requestPath/search")
-                                .param("keyword", "a")
+                                .param("keyword", "")
                                 .param("numOfRows", "2"),
                         ).andExpect(status().isBadRequest)
                 }

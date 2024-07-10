@@ -40,12 +40,12 @@ class TourismControllerTest(
                     verify(exactly = 1) { tourismService.searchTourism(2, "강원") }
                 }
             }
-            `when`("keyword 길이가 2자 미만인 경우") {
+            `when`("keyword 길이가 1자 미만인 경우") {
                 then("400을 반환") {
                     mockMvc
                         .perform(
                             get("$requestPath/search")
-                                .param("keyword", "a")
+                                .param("keyword", "")
                                 .param("numOfRows", "2"),
                         ).andExpect(status().isBadRequest)
                 }

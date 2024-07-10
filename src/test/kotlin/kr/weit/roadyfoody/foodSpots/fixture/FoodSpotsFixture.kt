@@ -1,6 +1,5 @@
 package kr.weit.roadyfoody.foodSpots.fixture
 
-import java.time.LocalDateTime
 import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
@@ -32,6 +31,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.domain.SliceImpl
 import org.springframework.web.multipart.MultipartFile
+import java.time.LocalDateTime
 
 const val TEST_FOOD_SPOT_NAME = "testFoodSpot"
 const val TEST_FOOD_SPOT_NAME_EMPTY = ""
@@ -205,25 +205,32 @@ fun createTestFoodSpotsFoodCategory(): List<FoodSpotsFoodCategory> =
 fun createTestFoodSpotsForDistance(): List<FoodSpots> =
     listOf(
         createTestFoodSpots(
-            name = "FoodSpot1-100m",
+            name = "Food Spot 1 - 100m",
             point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE + 0.001, TEST_FOOD_SPOT_LATITUDE),
         ),
         createTestFoodSpots(
-            name = "FoodSpot2-300m",
+            name = "Food Spot 2 - 300m",
             point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE, TEST_FOOD_SPOT_LATITUDE + 0.003),
         ),
         createTestFoodSpots(
-            name = "FoodSpot3-500m",
+            name = "Food Spot 3 - 500m",
             point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE + 0.005, TEST_FOOD_SPOT_LATITUDE),
         ),
         createTestFoodSpots(
-            name = "FoodSpot4-800m",
+            name = "Food Spot 4 - 800m",
             point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE - 0.008, TEST_FOOD_SPOT_LATITUDE),
         ),
         createTestFoodSpots(
-            name = "FoodSpot5-1km",
+            name = "Food Spot 5 - 1km",
             point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE, TEST_FOOD_SPOT_LATITUDE + 0.01),
         ),
+    )
+
+fun createMockTestFoodSpotList(): List<FoodSpots> =
+    listOf(
+        createMockTestFoodSpot(1L),
+        createMockTestFoodSpot(2L),
+        createMockTestFoodSpot(3L),
     )
 
 class MockTestFoodSpot(
@@ -272,6 +279,7 @@ fun createFoodSpotsSearchResponses(): FoodSpotsSearchResponses =
                 latitude = 1.0,
                 open = OperationStatus.OPEN,
                 foodCategories = listOf("category1", "category2"),
+                createdDateTime = LocalDateTime.of(2024, 1, 1, 1, 1),
             ),
             FoodSpotsSearchResponse(
                 id = 2L,
@@ -280,6 +288,7 @@ fun createFoodSpotsSearchResponses(): FoodSpotsSearchResponses =
                 latitude = 1.0,
                 open = OperationStatus.OPEN,
                 foodCategories = listOf("category1", "category2"),
+                createdDateTime = LocalDateTime.of(2024, 1, 1, 1, 1),
             ),
         ),
     )
