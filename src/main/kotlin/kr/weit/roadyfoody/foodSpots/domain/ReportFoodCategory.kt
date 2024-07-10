@@ -31,14 +31,6 @@ class ReportFoodCategory(
     @ManyToOne
     @JoinColumn(name = "food_categories_id")
     val foodCategory: FoodCategory,
-) : BaseTimeEntity() {
-    companion object {
-        fun of(
-            foodSpotsHistory: FoodSpotsHistory,
-            foodCategory: FoodCategory,
-        ) = ReportFoodCategory(
-            foodSpotsHistory = foodSpotsHistory,
-            foodCategory = foodCategory,
-        )
-    }
+) : BaseTimeEntity(){
+    constructor(foodSpotsHistory: FoodSpotsHistory,foodCategory: FoodCategory,id: Long=0L):this(id, foodSpotsHistory, foodCategory)
 }

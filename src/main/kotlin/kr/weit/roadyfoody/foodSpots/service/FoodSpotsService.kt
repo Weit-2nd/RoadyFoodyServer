@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutorService
+import kr.weit.roadyfoody.user.domain.User
 
 @Service
 class FoodSpotsService(
@@ -44,11 +45,10 @@ class FoodSpotsService(
 ) {
     @Transactional
     fun createReport(
-        userId: Long,
+        user:User,
         reportRequest: ReportRequest,
         photos: List<MultipartFile>?,
     ) {
-        val user = userRepository.getByUserId(userId)
         val foodSpotsInfo = reportRequest.toFoodSpotsEntity()
         foodSpotsRepository.save(foodSpotsInfo)
         val foodStoreHistory = reportRequest.toFoodSpotsHistoryEntity(foodSpotsInfo, user)
@@ -56,8 +56,8 @@ class FoodSpotsService(
         val foodCategories = foodCategoryRepository.getFoodCategories(reportRequest.foodCategories)
         reportOperationHoursRepository.saveAll(reportRequest.toReportOperationHoursEntity(foodStoreHistory))
         foodSportsOperationHoursRepository.saveAll(reportRequest.toOperationHoursEntity(foodSpotsInfo))
-        reportFoodCategoryRepository.saveAll(foodCategories.map { ReportFoodCategory.of(foodStoreHistory, it) })
-        foodSpotsCategoryRepository.saveAll(foodCategories.map { FoodSpotsFoodCategory.of(foodSpotsInfo, it) })
+        reportFoodCategoryRepository.saveAll(foodCategories.map { ReportFoodCategory(foodStoreHistory, it) })
+        foodSpotsCategoryRepository.saveAll(foodCategories.map { FoodSpotsFoodCategory(foodSpotsInfo, it) })
 
         photos?.let {
             val generatorPhotoNameMap = photos.associateBy { imageService.generateImageName(it) }
@@ -79,6 +79,7 @@ class FoodSpotsService(
         }
     }
 
+@Transactional
     fun getReportHistories(
         userId: Long,
         size: Int,
