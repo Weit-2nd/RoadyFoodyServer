@@ -13,6 +13,7 @@ import jakarta.persistence.OneToMany
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
 import kr.weit.roadyfoody.common.domain.BaseTimeEntity
+import kr.weit.roadyfoody.global.utils.CoordinateUtils.Companion.createCoordinate
 import kr.weit.roadyfoody.user.domain.User
 import org.locationtech.jts.geom.Point
 
@@ -31,7 +32,7 @@ class FoodSpotsHistory(
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "FOOD_SPOTS_HISTORIES_SEQ_GENERATOR")
     val id: Long = 0L,
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(updatable = false)
     val foodSpots: FoodSpots,
     @ManyToOne(fetch = FetchType.LAZY)
@@ -50,5 +51,17 @@ class FoodSpotsHistory(
     @OneToMany(mappedBy = "foodSpotsHistory")
     val operationHoursList: List<ReportOperationHours>,
     @OneToMany(mappedBy = "foodSpotsHistory")
-    val foodCategoriesList: List<ReportFoodCategory>,
-) : BaseTimeEntity()
+    val foodCategoryList: List<ReportFoodCategory>,
+) : BaseTimeEntity() {
+    constructor() : this(
+        foodSpots = FoodSpots(),
+        user = User.of("", "defaultNickname"),
+        name = "defaultName",
+        foodTruck = false,
+        open = false,
+        storeClosure = false,
+        point = createCoordinate(0.0, 0.0),
+        operationHoursList = emptyList(),
+        foodCategoryList = emptyList(),
+    )
+}

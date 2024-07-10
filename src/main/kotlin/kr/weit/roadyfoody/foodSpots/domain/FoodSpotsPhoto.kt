@@ -24,4 +24,14 @@ class FoodSpotsPhoto(
     val history: FoodSpotsHistory,
     @Column(nullable = false, length = 30)
     val fileName: String,
-) : BaseTimeEntity()
+) : BaseTimeEntity() {
+    companion object {
+        fun of(
+            history: FoodSpotsHistory,
+            fileName: String,
+        ) = FoodSpotsPhoto(
+            history = history,
+            fileName = fileName,
+        )
+    }
+}
