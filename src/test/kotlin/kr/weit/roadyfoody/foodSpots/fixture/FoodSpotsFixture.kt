@@ -17,6 +17,10 @@ import kr.weit.roadyfoody.foodSpots.dto.ReportHistoriesResponse
 import kr.weit.roadyfoody.foodSpots.dto.ReportPhotoResponse
 import kr.weit.roadyfoody.foodSpots.dto.ReportRequest
 import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_MAX_LENGTH
+import kr.weit.roadyfoody.global.utils.CoordinateUtils
+import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponse
+import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponses
+import kr.weit.roadyfoody.search.foodSpots.dto.OperationStatus
 import kr.weit.roadyfoody.support.utils.ImageFormat
 import kr.weit.roadyfoody.support.utils.createTestImageFile
 import kr.weit.roadyfoody.user.domain.User
@@ -78,6 +82,17 @@ fun createTestFoodSpots(
     operationHours: MutableList<FoodSpotsOperationHours> = mutableListOf(),
     foodCategories: MutableList<FoodSpotsFoodCategory> = mutableListOf(),
 ) = FoodSpots(id, name, foodTruck, open, storeClosure, point, operationHours, foodCategories)
+
+fun createTestFoodSpotsFoodCategory(
+    id: Long = 0L,
+    foodSpots: FoodSpots = createTestFoodSpots(),
+    foodCategory: FoodCategory = createTestFoodCategory(),
+) = FoodSpotsFoodCategory(id, foodSpots, foodCategory)
+
+fun createTestFoodCategory(
+    id: Long = 0L,
+    name: String = "Category 1",
+) = FoodCategory(id, name)
 
 fun createTestFoodHistory(
     id: Long = 0L,
@@ -144,6 +159,57 @@ fun createTestReportHistoriesResponse(
     reportCategoryResponse,
 )
 
+
+fun createTestFoodCategories(): List<FoodCategory> =
+    listOf(
+        createTestFoodCategory(1L, "포장마차"),
+        createTestFoodCategory(2L, "붕어빵"),
+        createTestFoodCategory(3L, "고기"),
+        createTestFoodCategory(4L, "술"),
+    )
+
+fun createTestFoodSpotsFoodCategory(): List<FoodSpotsFoodCategory> =
+    listOf(
+        createTestFoodSpotsFoodCategory(1L, createTestFoodSpots(1L), createTestFoodCategory(1L)),
+        createTestFoodSpotsFoodCategory(2L, createTestFoodSpots(2L), createTestFoodCategory(2L)),
+        createTestFoodSpotsFoodCategory(3L, createTestFoodSpots(1L), createTestFoodCategory(2L)),
+        createTestFoodSpotsFoodCategory(4L, createTestFoodSpots(2L), createTestFoodCategory(3L)),
+        createTestFoodSpotsFoodCategory(5L, createTestFoodSpots(3L), createTestFoodCategory(1L)),
+        createTestFoodSpotsFoodCategory(6L, createTestFoodSpots(3L), createTestFoodCategory(2L)),
+        createTestFoodSpotsFoodCategory(7L, createTestFoodSpots(3L), createTestFoodCategory(3L)),
+    )
+
+fun createTestFoodSpotsForDistance(): List<FoodSpots> =
+    listOf(
+        createTestFoodSpots(
+            name = "Food Spot 1 - 100m",
+            point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE + 0.001, TEST_FOOD_SPOT_LATITUDE),
+        ),
+        createTestFoodSpots(
+            name = "Food Spot 2 - 300m",
+            point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE, TEST_FOOD_SPOT_LATITUDE + 0.003),
+        ),
+        createTestFoodSpots(
+            name = "Food Spot 3 - 500m",
+            point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE + 0.005, TEST_FOOD_SPOT_LATITUDE),
+        ),
+        createTestFoodSpots(
+            name = "Food Spot 4 - 800m",
+            point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE - 0.008, TEST_FOOD_SPOT_LATITUDE),
+        ),
+        createTestFoodSpots(
+            name = "Food Spot 5 - 1km",
+            point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE, TEST_FOOD_SPOT_LATITUDE + 0.01),
+        ),
+    )
+
+fun createMockTestFoodSpotList(): List<FoodSpots> =
+    listOf(
+        createMockTestFoodSpot(1L),
+        createMockTestFoodSpot(2L),
+        createMockTestFoodSpot(3L),
+    )
+
 fun createOperationHoursRequest(
     dayOfWeek: DayOfWeek = DayOfWeek.MON,
     openingHours: String = TEST_OPERATION_HOURS_OPEN,
@@ -188,6 +254,13 @@ class MockTestFoodSpot(
 ) : FoodSpots(id, name, foodTruck, open, closed, point, operationHours, foodCategories) {
     override var createdDateTime: LocalDateTime = LocalDateTime.now()
     override var updatedDateTime: LocalDateTime = LocalDateTime.now()
+
+    companion object {
+        fun createPoint(
+            longitude: Double,
+            latitude: Double,
+        ): Point = CoordinateUtils.createCoordinate(longitude, latitude)
+    }
 }
 
 class MockTestFoodSpotsHistory(
@@ -204,3 +277,27 @@ class MockTestFoodSpotsHistory(
 ) : FoodSpotsHistory(id, foodSpots, user, name, foodTruck, open, closed, point, operationHours, foodCategories) {
     override var createdDateTime: LocalDateTime = LocalDateTime.now()
 }
+
+fun createFoodSpotsSearchResponses(): FoodSpotsSearchResponses =
+    FoodSpotsSearchResponses(
+        listOf(
+            FoodSpotsSearchResponse(
+                id = 1L,
+                name = "name",
+                longitude = 1.0,
+                latitude = 1.0,
+                open = OperationStatus.OPEN,
+                foodCategories = listOf("category1", "category2"),
+                createdDateTime = LocalDateTime.of(2024, 1, 1, 1, 1),
+            ),
+            FoodSpotsSearchResponse(
+                id = 2L,
+                name = "name",
+                longitude = 1.0,
+                latitude = 1.0,
+                open = OperationStatus.OPEN,
+                foodCategories = listOf("category1", "category2"),
+                createdDateTime = LocalDateTime.of(2024, 1, 1, 1, 1),
+            ),
+        ),
+    )

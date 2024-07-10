@@ -16,7 +16,5 @@ class AddressSearchController(
     override fun searchAddress(
         numOfRows: Int,
         keyword: String,
-    ): AddressSearchResponses {
-        return addressSearchService.searchAddress(keyword, numOfRows)
-    }
+    ): AddressSearchResponses = addressSearchService.searchAddress(keyword, numOfRows)
 }

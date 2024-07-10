@@ -46,7 +46,7 @@ interface AddressSearchControllerSpec {
         @RequestParam
         @Positive(message = "조회할 개수는 양수여야 합니다.")
         numOfRows: Int,
-        @Size(min = 2, max = 60, message = "검색어는 2자 이상 60자 이하로 입력해주세요.")
+        @Size(min = 1, max = 60, message = "검색어는 1자 이상 60자 이하로 입력해주세요.")
         @RequestParam keyword: String,
     ): AddressSearchResponses
 }
