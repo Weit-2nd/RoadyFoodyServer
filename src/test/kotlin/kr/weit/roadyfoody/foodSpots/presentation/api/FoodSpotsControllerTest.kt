@@ -188,7 +188,7 @@ class FoodSpotsControllerTest(
                     }
 
                     reportRequest = createTestReportRequest()
-                    reportPhotos = createMockPhotoList(WEBP) + createMockPhotoList(WEBP)
+                    reportPhotos = createMockPhotoList(WEBP, size = 4)
                     `when`("이미지가 3개 초과인 경우") {
                         then("400을 반환") {
                             mockMvc
