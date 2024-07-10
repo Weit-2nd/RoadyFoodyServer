@@ -2,7 +2,6 @@ package kr.weit.roadyfoody.foodSpots.presentation.api
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
-import io.kotest.common.ExperimentalKotest
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
 import io.mockk.just
@@ -37,7 +36,6 @@ import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-@OptIn(ExperimentalKotest::class)
 @WebMvcTest(FoodSpotsController::class)
 @ControllerTest
 class FoodSpotsControllerTest(

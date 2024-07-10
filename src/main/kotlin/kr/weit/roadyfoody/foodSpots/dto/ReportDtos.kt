@@ -65,7 +65,7 @@ data class ReportRequest(
             foodTruck = foodTruck,
             open = open,
             storeClosure = closed,
-            foodCategoriesList = mutableListOf(),
+            foodCategoryList = mutableListOf(),
             operationHoursList = mutableListOf(),
         )
 
@@ -80,7 +80,7 @@ data class ReportRequest(
         foodTruck = foodTruck,
         open = open,
         storeClosure = closed,
-        foodCategoriesList = mutableListOf(),
+        foodCategoryList = mutableListOf(),
         operationHoursList = mutableListOf(),
     )
 
