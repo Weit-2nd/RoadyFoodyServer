@@ -30,7 +30,7 @@ class FoodSpotsSearchService(
             )
 
         val today = LocalDate.now()
-        val dayOfWeekValue = today.get(ChronoField.DAY_OF_WEEK)
+        val dayOfWeekValue = today.get(ChronoField.DAY_OF_WEEK) - 1
         val dayOfWeek = DayOfWeek.of(dayOfWeekValue)
 
         val now = LocalTime.now()
