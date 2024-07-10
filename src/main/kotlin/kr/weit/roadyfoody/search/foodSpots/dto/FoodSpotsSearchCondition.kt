@@ -18,7 +18,7 @@ data class FoodSpotsSearchCondition(
     @field:NotNull(message = "반경은 필수입니다.")
     @field:Min(value = 500, message = "반경은 500 이상이어야 합니다.")
     val radius: Int,
-    @Size(min = 1, max = 60, message = "검색어는 1자 이상 60자 이하로 입력해주세요.")
+    @field:Size(min = 1, max = 60, message = "검색어는 1자 이상 60자 이하로 입력해주세요.")
     val name: String?,
     val categoryIds: List<Long>? = emptyList(),
 )

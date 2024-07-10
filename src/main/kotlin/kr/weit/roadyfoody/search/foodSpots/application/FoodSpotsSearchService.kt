@@ -37,12 +37,13 @@ class FoodSpotsSearchService(
         val format = DateTimeFormatter.ofPattern("HH:mm")
 
         val foodSpotsSearchResponses =
-            result.map { it ->
-                var openValue: OperationStatus = OperationStatus.OPEN
-                if (it.open) {
-                    it.operationHoursList.map {
-                        if (it.dayOfWeek == dayOfWeek) {
-                            openValue =
+            result.map { foodSpots ->
+                val openValue: OperationStatus =
+                    if (foodSpots.open) {
+                        foodSpots.operationHoursList
+                            .firstOrNull {
+                                it.dayOfWeek == dayOfWeek
+                            }?.let {
                                 if (now.isAfter(
                                         LocalTime.parse(it.openingHours, format),
                                     ) &&
@@ -52,19 +53,18 @@ class FoodSpotsSearchService(
                                 } else {
                                     OperationStatus.CLOSED
                                 }
-                        }
+                            } ?: OperationStatus.CLOSED
+                    } else {
+                        OperationStatus.TEMPORARILY_CLOSED
                     }
-                } else {
-                    openValue = OperationStatus.TEMPORARILY_CLOSED
-                }
                 FoodSpotsSearchResponse(
-                    id = it.id,
-                    name = it.name,
-                    longitude = it.point.x,
-                    latitude = it.point.y,
+                    id = foodSpots.id,
+                    name = foodSpots.name,
+                    longitude = foodSpots.point.x,
+                    latitude = foodSpots.point.y,
                     open = openValue,
-                    foodCategories = it.foodCategoriesList.map { it.foodCategory.name },
-                    createdDateTime = it.createdDateTime,
+                    foodCategories = foodSpots.foodCategoriesList.map { it.foodCategory.name },
+                    createdDateTime = foodSpots.createdDateTime,
                 )
             }
 

@@ -73,34 +73,29 @@ class CustomFoodSpotsRepositoryImpl(
 
     private fun filteringByCategoryIds(categoryIds: List<Long>): List<Long> {
         val query: SelectQuery<Long> =
-            when (categoryIds.isNotEmpty()) {
-                true ->
-                    jpql(SearchDsl) {
-                        selectDistinctNew<Long>(
-                            path(FoodSpotsFoodCategory::foodSpots)(FoodSpots::id),
-                        ).from(
-                            entity(FoodSpotsFoodCategory::class),
-                        ).where(
+            jpql(SearchDsl) {
+                val baseQuery =
+                    selectDistinctNew<Long>(
+                        path(FoodSpotsFoodCategory::foodSpots)(FoodSpots::id),
+                    ).from(
+                        entity(FoodSpotsFoodCategory::class),
+                    )
+
+                if (categoryIds.isNotEmpty()) {
+                    baseQuery
+                        .where(
                             entity(FoodSpotsFoodCategory::class).foodCategoryIn(categoryIds),
                         ).groupBy(
                             path(FoodSpotsFoodCategory::foodSpots)(FoodSpots::id),
                         ).having(
                             count(path(FoodSpotsFoodCategory::foodCategory)(FoodCategory::id))
                                 .greaterThanOrEqualTo(categoryIds.size.toLong()),
-                        ).orderBy(
-                            path(FoodSpotsFoodCategory::foodSpots)(FoodSpots::id).desc(),
                         )
-                    }
-                else ->
-                    jpql(SearchDsl) {
-                        selectDistinctNew<Long>(
-                            path(FoodSpotsFoodCategory::foodSpots)(FoodSpots::id),
-                        ).from(
-                            entity(FoodSpotsFoodCategory::class),
-                        ).orderBy(
-                            path(FoodSpotsFoodCategory::foodSpots)(FoodSpots::id).desc(),
-                        )
-                    }
+                } else {
+                    baseQuery
+                }.orderBy(
+                    path(FoodSpotsFoodCategory::foodSpots)(FoodSpots::id).desc(),
+                )
             }
 
         return executor.findList {
