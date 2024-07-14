@@ -29,12 +29,14 @@ class SecurityConfig(
             .addFilterBefore(
                 JwtFilter(jwtUtil, customUserDetailService),
                 UsernamePasswordAuthenticationFilter::class.java,
-            )
-            .authorizeHttpRequests {
+            ).authorizeHttpRequests {
                 it
-                    .requestMatchers(*NOT_PERMITTED_URL_PATTERNS).authenticated()
-                    .requestMatchers(*PERMITTED_URL_PATTERNS).permitAll()
-                    .anyRequest().authenticated()
+                    .requestMatchers(*NOT_PERMITTED_URL_PATTERNS)
+                    .authenticated()
+                    .requestMatchers(*PERMITTED_URL_PATTERNS)
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated()
             }.exceptionHandling {
                 it.authenticationEntryPoint(customAuthenticationEntryPoint)
             }.build()
@@ -43,7 +45,7 @@ class SecurityConfig(
 val PERMITTED_URL_PATTERNS =
     arrayOf(
         "/health",
-        "/ready",
+        "/ready/**",
         "/api/v1/tourism/**",
         "/api/v1/address/**",
         "/swagger-ui/**",
@@ -51,7 +53,7 @@ val PERMITTED_URL_PATTERNS =
         "/actuator/prometheus",
         "/api/v1/terms/**",
         "/api/v1/auth/**",
-        "/api/v1/food-spots/**",
+        "/api/v1/food-spots/search",
     )
 
 val NOT_PERMITTED_URL_PATTERNS =

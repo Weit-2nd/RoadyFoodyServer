@@ -19,6 +19,7 @@ enum class ErrorCode(
     NOT_FOUND_USER(HttpStatus.NOT_FOUND, -10009, "Not found user"),
     NOT_FOUND_TERM(HttpStatus.NOT_FOUND, -10010, "Not found term"),
     NOT_FOUND_FOOD_CATEGORY(HttpStatus.NOT_FOUND, -10011, "해당 카테고리가 존재하지 않습니다."),
+    NOT_FOUND_FOOD_SPOTS(HttpStatus.NOT_FOUND, -10012, "해당 음식점이 존재하지 않습니다."),
 
     // Bad Request -10000으로 코드 통일
     SIZE_NON_POSITIVE(HttpStatus.BAD_REQUEST, -10000, "조회할 개수는 양수여야 합니다."),

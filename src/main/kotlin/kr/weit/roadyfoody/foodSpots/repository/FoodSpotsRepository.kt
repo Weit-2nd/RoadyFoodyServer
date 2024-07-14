@@ -1,7 +1,6 @@
 package kr.weit.roadyfoody.foodSpots.repository
 
 import com.linecorp.kotlinjdsl.dsl.jpql.jpql
-import com.linecorp.kotlinjdsl.querymodel.jpql.path.Paths.path
 import com.linecorp.kotlinjdsl.querymodel.jpql.select.SelectQuery
 import com.linecorp.kotlinjdsl.support.spring.data.jpa.repository.KotlinJdslJpqlExecutor
 import kr.weit.roadyfoody.common.domain.query.SearchDsl
@@ -9,7 +8,10 @@ import kr.weit.roadyfoody.foodSpots.domain.FoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
 import kr.weit.roadyfoody.global.utils.findList
+import kr.weit.roadyfoody.review.exception.FoodSpotsNotFoundException
 import org.springframework.data.jpa.repository.JpaRepository
+
+fun FoodSpotsRepository.getByFoodSpotsId(foodSpotsId: Long): FoodSpots = findById(foodSpotsId).orElseThrow { FoodSpotsNotFoundException() }
 
 interface FoodSpotsRepository :
     JpaRepository<FoodSpots, Long>,
