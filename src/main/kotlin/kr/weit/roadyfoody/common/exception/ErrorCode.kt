@@ -37,6 +37,11 @@ enum class ErrorCode(
     IMAGES_SIZE_TOO_LARGE(HttpStatus.BAD_REQUEST, -10000, "하나 이상의 파일이 잘못 되었습니다."),
     INVALID_WEBP_IMAGE(HttpStatus.BAD_REQUEST, -10000, "webp 형식이 아닙니다."),
     MAX_FILE_SIZE_EXCEEDED(HttpStatus.BAD_REQUEST, -10000, "파일 사이즈가 초과하였습니다."),
+    FOOD_SPOT_ID_NON_POSITIVE(HttpStatus.BAD_REQUEST, -10000, "음식점 ID는 양수여야 합니다."),
+    REVIEW_CONTENT_BLANK(HttpStatus.BAD_REQUEST, -10000, "리뷰는 필수 입력값입니다."),
+    REVIEW_CONTENT_LENGTH_TOO_LONG(HttpStatus.BAD_REQUEST, -10000, "리뷰 최대 길이를 초과했습니다."),
+    REVIEW_RATING_NON_POSITIVE(HttpStatus.BAD_REQUEST, -10000, "양수가 아닌 별점은 입력할 수 없습니다."),
+    REVIEW_RATING_TOO_HIGH(HttpStatus.BAD_REQUEST, -10000, "별점은 10점 이하로 입력해주세요."),
 
     // Search API error 11000대
     REST_CLIENT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, -11000, "외부 API 호출 중 에러 발생"),

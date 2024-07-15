@@ -9,6 +9,7 @@ import kr.weit.roadyfoody.review.presentation.service.ReviewService
 import kr.weit.roadyfoody.review.presentation.spec.ReviewControllerSpec
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.http.HttpStatus.CREATED
+import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestPart
@@ -22,7 +23,7 @@ class ReviewController(
     private val reviewService: ReviewService,
 ) : ReviewControllerSpec {
     @ResponseStatus(CREATED)
-    @PostMapping
+    @PostMapping(consumes = [MULTIPART_FORM_DATA_VALUE])
     override fun createReview(
         @LoginUser
         user: User,
