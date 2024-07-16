@@ -35,6 +35,6 @@ class ReportFoodCategory(
     constructor(
         foodSpotsHistory: FoodSpotsHistory,
         foodCategory: FoodCategory,
-        id: Long = 0L
+        id: Long = 0L,
     ) : this(id, foodSpotsHistory, foodCategory)
 }
