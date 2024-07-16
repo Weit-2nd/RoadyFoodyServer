@@ -2,7 +2,7 @@ package kr.weit.roadyfoody.foodSpots.utils
 
 import io.swagger.v3.oas.annotations.media.Schema
 import kr.weit.roadyfoody.common.dto.SliceResponse
-import kr.weit.roadyfoody.foodSpots.dto.ReportHistoriesResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoriesResponse
 
 class SliceReportHistories(
     @Schema(description = "조회된 데이터 리스트")

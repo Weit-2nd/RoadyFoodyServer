@@ -1,9 +1,9 @@
-package kr.weit.roadyfoody.foodSpots.service
+package kr.weit.roadyfoody.foodSpots.application.service
 
+import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
 import kr.weit.roadyfoody.foodSpots.domain.ReportFoodCategory
-import kr.weit.roadyfoody.foodSpots.dto.ReportRequest
 import kr.weit.roadyfoody.foodSpots.repository.FoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSportsOperationHoursRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsFoodCategoryRepository
