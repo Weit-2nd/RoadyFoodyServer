@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.review.presentation.service
+package kr.weit.roadyfoody.review.service
 
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
 import kr.weit.roadyfoody.foodSpots.repository.getByFoodSpotsId
@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutorService
 
 @Service
-class ReviewService(
+class ReviewCommandService(
     private val reviewRepository: FoodSportsReviewRepository,
     private val reviewPhotoRepository: FoodSpotsReviewPhotoRepository,
     private val foodSpotsRepository: FoodSpotsRepository,

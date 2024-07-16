@@ -15,7 +15,6 @@ import kr.weit.roadyfoody.foodSpots.repository.getByFoodSpotsId
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.review.domain.FoodSpotsReviewPhoto
 import kr.weit.roadyfoody.review.exception.FoodSpotsNotFoundException
-import kr.weit.roadyfoody.review.presentation.service.ReviewService
 import kr.weit.roadyfoody.review.repository.FoodSportsReviewRepository
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewPhotoRepository
 import kr.weit.roadyfoody.support.utils.ImageFormat
@@ -32,7 +31,7 @@ class ReviewServiceTest :
             val imageService = spyk(ImageService(mockk()))
             val executor = mockk<ExecutorService>()
             val reportService =
-                ReviewService(
+                ReviewCommandService(
                     reviewRepository,
                     reviewPhotoRepository,
                     foodSpotsRepository,

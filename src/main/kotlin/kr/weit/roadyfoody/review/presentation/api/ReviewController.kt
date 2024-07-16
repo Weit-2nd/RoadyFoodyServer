@@ -5,8 +5,8 @@ import jakarta.validation.constraints.Size
 import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.foodSpots.validator.WebPImageList
 import kr.weit.roadyfoody.review.dto.ReviewRequest
-import kr.weit.roadyfoody.review.presentation.service.ReviewService
 import kr.weit.roadyfoody.review.presentation.spec.ReviewControllerSpec
+import kr.weit.roadyfoody.review.service.ReviewCommandService
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
@@ -20,7 +20,7 @@ import org.springframework.web.multipart.MultipartFile
 @RestController
 @RequestMapping("/api/v1/review")
 class ReviewController(
-    private val reviewService: ReviewService,
+    private val reviewCommandService: ReviewCommandService,
 ) : ReviewControllerSpec {
     @ResponseStatus(CREATED)
     @PostMapping(consumes = [MULTIPART_FORM_DATA_VALUE])
@@ -35,6 +35,6 @@ class ReviewController(
         @RequestPart(required = false)
         reviewPhotos: List<MultipartFile>?,
     ) {
-        reviewService.createReview(user, reviewRequest, reviewPhotos)
+        reviewCommandService.createReview(user, reviewRequest, reviewPhotos)
     }
 }
