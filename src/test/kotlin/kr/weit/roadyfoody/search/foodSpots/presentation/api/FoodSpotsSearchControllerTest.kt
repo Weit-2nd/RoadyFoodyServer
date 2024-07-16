@@ -7,6 +7,7 @@ import io.mockk.every
 import kr.weit.roadyfoody.foodSpots.fixture.createFoodSpotsSearchResponses
 import kr.weit.roadyfoody.search.foodSpots.application.FoodSpotsSearchService
 import kr.weit.roadyfoody.support.annotation.ControllerTest
+import kr.weit.roadyfoody.support.utils.getWithAuth
 import org.mockito.Mockito.`when`
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.test.web.servlet.MockMvc
@@ -25,13 +26,13 @@ class FoodSpotsSearchControllerTest(
 
         given("GET searchFoodSpots API 호출") {
             every {
-                foodSpotsSearchService.searchFoodSpots(any())
+                foodSpotsSearchService.searchFoodSpots(any(), any())
             } returns createFoodSpotsSearchResponses()
             `when`("정상적인 요청이 들어온 경우") {
                 then("가게를 조회합니다.") {
                     mockMvc
                         .perform(
-                            get("$requestPath/search")
+                            getWithAuth("$requestPath/search")
                                 .contentType("application/json")
                                 .param("centerLongitude", "127.074667")
                                 .param("centerLatitude", "37.147030")

@@ -10,6 +10,8 @@ import jakarta.persistence.Id
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
 import kr.weit.roadyfoody.common.domain.BaseModifiableEntity
+import kr.weit.roadyfoody.common.exception.ErrorCode
+import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
 import kr.weit.roadyfoody.user.utils.NICKNAME_REGEX
 import kr.weit.roadyfoody.user.utils.NICKNAME_REGEX_DESC
 
@@ -25,8 +27,9 @@ class User(
     val socialId: String,
     @Embedded
     var profile: Profile,
-) :
-    BaseModifiableEntity() {
+    @Column(nullable = false)
+    var coin: Int,
+) : BaseModifiableEntity() {
     init {
         require(NICKNAME_REGEX.matches(profile.nickname)) { NICKNAME_REGEX_DESC }
     }
@@ -36,7 +39,16 @@ class User(
             socialId: String,
             nickname: String,
             profileImageName: String? = null,
-        ): User = User(socialId = socialId, profile = Profile(nickname, profileImageName))
+            coin: Int = 0,
+        ): User = User(socialId = socialId, profile = Profile(nickname, profileImageName), coin = coin)
+    }
+
+    fun decreaseCoin(minusCoin: Int): Int {
+        require(coin >= minusCoin) {
+            throw RoadyFoodyBadRequestException(ErrorCode.COIN_NOT_ENOUGH)
+        }
+        this.coin -= minusCoin
+        return this.coin
     }
 }
 
