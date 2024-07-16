@@ -19,6 +19,7 @@ enum class ErrorCode(
     NOT_FOUND_USER(HttpStatus.NOT_FOUND, -10009, "Not found user"),
     NOT_FOUND_TERM(HttpStatus.NOT_FOUND, -10010, "Not found term"),
     NOT_FOUND_FOOD_CATEGORY(HttpStatus.NOT_FOUND, -10011, "해당 카테고리가 존재하지 않습니다."),
+    REDISSON_LOCK_TOO_MANY_REQUEST(HttpStatus.TOO_MANY_REQUESTS, -10012, "동시에 많은 요청이 발생했습니다. 잠시 후 다시 시도해주세요"),
 
     // Bad Request -10000으로 코드 통일
     SIZE_NON_POSITIVE(HttpStatus.BAD_REQUEST, -10000, "조회할 개수는 양수여야 합니다."),
@@ -42,6 +43,7 @@ enum class ErrorCode(
     RETRIES_EXCEEDED_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, -11001, "외부 API 호출 재시도 횟수 초과"),
     SEARCH_KEYWORD_LENGTH(HttpStatus.BAD_REQUEST, -10000, "검색어는 1자 이상 60자 이하로 입력해주세요."),
     RADIUS_SIZE_TOO_SMALL(HttpStatus.BAD_REQUEST, -10000, "검색 반경은 500m 이상 4000m 이하로 입력해주세요."),
+    COIN_NOT_ENOUGH(HttpStatus.BAD_REQUEST, -10000, "코인이 부족합니다."),
 
     // Auth API error 12000대
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, -12000, "유효하지 않은 토큰입니다."),
