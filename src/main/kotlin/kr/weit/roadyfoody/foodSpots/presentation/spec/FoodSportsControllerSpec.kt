@@ -14,8 +14,8 @@ import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.ErrorResponse
-import kr.weit.roadyfoody.foodSpots.dto.ReportHistoriesResponse
-import kr.weit.roadyfoody.foodSpots.dto.ReportRequest
+import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoriesResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
 import kr.weit.roadyfoody.foodSpots.utils.SliceReportHistories
 import kr.weit.roadyfoody.foodSpots.validator.WebPImageList
 import kr.weit.roadyfoody.global.swagger.ApiErrorCodeExamples

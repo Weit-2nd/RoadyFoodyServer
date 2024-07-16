@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.foodSpots.dto
+package kr.weit.roadyfoody.foodSpots.application.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.Valid
