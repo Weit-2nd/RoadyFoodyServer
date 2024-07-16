@@ -31,7 +31,7 @@ interface ReviewControllerSpec {
             ErrorCode.FOOD_SPOT_ID_NON_POSITIVE,
             ErrorCode.REVIEW_CONTENT_BLANK,
             ErrorCode.REVIEW_CONTENT_LENGTH_TOO_LONG,
-            ErrorCode.REVIEW_RATING_NON_POSITIVE,
+            ErrorCode.REVIEW_RATING_NEGATIVE,
             ErrorCode.REVIEW_RATING_TOO_HIGH,
             ErrorCode.IMAGES_TOO_MANY,
             ErrorCode.INVALID_IMAGE_TYPE,
