@@ -22,7 +22,7 @@ class FoodSpotsPhoto(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "food_spots_histories_id")
     val history: FoodSpotsHistory,
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false, length = 50)
     val fileName: String,
 ) : BaseTimeEntity() {
     companion object {
