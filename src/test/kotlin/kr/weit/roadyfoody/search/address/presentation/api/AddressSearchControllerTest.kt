@@ -8,6 +8,7 @@ import kr.weit.roadyfoody.global.TEST_KEYWORD
 import kr.weit.roadyfoody.search.address.application.service.AddressSearchService
 import kr.weit.roadyfoody.search.address.fixture.AddressFixture.createSearchResponses
 import kr.weit.roadyfoody.support.annotation.ControllerTest
+import kr.weit.roadyfoody.support.utils.getWithAuth
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
@@ -29,7 +30,7 @@ class AddressSearchControllerTest(
                 then("200 상태 번호와 AddressSearchResponses 반환한다.") {
                     mockMvc
                         .perform(
-                            get("$requestPath/search")
+                            getWithAuth("$requestPath/search")
                                 .param("keyword", TEST_KEYWORD)
                                 .param("numOfRows", "2"),
                         ).andExpect(status().isOk)
@@ -47,7 +48,7 @@ class AddressSearchControllerTest(
                 then("400을 반환") {
                     mockMvc
                         .perform(
-                            get("$requestPath/search")
+                            getWithAuth("$requestPath/search")
                                 .param("keyword", "주소")
                                 .param("numOfRows", "0"),
                         ).andExpect(status().isBadRequest)
@@ -57,7 +58,7 @@ class AddressSearchControllerTest(
                 then("400을 반환") {
                     mockMvc
                         .perform(
-                            get("$requestPath/search")
+                            getWithAuth("$requestPath/search")
                                 .param("keyword", "")
                                 .param("numOfRows", "2"),
                         ).andExpect(status().isBadRequest)
@@ -68,7 +69,7 @@ class AddressSearchControllerTest(
                 then("400을 반환") {
                     mockMvc
                         .perform(
-                            get("$requestPath/search")
+                            getWithAuth("$requestPath/search")
                                 .param("keyword", "a".repeat(61))
                                 .param("numOfRows", "2"),
                         ).andExpect(status().isBadRequest)
