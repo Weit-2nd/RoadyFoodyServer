@@ -22,7 +22,7 @@ import kr.weit.roadyfoody.user.fixture.createTestUser
 import java.util.Optional
 import java.util.concurrent.ExecutorService
 
-class ReviewServiceTest :
+class ReviewCommandServiceTest :
     BehaviorSpec(
         {
             val reviewRepository = mockk<FoodSportsReviewRepository>()
