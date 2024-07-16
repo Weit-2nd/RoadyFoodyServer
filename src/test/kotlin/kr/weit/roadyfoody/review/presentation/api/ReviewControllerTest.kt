@@ -16,7 +16,7 @@ import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
 import kr.weit.roadyfoody.foodSpots.fixture.createMockPhotoList
-import kr.weit.roadyfoody.review.service.ReviewCommandService
+import kr.weit.roadyfoody.review.application.service.ReviewCommandService
 import kr.weit.roadyfoody.support.annotation.ControllerTest
 import kr.weit.roadyfoody.support.utils.ImageFormat.PNG
 import kr.weit.roadyfoody.support.utils.ImageFormat.WEBP
