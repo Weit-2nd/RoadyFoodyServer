@@ -114,7 +114,7 @@ class FoodSpotsRepositoryTest(
                             TEST_INVALID_FOOD_SPOT_ID,
                         )
                     }
+                }
             }
         }
-    }
     })

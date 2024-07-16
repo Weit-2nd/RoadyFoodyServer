@@ -42,6 +42,6 @@ class FoodSpotsFoodCategory(
     constructor(foodSpots: FoodSpots, foodCategory: FoodCategory, id: Long = 0L) : this(
         id,
         foodSpots,
-        foodCategory
+        foodCategory,
     )
 }
