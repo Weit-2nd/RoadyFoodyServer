@@ -1,6 +1,5 @@
 package kr.weit.roadyfoody.foodSpots.fixture
 
-import java.time.LocalDateTime
 import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
@@ -32,6 +31,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.domain.SliceImpl
 import org.springframework.web.multipart.MultipartFile
+import java.time.LocalDateTime
 
 const val TEST_FOOD_SPOT_NAME = "testFoodSpot"
 const val TEST_FOOD_SPOT_NAME_EMPTY = ""
@@ -158,7 +158,6 @@ fun createTestReportHistoriesResponse(
     reportPhotoResponse,
     reportCategoryResponse,
 )
-
 
 fun createTestFoodCategories(): List<FoodCategory> =
     listOf(
