@@ -40,7 +40,7 @@ enum class ErrorCode(
     FOOD_SPOT_ID_NON_POSITIVE(HttpStatus.BAD_REQUEST, -10000, "음식점 ID는 양수여야 합니다."),
     REVIEW_CONTENT_BLANK(HttpStatus.BAD_REQUEST, -10000, "리뷰는 필수 입력값입니다."),
     REVIEW_CONTENT_LENGTH_TOO_LONG(HttpStatus.BAD_REQUEST, -10000, "리뷰 최대 길이를 초과했습니다."),
-    REVIEW_RATING_NON_POSITIVE(HttpStatus.BAD_REQUEST, -10000, "양수가 아닌 별점은 입력할 수 없습니다."),
+    REVIEW_RATING_NON_POSITIVE(HttpStatus.BAD_REQUEST, -10000, "별점은 0점 이상으로 입력해주세요."),
     REVIEW_RATING_TOO_HIGH(HttpStatus.BAD_REQUEST, -10000, "별점은 10점 이하로 입력해주세요."),
 
     // Search API error 11000대

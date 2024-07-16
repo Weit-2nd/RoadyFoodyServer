@@ -2,6 +2,7 @@ package kr.weit.roadyfoody.review.application.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Positive
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
@@ -18,7 +19,7 @@ data class ReviewRequest(
     @field:Length(max = 1200, message = "리뷰 최대 길이를 초과했습니다.")
     val contents: String,
     @Schema(description = "별점")
-    @field:Positive(message = "양수가 아닌 별점은 입력할 수 없습니다.")
+    @field:Min(0, message = "별점은 0점 이상으로 입력해주세요.")
     @field:Max(10, message = "별점은 10점 이하로 입력해주세요.")
     val rating: Int,
 ) {
