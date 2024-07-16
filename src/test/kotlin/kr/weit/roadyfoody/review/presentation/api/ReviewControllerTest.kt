@@ -16,7 +16,7 @@ import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
 import kr.weit.roadyfoody.foodSpots.fixture.createMockPhotoList
-import kr.weit.roadyfoody.review.presentation.service.ReviewService
+import kr.weit.roadyfoody.review.service.ReviewCommandService
 import kr.weit.roadyfoody.support.annotation.ControllerTest
 import kr.weit.roadyfoody.support.utils.ImageFormat.PNG
 import kr.weit.roadyfoody.support.utils.ImageFormat.WEBP
@@ -31,7 +31,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @WebMvcTest(ReviewController::class)
 @ControllerTest
 class ReviewControllerTest(
-    @MockkBean private val reviewService: ReviewService,
+    @MockkBean private val reviewCommandService: ReviewCommandService,
     private val mockMvc: MockMvc,
     private val objectMapper: ObjectMapper,
 ) : BehaviorSpec(
@@ -42,7 +42,7 @@ class ReviewControllerTest(
                 var reportRequest = createTestReviewRequest()
                 var reportPhotos = createMockPhotoList(WEBP)
                 every {
-                    reviewService.createReview(any(), any(), any())
+                    reviewCommandService.createReview(any(), any(), any())
                 } returns Unit
                 `when`("정상적인 데이터가 들어올 경우") {
                     then("리뷰가 등록된다.") {
@@ -199,7 +199,7 @@ class ReviewControllerTest(
                     every { mockPhoto.size } returns 1024 * 1024 + 1
                     every { mockPhoto.name } returns TEST_REVIEW_REQUEST_PHOTO
                     every { mockPhoto.inputStream } returns createTestImageFile(WEBP).inputStream
-                    every { reviewService.createReview(any(), any(), any()) } just runs
+                    every { reviewCommandService.createReview(any(), any(), any()) } just runs
                     then("400 반환") {
                         mockMvc
                             .perform(
@@ -213,7 +213,13 @@ class ReviewControllerTest(
                                         ),
                                     ).file(mockPhoto),
                             ).andExpect(status().isBadRequest)
-                        verify(exactly = 0) { reviewService.createReview(any(), any(), any()) }
+                        verify(exactly = 0) {
+                            reviewCommandService.createReview(
+                                any(),
+                                any(),
+                                any(),
+                            )
+                        }
                     }
                 }
             }
