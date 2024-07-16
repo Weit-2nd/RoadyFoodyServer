@@ -4,9 +4,9 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.Size
 import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.foodSpots.validator.WebPImageList
-import kr.weit.roadyfoody.review.dto.ReviewRequest
+import kr.weit.roadyfoody.review.application.dto.ReviewRequest
+import kr.weit.roadyfoody.review.application.service.ReviewCommandService
 import kr.weit.roadyfoody.review.presentation.spec.ReviewControllerSpec
-import kr.weit.roadyfoody.review.service.ReviewCommandService
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE

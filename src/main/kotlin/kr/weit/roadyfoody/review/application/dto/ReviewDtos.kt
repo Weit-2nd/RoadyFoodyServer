@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.review.dto
+package kr.weit.roadyfoody.review.application.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Max

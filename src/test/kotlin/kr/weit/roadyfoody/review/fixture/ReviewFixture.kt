@@ -1,9 +1,9 @@
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_PHOTO_NAME
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpots
+import kr.weit.roadyfoody.review.application.dto.ReviewRequest
 import kr.weit.roadyfoody.review.domain.FoodSpotsReview
 import kr.weit.roadyfoody.review.domain.FoodSpotsReviewPhoto
-import kr.weit.roadyfoody.review.dto.ReviewRequest
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import java.time.LocalDateTime

@@ -1,10 +1,10 @@
-package kr.weit.roadyfoody.review.service
+package kr.weit.roadyfoody.review.application.service
 
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
 import kr.weit.roadyfoody.foodSpots.repository.getByFoodSpotsId
 import kr.weit.roadyfoody.global.service.ImageService
+import kr.weit.roadyfoody.review.application.dto.ReviewRequest
 import kr.weit.roadyfoody.review.domain.FoodSpotsReviewPhoto
-import kr.weit.roadyfoody.review.dto.ReviewRequest
 import kr.weit.roadyfoody.review.repository.FoodSportsReviewRepository
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewPhotoRepository
 import kr.weit.roadyfoody.user.domain.User
