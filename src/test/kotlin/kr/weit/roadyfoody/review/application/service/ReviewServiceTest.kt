@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.review.service
+package kr.weit.roadyfoody.review.application.service
 
 import createMockTestReview
 import createTestReviewPhoto
@@ -13,7 +13,6 @@ import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodSpot
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
 import kr.weit.roadyfoody.foodSpots.repository.getByFoodSpotsId
 import kr.weit.roadyfoody.global.service.ImageService
-import kr.weit.roadyfoody.review.application.service.ReviewCommandService
 import kr.weit.roadyfoody.review.domain.FoodSpotsReviewPhoto
 import kr.weit.roadyfoody.review.exception.FoodSpotsNotFoundException
 import kr.weit.roadyfoody.review.repository.FoodSportsReviewRepository
