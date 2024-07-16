@@ -22,7 +22,8 @@ import kr.weit.roadyfoody.foodSpots.fixture.createMockPhotoList
 import kr.weit.roadyfoody.foodSpots.fixture.createOperationHoursRequest
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportHistoriesResponse
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportRequest
-import kr.weit.roadyfoody.foodSpots.service.FoodSpotsService
+import kr.weit.roadyfoody.foodSpots.service.FoodSpotsCommandService
+import kr.weit.roadyfoody.foodSpots.service.FoodSpotsQueryService
 import kr.weit.roadyfoody.support.annotation.ControllerTest
 import kr.weit.roadyfoody.support.utils.ImageFormat
 import kr.weit.roadyfoody.support.utils.ImageFormat.WEBP
@@ -39,7 +40,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @WebMvcTest(FoodSpotsController::class)
 @ControllerTest
 class FoodSpotsControllerTest(
-    @MockkBean private val foodSpotsService: FoodSpotsService,
+    @MockkBean private val foodSpotsCommandService: FoodSpotsCommandService,
+    @MockkBean private val foodSpotsQueryService: FoodSpotsQueryService,
     private val mockMvc: MockMvc,
     private val objectMapper: ObjectMapper,
 ) : BehaviorSpec(
@@ -50,7 +52,7 @@ class FoodSpotsControllerTest(
                 var reportRequest = createTestReportRequest()
                 var reportPhotos = createMockPhotoList(WEBP)
                 every {
-                    foodSpotsService.createReport(any(), any(), any())
+                    foodSpotsCommandService.createReport(any(), any(), any())
                 } returns Unit
                 `when`("정상적인 데이터가 들어올 경우") {
                     then("가게 리포트가 등록된다.") {
@@ -60,7 +62,9 @@ class FoodSpotsControllerTest(
                                     .file(
                                         createMultipartFile(
                                             TEST_FOOD_SPOTS_REQUEST_NAME,
-                                            objectMapper.writeValueAsBytes(reportRequest).inputStream(),
+                                            objectMapper
+                                                .writeValueAsBytes(reportRequest)
+                                                .inputStream(),
                                         ),
                                     ).file("reportPhotos", reportPhotos[0].bytes)
                                     .file("reportPhotos", reportPhotos[1].bytes),
@@ -77,7 +81,9 @@ class FoodSpotsControllerTest(
                                     .file(
                                         createMultipartFile(
                                             TEST_FOOD_SPOTS_REQUEST_NAME,
-                                            objectMapper.writeValueAsBytes(reportRequest).inputStream(),
+                                            objectMapper
+                                                .writeValueAsBytes(reportRequest)
+                                                .inputStream(),
                                         ),
                                     ),
                             ).andExpect(status().isBadRequest)
@@ -93,7 +99,9 @@ class FoodSpotsControllerTest(
                                     .file(
                                         createMultipartFile(
                                             TEST_FOOD_SPOTS_REQUEST_NAME,
-                                            objectMapper.writeValueAsBytes(reportRequest).inputStream(),
+                                            objectMapper
+                                                .writeValueAsBytes(reportRequest)
+                                                .inputStream(),
                                         ),
                                     ),
                             ).andExpect(status().isBadRequest)
@@ -109,7 +117,9 @@ class FoodSpotsControllerTest(
                                     .file(
                                         createMultipartFile(
                                             TEST_FOOD_SPOTS_REQUEST_NAME,
-                                            objectMapper.writeValueAsBytes(reportRequest).inputStream(),
+                                            objectMapper
+                                                .writeValueAsBytes(reportRequest)
+                                                .inputStream(),
                                         ),
                                     ),
                             ).andExpect(status().isBadRequest)
@@ -125,7 +135,9 @@ class FoodSpotsControllerTest(
                                     .file(
                                         createMultipartFile(
                                             TEST_FOOD_SPOTS_REQUEST_NAME,
-                                            objectMapper.writeValueAsBytes(reportRequest).inputStream(),
+                                            objectMapper
+                                                .writeValueAsBytes(reportRequest)
+                                                .inputStream(),
                                         ),
                                     ),
                             ).andExpect(status().isBadRequest)
@@ -141,7 +153,9 @@ class FoodSpotsControllerTest(
                                     .file(
                                         createMultipartFile(
                                             TEST_FOOD_SPOTS_REQUEST_NAME,
-                                            objectMapper.writeValueAsBytes(reportRequest).inputStream(),
+                                            objectMapper
+                                                .writeValueAsBytes(reportRequest)
+                                                .inputStream(),
                                         ),
                                     ),
                             ).andExpect(status().isBadRequest)
@@ -157,7 +171,9 @@ class FoodSpotsControllerTest(
                                     .file(
                                         createMultipartFile(
                                             TEST_FOOD_SPOTS_REQUEST_NAME,
-                                            objectMapper.writeValueAsBytes(reportRequest).inputStream(),
+                                            objectMapper
+                                                .writeValueAsBytes(reportRequest)
+                                                .inputStream(),
                                         ),
                                     ),
                             ).andExpect(status().isBadRequest)
@@ -179,7 +195,9 @@ class FoodSpotsControllerTest(
                                     .file(
                                         createMultipartFile(
                                             TEST_FOOD_SPOTS_REQUEST_NAME,
-                                            objectMapper.writeValueAsBytes(reportRequest).inputStream(),
+                                            objectMapper
+                                                .writeValueAsBytes(reportRequest)
+                                                .inputStream(),
                                         ),
                                     ),
                             ).apply {
@@ -233,7 +251,13 @@ class FoodSpotsControllerTest(
                         every { mockFile.size } returns 1024 * 1024 + 1
                         every { mockFile.name } returns TEST_FOOD_SPOTS_REQUEST_PHOTO
                         every { mockFile.inputStream } returns createTestImageFile(WEBP).inputStream
-                        every { foodSpotsService.createReport(any(), any(), any()) } just runs
+                        every {
+                            foodSpotsCommandService.createReport(
+                                any(),
+                                any(),
+                                any(),
+                            )
+                        } just runs
                         then("400을 반환") {
                             mockMvc
                                 .perform(
@@ -247,61 +271,67 @@ class FoodSpotsControllerTest(
                                             ),
                                         ).file(mockFile),
                                 ).andExpect(status().isBadRequest)
-                            verify(exactly = 0) { foodSpotsService.createReport(any(), any(), any()) }
+                            verify(exactly = 0) {
+                                foodSpotsCommandService.createReport(
+                                    any(),
+                                    any(),
+                                    any(),
+                                )
+                            }
                         }
                     }
                 }
+            }
 
-                given("GET $requestPath/histories/{userId} Test") {
-                    val response =
-                        SliceResponse(
-                            listOf(createTestReportHistoriesResponse()),
-                            TEST_FOOD_SPOTS_HAS_NEXT,
-                        )
+            given("GET $requestPath/histories/{userId} Test") {
+                val response =
+                    SliceResponse(
+                        listOf(createTestReportHistoriesResponse()),
+                        TEST_FOOD_SPOTS_HAS_NEXT,
+                    )
+                every {
+                    foodSpotsQueryService.getReportHistories(any(), any(), any())
+                } returns response
+                `when`("정상적인 요청이 들어올 경우") {
+                    then("해당 유저의 리포트 이력을 반환한다.") {
+                        mockMvc
+                            .perform(
+                                getWithAuth("$requestPath/histories/$TEST_USER_ID")
+                                    .param("size", TEST_FOOD_SPOTS_SIZE.toString())
+                                    .param("lastId", TEST_FOOD_SPOTS_LAST_ID.toString()),
+                            ).andExpect(status().isOk)
+                    }
+                }
+
+                `when`("size와 lastId가 없는 경우") {
                     every {
-                        foodSpotsService.getReportHistories(any(), any(), any())
+                        foodSpotsQueryService.getReportHistories(any(), any(), any())
                     } returns response
-                    `when`("정상적인 요청이 들어올 경우") {
-                        then("해당 유저의 리포트 이력을 반환한다.") {
-                            mockMvc
-                                .perform(
-                                    getWithAuth("$requestPath/histories/$TEST_USER_ID")
-                                        .param("size", TEST_FOOD_SPOTS_SIZE.toString())
-                                        .param("lastId", TEST_FOOD_SPOTS_LAST_ID.toString()),
-                                ).andExpect(status().isOk)
-                        }
+                    then("기본값으로 해당 유저의 리포트 이력을 반환한다.") {
+                        mockMvc
+                            .perform(
+                                getWithAuth("$requestPath/histories/$TEST_USER_ID"),
+                            ).andExpect(status().isOk)
                     }
+                }
 
-                    `when`("size와 lastId가 없는 경우") {
-                        every {
-                            foodSpotsService.getReportHistories(any(), any(), any())
-                        } returns response
-                        then("기본값으로 해당 유저의 리포트 이력을 반환한다.") {
-                            mockMvc
-                                .perform(
-                                    getWithAuth("$requestPath/histories/$TEST_USER_ID"),
-                                ).andExpect(status().isOk)
-                        }
+                `when`("size가 양수가 아닌 경우") {
+                    then("400을 반환") {
+                        mockMvc
+                            .perform(
+                                getWithAuth("$requestPath/histories/$TEST_USER_ID")
+                                    .param("size", "0"),
+                            ).andExpect(status().isBadRequest)
                     }
+                }
 
-                    `when`("size가 양수가 아닌 경우") {
-                        then("400을 반환") {
-                            mockMvc
-                                .perform(
-                                    getWithAuth("$requestPath/histories/$TEST_USER_ID")
-                                        .param("size", "0"),
-                                ).andExpect(status().isBadRequest)
-                        }
-                    }
-
-                    `when`("lastId가 양수가 아닌 경우") {
-                        then("400을 반환") {
-                            mockMvc
-                                .perform(
-                                    getWithAuth("$requestPath/histories/$TEST_USER_ID")
-                                        .param("lastId", "-1"),
-                                ).andExpect(status().isBadRequest)
-                        }
+                `when`("lastId가 양수가 아닌 경우") {
+                    then("400을 반환") {
+                        mockMvc
+                            .perform(
+                                getWithAuth("$requestPath/histories/$TEST_USER_ID")
+                                    .param("lastId", "-1"),
+                            ).andExpect(status().isBadRequest)
                     }
                 }
             }

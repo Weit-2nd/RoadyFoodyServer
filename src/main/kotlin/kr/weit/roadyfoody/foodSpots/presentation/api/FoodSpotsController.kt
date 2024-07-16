@@ -8,7 +8,8 @@ import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.dto.ReportHistoriesResponse
 import kr.weit.roadyfoody.foodSpots.dto.ReportRequest
 import kr.weit.roadyfoody.foodSpots.presentation.spec.FoodSportsControllerSpec
-import kr.weit.roadyfoody.foodSpots.service.FoodSpotsService
+import kr.weit.roadyfoody.foodSpots.service.FoodSpotsCommandService
+import kr.weit.roadyfoody.foodSpots.service.FoodSpotsQueryService
 import kr.weit.roadyfoody.foodSpots.validator.WebPImageList
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.http.HttpStatus.CREATED
@@ -26,7 +27,8 @@ import org.springframework.web.multipart.MultipartFile
 @RestController
 @RequestMapping("/api/v1/food-spots")
 class FoodSpotsController(
-    private val foodSpotsService: FoodSpotsService,
+    private val foodSpotsCommandService: FoodSpotsCommandService,
+    private val foodSpotsQueryService: FoodSpotsQueryService,
 ) : FoodSportsControllerSpec {
     @ResponseStatus(CREATED)
     @PostMapping(consumes = [MULTIPART_FORM_DATA_VALUE])
@@ -40,7 +42,7 @@ class FoodSpotsController(
         @WebPImageList
         @RequestPart(required = false)
         reportPhotos: List<MultipartFile>?,
-    ) = foodSpotsService.createReport(user, reportRequest, reportPhotos)
+    ) = foodSpotsCommandService.createReport(user, reportRequest, reportPhotos)
 
     @GetMapping("/histories/{userId}")
     override fun getReportHistories(
@@ -52,5 +54,5 @@ class FoodSpotsController(
         @Positive(message = "마지막 ID는 양수여야 합니다.")
         @RequestParam(required = false)
         lastId: Long?,
-    ): SliceResponse<ReportHistoriesResponse> = foodSpotsService.getReportHistories(userId, size, lastId)
+    ): SliceResponse<ReportHistoriesResponse> = foodSpotsQueryService.getReportHistories(userId, size, lastId)
 }
