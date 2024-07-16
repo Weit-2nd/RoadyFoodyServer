@@ -118,7 +118,7 @@ class ReviewControllerTest(
                 }
 
                 reportRequest = createTestReviewRequest(rating = TEST_INVALID_RATING)
-                `when`("별점이 양수가 아닌 경우") {
+                `when`("별점이 0점보다 작은 경우") {
                     then("400 반환") {
                         mockMvc
                             .perform(
