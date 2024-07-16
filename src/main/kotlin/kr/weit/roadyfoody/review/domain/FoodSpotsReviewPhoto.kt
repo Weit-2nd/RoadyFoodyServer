@@ -27,6 +27,12 @@ class FoodSpotsReviewPhoto(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "food_spots_reviews_id", updatable = false)
     val foodSpotsReview: FoodSpotsReview,
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false, length = 50)
     val fileName: String,
-) : BaseTimeEntity()
+) : BaseTimeEntity() {
+    constructor(foodSpotsReview: FoodSpotsReview, fileName: String) : this(
+        0L,
+        foodSpotsReview,
+        fileName,
+    )
+}

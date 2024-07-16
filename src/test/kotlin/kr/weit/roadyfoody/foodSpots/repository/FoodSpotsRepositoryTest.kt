@@ -1,5 +1,7 @@
 package kr.weit.roadyfoody.foodSpots.repository
 
+import TEST_INVALID_FOOD_SPOT_ID
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
@@ -10,6 +12,7 @@ import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOT_LONGITUDE
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodCategories
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsFoodCategory
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsForDistance
+import kr.weit.roadyfoody.review.exception.FoodSpotsNotFoundException
 import kr.weit.roadyfoody.support.annotation.RepositoryTest
 
 @RepositoryTest
@@ -93,6 +96,24 @@ class FoodSpotsRepositoryTest(
 
                     expected.shouldHaveSize(1)
                     expected.get(0).name shouldBe foodSpots[0].name
+                }
+            }
+        }
+        describe("getByFoodSpotsId") {
+            context("존재하는 id를 받는 경우") {
+                it("해당 id의 음식점를 반환") {
+                    val foodSpot = foodSpotsRepository.getByFoodSpotsId(foodSpots[0].id)
+                    foodSpot.name shouldBe foodSpots[0].name
+                }
+            }
+
+            context("존재하지 않는 id를 받는 경우") {
+                it("FoodSpotsNotFoundException 반환") {
+                    shouldThrow<FoodSpotsNotFoundException> {
+                        foodSpotsRepository.getByFoodSpotsId(
+                            TEST_INVALID_FOOD_SPOT_ID,
+                        )
+                    }
                 }
             }
         }
