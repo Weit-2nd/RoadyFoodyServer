@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.search.foodSpots.application
+package kr.weit.roadyfoody.search.foodSpots.application.service
 
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
@@ -72,6 +72,7 @@ class FoodSpotsSearchService(
         val additionalRadius = (searchRadius - baseRadius) / baseRadius
         val coinRequired = (2.0.pow(additionalRadius.toDouble()) * 100).toInt()
         val lockKey = generateRedisUserLockKey(user.id)
+
         redisLockUtil.executeWithLock(lockKey) {
             if (user.coin >= coinRequired) {
                 user.decreaseCoin(coinRequired)
@@ -114,5 +115,8 @@ class FoodSpotsSearchService(
         }
     }
 
-    private fun generateRedisUserLockKey(id: Long) = id.toString()
+    private fun generateRedisUserLockKey(id: Long): String {
+        val baseKey = "user:$id:coin-lock"
+        return baseKey
+    }
 }
