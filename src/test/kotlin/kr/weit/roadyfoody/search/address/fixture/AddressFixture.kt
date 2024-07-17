@@ -1,8 +1,8 @@
 package kr.weit.roadyfoody.search.address.fixture
 
-import kr.weit.roadyfoody.search.address.application.dto.AddressResponseWrapper
-import kr.weit.roadyfoody.search.address.application.dto.AddressSearchResponse
-import kr.weit.roadyfoody.search.address.application.dto.AddressSearchResponses
+import kr.weit.roadyfoody.search.address.dto.AddressResponseWrapper
+import kr.weit.roadyfoody.search.address.dto.AddressSearchResponse
+import kr.weit.roadyfoody.search.address.dto.AddressSearchResponses
 import org.springframework.core.io.ClassPathResource
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper
 
@@ -17,16 +17,12 @@ object AddressFixture {
         return objectMapper.readValue(resource.inputStream, AddressResponseWrapper::class.java)
     }
 
-    fun loadAddressResponseSize10(): AddressResponseWrapper {
-        return loadResponse(ADDRESS_RESPONSE_SIZE_10)
-    }
+    fun loadAddressResponseSize10(): AddressResponseWrapper = loadResponse(ADDRESS_RESPONSE_SIZE_10)
 
-    fun loadAddressResponseSize0(): AddressResponseWrapper {
-        return loadResponse(ADDRESS_RESPONSE_SIZE_0)
-    }
+    fun loadAddressResponseSize0(): AddressResponseWrapper = loadResponse(ADDRESS_RESPONSE_SIZE_0)
 
-    fun createSearchResponses(): AddressSearchResponses {
-        return AddressSearchResponses(
+    fun createSearchResponses(): AddressSearchResponses =
+        AddressSearchResponses(
             listOf(
                 AddressSearchResponse(
                     addressName = "addressName",
@@ -46,5 +42,4 @@ object AddressFixture {
                 ),
             ),
         )
-    }
 }

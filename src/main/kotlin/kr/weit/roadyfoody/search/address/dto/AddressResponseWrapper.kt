@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.search.address.application.dto
+package kr.weit.roadyfoody.search.address.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 

@@ -23,7 +23,10 @@ import kr.weit.roadyfoody.common.domain.BaseTimeEntity
 )
 class ReportFoodCategory(
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "REPORT_FOOD_CATEGORIES_SEQ_GENERATOR")
+    @GeneratedValue(
+        strategy = GenerationType.SEQUENCE,
+        generator = "REPORT_FOOD_CATEGORIES_SEQ_GENERATOR",
+    )
     val id: Long = 0L,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "food_spots_history_id")
