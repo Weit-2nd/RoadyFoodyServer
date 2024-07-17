@@ -32,7 +32,7 @@ class FoodSpotsSearchService(
         foodSpotsSearchQuery: FoodSpotsSearchCondition,
     ): FoodSpotsSearchResponses {
         val baseRadius = 500
-        var searchRadius = foodSpotsSearchQuery.radius
+        val searchRadius = foodSpotsSearchQuery.radius
 
         if (searchRadius > baseRadius) {
             handleRadiusExpansion(searchRadius, baseRadius, user)
