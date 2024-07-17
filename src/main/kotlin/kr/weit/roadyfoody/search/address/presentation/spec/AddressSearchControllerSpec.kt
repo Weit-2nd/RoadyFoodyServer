@@ -11,8 +11,8 @@ import jakarta.validation.constraints.Size
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.global.swagger.ApiErrorCodeExamples
 import kr.weit.roadyfoody.global.swagger.v1.SwaggerTag
-import kr.weit.roadyfoody.search.address.application.dto.AddressSearchResponse
-import kr.weit.roadyfoody.search.address.application.dto.AddressSearchResponses
+import kr.weit.roadyfoody.search.address.dto.AddressSearchResponse
+import kr.weit.roadyfoody.search.address.dto.AddressSearchResponses
 import org.springframework.web.bind.annotation.RequestParam
 
 @Tag(name = SwaggerTag.SEARCH)

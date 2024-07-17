@@ -9,9 +9,9 @@ import kr.weit.roadyfoody.foodSpots.domain.FoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOT_LATITUDE
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOT_LONGITUDE
+import kr.weit.roadyfoody.foodSpots.fixture.createFoodSpotsForDistance
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodCategories
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsFoodCategory
-import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsForDistance
 import kr.weit.roadyfoody.review.exception.FoodSpotsNotFoundException
 import kr.weit.roadyfoody.support.annotation.RepositoryTest
 
@@ -25,7 +25,7 @@ class FoodSpotsRepositoryTest(
         lateinit var foodCategory: List<FoodCategory>
 
         beforeSpec {
-            foodSpots = foodSpotsRepository.saveAllAndFlush(createTestFoodSpotsForDistance())
+            foodSpots = foodSpotsRepository.saveAllAndFlush(createFoodSpotsForDistance())
         }
 
         describe("getHistoriesByUser 메소드는") {

@@ -202,7 +202,7 @@ fun createTestFoodSpotsFoodCategory(): List<FoodSpotsFoodCategory> =
         createTestFoodSpotsFoodCategory(7L, createTestFoodSpots(3L), createTestFoodCategory(3L)),
     )
 
-fun createTestFoodSpotsForDistance(): List<FoodSpots> =
+fun createFoodSpotsForDistance(): List<FoodSpots> =
     listOf(
         createTestFoodSpots(
             name = "Food Spot 1 - 100m",
@@ -221,6 +221,30 @@ fun createTestFoodSpotsForDistance(): List<FoodSpots> =
             point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE - 0.008, TEST_FOOD_SPOT_LATITUDE),
         ),
         createTestFoodSpots(
+            name = "Food Spot 5 - 1km",
+            point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE, TEST_FOOD_SPOT_LATITUDE + 0.01),
+        ),
+    )
+
+fun createTestFoodSpotsForDistance(): List<FoodSpots> =
+    listOf(
+        MockTestFoodSpot(
+            name = "Food Spot 1 - 100m",
+            point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE + 0.001, TEST_FOOD_SPOT_LATITUDE),
+        ),
+        MockTestFoodSpot(
+            name = "Food Spot 2 - 300m",
+            point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE, TEST_FOOD_SPOT_LATITUDE + 0.003),
+        ),
+        MockTestFoodSpot(
+            name = "Food Spot 3 - 500m",
+            point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE + 0.005, TEST_FOOD_SPOT_LATITUDE),
+        ),
+        MockTestFoodSpot(
+            name = "Food Spot 4 - 800m",
+            point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE - 0.008, TEST_FOOD_SPOT_LATITUDE),
+        ),
+        MockTestFoodSpot(
             name = "Food Spot 5 - 1km",
             point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE, TEST_FOOD_SPOT_LATITUDE + 0.01),
         ),

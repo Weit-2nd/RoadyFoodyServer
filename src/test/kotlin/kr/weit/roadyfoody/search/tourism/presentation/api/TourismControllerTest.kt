@@ -8,6 +8,7 @@ import io.mockk.verify
 import kr.weit.roadyfoody.search.tourism.application.service.TourismService
 import kr.weit.roadyfoody.search.tourism.fixture.TourismFixture.createSearchResponses
 import kr.weit.roadyfoody.support.annotation.ControllerTest
+import kr.weit.roadyfoody.support.utils.getWithAuth
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
@@ -28,8 +29,9 @@ class TourismControllerTest(
                 every { tourismService.searchTourism(2, "강원") } returns createSearchResponses()
                 then("200 상태 번호와 SearchResponses 반환한다.") {
                     mockMvc
-                        .perform(get("$requestPath/search?numOfRows=2&keyword=강원"))
-                        .andExpect(status().isOk)
+                        .perform(
+                            getWithAuth("$requestPath/search?numOfRows=2&keyword=강원"),
+                        ).andExpect(status().isOk)
                         .andExpect(
                             content().json(
                                 objectMapper.writeValueAsString(
@@ -44,7 +46,7 @@ class TourismControllerTest(
                 then("400을 반환") {
                     mockMvc
                         .perform(
-                            get("$requestPath/search")
+                            getWithAuth("$requestPath/search")
                                 .param("keyword", "")
                                 .param("numOfRows", "2"),
                         ).andExpect(status().isBadRequest)
@@ -55,7 +57,7 @@ class TourismControllerTest(
                 then("400을 반환") {
                     mockMvc
                         .perform(
-                            get("$requestPath/search")
+                            getWithAuth("$requestPath/search")
                                 .param("keyword", "a".repeat(61))
                                 .param("numOfRows", "2"),
                         ).andExpect(status().isBadRequest)

@@ -20,6 +20,7 @@ fun createTestUser(
     id: Long = TEST_USER_ID,
     nickname: String = TEST_USER_NICKNAME,
     socialId: String = TEST_USER_SOCIAL_ID,
+    coin: Int = 500,
 ) = User(
     id,
     socialId,
@@ -27,6 +28,7 @@ fun createTestUser(
         nickname,
         "${TEST_USER_PROFILE_IMAGE_NAME}_$id",
     ),
+    coin,
 )
 
 // fail case
