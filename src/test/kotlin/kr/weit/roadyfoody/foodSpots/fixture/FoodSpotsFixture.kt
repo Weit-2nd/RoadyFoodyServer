@@ -1,5 +1,10 @@
 package kr.weit.roadyfoody.foodSpots.fixture
 
+import kr.weit.roadyfoody.foodSpots.application.dto.OperationHoursRequest
+import kr.weit.roadyfoody.foodSpots.application.dto.ReportCategoryResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoriesResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.ReportPhotoResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
 import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
@@ -10,11 +15,6 @@ import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsOperationHours
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
 import kr.weit.roadyfoody.foodSpots.domain.ReportFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHours
-import kr.weit.roadyfoody.foodSpots.dto.OperationHoursRequest
-import kr.weit.roadyfoody.foodSpots.dto.ReportCategoryResponse
-import kr.weit.roadyfoody.foodSpots.dto.ReportHistoriesResponse
-import kr.weit.roadyfoody.foodSpots.dto.ReportPhotoResponse
-import kr.weit.roadyfoody.foodSpots.dto.ReportRequest
 import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_MAX_LENGTH
 import kr.weit.roadyfoody.global.utils.CoordinateUtils
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponse
@@ -277,13 +277,6 @@ class MockTestFoodSpot(
 ) : FoodSpots(id, name, foodTruck, open, closed, point, operationHours, foodCategories) {
     override var createdDateTime: LocalDateTime = LocalDateTime.now()
     override var updatedDateTime: LocalDateTime = LocalDateTime.now()
-
-    companion object {
-        fun createPoint(
-            longitude: Double,
-            latitude: Double,
-        ): Point = CoordinateUtils.createCoordinate(longitude, latitude)
-    }
 }
 
 class MockTestFoodSpotsHistory(
