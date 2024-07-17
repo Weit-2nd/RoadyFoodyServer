@@ -25,7 +25,8 @@ class SearchDsl : Jpql() {
         centerLatitude: Double,
     ): Predicate {
         val distanceClause = "distance=$radius"
-        val sdoGeometry = "SDO_GEOMETRY(2001, 4326, SDO_POINT_TYPE($centerLongitude, $centerLatitude, NULL), NULL, NULL)"
+        val sdoGeometry =
+            "SDO_GEOMETRY(2001, 4326, SDO_POINT_TYPE($centerLongitude, $centerLatitude, NULL), NULL, NULL)"
         val sdoWithinDistanceClause = "SDO_WITHIN_DISTANCE({0}, $sdoGeometry, '$distanceClause')"
 
         val sdoWithinDistance =
@@ -50,7 +51,8 @@ class SearchDsl : Jpql() {
         centerLongitude: Double,
         centerLatitude: Double,
     ): Expression<Double> {
-        val sdoGeometry = "SDO_GEOMETRY(2001, 4326, SDO_POINT_TYPE($centerLongitude, $centerLatitude, NULL), NULL, NULL)"
+        val sdoGeometry =
+            "SDO_GEOMETRY(2001, 4326, SDO_POINT_TYPE($centerLongitude, $centerLatitude, NULL), NULL, NULL)"
         val sdoDistanceClause = "SDO_GEOM.SDO_DISTANCE({0}, $sdoGeometry, 1)"
 
         return Expressions.customExpression(

@@ -2,11 +2,11 @@ CREATE SEQUENCE rewards_seq START WITH 1 INCREMENT BY 1;
 
 CREATE TABLE rewards
 (
-    id              NUMBER(19, 0) NOT NULL,
-    user_id NUMBER(19, 0),
+    id                    NUMBER(19, 0) NOT NULL,
+    user_id               NUMBER(19, 0),
     food_spots_history_id NUMBER(19, 0),
-    reward_point INT NOT NULL,
-    created_datetime TIMESTAMP NOT NULL,
+    reward_point          INT       NOT NULL,
+    created_datetime      TIMESTAMP NOT NULL,
     CONSTRAINT pk_rewards PRIMARY KEY (id)
 );
 

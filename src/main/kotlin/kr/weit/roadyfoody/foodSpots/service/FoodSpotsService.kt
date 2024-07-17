@@ -1,7 +1,5 @@
 package kr.weit.roadyfoody.foodSpots.service
 
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.ExecutorService
 import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
@@ -28,6 +26,8 @@ import kr.weit.roadyfoody.user.repository.getByUserId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutorService
 
 @Service
 class FoodSpotsService(
@@ -54,10 +54,32 @@ class FoodSpotsService(
         val foodStoreHistory = reportRequest.toFoodSpotsHistoryEntity(foodSpotsInfo, user)
         foodSpotsHistoryRepository.save(foodStoreHistory)
         val foodCategories = foodCategoryRepository.getFoodCategories(reportRequest.foodCategories)
-        reportOperationHoursRepository.saveAll(reportRequest.toReportOperationHoursEntity(foodStoreHistory))
-        foodSportsOperationHoursRepository.saveAll(reportRequest.toOperationHoursEntity(foodSpotsInfo))
-        reportFoodCategoryRepository.saveAll(foodCategories.map { ReportFoodCategory(foodStoreHistory, it) })
-        foodSpotsCategoryRepository.saveAll(foodCategories.map { FoodSpotsFoodCategory(foodSpotsInfo, it) })
+        reportOperationHoursRepository.saveAll(
+            reportRequest.toReportOperationHoursEntity(
+                foodStoreHistory,
+            ),
+        )
+        foodSportsOperationHoursRepository.saveAll(
+            reportRequest.toOperationHoursEntity(
+                foodSpotsInfo,
+            ),
+        )
+        reportFoodCategoryRepository.saveAll(
+            foodCategories.map {
+                ReportFoodCategory(
+                    foodStoreHistory,
+                    it,
+                )
+            },
+        )
+        foodSpotsCategoryRepository.saveAll(
+            foodCategories.map {
+                FoodSpotsFoodCategory(
+                    foodSpotsInfo,
+                    it,
+                )
+            },
+        )
 
         photos?.let {
             val generatorPhotoNameMap = photos.associateBy { imageService.generateImageName(it) }

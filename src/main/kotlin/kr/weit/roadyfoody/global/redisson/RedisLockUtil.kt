@@ -24,16 +24,14 @@ class RedisLockUtil(
         val available = lock.tryLock(LOCK_WAIT_TIME_MS, LOCK_LEASE_TIME_MS, TIME_UNIT)
 
         try {
-            if (!available)
-                {
-                    throw RedisLockFailedException(ErrorCode.REDISSON_LOCK_TOO_MANY_REQUEST.errorMessage)
-                }
+            if (!available) {
+                throw RedisLockFailedException(ErrorCode.REDISSON_LOCK_TOO_MANY_REQUEST.errorMessage)
+            }
             return action()
         } finally {
-            if (available)
-                {
-                    lock.unlock()
-                }
+            if (available) {
+                lock.unlock()
+            }
         }
     }
 }
