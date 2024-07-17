@@ -16,6 +16,7 @@ import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodSpotList
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsForDistance
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
 import kr.weit.roadyfoody.global.redisson.RedisLockUtil
+import kr.weit.roadyfoody.search.foodSpots.application.service.FoodSpotsSearchService
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import kr.weit.roadyfoody.user.repository.UserRepository

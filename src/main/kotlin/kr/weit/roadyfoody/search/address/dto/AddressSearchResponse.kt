@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.search.address.application.dto
+package kr.weit.roadyfoody.search.address.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 
@@ -18,8 +18,8 @@ data class AddressSearchResponse(
     val tel: String?,
 ) {
     companion object {
-        fun from(document: Document): AddressSearchResponse {
-            return AddressSearchResponse(
+        fun from(document: Document): AddressSearchResponse =
+            AddressSearchResponse(
                 placeName = document.placeName,
                 addressName = document.addressName,
                 roadAddressName = document.roadAddressName,
@@ -27,7 +27,6 @@ data class AddressSearchResponse(
                 latitude = document.y.toDouble(),
                 tel = document.phone,
             )
-        }
     }
 }
 

@@ -1,6 +1,6 @@
 package kr.weit.roadyfoody.search.foodSpots.presentation.api
 
-import kr.weit.roadyfoody.search.foodSpots.application.FoodSpotsSearchService
+import kr.weit.roadyfoody.search.foodSpots.application.service.FoodSpotsSearchService
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
 import kr.weit.roadyfoody.search.foodSpots.presentation.spec.FoodSpotsSearchControllerSpec
 import kr.weit.roadyfoody.user.domain.User

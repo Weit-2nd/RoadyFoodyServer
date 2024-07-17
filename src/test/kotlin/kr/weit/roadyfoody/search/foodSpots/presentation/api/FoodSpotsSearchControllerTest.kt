@@ -5,13 +5,11 @@ import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
 import kr.weit.roadyfoody.foodSpots.fixture.createFoodSpotsSearchResponses
-import kr.weit.roadyfoody.search.foodSpots.application.FoodSpotsSearchService
+import kr.weit.roadyfoody.search.foodSpots.application.service.FoodSpotsSearchService
 import kr.weit.roadyfoody.support.annotation.ControllerTest
 import kr.weit.roadyfoody.support.utils.getWithAuth
-import org.mockito.Mockito.`when`
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
