@@ -31,6 +31,8 @@ fun createTestUser(
     coin,
 )
 
+fun createTestUsers(size: Int = 5) = List(size) { createTestUser(it.toLong() + 1) }
+
 // fail case
 const val TEST_NONEXISTENT_ID = 0L
 const val TEST_NONEXISTENT_NICKNAME = "JohnDoe"
