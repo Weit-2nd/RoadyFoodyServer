@@ -1,5 +1,6 @@
 package kr.weit.roadyfoody.foodSpots.fixture
 
+import kr.weit.roadyfoody.foodSpots.application.dto.FoodCategoryResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.OperationHoursRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportCategoryResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoriesResponse
@@ -309,3 +310,6 @@ fun createFoodSpotsSearchResponses(): FoodSpotsSearchResponses =
             ),
         ),
     )
+
+fun createFoodCategoryResponse(foodCategory: FoodCategory = createTestFoodCategory()): FoodCategoryResponse =
+    FoodCategoryResponse.of(foodCategory)
