@@ -7,5 +7,6 @@ object SwaggerTag {
     const val SEARCH: String = "C. 검색 API"
     const val FOOD_SPOTS: String = "D. 음식점 리포트 API"
     const val REVIEW: String = "E. 리뷰 API"
+    const val FOOD_CATEGORIES: String = "F. 음식점 카테고리 API"
     const val ADMIN: String = "Z. 관리자 API"
 }
