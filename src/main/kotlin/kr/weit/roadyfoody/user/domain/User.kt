@@ -50,6 +50,11 @@ class User(
         this.coin -= minusCoin
         return this.coin
     }
+
+    fun increaseCoin(plusCoin: Int): Int {
+        this.coin += plusCoin
+        return this.coin
+    }
 }
 
 @Embeddable

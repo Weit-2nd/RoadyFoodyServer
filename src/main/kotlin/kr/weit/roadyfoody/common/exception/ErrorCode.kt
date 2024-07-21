@@ -8,6 +8,7 @@ enum class ErrorCode(
     val code: Int,
     val errorMessage: String,
 ) {
+    // global error
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, -10000, "Invalid request"),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, -10001, "Unauthorized"),
     FORBIDDEN(HttpStatus.FORBIDDEN, -10002, "Forbidden"),
@@ -22,11 +23,9 @@ enum class ErrorCode(
     PAYLOAD_TOO_LARGE(HttpStatus.PAYLOAD_TOO_LARGE, -10008, "Payload too large"),
     NOT_FOUND_USER(HttpStatus.NOT_FOUND, -10009, "Not found user"),
     NOT_FOUND_TERM(HttpStatus.NOT_FOUND, -10010, "Not found term"),
-    REDISSON_LOCK_TOO_MANY_REQUEST(
-        HttpStatus.TOO_MANY_REQUESTS,
-        -10012,
-        "동시에 많은 요청이 발생했습니다. 잠시 후 다시 시도해주세요",
-    ),
+    REDISSON_LOCK_TOO_MANY_REQUEST(HttpStatus.TOO_MANY_REQUESTS, -10012, "동시에 많은 요청이 발생했습니다. 잠시 후 다시 시도해주세요"),
+    REDISSON_LOCK_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, -10013, "레디스 락을 사용할 수 없습니다."),
+    BAD_REDISSON_IDENTIFIER(HttpStatus.INTERNAL_SERVER_ERROR, -10014, "레디스 락 식별자가 잘못되었습니다."),
 
     // Bad Request -10000으로 코드 통일
     SIZE_NON_POSITIVE(HttpStatus.BAD_REQUEST, -10000, "조회할 개수는 양수여야 합니다."),

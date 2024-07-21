@@ -1,6 +1,6 @@
 package kr.weit.roadyfoody.support.annotation
 
-import kr.weit.roadyfoody.testcontainers.TestContainersConfig
+import kr.weit.roadyfoody.global.testcontainers.TestContainersConfig
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration

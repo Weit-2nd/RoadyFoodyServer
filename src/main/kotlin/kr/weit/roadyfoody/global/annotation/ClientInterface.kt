@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.common.annotation
+package kr.weit.roadyfoody.global.annotation
 
 import org.springframework.stereotype.Component
 import org.springframework.web.service.annotation.HttpExchange
