@@ -1,6 +1,6 @@
 package kr.weit.roadyfoody
 
-import kr.weit.roadyfoody.global.testcontainers.TestContainersConfig
+import kr.weit.roadyfoody.support.config.testcontainers.TestContainersConfig
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
