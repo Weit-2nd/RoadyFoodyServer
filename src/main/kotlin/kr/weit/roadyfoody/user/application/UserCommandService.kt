@@ -17,10 +17,9 @@ class UserCommandService(
         coin: Int,
     ) {
         val user = userRepository.getByUserId(userId)
-        if (user.coin < coin)
-            {
-                throw RoadyFoodyBadRequestException(ErrorCode.COIN_NOT_ENOUGH)
-            }
+        if (user.coin < coin) {
+            throw RoadyFoodyBadRequestException(ErrorCode.COIN_NOT_ENOUGH)
+        }
         user.decreaseCoin(coin)
     }
 
