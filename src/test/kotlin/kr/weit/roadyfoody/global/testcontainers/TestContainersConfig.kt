@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.testcontainers
+package kr.weit.roadyfoody.global.testcontainers
 
 import com.redis.testcontainers.RedisContainer
 import org.slf4j.LoggerFactory
