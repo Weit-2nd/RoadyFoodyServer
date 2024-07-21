@@ -1,7 +1,5 @@
 package kr.weit.roadyfoody.search.foodSpots.application.service
 
-import kr.weit.roadyfoody.common.exception.ErrorCode
-import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsQueryService
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponses
@@ -24,11 +22,7 @@ class FoodSpotsSearchService(
 
         val additionalRadius = (searchRadius - baseRadius) / baseRadius
         val coinRequired = (2.0.pow(additionalRadius.toDouble()) * 100).toInt()
-        if (user.coin >= coinRequired) {
-            userCommandService.decreaseCoin(user.id, coinRequired)
-        } else {
-            throw RoadyFoodyBadRequestException(ErrorCode.COIN_NOT_ENOUGH)
-        }
+        userCommandService.decreaseCoin(user.id, coinRequired)
 
         return foodSpotsQueryService.searchFoodSpots(foodSpotsSearchQuery)
     }
