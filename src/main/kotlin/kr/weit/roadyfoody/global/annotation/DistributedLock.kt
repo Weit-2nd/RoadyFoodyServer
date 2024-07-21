@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit
 annotation class DistributedLock(
     val lockName: String,
     val identifier: String,
-    val waitTime: Long = 10L,
-    val leaseTime: Long = 30L,
+    val waitTime: Long = 30L,
+    val leaseTime: Long = 10L,
     val timeUnit: TimeUnit = TimeUnit.SECONDS,
 )
