@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.common.annotation
+package kr.weit.roadyfoody.global.annotation
 
 import java.util.concurrent.TimeUnit
 

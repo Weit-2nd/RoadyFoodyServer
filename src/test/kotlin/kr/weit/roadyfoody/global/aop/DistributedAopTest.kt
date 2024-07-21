@@ -2,7 +2,7 @@ package kr.weit.roadyfoody.global.aop
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
-import kr.weit.roadyfoody.common.annotation.DistributedLock
+import kr.weit.roadyfoody.global.annotation.DistributedLock
 import kr.weit.roadyfoody.support.annotation.ServiceIntegrateTest
 import org.springframework.stereotype.Service
 import java.util.concurrent.CountDownLatch

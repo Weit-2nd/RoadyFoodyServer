@@ -15,7 +15,6 @@ import kr.weit.roadyfoody.foodSpots.fixture.MockTestFoodSpot
 import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodSpotList
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsForDistance
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
-import kr.weit.roadyfoody.global.redisson.RedisLockUtil
 import kr.weit.roadyfoody.search.foodSpots.application.service.FoodSpotsSearchService
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
 import kr.weit.roadyfoody.user.fixture.createTestUser
@@ -25,8 +24,8 @@ class FoodSpotsSearchServiceTest :
     BehaviorSpec({
         val foodSpotsRepository = mockk<FoodSpotsRepository>()
         val userRepository = mockk<UserRepository>()
-        val redisLockUtil = mockk<RedisLockUtil>()
-        val foodSpotsSearchService = FoodSpotsSearchService(foodSpotsRepository, userRepository, redisLockUtil)
+
+        val foodSpotsSearchService = FoodSpotsSearchService(foodSpotsRepository, userRepository)
         val user = createTestUser()
         afterEach { clearAllMocks() }
 
@@ -75,13 +74,6 @@ class FoodSpotsSearchServiceTest :
                     )
                 } returns createTestFoodSpotsForDistance()
 
-                every {
-                    redisLockUtil.executeWithLock(any<String>(), any<() -> Unit>())
-                } answers {
-                    val callback = it.invocation.args[1] as () -> Unit
-                    callback()
-                    true
-                }
                 val userWithCoin = createTestUser(coin = 1000)
                 every {
                     userRepository.save(any())
@@ -104,14 +96,6 @@ class FoodSpotsSearchServiceTest :
                         emptyList(),
                     )
                 } returns createTestFoodSpotsForDistance()
-
-                every {
-                    redisLockUtil.executeWithLock(any<String>(), any<() -> Unit>())
-                } answers {
-                    val callback = it.invocation.args[1] as () -> Unit
-                    callback()
-                    true
-                }
 
                 val userWithoutCoin = createTestUser(coin = 0)
 

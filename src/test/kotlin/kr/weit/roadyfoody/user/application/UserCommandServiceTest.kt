@@ -9,17 +9,17 @@ import kr.weit.roadyfoody.user.fixture.createTestUser
 import kr.weit.roadyfoody.user.repository.UserRepository
 import java.util.Optional
 
-class UserQueryServiceTest :
+class UserCommandServiceTest :
     BehaviorSpec({
         val userRepository = mockk<UserRepository>()
-        val userQueryService = UserQueryService(userRepository)
+        val userCommandService = UserCommandService(userRepository)
         val user = createTestUser()
         given("decreaseCoin 테스트") {
             val minusCoin = 100
             val expectedCoin = user.coin - minusCoin
             every { userRepository.findById(TEST_USER_ID) } returns Optional.of(user)
             `when`("코인을 감소시키면") {
-                userQueryService.decreaseCoin(user.id, minusCoin)
+                userCommandService.decreaseCoin(user.id, minusCoin)
                 then("코인이 감소한다.") {
                     user.coin shouldBe expectedCoin
                 }
@@ -31,7 +31,7 @@ class UserQueryServiceTest :
             val expectedCoin = user.coin + plusCoin
             every { userRepository.findById(TEST_USER_ID) } returns Optional.of(user)
             `when`("코인을 증가시키면") {
-                userQueryService.increaseCoin(user.id, plusCoin)
+                userCommandService.increaseCoin(user.id, plusCoin)
                 then("코인이 증가한다.") {
                     user.coin shouldBe expectedCoin
                 }

@@ -5,7 +5,6 @@ import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
 import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
-import kr.weit.roadyfoody.global.redisson.RedisLockUtil
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponse
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponses
@@ -24,7 +23,6 @@ import kotlin.math.pow
 class FoodSpotsSearchService(
     private val foodSpotsRepository: FoodSpotsRepository,
     private val userRepository: UserRepository,
-    private val redisLockUtil: RedisLockUtil,
 ) {
     @Transactional
     fun searchFoodSpots(
@@ -73,20 +71,18 @@ class FoodSpotsSearchService(
         val coinRequired = (2.0.pow(additionalRadius.toDouble()) * 100).toInt()
         val lockKey = generateRedisUserLockKey(user.id)
 
-        redisLockUtil.executeWithLock(lockKey) {
-            if (user.coin >= coinRequired) {
-                user.decreaseCoin(coinRequired)
-                userRepository.save(
-                    User(
-                        user.id,
-                        user.socialId,
-                        user.profile,
-                        user.coin,
-                    ),
-                )
-            } else {
-                throw RoadyFoodyBadRequestException(ErrorCode.COIN_NOT_ENOUGH)
-            }
+        if (user.coin >= coinRequired) {
+            user.decreaseCoin(coinRequired)
+            userRepository.save(
+                User(
+                    user.id,
+                    user.socialId,
+                    user.profile,
+                    user.coin,
+                ),
+            )
+        } else {
+            throw RoadyFoodyBadRequestException(ErrorCode.COIN_NOT_ENOUGH)
         }
     }
 

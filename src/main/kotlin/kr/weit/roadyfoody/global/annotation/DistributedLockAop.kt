@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.common.annotation
+package kr.weit.roadyfoody.global.annotation
 
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.RedisLockFailedException
@@ -20,7 +20,7 @@ class DistributedLockAop(
 ) {
     val log: Logger = LoggerFactory.getLogger(DistributedLockAop::class.java)
 
-    @Around("@annotation(kr.weit.roadyfoody.common.annotation.DistributedLock)")
+    @Around("@annotation(kr.weit.roadyfoody.global.annotation.DistributedLock)")
     fun lock(joinPoint: ProceedingJoinPoint): Any? {
         val signature = joinPoint.signature as MethodSignature
         val method = signature.method
