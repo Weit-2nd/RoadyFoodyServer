@@ -1,5 +1,7 @@
 package kr.weit.roadyfoody.user.application
 
+import kr.weit.roadyfoody.common.exception.ErrorCode
+import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
 import kr.weit.roadyfoody.global.annotation.DistributedLock
 import kr.weit.roadyfoody.user.repository.UserRepository
 import kr.weit.roadyfoody.user.repository.getByUserId
@@ -15,6 +17,9 @@ class UserCommandService(
         coin: Int,
     ) {
         val user = userRepository.getByUserId(userId)
+        if (user.coin < coin) {
+            throw RoadyFoodyBadRequestException(ErrorCode.COIN_NOT_ENOUGH)
+        }
         user.decreaseCoin(coin)
     }
 
