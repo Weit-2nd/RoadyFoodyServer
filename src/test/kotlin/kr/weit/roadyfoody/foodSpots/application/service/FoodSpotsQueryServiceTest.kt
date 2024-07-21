@@ -167,7 +167,7 @@ class FoodSpotsQueryServiceTest :
                     }
                 }
 
-                `when`("정상적으로 카테고리 별 500m 거리 이내 음식점을 반환한다.") {
+                `when`("정상적으로 카테고리 별 500m 거리 이내 음식점 검색이 가능한 경우") {
                     val categoryQuery =
                         FoodSpotsSearchCondition(
                             centerLongitude = 0.0,

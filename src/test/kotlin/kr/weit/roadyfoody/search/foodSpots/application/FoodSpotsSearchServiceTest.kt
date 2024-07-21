@@ -1,13 +1,12 @@
 package kr.weit.roadyfoody.search.foodSpots.application
 
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
+import io.mockk.every
 import io.mockk.mockk
-import kr.weit.roadyfoody.common.exception.ErrorCode
-import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsQueryService
+import kr.weit.roadyfoody.foodSpots.fixture.createFoodSpotsSearchResponses
 import kr.weit.roadyfoody.search.foodSpots.application.service.FoodSpotsSearchService
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
 import kr.weit.roadyfoody.user.application.UserCommandService
@@ -31,16 +30,15 @@ class FoodSpotsSearchServiceTest :
                     name = null,
                     categoryIds = emptyList(),
                 )
-            `when`("코인이 없어 10000m 거리 이내 음식점 검색이 불가능한 경우") {
+            `when`("코인이 있고 1000m이내 가게 검색을 요청하면") {
 
-                val userWithoutCoin = createTestUser(coin = 0)
+                val user = createTestUser(coin = 1000)
+                every { userCommandService.decreaseCoin(any(), any()) } returns Unit
+                every { foodSpotsQueryService.searchFoodSpots(query1000m) } returns createFoodSpotsSearchResponses()
 
-                then("${ErrorCode.COIN_NOT_ENOUGH.errorMessage}를 던진다") {
-                    val ex =
-                        shouldThrow<RoadyFoodyBadRequestException> {
-                            foodSpotsSearchService.searchFoodSpots(userWithoutCoin, query1000m)
-                        }
-                    ex.message shouldBe ErrorCode.COIN_NOT_ENOUGH.errorMessage
+                then("정상적으로 검색되어야 한다.") {
+                    val result = foodSpotsSearchService.searchFoodSpots(user, query1000m)
+                    result shouldBe createFoodSpotsSearchResponses()
                 }
             }
         }
