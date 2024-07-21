@@ -6,4 +6,7 @@ enum class RewardPoint(
     REPORT(100),
     FIRST_REPORT(200),
     CLOSED_REPORT(150),
+    ;
+
+    val point = point
 }
