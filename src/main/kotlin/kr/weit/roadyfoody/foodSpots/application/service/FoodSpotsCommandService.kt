@@ -77,25 +77,24 @@ class FoodSpotsCommandService(
             },
         )
 
-        photos?.let {
-            val generatorPhotoNameMap = photos.associateBy { imageService.generateImageName(it) }
+        val generatorPhotoNameMap = photos?.associateBy { imageService.generateImageName(it) } ?: emptyMap()
 
-            generatorPhotoNameMap
-                .map {
-                    FoodSpotsPhoto.of(foodStoreHistory, it.key)
-                }.also { foodSpotsPhotoRepository.saveAll(it) }
+        generatorPhotoNameMap
+            .map {
+                FoodSpotsPhoto.of(foodStoreHistory, it.key)
+            }.also { foodSpotsPhotoRepository.saveAll(it) }
 
-            generatorPhotoNameMap
-                .map {
-                    CompletableFuture.supplyAsync({
-                        imageService.upload(
-                            it.key,
-                            it.value,
-                        )
-                    }, executor)
-                }.forEach { it.join() }
-        }
         entityManager.flush()
         userCommandService.increaseCoin(user.id, RewardPoint.FIRST_REPORT.point)
+
+        generatorPhotoNameMap
+            .map {
+                CompletableFuture.supplyAsync({
+                    imageService.upload(
+                        it.key,
+                        it.value,
+                    )
+                }, executor)
+            }.forEach { it.join() }
     }
 }
