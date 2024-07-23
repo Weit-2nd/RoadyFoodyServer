@@ -1,5 +1,6 @@
 package kr.weit.roadyfoody.foodSpots.application.service
 
+import jakarta.persistence.EntityManager
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
@@ -14,6 +15,8 @@ import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportOperationHoursRepository
 import kr.weit.roadyfoody.foodSpots.repository.getFoodCategories
 import kr.weit.roadyfoody.global.service.ImageService
+import kr.weit.roadyfoody.mission.domain.RewardPoint
+import kr.weit.roadyfoody.user.application.UserCommandService
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -33,6 +36,8 @@ class FoodSpotsCommandService(
     private val foodSpotsCategoryRepository: FoodSpotsFoodCategoryRepository,
     private val imageService: ImageService,
     private val executor: ExecutorService,
+    private val userCommandService: UserCommandService,
+    private val entityManager: EntityManager,
 ) {
     @Transactional
     fun createReport(
@@ -72,24 +77,25 @@ class FoodSpotsCommandService(
             },
         )
 
-        photos?.let {
-            val generatorPhotoNameMap = photos.associateBy { imageService.generateImageName(it) }
+        val generatorPhotoNameMap = photos?.associateBy { imageService.generateImageName(it) } ?: emptyMap()
 
-            generatorPhotoNameMap
-                .map {
-                    FoodSpotsPhoto.of(foodStoreHistory, it.key)
-                }.also { foodSpotsPhotoRepository.saveAll(it) }
+        generatorPhotoNameMap
+            .map {
+                FoodSpotsPhoto.of(foodStoreHistory, it.key)
+            }.also { foodSpotsPhotoRepository.saveAll(it) }
 
-            generatorPhotoNameMap
-                .map {
-                    CompletableFuture.supplyAsync({
-                        imageService.upload(
-                            it.key,
-                            it.value,
-                        )
-                    }, executor)
-                }.forEach { it.join() }
-        }
+        entityManager.flush()
+        userCommandService.increaseCoin(user.id, RewardPoint.FIRST_REPORT.point)
+
+        generatorPhotoNameMap
+            .map {
+                CompletableFuture.supplyAsync({
+                    imageService.upload(
+                        it.key,
+                        it.value,
+                    )
+                }, executor)
+            }.forEach { it.join() }
     }
 
     @Transactional
