@@ -66,6 +66,6 @@ class ReportFoodCategoryRepositoryTest(
                     val result = reportFoodCategoryRepository.getByHistoryId(foodSpotsHistory.id)
                     result.size shouldBe 0
                 }
+            }
         }
-    }
     })

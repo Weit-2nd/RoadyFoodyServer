@@ -67,7 +67,7 @@ class FoodSpotsHistoryRepositoryTest(
                     foodSpotsHistoryRepository.deleteAll(histories)
                     val historiesAfterDelete = foodSpotsHistoryRepository.findByUser(user)
                     historiesAfterDelete.size shouldBe 0
+                }
             }
         }
-    }
     })
