@@ -3,8 +3,11 @@ package kr.weit.roadyfoody.foodSpots.application.service
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
 import io.mockk.spyk
+import jakarta.persistence.EntityManager
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsOperationHours
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
@@ -31,6 +34,7 @@ import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportOperationHoursRepository
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.support.utils.ImageFormat
+import kr.weit.roadyfoody.user.application.UserCommandService
 import kr.weit.roadyfoody.user.fixture.TEST_USER_ID
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import kr.weit.roadyfoody.user.repository.UserRepository
@@ -51,6 +55,8 @@ class FoodSpotsCommandServiceTest :
             val foodSpotsCategoryRepository = mockk<FoodSpotsFoodCategoryRepository>()
             val imageService = spyk(ImageService(mockk()))
             val executor = mockk<ExecutorService>()
+            val userCommandService = mockk<UserCommandService>()
+            val entityManager = mockk<EntityManager>()
             val foodSpotsCommandService =
                 FoodSpotsCommandService(
                     foodSpotsRepository,
@@ -63,6 +69,8 @@ class FoodSpotsCommandServiceTest :
                     foodSpotsCategoryRepository,
                     imageService,
                     executor,
+                    userCommandService,
+                    entityManager,
                 )
             val user = createTestUser()
 
@@ -85,6 +93,8 @@ class FoodSpotsCommandServiceTest :
                 every { executor.execute(any()) } answers {
                     firstArg<Runnable>().run()
                 }
+                every { userCommandService.increaseCoin(any(), any()) } just runs
+                every { entityManager.flush() } just runs
                 `when`("정상적인 데이터와 이미지가 들어올 경우") {
                     then("정상적으로 저장되어야 한다.") {
                         foodSpotsCommandService.createReport(
