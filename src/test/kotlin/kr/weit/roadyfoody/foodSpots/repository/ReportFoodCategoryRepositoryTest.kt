@@ -58,4 +58,14 @@ class ReportFoodCategoryRepositoryTest(
                 }
             }
         }
+
+        describe("deleteByFoodSpotsHistoryIn 메소드는") {
+            context("카테고리를 등록한 report history 리스트를 받는 경우") {
+                it("해당 history 리스트 모두 삭제한다.") {
+                    reportFoodCategoryRepository.deleteByFoodSpotsHistoryIn(listOf(foodSpotsHistory))
+                    val result = reportFoodCategoryRepository.getByHistoryId(foodSpotsHistory.id)
+                    result.size shouldBe 0
+                }
+        }
+    }
     })

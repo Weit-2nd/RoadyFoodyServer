@@ -47,4 +47,18 @@ class ReviewCommandService(
                 }.forEach { it.join() }
         }
     }
+
+    @Transactional
+    fun deleteWithdrewUserReview(user: User) {
+        reviewRepository.findByUser(user).also {
+            if (it.isNotEmpty()) {
+                reviewPhotoRepository
+                    .findByFoodSpotsReviewIn(it)
+                    .onEach { photo ->
+                        imageService.remove(photo.fileName)
+                    }.also { photoList -> reviewPhotoRepository.deleteAll(photoList) }
+                reviewRepository.deleteAll(it)
+            }
+        }
+    }
 }

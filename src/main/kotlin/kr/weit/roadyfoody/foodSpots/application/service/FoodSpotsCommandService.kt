@@ -91,4 +91,20 @@ class FoodSpotsCommandService(
                 }.forEach { it.join() }
         }
     }
+
+    @Transactional
+    fun deleteWithdrawUserReport(user: User) {
+        foodSpotsHistoryRepository.findByUser(user).also {
+            if (it.isNotEmpty()) {
+                reportOperationHoursRepository.deleteByFoodSpotsHistoryIn(it)
+                reportFoodCategoryRepository.deleteByFoodSpotsHistoryIn(it)
+                val photo =
+                    foodSpotsPhotoRepository
+                        .findByHistoryIn(it)
+                        .onEach { photo -> imageService.remove(photo.fileName) }
+                foodSpotsPhotoRepository.deleteAll(photo)
+                foodSpotsHistoryRepository.deleteAll(it)
+            }
+        }
+    }
 }

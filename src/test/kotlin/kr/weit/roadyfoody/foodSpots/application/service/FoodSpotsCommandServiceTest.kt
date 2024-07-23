@@ -119,5 +119,32 @@ class FoodSpotsCommandServiceTest :
                     }
                 }
             }
+            given("deleteWithdrawUserReport 테스트") {
+                `when`("유저 삭제 요청이 들어올 경우") {
+                    every { foodSpotsHistoryRepository.findByUser(any()) } returns
+                        listOf(
+                            createMockTestFoodHistory(),
+                        )
+                    every { reportOperationHoursRepository.deleteByFoodSpotsHistoryIn(any()) } returns Unit
+                    every { reportFoodCategoryRepository.deleteByFoodSpotsHistoryIn(any()) } returns Unit
+                    every { foodSpotsPhotoRepository.findByHistoryIn(any()) } returns
+                        listOf(
+                            createTestFoodSpotsPhoto(),
+                        )
+                    every { imageService.remove(any()) } returns Unit
+                    every { foodSpotsPhotoRepository.deleteAll(any()) } returns Unit
+                    every { foodSpotsHistoryRepository.deleteAll(any()) } returns Unit
+                    then("정상적으로 삭제되어야 한다.") {
+                        foodSpotsCommandService.deleteWithdrawUserReport(user)
+                    }
+                }
+
+                `when`("유저가 작성한 리포트가 없을 경우") {
+                    every { foodSpotsHistoryRepository.findByUser(any()) } returns emptyList()
+                    then("아무런 동작이 일어나지 않아야 한다.") {
+                        foodSpotsCommandService.deleteWithdrawUserReport(user)
+                    }
+                }
+            }
         },
     )

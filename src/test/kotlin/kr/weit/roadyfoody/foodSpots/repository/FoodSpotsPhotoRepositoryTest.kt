@@ -17,27 +17,34 @@ import kr.weit.roadyfoody.user.repository.UserRepository
 class FoodSpotsPhotoRepositoryTest(
     private val foodSpotsPhotoRepository: FoodSpotsPhotoRepository,
     private val foodSpotsHistoryRepository: FoodSpotsHistoryRepository,
-    private val foodSPotsRepository: FoodSpotsRepository,
+    private val foodSpotsRepository: FoodSpotsRepository,
     private val userRepository: UserRepository,
 ) : DescribeSpec({
         lateinit var user: User
         lateinit var foodSpots: FoodSpots
+        lateinit var otherFoodSpots: FoodSpots
         lateinit var foodSpotsHistory: FoodSpotsHistory
-        lateinit var otherFoodSpotsHistory: FoodSpotsHistory
+        lateinit var notExistPhotoFoodSpotsHistory: FoodSpotsHistory
         lateinit var foodSpotsPhoto: FoodSpotsPhoto
         lateinit var otherFoodSpotsPhoto: FoodSpotsPhoto
         beforeEach {
             user = userRepository.save(createTestUser(0L))
-            foodSpots = foodSPotsRepository.save(createTestFoodSpots())
+            foodSpots = foodSpotsRepository.save(createTestFoodSpots())
+            otherFoodSpots = foodSpotsRepository.save(createTestFoodSpots())
             foodSpotsHistory = foodSpotsHistoryRepository.save(createTestFoodHistory(foodSpots = foodSpots, user = user))
-            otherFoodSpotsHistory = foodSpotsHistoryRepository.save(createTestFoodHistory(foodSpots = foodSpots, user = user))
-            foodSpotsPhoto = foodSpotsPhotoRepository.save(createTestFoodSpotsPhoto(foodSpotsHistory))
-            otherFoodSpotsPhoto = foodSpotsPhotoRepository.save(createTestFoodSpotsPhoto(foodSpotsHistory))
+            notExistPhotoFoodSpotsHistory =
+                foodSpotsHistoryRepository.save(
+                    createTestFoodHistory(
+                        foodSpots = otherFoodSpots,
+                        user = user,
+                    ),
+                )
+            foodSpotsPhoto = createTestFoodSpotsPhoto(foodSpotsHistory)
+            otherFoodSpotsPhoto = createTestFoodSpotsPhoto(foodSpotsHistory)
             foodSpotsPhotoRepository.saveAll(
                 listOf(
                     foodSpotsPhoto,
                     otherFoodSpotsPhoto,
-                    createTestFoodSpotsPhoto(otherFoodSpotsHistory),
                 ),
             )
         }
@@ -57,4 +64,31 @@ class FoodSpotsPhotoRepositoryTest(
                 }
             }
         }
+
+        describe("findByHistoryIn 메소드는") {
+            context("존재하는 history 리스트를 받는 경우") {
+                it("일치하는 FoodSpotsPhoto 리스트를 반환한다.") {
+                    val result = foodSpotsPhotoRepository.findByHistoryIn(listOf(foodSpotsHistory))
+                    result.size shouldBe 2
+                }
+            }
+
+            context("사진이 존재하지 않는 history가 포함된 리스트를 받는 경우") {
+                it("일치하는 FoodSpotsPhoto 리스트를 반환한다.") {
+                    val result =
+                        foodSpotsPhotoRepository.findByHistoryIn(listOf(notExistPhotoFoodSpotsHistory))
+                    result shouldBe emptyList()
+                }
+            }
+        }
+
+        describe("deleteByHistoryId 메소드는") {
+            context("존재하는 report history 리스트를 받는 경우") {
+                it("해당 historyId 에 해당하는 FoodSpotsPhoto 를 삭제한다.") {
+                    foodSpotsPhotoRepository.findAll().size shouldBe 2
+                    foodSpotsPhotoRepository.deleteAll(listOf(foodSpotsPhoto, otherFoodSpotsPhoto))
+                foodSpotsPhotoRepository.findAll().size shouldBe 0
+            }
+        }
+    }
     })

@@ -16,7 +16,9 @@ fun FoodSpotsHistoryRepository.getHistoriesByUser(
 
 interface FoodSpotsHistoryRepository :
     JpaRepository<FoodSpotsHistory, Long>,
-    CustomFoodSpotsHistoryRepository
+    CustomFoodSpotsHistoryRepository {
+    fun findByUser(user: User): List<FoodSpotsHistory>
+}
 
 interface CustomFoodSpotsHistoryRepository {
     fun findSliceByUser(
