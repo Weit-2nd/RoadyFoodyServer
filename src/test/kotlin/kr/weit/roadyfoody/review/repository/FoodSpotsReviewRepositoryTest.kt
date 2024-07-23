@@ -12,10 +12,10 @@ import kr.weit.roadyfoody.user.fixture.createTestUser
 import kr.weit.roadyfoody.user.repository.UserRepository
 
 @RepositoryTest
-class FoodSportsReviewRepositoryTest(
+class FoodSpotsReviewRepositoryTest(
     private val userRepository: UserRepository,
     private val foodSpotsRepository: FoodSpotsRepository,
-    private val reviewRepository: FoodSportsReviewRepository,
+    private val reviewRepository: FoodSpotsReviewRepository,
 ) : DescribeSpec(
         {
             lateinit var user: User
