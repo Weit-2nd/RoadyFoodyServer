@@ -24,6 +24,12 @@ fun createTestReviewRequest(
     rating: Int = TEST_REVIEW_RATING,
 ) = ReviewRequest(foodSpotsId, contents, rating)
 
+fun createTestFoodSpotsReview(
+    user: User = createTestUser(),
+    foodSpots: FoodSpots = createTestFoodSpots(),
+    rate: Int = TEST_REVIEW_RATING,
+) = FoodSpotsReview(0L, foodSpots, user, rate, TEST_REVIEW_CONTENT)
+
 fun createMockTestReview(
     user: User = createTestUser(),
     foodSpots: FoodSpots = createTestFoodSpots(),

@@ -30,7 +30,6 @@ class FoodSpotsHistoryRepositoryTest(
                 listOf(
                     createTestFoodHistory(user = user, foodSpots = foodSpots),
                     createTestFoodHistory(user = user, foodSpots = otherFoodSpots),
-                    createTestFoodHistory(user = otherUser, foodSpots = foodSpots),
                 ),
             )
         }
@@ -41,6 +40,33 @@ class FoodSpotsHistoryRepositoryTest(
                     val histories = foodSpotsHistoryRepository.getHistoriesByUser(user, TEST_FOOD_SPOTS_SIZE, null)
                     histories.map { it.id }.content shouldBe listOf(otherFoodSpots.id, foodSpots.id)
                     histories.content.size shouldBe 2
+                }
+            }
+        }
+
+        describe("findByUser 메소드는") {
+            context("리포트 이력이 존재하는 user 를 받는 경우") {
+                it("해당 user 의 FoodSpotsHistory 리스트를 반환한다.") {
+                    val histories = foodSpotsHistoryRepository.findByUser(user)
+                    histories.size shouldBe 2
+                }
+            }
+
+            context("리포트 이력이 없는 user 를 받는 경우") {
+                it("빈 리스트를 반환한다.") {
+                    val histories = foodSpotsHistoryRepository.findByUser(otherUser)
+                    histories shouldBe emptyList()
+                }
+            }
+        }
+
+        describe("deleteAll 메소드는") {
+            context("history list를 받는 경우") {
+                it("해당 history 리스트 모두 삭제한다.") {
+                    val histories = foodSpotsHistoryRepository.findByUser(user)
+                    foodSpotsHistoryRepository.deleteAll(histories)
+                    val historiesAfterDelete = foodSpotsHistoryRepository.findByUser(user)
+                    historiesAfterDelete.size shouldBe 0
                 }
             }
         }

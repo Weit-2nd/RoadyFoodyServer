@@ -5,8 +5,8 @@ import kr.weit.roadyfoody.foodSpots.repository.getByFoodSpotsId
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.review.application.dto.ReviewRequest
 import kr.weit.roadyfoody.review.domain.FoodSpotsReviewPhoto
-import kr.weit.roadyfoody.review.repository.FoodSportsReviewRepository
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewPhotoRepository
+import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -16,7 +16,7 @@ import java.util.concurrent.ExecutorService
 
 @Service
 class ReviewCommandService(
-    private val reviewRepository: FoodSportsReviewRepository,
+    private val reviewRepository: FoodSpotsReviewRepository,
     private val reviewPhotoRepository: FoodSpotsReviewPhotoRepository,
     private val foodSpotsRepository: FoodSpotsRepository,
     private val imageService: ImageService,
@@ -45,6 +45,20 @@ class ReviewCommandService(
                         )
                     }, executor)
                 }.forEach { it.join() }
+        }
+    }
+
+    @Transactional
+    fun deleteWithdrewUserReview(user: User) {
+        reviewRepository.findByUser(user).also {
+            if (it.isNotEmpty()) {
+                reviewPhotoRepository
+                    .findByFoodSpotsReviewIn(it)
+                    .onEach { photo ->
+                        imageService.remove(photo.fileName)
+                    }.also { photoList -> reviewPhotoRepository.deleteAll(photoList) }
+                reviewRepository.deleteAll(it)
+            }
         }
     }
 }
