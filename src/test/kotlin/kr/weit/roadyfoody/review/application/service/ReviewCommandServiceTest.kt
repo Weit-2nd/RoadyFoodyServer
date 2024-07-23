@@ -15,8 +15,8 @@ import kr.weit.roadyfoody.foodSpots.repository.getByFoodSpotsId
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.review.domain.FoodSpotsReviewPhoto
 import kr.weit.roadyfoody.review.exception.FoodSpotsNotFoundException
-import kr.weit.roadyfoody.review.repository.FoodSportsReviewRepository
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewPhotoRepository
+import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
 import kr.weit.roadyfoody.support.utils.ImageFormat
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import java.util.Optional
@@ -25,7 +25,7 @@ import java.util.concurrent.ExecutorService
 class ReviewCommandServiceTest :
     BehaviorSpec(
         {
-            val reviewRepository = mockk<FoodSportsReviewRepository>()
+            val reviewRepository = mockk<FoodSpotsReviewRepository>()
             val reviewPhotoRepository = mockk<FoodSpotsReviewPhotoRepository>()
             val foodSpotsRepository = mockk<FoodSpotsRepository>()
             val imageService = spyk(ImageService(mockk()))

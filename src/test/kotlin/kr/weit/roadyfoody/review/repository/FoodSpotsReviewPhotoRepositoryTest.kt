@@ -17,7 +17,7 @@ import kr.weit.roadyfoody.user.repository.UserRepository
 class FoodSpotsReviewPhotoRepositoryTest(
     private val userRepository: UserRepository,
     private val foodSpotsRepository: FoodSpotsRepository,
-    private val reviewRepository: FoodSportsReviewRepository,
+    private val reviewRepository: FoodSpotsReviewRepository,
     private val reviewPhotoRepository: FoodSpotsReviewPhotoRepository,
 ) : DescribeSpec(
         {

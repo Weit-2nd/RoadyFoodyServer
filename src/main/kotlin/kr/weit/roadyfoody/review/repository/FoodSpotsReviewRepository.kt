@@ -4,6 +4,6 @@ import kr.weit.roadyfoody.review.domain.FoodSpotsReview
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface FoodSportsReviewRepository : JpaRepository<FoodSpotsReview, Long> {
+interface FoodSpotsReviewRepository : JpaRepository<FoodSpotsReview, Long> {
     fun findByUser(user: User): List<FoodSpotsReview>
 }

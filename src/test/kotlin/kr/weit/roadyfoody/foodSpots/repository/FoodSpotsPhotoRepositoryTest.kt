@@ -76,8 +76,13 @@ class FoodSpotsPhotoRepositoryTest(
             context("사진이 존재하지 않는 history가 포함된 리스트를 받는 경우") {
                 it("일치하는 FoodSpotsPhoto 리스트를 반환한다.") {
                     val result =
-                        foodSpotsPhotoRepository.findByHistoryIn(listOf(notExistPhotoFoodSpotsHistory))
-                    result shouldBe emptyList()
+                        foodSpotsPhotoRepository.findByHistoryIn(
+                            listOf(
+                                foodSpotsHistory,
+                                notExistPhotoFoodSpotsHistory,
+                            ),
+                        )
+                    result.size shouldBe 2
                 }
             }
         }
@@ -87,8 +92,8 @@ class FoodSpotsPhotoRepositoryTest(
                 it("해당 historyId 에 해당하는 FoodSpotsPhoto 를 삭제한다.") {
                     foodSpotsPhotoRepository.findAll().size shouldBe 2
                     foodSpotsPhotoRepository.deleteAll(listOf(foodSpotsPhoto, otherFoodSpotsPhoto))
-                foodSpotsPhotoRepository.findAll().size shouldBe 0
+                    foodSpotsPhotoRepository.findAll().size shouldBe 0
+                }
             }
         }
-    }
     })
