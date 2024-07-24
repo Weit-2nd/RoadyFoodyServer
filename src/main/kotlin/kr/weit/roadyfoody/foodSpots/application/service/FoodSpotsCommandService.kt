@@ -16,7 +16,7 @@ import kr.weit.roadyfoody.foodSpots.repository.ReportOperationHoursRepository
 import kr.weit.roadyfoody.foodSpots.repository.getFoodCategories
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.mission.domain.RewardPoint
-import kr.weit.roadyfoody.user.application.UserCommandService
+import kr.weit.roadyfoody.user.application.service.UserCommandService
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

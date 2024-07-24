@@ -34,7 +34,7 @@ import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportOperationHoursRepository
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.support.utils.ImageFormat
-import kr.weit.roadyfoody.user.application.UserCommandService
+import kr.weit.roadyfoody.user.application.service.UserCommandService
 import kr.weit.roadyfoody.user.fixture.TEST_USER_ID
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import kr.weit.roadyfoody.user.repository.UserRepository

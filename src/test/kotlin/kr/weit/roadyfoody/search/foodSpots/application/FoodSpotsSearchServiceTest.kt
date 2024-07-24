@@ -9,7 +9,7 @@ import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsQueryService
 import kr.weit.roadyfoody.foodSpots.fixture.createFoodSpotsSearchResponses
 import kr.weit.roadyfoody.search.foodSpots.application.service.FoodSpotsSearchService
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
-import kr.weit.roadyfoody.user.application.UserCommandService
+import kr.weit.roadyfoody.user.application.service.UserCommandService
 import kr.weit.roadyfoody.user.fixture.createTestUser
 
 class FoodSpotsSearchServiceTest :

@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.user.application
+package kr.weit.roadyfoody.user.application.service
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
