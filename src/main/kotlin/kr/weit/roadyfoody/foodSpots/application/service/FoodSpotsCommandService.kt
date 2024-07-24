@@ -2,6 +2,7 @@ package kr.weit.roadyfoody.foodSpots.application.service
 
 import jakarta.persistence.EntityManager
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
+import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
 import kr.weit.roadyfoody.foodSpots.domain.ReportFoodCategory
@@ -45,39 +46,45 @@ class FoodSpotsCommandService(
         reportRequest: ReportRequest,
         photos: List<MultipartFile>?,
     ) {
-        val foodSpotsInfo = reportRequest.toFoodSpotsEntity()
-        foodSpotsRepository.save(foodSpotsInfo)
-        val foodStoreHistory = reportRequest.toFoodSpotsHistoryEntity(foodSpotsInfo, user)
-        foodSpotsHistoryRepository.save(foodStoreHistory)
+        val foodSpots = storeFoodSpots(reportRequest)
+        storeReport(reportRequest, foodSpots, user, photos)
+    }
+
+    private fun storeFoodSpots(reportRequest: ReportRequest): FoodSpots {
+        val foodSpots = reportRequest.toFoodSpotsEntity()
+        foodSpotsRepository.save(foodSpots)
+
         val foodCategories = foodCategoryRepository.getFoodCategories(reportRequest.foodCategories)
-        reportOperationHoursRepository.saveAll(
-            reportRequest.toReportOperationHoursEntity(
-                foodStoreHistory,
-            ),
-        )
-        foodSportsOperationHoursRepository.saveAll(
-            reportRequest.toOperationHoursEntity(
-                foodSpotsInfo,
-            ),
-        )
-        reportFoodCategoryRepository.saveAll(
-            foodCategories.map {
-                ReportFoodCategory(
-                    foodStoreHistory,
-                    it,
-                )
-            },
-        )
         foodSpotsCategoryRepository.saveAll(
-            foodCategories.map {
-                FoodSpotsFoodCategory(
-                    foodSpotsInfo,
-                    it,
-                )
-            },
+            foodCategories.map { FoodSpotsFoodCategory(foodSpots, it) },
         )
 
-        val generatorPhotoNameMap = photos?.associateBy { imageService.generateImageName(it) } ?: emptyMap()
+        foodSportsOperationHoursRepository.saveAll(
+            reportRequest.toOperationHoursEntity(foodSpots),
+        )
+        return foodSpots
+    }
+
+    private fun storeReport(
+        reportRequest: ReportRequest,
+        foodSpots: FoodSpots,
+        user: User,
+        photos: List<MultipartFile>? = null,
+    ) {
+        val foodStoreHistory = reportRequest.toFoodSpotsHistoryEntity(foodSpots, user)
+        foodSpotsHistoryRepository.save(foodStoreHistory)
+
+        val foodCategories = foodCategoryRepository.getFoodCategories(reportRequest.foodCategories)
+        reportFoodCategoryRepository.saveAll(
+            foodCategories.map { ReportFoodCategory(foodStoreHistory, it) },
+        )
+
+        reportOperationHoursRepository.saveAll(
+            reportRequest.toReportOperationHoursEntity(foodStoreHistory),
+        )
+
+        val generatorPhotoNameMap =
+            photos?.associateBy { imageService.generateImageName(it) } ?: emptyMap()
 
         generatorPhotoNameMap
             .map {
@@ -90,10 +97,7 @@ class FoodSpotsCommandService(
         generatorPhotoNameMap
             .map {
                 CompletableFuture.supplyAsync({
-                    imageService.upload(
-                        it.key,
-                        it.value,
-                    )
+                    imageService.upload(it.key, it.value)
                 }, executor)
             }.forEach { it.join() }
     }
