@@ -104,5 +104,5 @@ class FoodSpotsSearchService(
         return EARTH_RADIUS * c
     }
 
-    fun haversine(`val`: Double): Double = sin(`val` / 2).pow(2.0)
+    fun haversine(value: Double): Double = sin(value / 2).pow(2.0)
 }
