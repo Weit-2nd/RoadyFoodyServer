@@ -156,5 +156,12 @@ class FoodSpotsCommandServiceTest :
                     }
                 }
             }
+
+            given("setFoodSpotsOpen 테스트") {
+                every { foodSpotsRepository.updateOpeningStatus() } returns 1
+                then("정상적으로 업데이트 되어야 한다.") {
+                    foodSpotsCommandService.setFoodSpotsOpen()
+                }
+            }
         },
     )

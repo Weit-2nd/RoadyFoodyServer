@@ -113,4 +113,8 @@ class FoodSpotsCommandService(
             }
         }
     }
+
+    fun setFoodSpotsOpen() {
+        foodSpotsRepository.updateOpeningStatus()
+    }
 }

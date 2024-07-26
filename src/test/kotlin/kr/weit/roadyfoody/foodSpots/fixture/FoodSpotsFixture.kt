@@ -201,6 +201,24 @@ fun createFoodSpotsForDistance(): List<FoodSpots> =
             name = "Food Spot 5 - 1km",
             point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE, TEST_FOOD_SPOT_LATITUDE + 0.01),
         ),
+        createTestFoodSpots(
+            name = "Food Spot 6 - 1km",
+            open = false,
+            point =
+                CoordinateUtils.createCoordinate(
+                    TEST_FOOD_SPOT_LONGITUDE,
+                    TEST_FOOD_SPOT_LATITUDE + 0.01,
+                ),
+        ),
+        createTestFoodSpots(
+            name = "Food Spot 7 - 1km",
+            open = false,
+            point =
+                CoordinateUtils.createCoordinate(
+                    TEST_FOOD_SPOT_LONGITUDE,
+                    TEST_FOOD_SPOT_LATITUDE + 0.01,
+                ),
+        ),
     )
 
 fun createTestFoodSpotsForDistance(): List<FoodSpots> =

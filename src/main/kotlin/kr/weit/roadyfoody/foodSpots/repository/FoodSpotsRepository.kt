@@ -25,6 +25,8 @@ interface CustomFoodSpotsRepository {
         name: String?,
         categoryIds: List<Long>,
     ): List<FoodSpots>
+
+    fun updateOpeningStatus(): Int
 }
 
 class CustomFoodSpotsRepositoryImpl(
@@ -56,6 +58,18 @@ class CustomFoodSpotsRepositoryImpl(
             }
         return executor.findList {
             targetQuery
+        }
+    }
+
+    override fun updateOpeningStatus(): Int {
+        val query =
+            jpql {
+                update(entity(FoodSpots::class))
+                    .set(path(FoodSpots::open), true)
+                    .where(path(FoodSpots::open).notEqual(true))
+            }
+        return executor.update {
+            query
         }
     }
 
