@@ -13,6 +13,7 @@ import kr.weit.roadyfoody.foodSpots.presentation.spec.FoodSportsControllerSpec
 import kr.weit.roadyfoody.foodSpots.validator.WebPImageList
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.http.HttpStatus.CREATED
+import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -55,4 +56,10 @@ class FoodSpotsController(
         @RequestParam(required = false)
         lastId: Long?,
     ): SliceResponse<ReportHistoriesResponse> = foodSpotsQueryService.getReportHistories(userId, size, lastId)
+
+    @ResponseStatus(NO_CONTENT)
+    @GetMapping("/open")
+    override fun setFoodSpotsOpen() {
+        foodSpotsCommandService.setFoodSpotsOpen()
+    }
 }
