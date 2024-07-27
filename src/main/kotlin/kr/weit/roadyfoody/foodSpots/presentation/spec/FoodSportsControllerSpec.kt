@@ -127,15 +127,4 @@ interface FoodSportsControllerSpec {
         @RequestParam(required = false)
         lastId: Long?,
     ): SliceResponse<ReportHistoriesResponse>
-
-    @Operation(
-        description = "음식점 오픈 스케쥴링 API",
-        responses = [
-            ApiResponse(
-                responseCode = "204",
-                description = "업데이트 성공",
-            ),
-        ],
-    )
-    fun setFoodSpotsOpen()
 }

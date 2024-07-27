@@ -335,19 +335,5 @@ class FoodSpotsControllerTest(
                     }
                 }
             }
-
-            given("GET $requestPath/open Test") {
-                every {
-                    foodSpotsCommandService.setFoodSpotsOpen()
-                } just runs
-                `when`("정상적인 요청이 들어올 경우") {
-                    then("가게 상태를 업데이트한다.") {
-                        mockMvc
-                            .perform(
-                                getWithAuth("$requestPath/open"),
-                            ).andExpect(status().isNoContent)
-                    }
-                }
-            }
         },
     )

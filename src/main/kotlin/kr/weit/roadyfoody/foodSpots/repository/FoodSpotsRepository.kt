@@ -61,17 +61,12 @@ class CustomFoodSpotsRepositoryImpl(
         }
     }
 
-    override fun updateOpeningStatus(): Int {
-        val query =
-            jpql {
-                update(entity(FoodSpots::class))
-                    .set(path(FoodSpots::open), true)
-                    .where(path(FoodSpots::open).notEqual(true))
-            }
-        return executor.update {
-            query
+    override fun updateOpeningStatus(): Int =
+        executor.update {
+            update(entity(FoodSpots::class))
+                .set(path(FoodSpots::open), true)
+                .where(path(FoodSpots::open).equal(false))
         }
-    }
 
     private fun filteringByCategoryIds(categoryIds: List<Long>): List<Long> {
         val query: SelectQuery<Long> =
