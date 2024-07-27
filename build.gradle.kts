@@ -105,3 +105,11 @@ tasks.getByName("bootJar") {
 tasks.getByName<Jar>("jar") {
     enabled = false
 }
+
+// https://github.com/Ninja-Squad/springmockk/blob/master/README.md#gotchas
+tasks.test {
+    jvmArgs(
+        "--add-opens",
+        "java.base/java.lang.reflect=ALL-UNNAMED",
+    )
+}
