@@ -7,6 +7,7 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.spyk
+import io.mockk.verify
 import jakarta.persistence.EntityManager
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsOperationHours
@@ -167,10 +168,11 @@ class FoodSpotsCommandServiceTest :
                 every { foodSpotsRepository.updateOpeningStatus() } returns 1
                 every { redissonClient.getBucket<String>(any<String>()) } returns
                     mockk {
-                        every { setIfAbsent(any(), any()) } returns false
+                        every { setIfAbsent(any(), any()) } returns true
                     }
                 then("정상적으로 업데이트 되어야 한다.") {
                     foodSpotsCommandService.setFoodSpotsOpen()
+                    verify(exactly = 1) { foodSpotsRepository.updateOpeningStatus() }
                 }
             }
         },
