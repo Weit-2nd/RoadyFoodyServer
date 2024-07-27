@@ -73,7 +73,7 @@ class FoodSpotsSearchService(
         return foodSpotsSearchResponses
     }
 
-    fun calculateDistance(
+    private fun calculateDistance(
         startLat: Double,
         startLong: Double,
         endLat: Double,
