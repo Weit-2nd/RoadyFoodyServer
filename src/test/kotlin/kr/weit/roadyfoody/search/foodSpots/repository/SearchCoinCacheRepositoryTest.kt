@@ -33,7 +33,6 @@ class SearchCoinCacheRepositoryTest
                         val result = searchCoinCacheRepository.findByUserId(0L)
                         result shouldHaveSize searchCoinCaches.size
                         result.forEachIndexed { index, cache ->
-                            print("${cache.id} ${cache.radius} ${searchCoinCaches[index].id}")
                             cache.id shouldBe searchCoinCaches[index].id
                         }
                     }

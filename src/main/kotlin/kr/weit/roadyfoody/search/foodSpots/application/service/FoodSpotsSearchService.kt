@@ -41,19 +41,8 @@ class FoodSpotsSearchService(
         val coinRequired = (2.0.pow(additionalRadius.toDouble()) * 100).toInt()
         val recentSearches = searchCoinCacheRepository.findByUserId(user.id)
 
-        println(recentSearches.size)
-
         val existingCache =
             recentSearches.find { cache ->
-                println(
-                    calculateDistance(
-                        foodSpotsSearchQuery.centerLatitude,
-                        foodSpotsSearchQuery.centerLongitude,
-                        cache.latitude,
-                        cache.longitude,
-                    ),
-                )
-                print("$searchRadius ${cache.radius}")
                 calculateDistance(
                     foodSpotsSearchQuery.centerLatitude,
                     foodSpotsSearchQuery.centerLongitude,
