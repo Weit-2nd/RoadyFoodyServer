@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
 import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
+import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsOperationHours
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
@@ -195,14 +196,13 @@ data class FoodSpotsUpdateRequest(
     val open: Boolean?,
     @Schema(description = "폐업 여부", example = "false")
     val closed: Boolean?,
-    @field:NotEmpty(message = "음식 카테고리는 최소 1개 이상 선택해야 합니다.")
     @Schema(description = "음식 카테고리", example = "[1, 2]")
-    val foodCategories: Set<Long>,
+    val foodCategories: Set<Long>?,
     @field:Valid
     @Schema(
         description = "운영시간 리스트 ex) 사용자가 월/수/금의 운영시간 입력-> 월/수/금 데이터만 보내주세요. 없을 경우, 빈 배열",
     )
-    val operationHours: List<OperationHoursRequest>,
+    val operationHours: List<OperationHoursRequest>?,
 ) {
     fun toReportRequest(foodSpots: FoodSpots) =
         ReportRequest(
@@ -212,17 +212,31 @@ data class FoodSpotsUpdateRequest(
             foodTruck = foodSpots.foodTruck,
             open = this.open ?: foodSpots.open,
             closed = this.closed ?: foodSpots.storeClosure,
-            foodCategories = this.foodCategories,
-            operationHours = this.operationHours,
+            foodCategories = this.foodCategories ?: foodSpots.foodCategoryList.toIds(),
+            operationHours = this.operationHours ?: foodSpots.operationHoursList.toOperationHoursRequests(),
         )
 
-    fun toOperationHoursEntity(foodSpots: FoodSpots) =
-        operationHours.map {
+    fun toOperationHoursEntity(foodSpots: FoodSpots) = operationHours.toOperationHoursEntities(foodSpots)
+}
+
+fun MutableList<FoodSpotsFoodCategory>.toIds() = this.map { it.foodCategory.id }.toSet()
+
+fun MutableList<FoodSpotsOperationHours>.toOperationHoursRequests() =
+    this.map {
+        OperationHoursRequest(
+            dayOfWeek = it.dayOfWeek,
+            openingHours = it.openingHours,
+            closingHours = it.closingHours,
+        )
+    }
+
+fun List<OperationHoursRequest>?.toOperationHoursEntities(foodSpots: FoodSpots) =
+    this
+        ?.map {
             FoodSpotsOperationHours(
                 foodSpots = foodSpots,
                 dayOfWeek = it.dayOfWeek,
                 openingHours = it.openingHours,
                 closingHours = it.closingHours,
             )
-        }
-}
+        }?.toSet()

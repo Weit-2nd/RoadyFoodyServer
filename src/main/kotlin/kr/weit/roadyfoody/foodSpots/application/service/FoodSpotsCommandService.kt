@@ -5,6 +5,7 @@ import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
+import kr.weit.roadyfoody.foodSpots.application.dto.toIds
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
@@ -181,7 +182,11 @@ class FoodSpotsCommandService(
         foodSpots: FoodSpots,
         request: FoodSpotsUpdateRequest,
     ): Boolean {
-        val currentFoodCategoryIds = foodSpots.foodCategoryList.map { it.foodCategory.id }.toSet()
+        if (request.foodCategories == null) {
+            return false
+        }
+
+        val currentFoodCategoryIds = foodSpots.foodCategoryList.toIds()
         val newFoodCategoryIds = request.foodCategories
 
         val categoryIdsToRemove = currentFoodCategoryIds subtract newFoodCategoryIds
@@ -208,7 +213,7 @@ class FoodSpotsCommandService(
         request: FoodSpotsUpdateRequest,
     ): Boolean {
         val currentFoodSpotsOperationHours = foodSpots.operationHoursList.toSet()
-        val newFoodSpotsOperationHours = request.toOperationHoursEntity(foodSpots).toSet()
+        val newFoodSpotsOperationHours = request.toOperationHoursEntity(foodSpots) ?: return false
 
         val foodSpotsOperationHoursToRemove = currentFoodSpotsOperationHours subtract newFoodSpotsOperationHours
         foodSportsOperationHoursRepository.deleteAll(foodSpotsOperationHoursToRemove)
