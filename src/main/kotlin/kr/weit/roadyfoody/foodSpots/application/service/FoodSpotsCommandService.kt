@@ -19,6 +19,7 @@ import kr.weit.roadyfoody.mission.domain.RewardPoint
 import kr.weit.roadyfoody.user.application.UserCommandService
 import kr.weit.roadyfoody.user.domain.User
 import org.redisson.api.RedissonClient
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
@@ -123,6 +124,7 @@ class FoodSpotsCommandService(
         }
     }
 
+    @Scheduled(cron = "0 0 0 * * *")
     fun setFoodSpotsOpen() {
         if (redissonClient
                 .getBucket<String>(
