@@ -12,7 +12,6 @@ import io.mockk.verify
 import kr.weit.roadyfoody.foodSpots.exception.FoodSpotsHistoryNotFoundException
 import kr.weit.roadyfoody.foodSpots.fixture.MockTestFoodSpot
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_HISTORY_ID
-import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_LAST_ID
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_PHOTO_URL
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_SIZE
 import kr.weit.roadyfoody.foodSpots.fixture.createMockSliceFoodHistory
@@ -29,6 +28,7 @@ import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportOperationHoursRepository
 import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
 import kr.weit.roadyfoody.foodSpots.repository.getHistoriesByUser
+import kr.weit.roadyfoody.global.TEST_LAST_ID
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
 import kr.weit.roadyfoody.user.exception.UserNotFoundException
@@ -65,7 +65,7 @@ class FoodSpotsQueryServiceTest :
                     foodSpotsHistoryRepository.getHistoriesByUser(
                         user,
                         TEST_FOOD_SPOTS_SIZE,
-                        TEST_FOOD_SPOTS_LAST_ID,
+                        TEST_LAST_ID,
                     )
                 } returns createMockSliceFoodHistory()
                 every { foodSpotsPhotoRepository.getByHistoryId(any()) } returns
@@ -82,7 +82,7 @@ class FoodSpotsQueryServiceTest :
                         foodSPotsQueryService.getReportHistories(
                             TEST_USER_ID,
                             TEST_FOOD_SPOTS_SIZE,
-                            TEST_FOOD_SPOTS_LAST_ID,
+                            TEST_LAST_ID,
                         )
                     }
                 }
@@ -94,7 +94,7 @@ class FoodSpotsQueryServiceTest :
                             foodSPotsQueryService.getReportHistories(
                                 TEST_USER_ID,
                                 TEST_FOOD_SPOTS_SIZE,
-                                TEST_FOOD_SPOTS_LAST_ID,
+                                TEST_LAST_ID,
                             )
                         }
                     }

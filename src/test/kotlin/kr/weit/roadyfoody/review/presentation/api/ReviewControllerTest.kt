@@ -8,6 +8,7 @@ import TEST_REVIEW_REQUEST_NAME
 import TEST_REVIEW_REQUEST_PHOTO
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
+import createSliceResponseUserReview
 import createTestReviewRequest
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
@@ -16,13 +17,19 @@ import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
 import kr.weit.roadyfoody.foodSpots.fixture.createMockPhotoList
+import kr.weit.roadyfoody.global.TEST_LAST_ID
+import kr.weit.roadyfoody.global.TEST_NON_POSITIVE_ID
+import kr.weit.roadyfoody.global.TEST_NON_POSITIVE_SIZE
+import kr.weit.roadyfoody.global.TEST_PAGE_SIZE
 import kr.weit.roadyfoody.review.application.service.ReviewCommandService
+import kr.weit.roadyfoody.review.application.service.ReviewQueryService
 import kr.weit.roadyfoody.support.annotation.ControllerTest
 import kr.weit.roadyfoody.support.utils.ImageFormat.PNG
 import kr.weit.roadyfoody.support.utils.ImageFormat.WEBP
 import kr.weit.roadyfoody.support.utils.createMultipartFile
 import kr.weit.roadyfoody.support.utils.createTestImageFile
 import kr.weit.roadyfoody.support.utils.multipartWithAuth
+import kr.weit.roadyfoody.user.fixture.TEST_USER_ID
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.web.servlet.MockMvc
@@ -32,6 +39,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @ControllerTest
 class ReviewControllerTest(
     @MockkBean private val reviewCommandService: ReviewCommandService,
+    @MockkBean private val reviewQueryService: ReviewQueryService,
     private val mockMvc: MockMvc,
     private val objectMapper: ObjectMapper,
 ) : BehaviorSpec(
@@ -223,5 +231,94 @@ class ReviewControllerTest(
                     }
                 }
             }
+
+            given("GET $requestPath/user/{userId} Test") {
+                val response = createSliceResponseUserReview()
+                every {
+                    reviewQueryService.getUserReviews(any(), any(), any())
+                } returns response
+                `when`("정상적인 데이터가 들어올 경우") {
+                    then("유저의 리뷰 리스트가 조회된다.") {
+                        mockMvc
+                            .perform(
+                                multipartWithAuth("$requestPath/user/$TEST_USER_ID")
+                                    .param("size", "$TEST_PAGE_SIZE")
+                                    .param("lastId", "$TEST_LAST_ID"),
+                            ).andExpect(status().isOk)
+                    }
+                }
+
+                `when`("userId가 양수가 아닌 경우") {
+                    then("400 반환") {
+                        mockMvc
+                            .perform(
+                                multipartWithAuth("$requestPath/user/$TEST_NON_POSITIVE_ID")
+                                    .param("size", "$TEST_PAGE_SIZE")
+                                    .param("lastId", "$TEST_LAST_ID"),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+
+                `when`("조회할 개수가 양수가 아닌 경우") {
+                    then("400 반환") {
+                        mockMvc
+                            .perform(
+                                multipartWithAuth("$requestPath/user/$TEST_USER_ID")
+                                    .param("size", "$TEST_NON_POSITIVE_SIZE")
+                                    .param("lastId", "$TEST_LAST_ID"),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+
+                `when`("마지막 ID가 양수가 아닌 경우") {
+                    then("400 반환") {
+                        mockMvc
+                            .perform(
+                                multipartWithAuth("$requestPath/user/$TEST_USER_ID")
+                                    .param("size", "$TEST_PAGE_SIZE")
+                                    .param("lastId", "$TEST_NON_POSITIVE_ID"),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+            }
+
+            /*given("GET $requestPath/food-spots/{foodSpotsId} Test") {
+                val response = createMockSliceUserReviewResponse()
+                every {
+                    reviewQueryService.getFoodSpotsReview(any(), any(), any(), any())
+                } returns response
+                `when`("정상적인 데이터가 들어올 경우") {
+                    then("음식점의 리뷰 리스트가 조회된다.") {
+                        mockMvc
+                            .perform(
+                                multipartWithAuth("$requestPath/food-spots/$TEST_USER_ID")
+                                    .param("size", "$TEST_PAGE_SIZE")
+                                    .param("lastId", "$TEST_LAST_ID"),
+                            ).andExpect(status().isOk)
+                    }
+                }
+
+                `when`("조회할 개수가 양수가 아닌 경우") {
+                    then("400 반환") {
+                        mockMvc
+                            .perform(
+                                multipartWithAuth("$requestPath/food-spots/$TEST_USER_ID")
+                                    .param("size", "$TEST_NON_POSITIVE_SIZE")
+                                    .param("lastId", "$TEST_LAST_ID"),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+
+                `when`("마지막 ID가 양수가 아닌 경우") {
+                    then("400 반환") {
+                        mockMvc
+                            .perform(
+                                multipartWithAuth("$requestPath/food-spots/$TEST_USER_ID")
+                                    .param("size", "$TEST_PAGE_SIZE")
+                                    .param("lastId", "$TEST_NON_POSITIVE_ID"),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+            }*/
         },
     )

@@ -6,6 +6,7 @@ import io.kotest.matchers.shouldBe
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpots
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
+import kr.weit.roadyfoody.global.TEST_PAGE_SIZE
 import kr.weit.roadyfoody.support.annotation.RepositoryTest
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.fixture.createTestUser
@@ -50,6 +51,26 @@ class FoodSpotsReviewRepositoryTest(
                         val reviews = reviewRepository.findByUser(user)
                         reviewRepository.deleteAll(reviews)
                         reviewRepository.findAll().size shouldBe 1
+                    }
+                }
+            }
+
+            describe("sliceByUser 메소드는") {
+                context("유저 ID, 사이즈, 마지막 ID을 받는 경우") {
+                    it("해당 유저의 리뷰 리스트를 반환한다.") {
+                        val review = reviewRepository.findByUser(user)
+                        reviewRepository
+                            .sliceByUser(
+                                user,
+                                TEST_PAGE_SIZE,
+                                review[0].id,
+                            ).size shouldBe 1
+                    }
+                }
+
+                context("유저 ID, 사이즈만 받는 경우") {
+                    it("해당 유저의 리뷰 리스트를 반환한다.") {
+                        reviewRepository.sliceByUser(user, TEST_PAGE_SIZE, null).size shouldBe 2
                     }
                 }
             }

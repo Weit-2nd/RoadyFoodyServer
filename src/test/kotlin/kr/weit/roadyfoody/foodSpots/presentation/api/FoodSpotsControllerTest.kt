@@ -13,7 +13,6 @@ import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsCommandService
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsQueryService
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_HAS_NEXT
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_HISTORY_ID
-import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_LAST_ID
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_REQUEST_NAME
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_REQUEST_PHOTO
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_SIZE
@@ -27,6 +26,7 @@ import kr.weit.roadyfoody.foodSpots.fixture.createOperationHoursRequest
 import kr.weit.roadyfoody.foodSpots.fixture.createReportHistoryDetailResponse
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportHistoriesResponse
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportRequest
+import kr.weit.roadyfoody.global.TEST_LAST_ID
 import kr.weit.roadyfoody.support.annotation.ControllerTest
 import kr.weit.roadyfoody.support.utils.ImageFormat
 import kr.weit.roadyfoody.support.utils.ImageFormat.WEBP
@@ -301,7 +301,7 @@ class FoodSpotsControllerTest(
                             .perform(
                                 getWithAuth("$requestPath/histories/$TEST_USER_ID")
                                     .param("size", TEST_FOOD_SPOTS_SIZE.toString())
-                                    .param("lastId", TEST_FOOD_SPOTS_LAST_ID.toString()),
+                                    .param("lastId", TEST_LAST_ID.toString()),
                             ).andExpect(status().isOk)
                     }
                 }
@@ -338,14 +338,14 @@ class FoodSpotsControllerTest(
                     }
                 }
             }
-
+// TODO: PATH가 같음
             given("GET $requestPath/histories/{historyId} Test") {
                 val response = createReportHistoryDetailResponse()
                 every {
                     foodSpotsQueryService.getReportHistory(any())
                 } returns response
                 `when`("정상적인 요청이 들어올 경우") {
-                    then("해당 유저의 리포트 이력을 반환한다.") {
+                    then("해당 리포트 이력의 상세를 반환한다.") {
                         mockMvc
                             .perform(
                                 getWithAuth("$requestPath/histories/$TEST_FOOD_SPOTS_HISTORY_ID"),

@@ -82,4 +82,8 @@ enum class ErrorCode(
     REVIEW_RATING_NEGATIVE(HttpStatus.BAD_REQUEST, -10000, "별점은 0점 이상으로 입력해주세요."),
     REVIEW_RATING_TOO_HIGH(HttpStatus.BAD_REQUEST, -10000, "별점은 10점 이하로 입력해주세요."),
     NOT_FOUND_FOOD_SPOTS(HttpStatus.NOT_FOUND, -10012, "해당 음식점이 존재하지 않습니다."),
+    NOT_FOUND_FOOD_SPOTS_REVIEW(HttpStatus.NOT_FOUND, -10013, "해당 리뷰가 존재하지 않습니다."),
+
+    // User API error 15000대
+    USER_ID_NON_POSITIVE(HttpStatus.BAD_REQUEST, -15000, "유저 ID는 양수여야 합니다."),
 }

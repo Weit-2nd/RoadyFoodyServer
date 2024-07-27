@@ -51,7 +51,6 @@ const val TEST_PHOTO_NAME = "test_photo_name"
 const val TEST_FOOD_SPOTS_REQUEST_NAME = "reportRequest"
 const val TEST_FOOD_SPOTS_REQUEST_PHOTO = "reportPhotos"
 const val TEST_FOOD_SPOTS_SIZE = 10
-const val TEST_FOOD_SPOTS_LAST_ID = 1L
 const val TEST_FOOD_SPOTS_PHOTO_URL = "test_url"
 const val TEST_FOOD_SPOTS_HAS_NEXT = false
 const val TEST_INVALID_FOOD_CATEGORY_ID = -1L
