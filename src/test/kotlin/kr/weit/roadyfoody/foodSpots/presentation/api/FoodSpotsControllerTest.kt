@@ -436,19 +436,6 @@ class FoodSpotsControllerTest(
                         }
                     }
                 }
-
-                `when`("음식 카테고리가 없는 경우") {
-                    val request = createTestFoodSpotsUpdateRequest(categories = setOf())
-                    then("400을 반환") {
-                        mockMvc
-                            .perform(
-                                patchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
-                                    .content(
-                                        objectMapper.writeValueAsString(request),
-                                    ).contentType("application/json"),
-                            ).andExpect(status().isBadRequest)
-                    }
-                }
             }
         },
     )

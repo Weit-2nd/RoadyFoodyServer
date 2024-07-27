@@ -13,6 +13,7 @@ import io.mockk.spyk
 import jakarta.persistence.EntityManager
 import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
 import kr.weit.roadyfoody.foodSpots.application.dto.OperationHoursRequest
+import kr.weit.roadyfoody.foodSpots.application.dto.toIds
 import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsOperationHours
@@ -263,7 +264,7 @@ class FoodSpotsCommandServiceTest :
                     val onlyCategoryAddRequest =
                         createTestFoodSpotsUpdateRequestFromEntity(foodSpots)
                             .copy(
-                                foodCategories = foodSpots.foodCategoryList.map { it.foodCategory.id }.toSet() + newCategory.id,
+                                foodCategories = foodSpots.foodCategoryList.toIds() + newCategory.id,
                             )
 
                     then("정상적으로 업데이트 되어야 한다.") {
@@ -293,7 +294,7 @@ class FoodSpotsCommandServiceTest :
                         listOf(createTestReportOperationHours())
                     val onlyCategoryDeleteRequest =
                         createTestFoodSpotsUpdateRequestFromEntity(foodSpots)
-                            .copy(foodCategories = foodSpots.foodCategoryList.map { it.foodCategory.id }.toSet() - lastCategoryId)
+                            .copy(foodCategories = foodSpots.foodCategoryList.toIds() - lastCategoryId)
 
                     then("정상적으로 업데이트 되어야 한다.") {
                         foodSpotsCommandService.doUpdateReport(
@@ -327,7 +328,7 @@ class FoodSpotsCommandServiceTest :
                         createTestFoodSpotsUpdateRequestFromEntity(foodSpots)
                             .copy(
                                 foodCategories =
-                                    foodSpots.foodCategoryList.map { it.foodCategory.id }.toSet() + newCategory.id - lastCategoryIdToRemove,
+                                    foodSpots.foodCategoryList.toIds() + newCategory.id - lastCategoryIdToRemove,
                             )
 
                     then("정상적으로 업데이트 되어야 한다.") {
