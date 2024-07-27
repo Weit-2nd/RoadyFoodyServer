@@ -2,6 +2,7 @@ package kr.weit.roadyfoody.foodSpots.repository
 
 import com.linecorp.kotlinjdsl.support.spring.data.jpa.repository.KotlinJdslJpqlExecutor
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
+import kr.weit.roadyfoody.foodSpots.exception.FoodSpotsHistoryNotFoundException
 import kr.weit.roadyfoody.global.utils.getSlice
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.data.domain.Pageable
@@ -13,6 +14,9 @@ fun FoodSpotsHistoryRepository.getHistoriesByUser(
     size: Int,
     lastId: Long?,
 ): Slice<FoodSpotsHistory> = findSliceByUser(user, size, lastId)
+
+fun FoodSpotsHistoryRepository.getByHistoryId(historyId: Long): FoodSpotsHistory =
+    findById(historyId).orElseThrow { FoodSpotsHistoryNotFoundException() }
 
 interface FoodSpotsHistoryRepository :
     JpaRepository<FoodSpotsHistory, Long>,

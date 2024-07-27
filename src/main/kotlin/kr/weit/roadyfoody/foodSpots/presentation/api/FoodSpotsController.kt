@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size
 import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoriesResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoryDetailResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsCommandService
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsQueryService
@@ -55,4 +56,10 @@ class FoodSpotsController(
         @RequestParam(required = false)
         lastId: Long?,
     ): SliceResponse<ReportHistoriesResponse> = foodSpotsQueryService.getReportHistories(userId, size, lastId)
+
+    @GetMapping("/histories/{historyId}")
+    override fun getReportHistory(
+        @PathVariable("historyId")
+        historyId: Long,
+    ): ReportHistoryDetailResponse = foodSpotsQueryService.getReportHistory(historyId)
 }

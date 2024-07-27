@@ -15,6 +15,7 @@ import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.ErrorResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoriesResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoryDetailResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
 import kr.weit.roadyfoody.foodSpots.utils.SliceReportHistories
 import kr.weit.roadyfoody.foodSpots.validator.WebPImageList
@@ -127,4 +128,34 @@ interface FoodSportsControllerSpec {
         @RequestParam(required = false)
         lastId: Long?,
     ): SliceResponse<ReportHistoriesResponse>
+
+    @Operation(
+        description = "음식점 리포트 이력 상세 조회 API",
+        parameters = [
+            Parameter(name = "historyId", description = "조회할 리포트 이력 ID", example = "1"),
+        ],
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "리포트 상세 조회 성공",
+                content = [
+                    Content(
+                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                        schema = Schema(implementation = ReportHistoryDetailResponse::class),
+                    ),
+                ],
+            ),
+        ],
+    )
+    @ApiErrorCodeExamples(
+        [
+            ErrorCode.FOOD_SPOT_HISTORY_ID_NON_POSITIVE,
+            ErrorCode.NOT_FOUND_REPORT_HISTORY,
+        ],
+    )
+    fun getReportHistory(
+        @PathVariable("historyId")
+        @Positive
+        historyId: Long,
+    ): ReportHistoryDetailResponse
 }

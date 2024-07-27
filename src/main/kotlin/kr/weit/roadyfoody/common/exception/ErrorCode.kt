@@ -71,7 +71,9 @@ enum class ErrorCode(
         -10000,
         "시간은 00:00부터 23:59까지의 형식이어야 합니다.",
     ),
+    FOOD_SPOT_HISTORY_ID_NON_POSITIVE(HttpStatus.BAD_REQUEST, -10000, "음식점 이력 ID는 양수여야 합니다."),
     NOT_FOUND_FOOD_CATEGORY(HttpStatus.NOT_FOUND, -10011, "해당 카테고리가 존재하지 않습니다."),
+    NOT_FOUND_REPORT_HISTORY(HttpStatus.NOT_FOUND, -10012, "해당 리포트 이력이 존재하지 않습니다."),
 
     // Review API error 14000대
     FOOD_SPOT_ID_NON_POSITIVE(HttpStatus.BAD_REQUEST, -10000, "음식점 ID는 양수여야 합니다."),

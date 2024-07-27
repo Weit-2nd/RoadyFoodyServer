@@ -9,19 +9,24 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
+import kr.weit.roadyfoody.foodSpots.exception.FoodSpotsHistoryNotFoundException
 import kr.weit.roadyfoody.foodSpots.fixture.MockTestFoodSpot
+import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_HISTORY_ID
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_LAST_ID
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_PHOTO_URL
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_SIZE
 import kr.weit.roadyfoody.foodSpots.fixture.createMockSliceFoodHistory
+import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodHistory
 import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodSpotList
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsForDistance
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsPhoto
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportFoodCategory
+import kr.weit.roadyfoody.foodSpots.fixture.createTestReportOperationHours
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsPhotoRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
+import kr.weit.roadyfoody.foodSpots.repository.ReportOperationHoursRepository
 import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
 import kr.weit.roadyfoody.foodSpots.repository.getHistoriesByUser
 import kr.weit.roadyfoody.global.service.ImageService
@@ -40,6 +45,7 @@ class FoodSpotsQueryServiceTest :
             val foodSpotsRepository = mockk<FoodSpotsRepository>()
             val userRepository = mockk<UserRepository>()
             val reportFoodCategoryRepository = mockk<ReportFoodCategoryRepository>()
+            val reportOperationHoursRepository = mockk<ReportOperationHoursRepository>()
             val imageService = spyk(ImageService(mockk()))
             val foodSPotsQueryService =
                 FoodSpotsQueryService(
@@ -49,6 +55,7 @@ class FoodSpotsQueryServiceTest :
                     reportFoodCategoryRepository,
                     imageService,
                     foodSpotsRepository,
+                    reportOperationHoursRepository,
                 )
             val user = createTestUser()
             afterEach { clearAllMocks() }
@@ -223,6 +230,37 @@ class FoodSpotsQueryServiceTest :
                                 null,
                                 emptyList(),
                             )
+                        }
+                    }
+                }
+            }
+
+            given("getReportHistory 테스트") {
+                every { foodSpotsHistoryRepository.getByHistoryId(any()) } returns createMockTestFoodHistory()
+                every { foodSpotsPhotoRepository.getByHistoryId(any()) } returns
+                    listOf(
+                        createTestFoodSpotsPhoto(),
+                    )
+                every { imageService.getDownloadUrl(any()) } returns TEST_FOOD_SPOTS_PHOTO_URL
+                every { reportFoodCategoryRepository.getByHistoryId(any()) } returns
+                    listOf(
+                        createTestReportFoodCategory(),
+                    )
+                every { reportOperationHoursRepository.getByHistoryId(any()) } returns
+                    listOf(
+                        createTestReportOperationHours(),
+                    )
+                `when`("정상적인 데이터가 들어올 경우") {
+                    then("해당 리포트 이력 상세가 조회되어야 한다.") {
+                        foodSPotsQueryService.getReportHistory(TEST_FOOD_SPOTS_HISTORY_ID)
+                    }
+                }
+
+                `when`("해당 이력이 존재하지 않는 경우") {
+                    every { foodSpotsHistoryRepository.getByHistoryId(any()) } throws FoodSpotsHistoryNotFoundException()
+                    then("FoodSpotsHistoryNotFoundException 이 발생한다.") {
+                        shouldThrow<FoodSpotsHistoryNotFoundException> {
+                            foodSPotsQueryService.getReportHistory(TEST_FOOD_SPOTS_HISTORY_ID)
                         }
                     }
                 }

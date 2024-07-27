@@ -3,6 +3,8 @@ package kr.weit.roadyfoody.foodSpots.application.service
 import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportCategoryResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoriesResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoryDetailResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.ReportOperationHoursResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportPhotoResponse
 import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
@@ -10,6 +12,7 @@ import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsPhotoRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
+import kr.weit.roadyfoody.foodSpots.repository.ReportOperationHoursRepository
 import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
 import kr.weit.roadyfoody.foodSpots.repository.getHistoriesByUser
 import kr.weit.roadyfoody.global.service.ImageService
@@ -34,6 +37,7 @@ class FoodSpotsQueryService(
     private val reportFoodCategoryRepository: ReportFoodCategoryRepository,
     private val imageService: ImageService,
     private val foodSpotsRepository: FoodSpotsRepository,
+    private val reportOperationHoursRepository: ReportOperationHoursRepository,
 ) {
     @Transactional(readOnly = true)
     fun getReportHistories(
@@ -83,6 +87,31 @@ class FoodSpotsQueryService(
             }
 
         return FoodSpotsSearchResponses(foodSpotsSearchResponses)
+    }
+
+    @Transactional(readOnly = true)
+    fun getReportHistory(historyId: Long): ReportHistoryDetailResponse {
+        val foodSpotsHistory = foodSpotsHistoryRepository.getByHistoryId(historyId)
+        val reportPhotoResponse =
+            foodSpotsPhotoRepository.getByHistoryId(historyId).map { photo ->
+                ReportPhotoResponse(photo, imageService.getDownloadUrl(photo.fileName))
+            }
+        val reportCategoryResponse =
+            reportFoodCategoryRepository.getByHistoryId(historyId).map { category ->
+                ReportCategoryResponse(category)
+            }
+        val reportOperationHoursResponse =
+            reportOperationHoursRepository
+                .getByHistoryId(foodSpotsHistory.foodSpots.id)
+                .map { operationHours ->
+                    ReportOperationHoursResponse(operationHours)
+                }
+        return ReportHistoryDetailResponse(
+            foodSpotsHistory,
+            reportPhotoResponse,
+            reportCategoryResponse,
+            reportOperationHoursResponse,
+        )
     }
 
     private fun determineOpenStatus(foodSpot: FoodSpots): OperationStatus {

@@ -4,6 +4,8 @@ import kr.weit.roadyfoody.foodSpots.application.dto.FoodCategoryResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.OperationHoursRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportCategoryResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoriesResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoryDetailResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.ReportOperationHoursResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportPhotoResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
 import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
@@ -58,6 +60,8 @@ const val TEST_OPERATION_HOURS_OPEN = "00:00"
 const val TEST_OPERATION_HOURS_CLOSE = "23:59"
 const val TEST_INVALID_TIME_FORMAT = "25:60"
 const val TEST_CATEGORY_NAME = "붕어빵"
+const val TEST_FOOD_SPOTS_HISTORY_ID = 1L
+const val TEST_INVALID_FOOD_SPOTS_HISTORY_ID = -1L
 
 fun createMockTestFoodSpot(id: Long = 0L) = MockTestFoodSpot(id)
 
@@ -321,3 +325,16 @@ fun createFoodSpotsSearchResponses(): FoodSpotsSearchResponses =
 
 fun createFoodCategoryResponse(foodCategory: FoodCategory = createTestFoodCategory()): FoodCategoryResponse =
     FoodCategoryResponse.of(foodCategory)
+
+fun createReportOperationHoursResponse(): ReportOperationHoursResponse =
+    ReportOperationHoursResponse(
+        createTestReportOperationHours(),
+    )
+
+fun createReportHistoryDetailResponse(): ReportHistoryDetailResponse =
+    ReportHistoryDetailResponse(
+        createMockTestFoodHistory(),
+        listOf(createTestReportPhotoResponse()),
+        listOf(createTestReportCategoryResponse()),
+        listOf(createReportOperationHoursResponse()),
+    )

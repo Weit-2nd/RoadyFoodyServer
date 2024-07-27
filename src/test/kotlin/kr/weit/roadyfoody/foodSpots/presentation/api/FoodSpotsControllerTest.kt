@@ -12,6 +12,7 @@ import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsCommandService
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsQueryService
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_HAS_NEXT
+import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_HISTORY_ID
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_LAST_ID
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_REQUEST_NAME
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_REQUEST_PHOTO
@@ -19,9 +20,11 @@ import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_SIZE
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOT_NAME_EMPTY
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOT_NAME_INVALID_STR
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOT_NAME_TOO_LONG
+import kr.weit.roadyfoody.foodSpots.fixture.TEST_INVALID_FOOD_SPOTS_HISTORY_ID
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_INVALID_TIME_FORMAT
 import kr.weit.roadyfoody.foodSpots.fixture.createMockPhotoList
 import kr.weit.roadyfoody.foodSpots.fixture.createOperationHoursRequest
+import kr.weit.roadyfoody.foodSpots.fixture.createReportHistoryDetailResponse
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportHistoriesResponse
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportRequest
 import kr.weit.roadyfoody.support.annotation.ControllerTest
@@ -331,6 +334,30 @@ class FoodSpotsControllerTest(
                             .perform(
                                 getWithAuth("$requestPath/histories/$TEST_USER_ID")
                                     .param("lastId", "-1"),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+            }
+
+            given("GET $requestPath/histories/{historyId} Test") {
+                val response = createReportHistoryDetailResponse()
+                every {
+                    foodSpotsQueryService.getReportHistory(any())
+                } returns response
+                `when`("정상적인 요청이 들어올 경우") {
+                    then("해당 유저의 리포트 이력을 반환한다.") {
+                        mockMvc
+                            .perform(
+                                getWithAuth("$requestPath/histories/$TEST_FOOD_SPOTS_HISTORY_ID"),
+                            ).andExpect(status().isNoContent)
+                    }
+                }
+
+                `when`("historyId가 양수가 아닌 경우") {
+                    then("400을 반환") {
+                        mockMvc
+                            .perform(
+                                getWithAuth("$requestPath/histories/$TEST_INVALID_FOOD_SPOTS_HISTORY_ID"),
                             ).andExpect(status().isBadRequest)
                     }
                 }

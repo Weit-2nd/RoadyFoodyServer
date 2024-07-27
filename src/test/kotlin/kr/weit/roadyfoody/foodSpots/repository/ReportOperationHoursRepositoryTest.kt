@@ -48,4 +48,13 @@ class ReportOperationHoursRepositoryTest(
                 }
             }
         }
+
+        describe("getByHistoryId 메소드는") {
+            context("존재하는 historyId 를 받는 경우") {
+                it("일치하는 ReportOperationHours 리스트를 반환한다.") {
+                    val result = reportOperationHoursRepository.getByHistoryId(foodSpotsHistory.id)
+                    result.size shouldBe 1
+                }
+        }
+    }
     })
