@@ -176,3 +176,53 @@ data class ReportCategoryResponse(
         name = reportFoodCategory.foodCategory.name,
     )
 }
+
+data class FoodSpotsUpdateRequest(
+    @field:Pattern(regexp = FOOD_SPOTS_NAME_REGEX_STR, message = FOOD_SPOTS_NAME_REGEX_DESC)
+    @Schema(
+        description =
+            "상호명 : $FOOD_SPOTS_NAME_REGEX_DESC\t(허용된 특수문자 : 마침표 (.) 쉼표 (,) 작은따옴표 (') 가운데점 (·) 앰퍼샌드 (&) 하이픈 (-))",
+        example = "명륜진사갈비 본사",
+    )
+    val name: String?,
+    @field:Longitude
+    @Schema(description = "경도", example = "127.12312219099")
+    val longitude: Double?,
+    @field:Latitude
+    @Schema(description = "위도", example = "37.4940529587731")
+    val latitude: Double?,
+    @Schema(description = "영업 여부", example = "true")
+    val open: Boolean?,
+    @Schema(description = "폐업 여부", example = "false")
+    val closed: Boolean?,
+    @field:NotEmpty(message = "음식 카테고리는 최소 1개 이상 선택해야 합니다.")
+    @Schema(description = "음식 카테고리", example = "[1, 2]")
+    val foodCategories: Set<Long>,
+    @field:Valid
+    @Schema(
+        description = "운영시간 리스트 ex) 사용자가 월/수/금의 운영시간 입력-> 월/수/금 데이터만 보내주세요. 없을 경우, 빈 배열",
+    )
+    val operationHours: List<OperationHoursRequest>,
+) {
+    fun toReportRequest(foodSpots: FoodSpots) =
+        ReportRequest(
+            name = this.name ?: foodSpots.name,
+            longitude = this.longitude ?: foodSpots.point.x,
+            latitude = this.latitude ?: foodSpots.point.y,
+            foodTruck = foodSpots.foodTruck,
+            open = this.open ?: foodSpots.open,
+            closed = this.closed ?: foodSpots.storeClosure,
+            foodCategories = this.foodCategories,
+            operationHours = this.operationHours,
+        )
+
+    fun toOperationHoursEntity(foodSpots: FoodSpots) =
+        operationHours.map {
+            FoodSpotsOperationHours(
+                foodSpots = foodSpots,
+                dayOfWeek = it.dayOfWeek,
+                openingHours = it.openingHours,
+                closingHours = it.closingHours,
+            )
+        }
+}
