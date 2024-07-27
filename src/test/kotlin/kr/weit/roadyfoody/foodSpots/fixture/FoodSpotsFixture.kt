@@ -101,9 +101,9 @@ fun createTestFoodSpots(
 ) = FoodSpots(id, name, foodTruck, open, storeClosure, point, operationHours, foodCategories)
 
 fun createTestFoodSpotsFoodCategory(
-    id: Long = 0L,
     foodSpots: FoodSpots = createTestFoodSpots(),
     foodCategory: FoodCategory = createTestFoodCategory(),
+    id: Long = 0L,
 ) = FoodSpotsFoodCategory(id, foodSpots, foodCategory)
 
 fun createTestFoodCategory(
@@ -254,11 +254,6 @@ fun createOperationHoursRequest(
 ) = OperationHoursRequest(dayOfWeek, openingHours, closingHours)
 
 fun createTestFoodCategory(name: String = TEST_CATEGORY_NAME) = FoodCategory(name = name)
-
-fun createTestFoodSpotsFoodCategory(
-    foodSpots: FoodSpots = createTestFoodSpots(),
-    foodCategory: FoodCategory = createTestFoodCategory(),
-) = FoodSpotsFoodCategory(0L, foodSpots, foodCategory)
 
 fun createTestReportFoodCategory(
     foodSpotsHistory: FoodSpotsHistory = createTestFoodHistory(),
