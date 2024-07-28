@@ -117,4 +117,22 @@ class FoodSpotsRepositoryTest(
                 }
             }
         }
+
+        describe("updateAllOpen") {
+            context("닫은 가게가 있는 경우") {
+                it("open 컬럼을 true로 업데이트한다.") {
+                    val updatedCount = foodSpotsRepository.updateOpeningStatus()
+                    foodSpotsRepository.findAll().forEach {
+                        it.open shouldBe true
+                    }
+                    updatedCount shouldBe 2
+                }
+            }
+            context("영업중인 가게가 없는 경우") {
+                it("업데이트하지 않는다.") {
+                    foodSpotsRepository.updateOpeningStatus()
+                    foodSpotsRepository.updateOpeningStatus() shouldBe 0
+            }
+        }
+    }
     })

@@ -3,8 +3,12 @@ package kr.weit.roadyfoody.foodSpots.application.service
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
 import io.mockk.spyk
+import io.mockk.verify
+import jakarta.persistence.EntityManager
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsOperationHours
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
@@ -31,9 +35,11 @@ import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportOperationHoursRepository
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.support.utils.ImageFormat
+import kr.weit.roadyfoody.user.application.UserCommandService
 import kr.weit.roadyfoody.user.fixture.TEST_USER_ID
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import kr.weit.roadyfoody.user.repository.UserRepository
+import org.redisson.api.RedissonClient
 import java.util.Optional
 import java.util.concurrent.ExecutorService
 
@@ -51,6 +57,9 @@ class FoodSpotsCommandServiceTest :
             val foodSpotsCategoryRepository = mockk<FoodSpotsFoodCategoryRepository>()
             val imageService = spyk(ImageService(mockk()))
             val executor = mockk<ExecutorService>()
+            val userCommandService = mockk<UserCommandService>()
+            val entityManager = mockk<EntityManager>()
+            val redissonClient = mockk<RedissonClient>()
             val foodSpotsCommandService =
                 FoodSpotsCommandService(
                     foodSpotsRepository,
@@ -63,6 +72,9 @@ class FoodSpotsCommandServiceTest :
                     foodSpotsCategoryRepository,
                     imageService,
                     executor,
+                    userCommandService,
+                    entityManager,
+                    redissonClient,
                 )
             val user = createTestUser()
 
@@ -71,7 +83,10 @@ class FoodSpotsCommandServiceTest :
                 every { foodSpotsHistoryRepository.save(any()) } returns createMockTestFoodHistory()
                 every { userRepository.findById(TEST_USER_ID) } returns Optional.of(user)
                 every { imageService.upload(any(), any()) } returns Unit
-                every { foodCategoryRepository.findFoodCategoryByIdIn(any()) } returns listOf(createTestFoodCategory())
+                every { foodCategoryRepository.findFoodCategoryByIdIn(any()) } returns
+                    listOf(
+                        createTestFoodCategory(),
+                    )
                 every { reportOperationHoursRepository.saveAll(any<List<ReportOperationHours>>()) } returns
                     listOf(createTestReportOperationHours())
                 every { foodSportsOperationHoursRepository.saveAll(any<List<FoodSpotsOperationHours>>()) } returns
@@ -85,6 +100,8 @@ class FoodSpotsCommandServiceTest :
                 every { executor.execute(any()) } answers {
                     firstArg<Runnable>().run()
                 }
+                every { userCommandService.increaseCoin(any(), any()) } just runs
+                every { entityManager.flush() } just runs
                 `when`("정상적인 데이터와 이미지가 들어올 경우") {
                     then("정상적으로 저장되어야 한다.") {
                         foodSpotsCommandService.createReport(
@@ -117,6 +134,45 @@ class FoodSpotsCommandServiceTest :
                             )
                         }
                     }
+                }
+            }
+            given("deleteWithdrawUserReport 테스트") {
+                `when`("유저 삭제 요청이 들어올 경우") {
+                    every { foodSpotsHistoryRepository.findByUser(any()) } returns
+                        listOf(
+                            createMockTestFoodHistory(),
+                        )
+                    every { reportOperationHoursRepository.deleteByFoodSpotsHistoryIn(any()) } returns Unit
+                    every { reportFoodCategoryRepository.deleteByFoodSpotsHistoryIn(any()) } returns Unit
+                    every { foodSpotsPhotoRepository.findByHistoryIn(any()) } returns
+                        listOf(
+                            createTestFoodSpotsPhoto(),
+                        )
+                    every { imageService.remove(any()) } returns Unit
+                    every { foodSpotsPhotoRepository.deleteAll(any()) } returns Unit
+                    every { foodSpotsHistoryRepository.deleteAll(any()) } returns Unit
+                    then("정상적으로 삭제되어야 한다.") {
+                        foodSpotsCommandService.deleteWithdrawUserReport(user)
+                    }
+                }
+
+                `when`("유저가 작성한 리포트가 없을 경우") {
+                    every { foodSpotsHistoryRepository.findByUser(any()) } returns emptyList()
+                    then("아무런 동작이 일어나지 않아야 한다.") {
+                        foodSpotsCommandService.deleteWithdrawUserReport(user)
+                    }
+                }
+            }
+
+            given("setFoodSpotsOpen 테스트") {
+                every { foodSpotsRepository.updateOpeningStatus() } returns 1
+                every { redissonClient.getBucket<String>(any<String>()) } returns
+                    mockk {
+                        every { setIfAbsent(any(), any()) } returns true
+                    }
+                then("정상적으로 업데이트 되어야 한다.") {
+                    foodSpotsCommandService.setFoodSpotsOpen()
+                    verify(exactly = 1) { foodSpotsRepository.updateOpeningStatus() }
                 }
             }
         },

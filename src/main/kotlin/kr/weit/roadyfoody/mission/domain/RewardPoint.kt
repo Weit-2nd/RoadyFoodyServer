@@ -1,7 +1,7 @@
 package kr.weit.roadyfoody.mission.domain
 
 enum class RewardPoint(
-    point: Int,
+    val point: Int,
 ) {
     REPORT(100),
     FIRST_REPORT(200),
