@@ -57,21 +57,24 @@ enum class ErrorCode(
     // Report API error 13000대
     INVALID_LENGTH_FOOD_SPOTS_NAME(
         HttpStatus.BAD_REQUEST,
-        -10000,
+        -13000,
         "상호명은 1자 이상 20자 이하 한글, 영문, 숫자, 특수문자 여야 합니다.",
     ),
     INVALID_CHARACTERS_FOOD_SPOTS_NAME(
         HttpStatus.BAD_REQUEST,
-        -10000,
+        -13000,
         "설명은 1자 이상 100자 이하로 입력해주세요.",
     ),
-    NO_CATEGORY_SELECTED(HttpStatus.BAD_REQUEST, -10000, "음식 카테고리는 최소 1개 이상 선택해야 합니다."),
+    NO_CATEGORY_SELECTED(HttpStatus.BAD_REQUEST, -13000, "음식 카테고리는 최소 1개 이상 선택해야 합니다."),
     INVALID_FORMAT_OPERATION_HOURS(
         HttpStatus.BAD_REQUEST,
-        -10000,
+        -13000,
         "시간은 00:00부터 23:59까지의 형식이어야 합니다.",
     ),
-    NOT_FOUND_FOOD_CATEGORY(HttpStatus.NOT_FOUND, -10011, "해당 카테고리가 존재하지 않습니다."),
+    FOOD_SPOTS_HISTORIES_ID_NON_POSITIVE(HttpStatus.BAD_REQUEST, -13000, "음식점 리포트 ID는 양수여야 합니다."),
+    NOT_FOUND_FOOD_CATEGORY(HttpStatus.NOT_FOUND, -13001, "해당 카테고리가 존재하지 않습니다."),
+    NOT_FOUND_FOOD_SPOTS_HISTORIES(HttpStatus.NOT_FOUND, -13002, "해당 음식점 리포트가 존재하지 않습니다."),
+    NOT_FOOD_SPOTS_HISTORIES_OWNER(HttpStatus.FORBIDDEN, -13003, "해당 음식점 리포트의 소유자가 아닙니다."),
 
     // Review API error 14000대
     FOOD_SPOT_ID_NON_POSITIVE(HttpStatus.BAD_REQUEST, -10000, "음식점 ID는 양수여야 합니다."),

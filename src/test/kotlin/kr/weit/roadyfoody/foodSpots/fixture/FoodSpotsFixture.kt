@@ -58,6 +58,7 @@ const val TEST_OPERATION_HOURS_OPEN = "00:00"
 const val TEST_OPERATION_HOURS_CLOSE = "23:59"
 const val TEST_INVALID_TIME_FORMAT = "25:60"
 const val TEST_CATEGORY_NAME = "붕어빵"
+const val TEST_FOOD_SPOTS_HISTORY_ID = 1L
 
 fun createMockTestFoodSpot(id: Long = 0L) = MockTestFoodSpot(id)
 

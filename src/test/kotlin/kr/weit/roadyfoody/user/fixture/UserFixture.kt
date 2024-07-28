@@ -15,6 +15,7 @@ val TEST_SOCIAL_LOGIN_TYPE = SocialLoginType.KAKAO
 val TEST_USER_SOCIAL_ID = "$TEST_SOCIAL_LOGIN_TYPE $TEST_SOCIAL_ID"
 const val TEST_USER_NICKNAME = "existentNick"
 const val TEST_USER_PROFILE_IMAGE_NAME = "test_image_name"
+const val TEST_OTHER_USER_ID = 2L
 
 fun createTestUser(
     id: Long = TEST_USER_ID,

@@ -127,4 +127,28 @@ interface FoodSportsControllerSpec {
         @RequestParam(required = false)
         lastId: Long?,
     ): SliceResponse<ReportHistoriesResponse>
+
+    @Operation(
+        description = "음식점 정보 리포트 삭제 API",
+        responses = [
+            ApiResponse(
+                responseCode = "204",
+                description = "리포트 삭제 성공",
+            ),
+        ],
+    )
+    @ApiErrorCodeExamples(
+        [
+            ErrorCode.NOT_FOUND_FOOD_SPOTS_HISTORIES,
+            ErrorCode.FOOD_SPOTS_HISTORIES_ID_NON_POSITIVE,
+            ErrorCode.NOT_FOOD_SPOTS_HISTORIES_OWNER,
+        ],
+    )
+    fun deleteFoodSpotsHistories(
+        @LoginUser
+        user: User,
+        @Positive(message = "음식점 리포트 ID는 양수여야 합니다.")
+        @PathVariable("historyId")
+        historyId: Long,
+    )
 }
