@@ -283,7 +283,7 @@ class FoodSpotsControllerTest(
                 }
             }
 
-            given("GET $requestPath/histories/{userId} Test") {
+            given("GET $requestPath/users/{userId}/histories Test") {
                 val response =
                     SliceResponse(
                         listOf(createTestReportHistoriesResponse()),
@@ -296,7 +296,7 @@ class FoodSpotsControllerTest(
                     then("해당 유저의 리포트 이력을 반환한다.") {
                         mockMvc
                             .perform(
-                                getWithAuth("$requestPath/histories/$TEST_USER_ID")
+                                getWithAuth("$requestPath/users/$TEST_USER_ID/histories")
                                     .param("size", TEST_FOOD_SPOTS_SIZE.toString())
                                     .param("lastId", TEST_FOOD_SPOTS_LAST_ID.toString()),
                             ).andExpect(status().isOk)
@@ -310,7 +310,7 @@ class FoodSpotsControllerTest(
                     then("기본값으로 해당 유저의 리포트 이력을 반환한다.") {
                         mockMvc
                             .perform(
-                                getWithAuth("$requestPath/histories/$TEST_USER_ID"),
+                                getWithAuth("$requestPath/users/$TEST_USER_ID/histories"),
                             ).andExpect(status().isOk)
                     }
                 }
@@ -319,7 +319,7 @@ class FoodSpotsControllerTest(
                     then("400을 반환") {
                         mockMvc
                             .perform(
-                                getWithAuth("$requestPath/histories/$TEST_USER_ID")
+                                getWithAuth("$requestPath/users/$TEST_USER_ID/histories")
                                     .param("size", "0"),
                             ).andExpect(status().isBadRequest)
                     }
@@ -329,7 +329,7 @@ class FoodSpotsControllerTest(
                     then("400을 반환") {
                         mockMvc
                             .perform(
-                                getWithAuth("$requestPath/histories/$TEST_USER_ID")
+                                getWithAuth("$requestPath/users/$TEST_USER_ID/histories")
                                     .param("lastId", "-1"),
                             ).andExpect(status().isBadRequest)
                     }
