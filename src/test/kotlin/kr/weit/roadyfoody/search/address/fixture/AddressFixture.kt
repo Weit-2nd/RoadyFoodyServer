@@ -53,7 +53,7 @@ object AddressFixture {
             ),
         )
 
-    fun loadRoadAddressResponse(): RoadAddressResponse =
+    fun createRoadAddressResponse(): RoadAddressResponse =
         RoadAddressResponse(
             addressName = "경기도 안성시 죽산면 죽산초교길 69-4",
             region1DepthName = "경기",

@@ -2,6 +2,7 @@ package kr.weit.roadyfoody.search.address.presentation.api
 
 import kr.weit.roadyfoody.search.address.application.service.AddressSearchService
 import kr.weit.roadyfoody.search.address.dto.AddressSearchResponses
+import kr.weit.roadyfoody.search.address.dto.RoadAddressResponse
 import kr.weit.roadyfoody.search.address.presentation.spec.AddressSearchControllerSpec
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -17,4 +18,14 @@ class AddressSearchController(
         numOfRows: Int,
         keyword: String,
     ): AddressSearchResponses = addressSearchService.searchAddress(keyword, numOfRows)
+
+    @GetMapping("/point")
+    override fun searchPoint2Address(
+        longitude: Double,
+        latitude: Double,
+    ): RoadAddressResponse =
+        addressSearchService.searchPoint2Address(
+            longitude.toString(),
+            latitude.toString(),
+        )
 }

@@ -6,13 +6,17 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Positive
 import jakarta.validation.constraints.Size
 import kr.weit.roadyfoody.common.exception.ErrorCode
+import kr.weit.roadyfoody.foodSpots.validator.Latitude
+import kr.weit.roadyfoody.foodSpots.validator.Longitude
 import kr.weit.roadyfoody.global.swagger.ApiErrorCodeExamples
 import kr.weit.roadyfoody.global.swagger.v1.SwaggerTag
 import kr.weit.roadyfoody.search.address.dto.AddressSearchResponse
 import kr.weit.roadyfoody.search.address.dto.AddressSearchResponses
+import kr.weit.roadyfoody.search.address.dto.RoadAddressResponse
 import org.springframework.web.bind.annotation.RequestParam
 
 @Tag(name = SwaggerTag.SEARCH)
@@ -49,4 +53,42 @@ interface AddressSearchControllerSpec {
         @Size(min = 1, max = 60, message = "검색어는 1자 이상 60자 이하로 입력해주세요.")
         @RequestParam keyword: String,
     ): AddressSearchResponses
+
+    @Operation(
+        description = "좌표 검색 API",
+        parameters = [
+            Parameter(name = "longitude", description = "경도", required = true, example = "127.423084873712"),
+            Parameter(name = "latitude", description = "위도", required = true, example = "37.0789561558879"),
+        ],
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = AddressSearchResponse::class),
+                    ),
+                ],
+            ),
+        ],
+    )
+    @ApiErrorCodeExamples(
+        [
+            ErrorCode.REST_CLIENT_ERROR,
+            ErrorCode.LATITUDE_TOO_HIGH,
+            ErrorCode.LATITUDE_TOO_LOW,
+            ErrorCode.LONGITUDE_TOO_HIGH,
+            ErrorCode.LONGITUDE_TOO_LOW,
+        ],
+    )
+    fun searchPoint2Address(
+        @Schema(description = "경도", example = "127.12312219099")
+        @NotNull(message = "경도는 필수입니다.")
+        @Longitude
+        longitude: Double,
+        @Schema(description = "위도", example = "37.4940529587731")
+        @NotNull(message = "위도는 필수입니다.")
+        @Latitude
+        latitude: Double,
+    ): RoadAddressResponse
 }
