@@ -1,4 +1,5 @@
 package kr.weit.roadyfoody.search.address.presentation.api
+
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.BehaviorSpec
@@ -6,12 +7,12 @@ import io.mockk.every
 import io.mockk.verify
 import kr.weit.roadyfoody.global.TEST_KEYWORD
 import kr.weit.roadyfoody.search.address.application.service.AddressSearchService
+import kr.weit.roadyfoody.search.address.fixture.AddressFixture.createRoadAddressResponse
 import kr.weit.roadyfoody.search.address.fixture.AddressFixture.createSearchResponses
 import kr.weit.roadyfoody.support.annotation.ControllerTest
 import kr.weit.roadyfoody.support.utils.getWithAuth
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
@@ -26,7 +27,12 @@ class AddressSearchControllerTest(
 
         given("GET $requestPath/search 테스트") {
             `when`("키워드로 주소 검색 요청을 보내면") {
-                every { addressSearchService.searchAddress(TEST_KEYWORD, 2) } returns createSearchResponses()
+                every {
+                    addressSearchService.searchAddress(
+                        TEST_KEYWORD,
+                        2,
+                    )
+                } returns createSearchResponses()
                 then("200 상태 번호와 AddressSearchResponses 반환한다.") {
                     mockMvc
                         .perform(
@@ -73,6 +79,33 @@ class AddressSearchControllerTest(
                                 .param("keyword", "a".repeat(61))
                                 .param("numOfRows", "2"),
                         ).andExpect(status().isBadRequest)
+                }
+            }
+        }
+
+        given("GET $requestPath/point 테스트") {
+            `when`("좌표로 주소 검색 요청을 보내면") {
+                every {
+                    addressSearchService.searchPoint2Address(
+                        "0.0",
+                        "0.0",
+                    )
+                } returns createRoadAddressResponse()
+                then("200 상태 번호와 RoadAddressResponse 반환한다.") {
+                    mockMvc
+                        .perform(
+                            getWithAuth("$requestPath/point")
+                                .param("longitude", "0.0")
+                                .param("latitude", "0.0"),
+                        ).andExpect(status().isOk)
+                        .andExpect(
+                            content().json(
+                                objectMapper.writeValueAsString(
+                                    createRoadAddressResponse(),
+                                ),
+                            ),
+                        )
+                    verify(exactly = 1) { addressSearchService.searchPoint2Address("0.0", "0.0") }
                 }
             }
         }
