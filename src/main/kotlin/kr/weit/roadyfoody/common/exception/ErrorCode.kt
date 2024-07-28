@@ -42,6 +42,7 @@ enum class ErrorCode(
     SEARCH_KEYWORD_LENGTH(HttpStatus.BAD_REQUEST, -10000, "검색어는 1자 이상 60자 이하로 입력해주세요."),
     RADIUS_SIZE_TOO_SMALL(HttpStatus.BAD_REQUEST, -10000, "검색 반경은 500m 이상 4000m 이하로 입력해주세요."),
     COIN_NOT_ENOUGH(HttpStatus.BAD_REQUEST, -10000, "코인이 부족합니다."),
+    INVALID_POINT_TO_ADDRESS(HttpStatus.BAD_REQUEST, -10000, "좌표를 주소로 변환할 수 없습니다."),
 
     // Auth API error 12000대
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, -12000, "유효하지 않은 토큰입니다."),
