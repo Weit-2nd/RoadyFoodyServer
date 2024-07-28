@@ -9,7 +9,7 @@ import org.springframework.web.service.annotation.GetExchange
 interface KakaoPointClientInterface {
     @GetExchange("/v2/local/geo/coord2address.json")
     fun searchPointToAddress(
-        @RequestParam(name = "longitude") longitude: String,
-        @RequestParam(name = "latitude") latitude: String,
+        @RequestParam(name = "x") longitude: String,
+        @RequestParam(name = "y") latitude: String,
     ): Point2AddressWrapper
 }
