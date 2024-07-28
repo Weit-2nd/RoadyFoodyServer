@@ -28,6 +28,8 @@ import kr.weit.roadyfoody.foodSpots.fixture.TEST_UPDATE_FOOD_SPOT_LONGITUDE
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_UPDATE_FOOD_SPOT_NAME
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_UPDATE_OPERATION_HOURS_CLOSE
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_UPDATE_OPERATION_HOURS_OPEN
+import kr.weit.roadyfoody.foodSpots.exception.NotFoodSpotsHistoriesOwnerException
+import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_HISTORY_ID
 import kr.weit.roadyfoody.foodSpots.fixture.createMockPhotoList
 import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodHistory
 import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodSpot
@@ -49,9 +51,11 @@ import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsPhotoRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportOperationHoursRepository
+import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.support.utils.ImageFormat
 import kr.weit.roadyfoody.user.application.service.UserCommandService
+import kr.weit.roadyfoody.user.fixture.TEST_OTHER_USER_ID
 import kr.weit.roadyfoody.user.fixture.TEST_USER_ID
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import kr.weit.roadyfoody.user.repository.UserRepository
@@ -451,6 +455,30 @@ class FoodSpotsCommandServiceTest :
                 then("정상적으로 업데이트 되어야 한다.") {
                     foodSpotsCommandService.setFoodSpotsOpen()
                     verify(exactly = 1) { foodSpotsRepository.updateOpeningStatus() }
+                }
+            }
+
+            given("deleteFoodSpotsHistories 테스트") {
+                `when`("리포트의 주인이 아닌경우") {
+                    every { foodSpotsHistoryRepository.getByHistoryId(any()) } returns
+                        createMockTestFoodHistory(
+                            createTestUser(TEST_OTHER_USER_ID),
+                        )
+                    then("예외가 발생한다.") {
+                        shouldThrow<NotFoodSpotsHistoriesOwnerException> {
+                            foodSpotsCommandService.deleteFoodSpotsHistories(user, TEST_FOOD_SPOTS_HISTORY_ID)
+                        }
+                    }
+                }
+                `when`("리포트 삭제 요청이 들어올 경우") {
+                    every { foodSpotsHistoryRepository.getByHistoryId(any()) } returns createMockTestFoodHistory(user)
+                    every { foodSpotsHistoryRepository.deleteById(any()) } returns Unit
+                    then("정상적으로 삭제되어야 한다.") {
+                        foodSpotsCommandService.deleteFoodSpotsHistories(user, TEST_FOOD_SPOTS_HISTORY_ID)
+                        verify(exactly = 1) {
+                            foodSpotsHistoryRepository.deleteById(any())
+                        }
+                    }
                 }
             }
         },
