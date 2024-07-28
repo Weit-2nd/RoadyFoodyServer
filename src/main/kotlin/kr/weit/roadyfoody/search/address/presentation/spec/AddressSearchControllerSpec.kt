@@ -66,7 +66,7 @@ interface AddressSearchControllerSpec {
                 content = [
                     Content(
                         mediaType = "application/json",
-                        schema = Schema(implementation = AddressSearchResponse::class),
+                        schema = Schema(implementation = RoadAddressResponse::class),
                     ),
                 ],
             ),
