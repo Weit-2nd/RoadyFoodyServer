@@ -66,7 +66,5 @@ class FoodSpotsController(
         @Positive(message = "음식점 리포트 ID는 양수여야 합니다.")
         @PathVariable("historyId")
         historyId: Long,
-    ) {
-        foodSpotsCommandService.deleteFoodSpotsHistories(user, historyId)
-    }
+    ) = foodSpotsCommandService.deleteFoodSpotsHistories(user, historyId)
 }

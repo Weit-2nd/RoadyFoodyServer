@@ -4,9 +4,12 @@ import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
 import kr.weit.roadyfoody.foodSpots.repository.getByFoodSpotsId
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.review.application.dto.ReviewRequest
+import kr.weit.roadyfoody.review.domain.FoodSpotsReview
 import kr.weit.roadyfoody.review.domain.FoodSpotsReviewPhoto
+import kr.weit.roadyfoody.review.exception.NotFoodSpotsReviewOwnerException
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewPhotoRepository
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
+import kr.weit.roadyfoody.review.repository.getReviewByReviewId
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -52,13 +55,30 @@ class ReviewCommandService(
     fun deleteWithdrewUserReview(user: User) {
         reviewRepository.findByUser(user).also {
             if (it.isNotEmpty()) {
-                reviewPhotoRepository
-                    .findByFoodSpotsReviewIn(it)
-                    .onEach { photo ->
-                        imageService.remove(photo.fileName)
-                    }.also { photoList -> reviewPhotoRepository.deleteAll(photoList) }
+                deleteReviewPhoto(it)
                 reviewRepository.deleteAll(it)
             }
         }
+    }
+
+    @Transactional
+    fun deleteReview(
+        user: User,
+        reviewId: Long,
+    ) {
+        val review = reviewRepository.getReviewByReviewId(reviewId)
+        if (review.user != user) {
+            throw NotFoodSpotsReviewOwnerException("Not review owner")
+        }
+        deleteReviewPhoto(listOf(review))
+        reviewRepository.delete(review)
+    }
+
+    private fun deleteReviewPhoto(reviews: List<FoodSpotsReview>) {
+        reviewPhotoRepository
+            .findByFoodSpotsReviewIn(reviews)
+            .onEach { photo ->
+                imageService.remove(photo.fileName)
+            }.also { photoList -> reviewPhotoRepository.deleteAll(photoList) }
     }
 }

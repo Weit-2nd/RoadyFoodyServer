@@ -197,6 +197,9 @@ class FoodSpotsCommandServiceTest :
                     every { foodSpotsHistoryRepository.deleteById(any()) } returns Unit
                     then("정상적으로 삭제되어야 한다.") {
                         foodSpotsCommandService.deleteFoodSpotsHistories(user, TEST_FOOD_SPOTS_HISTORY_ID)
+                        verify(exactly = 1) {
+                            foodSpotsHistoryRepository.deleteById(any())
+                        }
                     }
                 }
             }

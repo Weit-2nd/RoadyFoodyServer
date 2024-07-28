@@ -77,10 +77,13 @@ enum class ErrorCode(
     NOT_FOOD_SPOTS_HISTORIES_OWNER(HttpStatus.FORBIDDEN, -13003, "해당 음식점 리포트의 소유자가 아닙니다."),
 
     // Review API error 14000대
-    FOOD_SPOT_ID_NON_POSITIVE(HttpStatus.BAD_REQUEST, -10000, "음식점 ID는 양수여야 합니다."),
-    REVIEW_CONTENT_BLANK(HttpStatus.BAD_REQUEST, -10000, "리뷰는 필수 입력값입니다."),
-    REVIEW_CONTENT_LENGTH_TOO_LONG(HttpStatus.BAD_REQUEST, -10000, "리뷰 최대 길이를 초과했습니다."),
-    REVIEW_RATING_NEGATIVE(HttpStatus.BAD_REQUEST, -10000, "별점은 0점 이상으로 입력해주세요."),
-    REVIEW_RATING_TOO_HIGH(HttpStatus.BAD_REQUEST, -10000, "별점은 10점 이하로 입력해주세요."),
-    NOT_FOUND_FOOD_SPOTS(HttpStatus.NOT_FOUND, -10012, "해당 음식점이 존재하지 않습니다."),
+    FOOD_SPOT_ID_NON_POSITIVE(HttpStatus.BAD_REQUEST, -14000, "음식점 ID는 양수여야 합니다."),
+    REVIEW_CONTENT_BLANK(HttpStatus.BAD_REQUEST, -14000, "리뷰는 필수 입력값입니다."),
+    REVIEW_CONTENT_LENGTH_TOO_LONG(HttpStatus.BAD_REQUEST, -14000, "리뷰 최대 길이를 초과했습니다."),
+    REVIEW_RATING_NEGATIVE(HttpStatus.BAD_REQUEST, -14000, "별점은 0점 이상으로 입력해주세요."),
+    REVIEW_RATING_TOO_HIGH(HttpStatus.BAD_REQUEST, -14000, "별점은 10점 이하로 입력해주세요."),
+    REVIEW_ID_NON_POSITIVE(HttpStatus.BAD_REQUEST, -14000, "리뷰 ID는 양수여야 합니다."),
+    NOT_FOUND_FOOD_SPOTS(HttpStatus.NOT_FOUND, -14001, "해당 음식점이 존재하지 않습니다."),
+    NOT_FOUND_FOOD_SPOTS_REVIEW(HttpStatus.NOT_FOUND, -14002, "해당 리뷰가 존재하지 않습니다."),
+    NOT_FOOD_SPOTS_REVIEW_OWNER(HttpStatus.FORBIDDEN, -14003, "해당 리뷰의 소유자가 아닙니다."),
 }
