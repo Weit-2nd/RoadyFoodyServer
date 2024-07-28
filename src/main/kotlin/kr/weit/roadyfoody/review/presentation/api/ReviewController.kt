@@ -10,6 +10,7 @@ import kr.weit.roadyfoody.review.application.service.ReviewCommandService
 import kr.weit.roadyfoody.review.presentation.spec.ReviewControllerSpec
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.http.HttpStatus.CREATED
+import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -41,7 +42,7 @@ class ReviewController(
         reviewCommandService.createReview(user, reviewRequest, reviewPhotos)
     }
 
-    @ResponseStatus(CREATED)
+    @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{reviewId}")
     override fun deleteFoodSpotsReviews(
         @LoginUser

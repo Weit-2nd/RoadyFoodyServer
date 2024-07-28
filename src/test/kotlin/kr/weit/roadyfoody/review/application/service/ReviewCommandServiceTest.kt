@@ -6,6 +6,7 @@ import createTestReviewPhoto
 import createTestReviewRequest
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
+import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
@@ -43,6 +44,7 @@ class ReviewCommandServiceTest :
                     imageService,
                     executor,
                 )
+            afterEach { clearAllMocks() }
 
             given("createReview 테스트") {
                 every { foodSpotsRepository.getByFoodSpotsId(any()) } returns createMockTestFoodSpot()
