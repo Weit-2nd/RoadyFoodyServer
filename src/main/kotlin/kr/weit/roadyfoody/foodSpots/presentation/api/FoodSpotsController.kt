@@ -7,7 +7,6 @@ import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsCommandService
-import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsQueryService
 import kr.weit.roadyfoody.foodSpots.presentation.spec.FoodSportsControllerSpec
 import kr.weit.roadyfoody.foodSpots.validator.WebPImageList
 import kr.weit.roadyfoody.user.domain.User
@@ -29,7 +28,6 @@ import org.springframework.web.multipart.MultipartFile
 @RequestMapping("/api/v1/food-spots")
 class FoodSpotsController(
     private val foodSpotsCommandService: FoodSpotsCommandService,
-    private val foodSpotsQueryService: FoodSpotsQueryService,
 ) : FoodSportsControllerSpec {
     @ResponseStatus(CREATED)
     @PostMapping(consumes = [MULTIPART_FORM_DATA_VALUE])

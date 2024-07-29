@@ -11,7 +11,6 @@ import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsCommandService
-import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsQueryService
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_HISTORY_ID
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_REQUEST_NAME
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_REQUEST_PHOTO
@@ -40,7 +39,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @ControllerTest
 class FoodSpotsControllerTest(
     @MockkBean private val foodSpotsCommandService: FoodSpotsCommandService,
-    @MockkBean private val foodSpotsQueryService: FoodSpotsQueryService,
     private val mockMvc: MockMvc,
     private val objectMapper: ObjectMapper,
 ) : BehaviorSpec(
