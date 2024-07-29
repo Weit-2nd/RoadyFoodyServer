@@ -1,6 +1,7 @@
 package kr.weit.roadyfoody.review.presentation.api
 
 import jakarta.validation.Valid
+import jakarta.validation.constraints.Positive
 import jakarta.validation.constraints.Size
 import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.foodSpots.validator.WebPImageList
@@ -9,7 +10,10 @@ import kr.weit.roadyfoody.review.application.service.ReviewCommandService
 import kr.weit.roadyfoody.review.presentation.spec.ReviewControllerSpec
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.http.HttpStatus.CREATED
+import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestPart
@@ -37,4 +41,14 @@ class ReviewController(
     ) {
         reviewCommandService.createReview(user, reviewRequest, reviewPhotos)
     }
+
+    @ResponseStatus(NO_CONTENT)
+    @DeleteMapping("/{reviewId}")
+    override fun deleteFoodSpotsReviews(
+        @LoginUser
+        user: User,
+        @Positive(message = "리뷰 ID는 양수여야 합니다.")
+        @PathVariable("reviewId")
+        reviewId: Long,
+    ) = reviewCommandService.deleteReview(user, reviewId)
 }

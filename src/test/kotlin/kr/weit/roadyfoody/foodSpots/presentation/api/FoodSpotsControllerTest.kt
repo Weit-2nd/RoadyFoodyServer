@@ -14,6 +14,7 @@ import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsCommandService
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsQueryService
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_HAS_NEXT
+import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_HISTORY_ID
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_LAST_ID
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_REQUEST_NAME
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_REQUEST_PHOTO
@@ -32,6 +33,7 @@ import kr.weit.roadyfoody.support.utils.ImageFormat
 import kr.weit.roadyfoody.support.utils.ImageFormat.WEBP
 import kr.weit.roadyfoody.support.utils.createMultipartFile
 import kr.weit.roadyfoody.support.utils.createTestImageFile
+import kr.weit.roadyfoody.support.utils.deleteWithAuth
 import kr.weit.roadyfoody.support.utils.getWithAuth
 import kr.weit.roadyfoody.support.utils.multipartWithAuth
 import kr.weit.roadyfoody.support.utils.patchWithAuth
@@ -446,6 +448,31 @@ class FoodSpotsControllerTest(
                                         objectMapper.writeValueAsString(request),
                                     ).contentType("application/json"),
                             ).andExpect(status().isBadRequest)
+                    }
+                }
+            }
+
+            given("DELETE $requestPath/histories/{historyId}") {
+                `when`("음수인 리포트 ID가 들어올 경우") {
+                    then("400을 반환한다.") {
+                        val it =
+                            mockMvc
+                                .perform(
+                                    deleteWithAuth("$requestPath/histories/-1"),
+                                )
+                        it.andExpect(status().isBadRequest)
+                    }
+                }
+
+                every {
+                    foodSpotsCommandService.deleteFoodSpotsHistories(any(), any())
+                } just runs
+                `when`("정상적인 요청이 들어올 경우") {
+                    then("해당 리포트를 삭제한다.") {
+                        mockMvc
+                            .perform(
+                                deleteWithAuth("$requestPath/histories/$TEST_FOOD_SPOTS_HISTORY_ID"),
+                            ).andExpect(status().isNoContent)
                     }
                 }
             }

@@ -12,6 +12,7 @@ import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsOperationHours
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
 import kr.weit.roadyfoody.foodSpots.domain.ReportFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHours
+import kr.weit.roadyfoody.foodSpots.exception.NotFoodSpotsHistoriesOwnerException
 import kr.weit.roadyfoody.foodSpots.repository.FoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSportsOperationHoursRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsFoodCategoryRepository
@@ -21,6 +22,7 @@ import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportOperationHoursRepository
 import kr.weit.roadyfoody.foodSpots.repository.getByFoodSpotsId
+import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
 import kr.weit.roadyfoody.foodSpots.repository.getFoodCategories
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.global.utils.CoordinateUtils.Companion.createCoordinate
@@ -273,5 +275,20 @@ class FoodSpotsCommandService(
         ) {
             foodSpotsRepository.updateOpeningStatus()
         }
+    }
+
+    @Transactional
+    fun deleteFoodSpotsHistories(
+        user: User,
+        historyId: Long,
+    ) {
+        val foodSpotsHistory = foodSpotsHistoryRepository.getByHistoryId(historyId)
+        if (foodSpotsHistory.user.id != user.id) {
+            throw NotFoodSpotsHistoriesOwnerException("해당 음식점 리포트의 소유자가 아닙니다.")
+        }
+        foodSpotsHistoryRepository.deleteById(historyId)
+        // TODO 유저 코인을 감소 시켜야 하는데 첫 리포트인지, 수정 혹은 폐업 리포트인지 구별할수 없어서 추후 구현
+        // entityManager.flush()
+        // user.decreaseCoin(RewardPoint.REPORT)
     }
 }
