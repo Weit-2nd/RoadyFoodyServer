@@ -45,7 +45,7 @@ class FoodSpotsController(
         reportPhotos: List<MultipartFile>?,
     ) = foodSpotsCommandService.createReport(user, reportRequest, reportPhotos)
 
-    @GetMapping("/histories/{userId}")
+    @GetMapping("users/{userId}/histories")
     override fun getReportHistories(
         @PathVariable("userId")
         userId: Long,
