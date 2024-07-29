@@ -63,14 +63,19 @@ class FoodSpotsReviewRepositoryTest(
                             .sliceByUser(
                                 user,
                                 TEST_PAGE_SIZE,
-                                review[0].id,
-                            ).size shouldBe 1
+                                review[1].id,
+                            ).content.size shouldBe 1
                     }
                 }
 
                 context("유저 ID, 사이즈만 받는 경우") {
                     it("해당 유저의 리뷰 리스트를 반환한다.") {
-                        reviewRepository.sliceByUser(user, TEST_PAGE_SIZE, null).size shouldBe 2
+                        reviewRepository
+                            .sliceByUser(
+                                user,
+                                TEST_PAGE_SIZE,
+                                null,
+                            ).content.size shouldBe 2
                     }
                 }
             }

@@ -338,7 +338,7 @@ class FoodSpotsControllerTest(
                     }
                 }
             }
-// TODO: PATH가 같음
+
             given("GET $requestPath/histories/{historyId} Test") {
                 val response = createReportHistoryDetailResponse()
                 every {
@@ -349,7 +349,7 @@ class FoodSpotsControllerTest(
                         mockMvc
                             .perform(
                                 getWithAuth("$requestPath/histories/$TEST_FOOD_SPOTS_HISTORY_ID"),
-                            ).andExpect(status().isNoContent)
+                            ).andExpect(status().isOk)
                     }
                 }
 

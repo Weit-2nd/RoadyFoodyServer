@@ -55,6 +55,6 @@ class ReportOperationHoursRepositoryTest(
                     val result = reportOperationHoursRepository.getByHistoryId(foodSpotsHistory.id)
                     result.size shouldBe 1
                 }
+            }
         }
-    }
     })

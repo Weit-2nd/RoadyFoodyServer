@@ -28,6 +28,7 @@ import kr.weit.roadyfoody.support.utils.ImageFormat.PNG
 import kr.weit.roadyfoody.support.utils.ImageFormat.WEBP
 import kr.weit.roadyfoody.support.utils.createMultipartFile
 import kr.weit.roadyfoody.support.utils.createTestImageFile
+import kr.weit.roadyfoody.support.utils.getWithAuth
 import kr.weit.roadyfoody.support.utils.multipartWithAuth
 import kr.weit.roadyfoody.user.fixture.TEST_USER_ID
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -241,7 +242,7 @@ class ReviewControllerTest(
                     then("유저의 리뷰 리스트가 조회된다.") {
                         mockMvc
                             .perform(
-                                multipartWithAuth("$requestPath/user/$TEST_USER_ID")
+                                getWithAuth("$requestPath/user/$TEST_USER_ID")
                                     .param("size", "$TEST_PAGE_SIZE")
                                     .param("lastId", "$TEST_LAST_ID"),
                             ).andExpect(status().isOk)
@@ -252,7 +253,7 @@ class ReviewControllerTest(
                     then("400 반환") {
                         mockMvc
                             .perform(
-                                multipartWithAuth("$requestPath/user/$TEST_NON_POSITIVE_ID")
+                                getWithAuth("$requestPath/user/$TEST_NON_POSITIVE_ID")
                                     .param("size", "$TEST_PAGE_SIZE")
                                     .param("lastId", "$TEST_LAST_ID"),
                             ).andExpect(status().isBadRequest)
@@ -263,7 +264,7 @@ class ReviewControllerTest(
                     then("400 반환") {
                         mockMvc
                             .perform(
-                                multipartWithAuth("$requestPath/user/$TEST_USER_ID")
+                                getWithAuth("$requestPath/user/$TEST_USER_ID")
                                     .param("size", "$TEST_NON_POSITIVE_SIZE")
                                     .param("lastId", "$TEST_LAST_ID"),
                             ).andExpect(status().isBadRequest)
@@ -274,7 +275,7 @@ class ReviewControllerTest(
                     then("400 반환") {
                         mockMvc
                             .perform(
-                                multipartWithAuth("$requestPath/user/$TEST_USER_ID")
+                                getWithAuth("$requestPath/user/$TEST_USER_ID")
                                     .param("size", "$TEST_PAGE_SIZE")
                                     .param("lastId", "$TEST_NON_POSITIVE_ID"),
                             ).andExpect(status().isBadRequest)
@@ -291,7 +292,7 @@ class ReviewControllerTest(
                     then("음식점의 리뷰 리스트가 조회된다.") {
                         mockMvc
                             .perform(
-                                multipartWithAuth("$requestPath/food-spots/$TEST_USER_ID")
+                                getWithAuth("$requestPath/food-spots/$TEST_USER_ID")
                                     .param("size", "$TEST_PAGE_SIZE")
                                     .param("lastId", "$TEST_LAST_ID"),
                             ).andExpect(status().isOk)
@@ -302,7 +303,7 @@ class ReviewControllerTest(
                     then("400 반환") {
                         mockMvc
                             .perform(
-                                multipartWithAuth("$requestPath/food-spots/$TEST_USER_ID")
+                                getWithAuth("$requestPath/food-spots/$TEST_USER_ID")
                                     .param("size", "$TEST_NON_POSITIVE_SIZE")
                                     .param("lastId", "$TEST_LAST_ID"),
                             ).andExpect(status().isBadRequest)
@@ -313,7 +314,7 @@ class ReviewControllerTest(
                     then("400 반환") {
                         mockMvc
                             .perform(
-                                multipartWithAuth("$requestPath/food-spots/$TEST_USER_ID")
+                                getWithAuth("$requestPath/food-spots/$TEST_USER_ID")
                                     .param("size", "$TEST_PAGE_SIZE")
                                     .param("lastId", "$TEST_NON_POSITIVE_ID"),
                             ).andExpect(status().isBadRequest)

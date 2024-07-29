@@ -87,7 +87,7 @@ class FoodSpotsHistoryRepositoryTest(
                     shouldThrow<FoodSpotsHistoryNotFoundException> {
                         foodSpotsHistoryRepository.getByHistoryId(TEST_INVALID_FOOD_SPOTS_HISTORY_ID)
                     }
+                }
             }
         }
-    }
     })
