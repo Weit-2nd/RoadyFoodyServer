@@ -39,10 +39,10 @@ class AddressSearchService(
     }
 
     fun searchPoint2Address(
-        longitude: String,
-        latitude: String,
+        longitude: Double,
+        latitude: Double,
     ): Point2AddressResponse {
-        val originalResponse = kakaoPointClientInterface.searchPointToAddress(longitude, latitude)
+        val originalResponse = kakaoPointClientInterface.searchPointToAddress(longitude.toString(), latitude.toString())
         if (originalResponse.documents.isEmpty()) {
             throw RoadyFoodyBadRequestException(ErrorCode.INVALID_POINT_TO_ADDRESS)
         }

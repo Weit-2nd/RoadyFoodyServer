@@ -87,8 +87,8 @@ class AddressSearchControllerTest(
             `when`("좌표로 주소 검색 요청을 보내면") {
                 every {
                     addressSearchService.searchPoint2Address(
-                        "0.0",
-                        "0.0",
+                        0.0,
+                        0.0,
                     )
                 } returns createPoint2AddressResponse()
                 then("200 상태 번호와 RoadAddressResponse 반환한다.") {
@@ -105,7 +105,7 @@ class AddressSearchControllerTest(
                                 ),
                             ),
                         )
-                    verify(exactly = 1) { addressSearchService.searchPoint2Address("0.0", "0.0") }
+                    verify(exactly = 1) { addressSearchService.searchPoint2Address(0.0, 0.0) }
                 }
             }
         }

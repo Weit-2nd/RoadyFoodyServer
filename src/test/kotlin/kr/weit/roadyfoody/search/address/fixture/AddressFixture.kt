@@ -57,7 +57,7 @@ object AddressFixture {
         Point2AddressResponse(
             roadAddressName = "경기도 안성시 죽산면 죽산초교길 69-4",
             addressName = "경기 안성시 죽산면 죽산리 343-1",
-            latitude = "37.0789561558879",
-            longitude = "127.423084873712",
+            latitude = 37.0789561558879,
+            longitude = 127.423084873712,
         )
 }
