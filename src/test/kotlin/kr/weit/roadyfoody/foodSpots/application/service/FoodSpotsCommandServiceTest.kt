@@ -21,14 +21,14 @@ import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
 import kr.weit.roadyfoody.foodSpots.domain.ReportFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHours
 import kr.weit.roadyfoody.foodSpots.exception.CategoriesNotFoundException
+import kr.weit.roadyfoody.foodSpots.exception.NotFoodSpotsHistoriesOwnerException
+import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_HISTORY_ID
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_NEW_CATEGORY_NAME
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_UPDATE_FOOD_SPOT_LATITUDE
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_UPDATE_FOOD_SPOT_LONGITUDE
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_UPDATE_FOOD_SPOT_NAME
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_UPDATE_OPERATION_HOURS_CLOSE
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_UPDATE_OPERATION_HOURS_OPEN
-import kr.weit.roadyfoody.foodSpots.exception.NotFoodSpotsHistoriesOwnerException
-import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_HISTORY_ID
 import kr.weit.roadyfoody.foodSpots.fixture.createMockPhotoList
 import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodHistory
 import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodSpot

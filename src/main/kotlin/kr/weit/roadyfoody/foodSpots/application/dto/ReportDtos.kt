@@ -11,8 +11,6 @@ import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsOperationHours
-import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
-import kr.weit.roadyfoody.foodSpots.domain.ReportFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHours
 import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_REGEX_DESC
 import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_REGEX_STR
@@ -22,7 +20,6 @@ import kr.weit.roadyfoody.foodSpots.validator.Latitude
 import kr.weit.roadyfoody.foodSpots.validator.Longitude
 import kr.weit.roadyfoody.global.utils.CoordinateUtils.Companion.createCoordinate
 import kr.weit.roadyfoody.user.domain.User
-import java.time.LocalDateTime
 
 data class ReportRequest(
     @Schema(
@@ -116,67 +113,6 @@ data class OperationHoursRequest(
     @field:Pattern(regexp = OPERATION_HOURS_REGEX_STR, message = OPERATION_HOURS_REGEX_DESC)
     val closingHours: String,
 )
-
-data class ReportHistoriesResponse(
-    @Schema(description = "리포트 이력 ID", example = "1")
-    val id: Long,
-    @Schema(description = "유저 ID", example = "1")
-    val userId: Long,
-    @Schema(description = "음식점 ID", example = "1")
-    val foodSpotsId: Long,
-    @Schema(description = "상호명", example = "명륜진사갈비 본사")
-    val name: String,
-    @Schema(description = "경도", example = "127.12312219099")
-    val longitude: Double,
-    @Schema(description = "위도", example = "37.4940529587731")
-    val latitude: Double,
-    @Schema(description = "생성일시", example = "2021-08-01T00:00:00")
-    val createdDateTime: LocalDateTime,
-    @Schema(description = "리포트 사진 리스트")
-    val reportPhotos: List<ReportPhotoResponse>,
-    @Schema(description = "음식 카테고리 리스트")
-    val categories: List<ReportCategoryResponse>,
-) {
-    constructor(
-        foodSpotsHistory: FoodSpotsHistory,
-        reportPhotoResponse: List<ReportPhotoResponse>,
-        categories: List<ReportCategoryResponse>,
-    ) : this(
-        id = foodSpotsHistory.id,
-        userId = foodSpotsHistory.user.id,
-        foodSpotsId = foodSpotsHistory.foodSpots.id,
-        name = foodSpotsHistory.name,
-        longitude = foodSpotsHistory.point.x,
-        latitude = foodSpotsHistory.point.y,
-        createdDateTime = foodSpotsHistory.createdDateTime,
-        reportPhotos = reportPhotoResponse,
-        categories = categories,
-    )
-}
-
-data class ReportPhotoResponse(
-    @Schema(description = "리포트 사진 ID", example = "1")
-    val id: Long,
-    @Schema(description = "리포트 사진 URL")
-    val url: String,
-) {
-    constructor(reportPhoto: FoodSpotsPhoto, url: String) : this(
-        id = reportPhoto.id,
-        url = url,
-    )
-}
-
-data class ReportCategoryResponse(
-    @Schema(description = "리포트 카테고리 ID", example = "1")
-    val id: Long,
-    @Schema(description = "음식 카테고리명", example = "한식")
-    val name: String,
-) {
-    constructor(reportFoodCategory: ReportFoodCategory) : this(
-        id = reportFoodCategory.id,
-        name = reportFoodCategory.foodCategory.name,
-    )
-}
 
 data class FoodSpotsUpdateRequest(
     @field:Pattern(regexp = FOOD_SPOTS_NAME_REGEX_STR, message = FOOD_SPOTS_NAME_REGEX_DESC)
