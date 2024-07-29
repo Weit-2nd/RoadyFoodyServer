@@ -25,6 +25,8 @@ interface CustomFoodSpotsRepository {
         name: String?,
         categoryIds: List<Long>,
     ): List<FoodSpots>
+
+    fun updateOpeningStatus(): Int
 }
 
 class CustomFoodSpotsRepositoryImpl(
@@ -58,6 +60,13 @@ class CustomFoodSpotsRepositoryImpl(
             targetQuery
         }
     }
+
+    override fun updateOpeningStatus(): Int =
+        executor.update {
+            update(entity(FoodSpots::class))
+                .set(path(FoodSpots::open), true)
+                .where(path(FoodSpots::open).equal(false))
+        }
 
     private fun filteringByCategoryIds(categoryIds: List<Long>): List<Long> {
         val query: SelectQuery<Long> =

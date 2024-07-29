@@ -10,6 +10,7 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.spyk
+import io.mockk.verify
 import jakarta.persistence.EntityManager
 import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
 import kr.weit.roadyfoody.foodSpots.application.dto.OperationHoursRequest
@@ -53,6 +54,7 @@ import kr.weit.roadyfoody.user.application.UserCommandService
 import kr.weit.roadyfoody.user.fixture.TEST_USER_ID
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import kr.weit.roadyfoody.user.repository.UserRepository
+import org.redisson.api.RedissonClient
 import java.util.Optional
 import java.util.concurrent.ExecutorService
 
@@ -72,6 +74,7 @@ class FoodSpotsCommandServiceTest :
             val executor = mockk<ExecutorService>()
             val userCommandService = mockk<UserCommandService>()
             val entityManager = mockk<EntityManager>()
+            val redissonClient = mockk<RedissonClient>()
             val foodSpotsCommandService =
                 FoodSpotsCommandService(
                     foodSpotsRepository,
@@ -86,6 +89,7 @@ class FoodSpotsCommandServiceTest :
                     executor,
                     userCommandService,
                     entityManager,
+                    redissonClient,
                 )
             val user = createTestUser()
 
@@ -94,7 +98,10 @@ class FoodSpotsCommandServiceTest :
                 every { foodSpotsHistoryRepository.save(any()) } returns createMockTestFoodHistory()
                 every { userRepository.findById(TEST_USER_ID) } returns Optional.of(user)
                 every { imageService.upload(any(), any()) } returns Unit
-                every { foodCategoryRepository.findFoodCategoryByIdIn(any()) } returns listOf(createTestFoodCategory())
+                every { foodCategoryRepository.findFoodCategoryByIdIn(any()) } returns
+                    listOf(
+                        createTestFoodCategory(),
+                    )
                 every { reportOperationHoursRepository.saveAll(any<List<ReportOperationHours>>()) } returns
                     listOf(createTestReportOperationHours())
                 every { foodSportsOperationHoursRepository.saveAll(any<List<FoodSpotsOperationHours>>()) } returns
@@ -439,6 +446,18 @@ class FoodSpotsCommandServiceTest :
                     then("아무런 동작이 일어나지 않아야 한다.") {
                         foodSpotsCommandService.deleteWithdrawUserReport(user)
                     }
+                }
+            }
+
+            given("setFoodSpotsOpen 테스트") {
+                every { foodSpotsRepository.updateOpeningStatus() } returns 1
+                every { redissonClient.getBucket<String>(any<String>()) } returns
+                    mockk {
+                        every { setIfAbsent(any(), any()) } returns true
+                    }
+                then("정상적으로 업데이트 되어야 한다.") {
+                    foodSpotsCommandService.setFoodSpotsOpen()
+                    verify(exactly = 1) { foodSpotsRepository.updateOpeningStatus() }
                 }
             }
         },
