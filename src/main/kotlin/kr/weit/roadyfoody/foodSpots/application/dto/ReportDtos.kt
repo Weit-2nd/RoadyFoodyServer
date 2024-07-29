@@ -8,7 +8,6 @@ import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
 import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
-import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsOperationHours
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
@@ -204,39 +203,40 @@ data class FoodSpotsUpdateRequest(
     )
     val operationHours: List<OperationHoursRequest>?,
 ) {
-    fun toReportRequest(foodSpots: FoodSpots) =
-        ReportRequest(
-            name = this.name ?: foodSpots.name,
-            longitude = this.longitude ?: foodSpots.point.x,
-            latitude = this.latitude ?: foodSpots.point.y,
-            foodTruck = foodSpots.foodTruck,
-            open = this.open ?: foodSpots.open,
-            closed = this.closed ?: foodSpots.storeClosure,
-            foodCategories = this.foodCategories ?: foodSpots.foodCategoryList.toIds(),
-            operationHours = this.operationHours ?: foodSpots.operationHoursList.toOperationHoursRequests(),
-        )
+    fun toFoodSpotsHistoryEntity(
+        foodSpots: FoodSpots,
+        user: User,
+    ) = FoodSpotsHistory(
+        name = name ?: foodSpots.name,
+        foodSpots = foodSpots,
+        user = user,
+        point = if (longitude != null && latitude != null) createCoordinate(longitude, latitude) else foodSpots.point,
+        foodTruck = foodSpots.foodTruck,
+        open = open ?: foodSpots.open,
+        storeClosure = closed ?: foodSpots.storeClosure,
+        foodCategoryList = mutableListOf(),
+        operationHoursList = mutableListOf(),
+    )
 
-    fun toOperationHoursEntity(foodSpots: FoodSpots) = operationHours.toOperationHoursEntities(foodSpots)
+    fun toOperationHoursEntity(foodSpots: FoodSpots) =
+        operationHours
+            ?.map {
+                FoodSpotsOperationHours(
+                    foodSpots = foodSpots,
+                    dayOfWeek = it.dayOfWeek,
+                    openingHours = it.openingHours,
+                    closingHours = it.closingHours,
+                )
+            }?.toSet()
+
+    fun toReportOperationHoursEntity(foodSpotsHistory: FoodSpotsHistory) =
+        operationHours
+            ?.map {
+                ReportOperationHours(
+                    foodSpotsHistory = foodSpotsHistory,
+                    dayOfWeek = it.dayOfWeek,
+                    openingHours = it.openingHours,
+                    closingHours = it.closingHours,
+                )
+            }
 }
-
-fun MutableList<FoodSpotsFoodCategory>.toIds() = this.map { it.foodCategory.id }.toSet()
-
-fun MutableList<FoodSpotsOperationHours>.toOperationHoursRequests() =
-    this.map {
-        OperationHoursRequest(
-            dayOfWeek = it.dayOfWeek,
-            openingHours = it.openingHours,
-            closingHours = it.closingHours,
-        )
-    }
-
-fun List<OperationHoursRequest>?.toOperationHoursEntities(foodSpots: FoodSpots) =
-    this
-        ?.map {
-            FoodSpotsOperationHours(
-                foodSpots = foodSpots,
-                dayOfWeek = it.dayOfWeek,
-                openingHours = it.openingHours,
-                closingHours = it.closingHours,
-            )
-        }?.toSet()

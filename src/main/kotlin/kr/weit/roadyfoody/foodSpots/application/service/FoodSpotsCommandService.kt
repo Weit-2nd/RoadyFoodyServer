@@ -5,12 +5,13 @@ import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
-import kr.weit.roadyfoody.foodSpots.application.dto.toIds
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
+import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsOperationHours
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
 import kr.weit.roadyfoody.foodSpots.domain.ReportFoodCategory
+import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHours
 import kr.weit.roadyfoody.foodSpots.repository.FoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSportsOperationHoursRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsFoodCategoryRepository
@@ -53,14 +54,26 @@ class FoodSpotsCommandService(
         reportRequest: ReportRequest,
         photos: List<MultipartFile>?,
     ) {
-        val foodSpots = storeFoodSpots(reportRequest)
-        val foodStoreHistory = storeReport(reportRequest, foodSpots, user)
+        val foodSpots = reportRequest.toFoodSpotsEntity()
+        storeFoodSpots(
+            foodSpots,
+            reportRequest.foodCategories,
+            reportRequest.toOperationHoursEntity(foodSpots),
+        )
+
+        val foodSpotsHistory = reportRequest.toFoodSpotsHistoryEntity(foodSpots, user)
+        storeReport(
+            foodSpotsHistory,
+            reportRequest.foodCategories,
+            reportRequest.toReportOperationHoursEntity(foodSpotsHistory),
+        )
+
         val generatorPhotoNameMap =
             photos?.associateBy { imageService.generateImageName(it) } ?: emptyMap()
 
         generatorPhotoNameMap
             .map {
-                FoodSpotsPhoto.of(foodStoreHistory, it.key)
+                FoodSpotsPhoto.of(foodSpotsHistory, it.key)
             }.also { foodSpotsPhotoRepository.saveAll(it) }
 
         entityManager.flush()
@@ -75,18 +88,19 @@ class FoodSpotsCommandService(
             }.forEach { it.join() }
     }
 
-    private fun storeFoodSpots(reportRequest: ReportRequest): FoodSpots {
-        val foodSpots = reportRequest.toFoodSpotsEntity()
+    private fun storeFoodSpots(
+        foodSpots: FoodSpots,
+        foodCategoryIds: Set<Long>,
+        operationHoursList: List<FoodSpotsOperationHours>,
+    ): FoodSpots {
         foodSpotsRepository.save(foodSpots)
 
-        val foodCategories = foodCategoryRepository.getFoodCategories(reportRequest.foodCategories)
+        val foodCategories = foodCategoryRepository.getFoodCategories(foodCategoryIds)
         foodSpotsCategoryRepository.saveAll(
             foodCategories.map { FoodSpotsFoodCategory(foodSpots, it) },
         )
 
-        foodSportsOperationHoursRepository.saveAll(
-            reportRequest.toOperationHoursEntity(foodSpots),
-        )
+        foodSportsOperationHoursRepository.saveAll(operationHoursList)
         return foodSpots
     }
 
@@ -110,7 +124,16 @@ class FoodSpotsCommandService(
             throw RoadyFoodyBadRequestException(ErrorCode.INVALID_CHANGE_VALUE)
         }
 
-        storeReport(request.toReportRequest(foodSpots), foodSpots, user)
+        val foodSpotsHistory = request.toFoodSpotsHistoryEntity(foodSpots, user)
+        storeReport(
+            foodSpotsHistory,
+            // 카테고리나 운영시간을 미기재할 시 기존 FoodSpots 의 값을 그대로 사용
+            request.foodCategories ?: foodSpots.foodCategoryList.map { it.foodCategory.id }.toSet(),
+            request.toReportOperationHoursEntity(foodSpotsHistory)
+                ?: foodSpots.operationHoursList.map {
+                    ReportOperationHours(foodSpotsHistory, it.dayOfWeek, it.openingHours, it.closingHours)
+                },
+        )
 
         entityManager.flush()
 
@@ -122,21 +145,18 @@ class FoodSpotsCommandService(
     }
 
     private fun storeReport(
-        reportRequest: ReportRequest,
-        foodSpots: FoodSpots,
-        user: User,
+        foodStoreHistory: FoodSpotsHistory,
+        foodCategoryIds: Set<Long>,
+        operationHoursList: List<ReportOperationHours>,
     ): FoodSpotsHistory {
-        val foodStoreHistory = reportRequest.toFoodSpotsHistoryEntity(foodSpots, user)
         foodSpotsHistoryRepository.save(foodStoreHistory)
 
-        val foodCategories = foodCategoryRepository.getFoodCategories(reportRequest.foodCategories)
+        val foodCategories = foodCategoryRepository.getFoodCategories(foodCategoryIds)
         reportFoodCategoryRepository.saveAll(
             foodCategories.map { ReportFoodCategory(foodStoreHistory, it) },
         )
 
-        reportOperationHoursRepository.saveAll(
-            reportRequest.toReportOperationHoursEntity(foodStoreHistory),
-        )
+        reportOperationHoursRepository.saveAll(operationHoursList)
 
         return foodStoreHistory
     }
@@ -176,7 +196,7 @@ class FoodSpotsCommandService(
             return false
         }
 
-        val currentFoodCategoryIds = foodSpots.foodCategoryList.toIds()
+        val currentFoodCategoryIds = foodSpots.foodCategoryList.map { it.foodCategory.id }.toSet()
         val newFoodCategoryIds = request.foodCategories
 
         val categoryIdsToRemove = currentFoodCategoryIds subtract newFoodCategoryIds
