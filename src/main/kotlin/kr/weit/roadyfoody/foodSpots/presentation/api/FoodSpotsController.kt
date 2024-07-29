@@ -61,11 +61,12 @@ class FoodSpotsController(
         lastId: Long?,
     ): SliceResponse<ReportHistoriesResponse> = foodSpotsQueryService.getReportHistories(userId, size, lastId)
 
-    @ResponseStatus(NO_CONTENT)
+    @ResponseStatus(CREATED)
     @PatchMapping("/{foodSpotsId}")
     override fun updateFoodSpots(
         @LoginUser
         user: User,
+        @Positive(message = "음식점 ID는 양수여야 합니다.")
         @PathVariable("foodSpotsId")
         foodSpotsId: Long,
         @Valid

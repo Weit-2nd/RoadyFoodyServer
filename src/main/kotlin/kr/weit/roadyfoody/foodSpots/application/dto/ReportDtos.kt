@@ -6,9 +6,9 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
+import jakarta.validation.constraints.Size
 import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
-import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsOperationHours
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
@@ -196,47 +196,52 @@ data class FoodSpotsUpdateRequest(
     val open: Boolean?,
     @Schema(description = "폐업 여부", example = "false")
     val closed: Boolean?,
-    @Schema(description = "음식 카테고리", example = "[1, 2]")
+    @field:Size(min = 1, message = "음식 카테고리는 최소 1개 이상 선택해야 합니다.")
+    @Schema(
+        description = "음식 카테고리 ex) 변경된, 변경되지 않은 카테고리 모두 입력해주세요. 없을 경우, 생략해주세요",
+        example = "[1, 2]",
+    )
     val foodCategories: Set<Long>?,
     @field:Valid
     @Schema(
-        description = "운영시간 리스트 ex) 사용자가 월/수/금의 운영시간 입력-> 월/수/금 데이터만 보내주세요. 없을 경우, 빈 배열",
+        description = "운영시간 리스트 ex) 변경된, 변경되지 않은 운영시간 모두 입력해주세요. 없을 경우, 생략해주세요",
     )
     val operationHours: List<OperationHoursRequest>?,
 ) {
-    fun toReportRequest(foodSpots: FoodSpots) =
-        ReportRequest(
-            name = this.name ?: foodSpots.name,
-            longitude = this.longitude ?: foodSpots.point.x,
-            latitude = this.latitude ?: foodSpots.point.y,
-            foodTruck = foodSpots.foodTruck,
-            open = this.open ?: foodSpots.open,
-            closed = this.closed ?: foodSpots.storeClosure,
-            foodCategories = this.foodCategories ?: foodSpots.foodCategoryList.toIds(),
-            operationHours = this.operationHours ?: foodSpots.operationHoursList.toOperationHoursRequests(),
-        )
+    fun toFoodSpotsHistoryEntity(
+        foodSpots: FoodSpots,
+        user: User,
+    ) = FoodSpotsHistory(
+        name = name ?: foodSpots.name,
+        foodSpots = foodSpots,
+        user = user,
+        point = if (longitude != null && latitude != null) createCoordinate(longitude, latitude) else foodSpots.point,
+        foodTruck = foodSpots.foodTruck,
+        open = open ?: foodSpots.open,
+        storeClosure = closed ?: foodSpots.storeClosure,
+        foodCategoryList = mutableListOf(),
+        operationHoursList = mutableListOf(),
+    )
 
-    fun toOperationHoursEntity(foodSpots: FoodSpots) = operationHours.toOperationHoursEntities(foodSpots)
+    fun toOperationHoursEntity(foodSpots: FoodSpots) =
+        operationHours
+            ?.map {
+                FoodSpotsOperationHours(
+                    foodSpots = foodSpots,
+                    dayOfWeek = it.dayOfWeek,
+                    openingHours = it.openingHours,
+                    closingHours = it.closingHours,
+                )
+            }?.toSet()
+
+    fun toReportOperationHoursEntity(foodSpotsHistory: FoodSpotsHistory) =
+        operationHours
+            ?.map {
+                ReportOperationHours(
+                    foodSpotsHistory = foodSpotsHistory,
+                    dayOfWeek = it.dayOfWeek,
+                    openingHours = it.openingHours,
+                    closingHours = it.closingHours,
+                )
+            }
 }
-
-fun MutableList<FoodSpotsFoodCategory>.toIds() = this.map { it.foodCategory.id }.toSet()
-
-fun MutableList<FoodSpotsOperationHours>.toOperationHoursRequests() =
-    this.map {
-        OperationHoursRequest(
-            dayOfWeek = it.dayOfWeek,
-            openingHours = it.openingHours,
-            closingHours = it.closingHours,
-        )
-    }
-
-fun List<OperationHoursRequest>?.toOperationHoursEntities(foodSpots: FoodSpots) =
-    this
-        ?.map {
-            FoodSpotsOperationHours(
-                foodSpots = foodSpots,
-                dayOfWeek = it.dayOfWeek,
-                openingHours = it.openingHours,
-                closingHours = it.closingHours,
-            )
-        }?.toSet()

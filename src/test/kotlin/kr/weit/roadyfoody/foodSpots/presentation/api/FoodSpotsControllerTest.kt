@@ -1,6 +1,7 @@
 package kr.weit.roadyfoody.foodSpots.presentation.api
 
 import TEST_FOOD_SPOT_ID
+import TEST_INVALID_FOOD_SPOT_ID
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.BehaviorSpec
@@ -351,7 +352,18 @@ class FoodSpotsControllerTest(
                                 patchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
                                     .content(objectMapper.writeValueAsString(request))
                                     .contentType("application/json"),
-                            ).andExpect(status().isNoContent)
+                            ).andExpect(status().isCreated)
+                    }
+                }
+
+                `when`("음식점 ID가 양수가 아닌 경우") {
+                    then("400을 반환") {
+                        mockMvc
+                            .perform(
+                                patchWithAuth("$requestPath/$TEST_INVALID_FOOD_SPOT_ID")
+                                    .content(objectMapper.writeValueAsString(createTestFoodSpotsUpdateRequest()))
+                                    .contentType("application/json"),
+                            ).andExpect(status().isBadRequest)
                     }
                 }
 
@@ -418,24 +430,24 @@ class FoodSpotsControllerTest(
                                     ).contentType("application/json"),
                             ).andExpect(status().isBadRequest)
                     }
+                }
 
-                    `when`("운영시간 형식이 잘못된 경우") {
-                        val request =
-                            createTestFoodSpotsUpdateRequest(
-                                operationHours =
-                                    listOf(
-                                        createOperationHoursRequest(openingHours = TEST_INVALID_TIME_FORMAT),
-                                    ),
-                            )
-                        then("400을 반환") {
-                            mockMvc
-                                .perform(
-                                    patchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
-                                        .content(
-                                            objectMapper.writeValueAsString(request),
-                                        ).contentType("application/json"),
-                                ).andExpect(status().isBadRequest)
-                        }
+                `when`("운영시간 형식이 잘못된 경우") {
+                    val request =
+                        createTestFoodSpotsUpdateRequest(
+                            operationHours =
+                                listOf(
+                                    createOperationHoursRequest(openingHours = TEST_INVALID_TIME_FORMAT),
+                                ),
+                        )
+                    then("400을 반환") {
+                        mockMvc
+                            .perform(
+                                patchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                    .content(
+                                        objectMapper.writeValueAsString(request),
+                                    ).contentType("application/json"),
+                            ).andExpect(status().isBadRequest)
                     }
                 }
             }
