@@ -8,7 +8,7 @@ import kr.weit.roadyfoody.search.foodSpots.domain.SearchCoinCache
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponses
 import kr.weit.roadyfoody.search.foodSpots.repository.SearchCoinCacheRepository
-import kr.weit.roadyfoody.user.application.UserCommandService
+import kr.weit.roadyfoody.user.application.service.UserCommandService
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.stereotype.Service
 import kotlin.math.atan2

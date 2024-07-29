@@ -1,5 +1,7 @@
 package kr.weit.roadyfoody.foodSpots.presentation.api
 
+import TEST_FOOD_SPOT_ID
+import TEST_INVALID_FOOD_SPOT_ID
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.BehaviorSpec
@@ -22,6 +24,7 @@ import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOT_NAME_TOO_LONG
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_INVALID_TIME_FORMAT
 import kr.weit.roadyfoody.foodSpots.fixture.createMockPhotoList
 import kr.weit.roadyfoody.foodSpots.fixture.createOperationHoursRequest
+import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportHistoriesResponse
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportRequest
 import kr.weit.roadyfoody.support.annotation.ControllerTest
@@ -31,6 +34,7 @@ import kr.weit.roadyfoody.support.utils.createMultipartFile
 import kr.weit.roadyfoody.support.utils.createTestImageFile
 import kr.weit.roadyfoody.support.utils.getWithAuth
 import kr.weit.roadyfoody.support.utils.multipartWithAuth
+import kr.weit.roadyfoody.support.utils.patchWithAuth
 import kr.weit.roadyfoody.user.fixture.TEST_USER_ID
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.mock.web.MockMultipartFile
@@ -331,6 +335,116 @@ class FoodSpotsControllerTest(
                             .perform(
                                 getWithAuth("$requestPath/users/$TEST_USER_ID/histories")
                                     .param("lastId", "-1"),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+            }
+
+            given("PATCH $requestPath/{foodSpotsId} Test") {
+                every { foodSpotsCommandService.doUpdateReport(any(), any(), any()) } just runs
+                `when`("정상적인 요청이 들어올 경우") {
+                    val request = createTestFoodSpotsUpdateRequest()
+                    then("해당 가게 정보를 수정한다.") {
+                        mockMvc
+                            .perform(
+                                patchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                    .content(objectMapper.writeValueAsString(request))
+                                    .contentType("application/json"),
+                            ).andExpect(status().isCreated)
+                    }
+                }
+
+                `when`("음식점 ID가 양수가 아닌 경우") {
+                    then("400을 반환") {
+                        mockMvc
+                            .perform(
+                                patchWithAuth("$requestPath/$TEST_INVALID_FOOD_SPOT_ID")
+                                    .content(objectMapper.writeValueAsString(createTestFoodSpotsUpdateRequest()))
+                                    .contentType("application/json"),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+
+                `when`("상호명이 공백인 경우") {
+                    val request = createTestFoodSpotsUpdateRequest(name = TEST_FOOD_SPOT_NAME_EMPTY)
+                    then("400을 반환") {
+                        mockMvc
+                            .perform(
+                                patchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                    .content(
+                                        objectMapper.writeValueAsString(request),
+                                    ).contentType("application/json"),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+
+                `when`("상호명에 허용되지 않은 특수문자가 포함된 경우") {
+                    val request = createTestFoodSpotsUpdateRequest(name = TEST_FOOD_SPOT_NAME_INVALID_STR)
+                    then("400을 반환") {
+                        mockMvc
+                            .perform(
+                                patchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                    .content(
+                                        objectMapper.writeValueAsString(request),
+                                    ).contentType("application/json"),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+
+                `when`("상호명이 30자 초과인 경우") {
+                    val request = createTestFoodSpotsUpdateRequest(name = TEST_FOOD_SPOT_NAME_TOO_LONG)
+                    then("400을 반환") {
+                        mockMvc
+                            .perform(
+                                patchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                    .content(
+                                        objectMapper.writeValueAsString(request),
+                                    ).contentType("application/json"),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+
+                `when`("경도가 범위를 벗어난 경우") {
+                    val request = createTestFoodSpotsUpdateRequest(longitude = 190.0)
+                    then("400을 반환") {
+                        mockMvc
+                            .perform(
+                                patchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                    .content(
+                                        objectMapper.writeValueAsString(request),
+                                    ).contentType("application/json"),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+
+                `when`("위도가 범위를 벗어난 경우") {
+                    val request = createTestFoodSpotsUpdateRequest(latitude = -190.0)
+                    then("400을 반환") {
+                        mockMvc
+                            .perform(
+                                patchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                    .content(
+                                        objectMapper.writeValueAsString(request),
+                                    ).contentType("application/json"),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+
+                `when`("운영시간 형식이 잘못된 경우") {
+                    val request =
+                        createTestFoodSpotsUpdateRequest(
+                            operationHours =
+                                listOf(
+                                    createOperationHoursRequest(openingHours = TEST_INVALID_TIME_FORMAT),
+                                ),
+                        )
+                    then("400을 반환") {
+                        mockMvc
+                            .perform(
+                                patchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                    .content(
+                                        objectMapper.writeValueAsString(request),
+                                    ).contentType("application/json"),
                             ).andExpect(status().isBadRequest)
                     }
                 }

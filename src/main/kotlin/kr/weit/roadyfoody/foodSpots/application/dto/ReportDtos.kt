@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
+import jakarta.validation.constraints.Size
 import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
@@ -175,4 +176,72 @@ data class ReportCategoryResponse(
         id = reportFoodCategory.id,
         name = reportFoodCategory.foodCategory.name,
     )
+}
+
+data class FoodSpotsUpdateRequest(
+    @field:Pattern(regexp = FOOD_SPOTS_NAME_REGEX_STR, message = FOOD_SPOTS_NAME_REGEX_DESC)
+    @Schema(
+        description =
+            "상호명 : $FOOD_SPOTS_NAME_REGEX_DESC\t(허용된 특수문자 : 마침표 (.) 쉼표 (,) 작은따옴표 (') 가운데점 (·) 앰퍼샌드 (&) 하이픈 (-))",
+        example = "명륜진사갈비 본사",
+    )
+    val name: String?,
+    @field:Longitude
+    @Schema(description = "경도", example = "127.12312219099")
+    val longitude: Double?,
+    @field:Latitude
+    @Schema(description = "위도", example = "37.4940529587731")
+    val latitude: Double?,
+    @Schema(description = "영업 여부", example = "true")
+    val open: Boolean?,
+    @Schema(description = "폐업 여부", example = "false")
+    val closed: Boolean?,
+    @field:Size(min = 1, message = "음식 카테고리는 최소 1개 이상 선택해야 합니다.")
+    @Schema(
+        description = "음식 카테고리 ex) 변경된, 변경되지 않은 카테고리 모두 입력해주세요. 없을 경우, 생략해주세요",
+        example = "[1, 2]",
+    )
+    val foodCategories: Set<Long>?,
+    @field:Valid
+    @Schema(
+        description = "운영시간 리스트 ex) 변경된, 변경되지 않은 운영시간 모두 입력해주세요. 없을 경우, 생략해주세요",
+    )
+    val operationHours: List<OperationHoursRequest>?,
+) {
+    fun toFoodSpotsHistoryEntity(
+        foodSpots: FoodSpots,
+        user: User,
+    ) = FoodSpotsHistory(
+        name = name ?: foodSpots.name,
+        foodSpots = foodSpots,
+        user = user,
+        point = if (longitude != null && latitude != null) createCoordinate(longitude, latitude) else foodSpots.point,
+        foodTruck = foodSpots.foodTruck,
+        open = open ?: foodSpots.open,
+        storeClosure = closed ?: foodSpots.storeClosure,
+        foodCategoryList = mutableListOf(),
+        operationHoursList = mutableListOf(),
+    )
+
+    fun toOperationHoursEntity(foodSpots: FoodSpots) =
+        operationHours
+            ?.map {
+                FoodSpotsOperationHours(
+                    foodSpots = foodSpots,
+                    dayOfWeek = it.dayOfWeek,
+                    openingHours = it.openingHours,
+                    closingHours = it.closingHours,
+                )
+            }?.toSet()
+
+    fun toReportOperationHoursEntity(foodSpotsHistory: FoodSpotsHistory) =
+        operationHours
+            ?.map {
+                ReportOperationHours(
+                    foodSpotsHistory = foodSpotsHistory,
+                    dayOfWeek = it.dayOfWeek,
+                    openingHours = it.openingHours,
+                    closingHours = it.closingHours,
+                )
+            }
 }
