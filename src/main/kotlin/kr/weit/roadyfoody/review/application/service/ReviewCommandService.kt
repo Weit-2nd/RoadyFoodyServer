@@ -67,8 +67,8 @@ class ReviewCommandService(
         reviewId: Long,
     ) {
         val review = reviewRepository.getReviewByReviewId(reviewId)
-        if (review.user != user) {
-            throw NotFoodSpotsReviewOwnerException("Not review owner")
+        if (review.user.id != user.id) {
+            throw NotFoodSpotsReviewOwnerException("해당 리뷰의 소유자가 아닙니다.")
         }
         deleteReviewPhoto(listOf(review))
         reviewRepository.delete(review)

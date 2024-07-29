@@ -283,7 +283,7 @@ class FoodSpotsCommandService(
         historyId: Long,
     ) {
         val foodSpotsHistory = foodSpotsHistoryRepository.getByHistoryId(historyId)
-        if (foodSpotsHistory.user != user) {
+        if (foodSpotsHistory.user.id != user.id) {
             throw NotFoodSpotsHistoriesOwnerException("해당 음식점 리포트의 소유자가 아닙니다.")
         }
         foodSpotsHistoryRepository.deleteById(historyId)
