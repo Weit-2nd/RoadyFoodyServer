@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 fun FoodSpotsReviewRepository.getReviewByReviewId(reviewId: Long): FoodSpotsReview =
     findById(reviewId).orElseThrow {
-        FoodSpotsReviewNotFoundException("Not found review")
+        FoodSpotsReviewNotFoundException("해당 리뷰가 존재하지 않습니다.")
     }
 
 interface FoodSpotsReviewRepository : JpaRepository<FoodSpotsReview, Long> {
