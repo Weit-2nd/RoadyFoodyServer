@@ -76,12 +76,12 @@ enum class ErrorCode(
         -13000,
         "시간은 00:00부터 23:59까지의 형식이어야 합니다.",
     ),
-    FOOD_SPOTS_HISTORIES_ID_NON_POSITIVE(HttpStatus.BAD_REQUEST, -13000, "음식점 리포트 ID는 양수여야 합니다."),
+    INVALID_CHANGE_VALUE(HttpStatus.BAD_REQUEST, -13000, "변경할 값이 없습니다."),
+    NON_POSITIVE_FOOD_SPOT_ID(HttpStatus.BAD_REQUEST, -13000, "음식점 ID는 양수여야 합니다."),
+    NON_POSITIVE_FOOD_SPOTS_HISTORIES_ID(HttpStatus.BAD_REQUEST, -13000, "음식점 리포트 ID는 양수여야 합니다."),
     NOT_FOUND_FOOD_CATEGORY(HttpStatus.NOT_FOUND, -13001, "해당 카테고리가 존재하지 않습니다."),
     NOT_FOUND_FOOD_SPOTS_HISTORIES(HttpStatus.NOT_FOUND, -13002, "해당 음식점 리포트가 존재하지 않습니다."),
     NOT_FOOD_SPOTS_HISTORIES_OWNER(HttpStatus.FORBIDDEN, -13003, "해당 음식점 리포트의 소유자가 아닙니다."),
-    NON_POSITIVE_FOOD_SPOT_ID(HttpStatus.BAD_REQUEST, -13000, "음식점 ID는 양수여야 합니다."),
-    INVALID_CHANGE_VALUE(HttpStatus.BAD_REQUEST, -13000, "변경할 값이 없습니다."),
 
     // Review API error 14000대
     FOOD_SPOT_ID_NON_POSITIVE(HttpStatus.BAD_REQUEST, -14000, "음식점 ID는 양수여야 합니다."),

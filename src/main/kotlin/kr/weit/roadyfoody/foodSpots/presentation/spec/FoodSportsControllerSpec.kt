@@ -103,7 +103,7 @@ interface FoodSportsControllerSpec {
     @ApiErrorCodeExamples(
         [
             ErrorCode.NOT_FOUND_FOOD_SPOTS_HISTORIES,
-            ErrorCode.FOOD_SPOTS_HISTORIES_ID_NON_POSITIVE,
+            ErrorCode.NON_POSITIVE_FOOD_SPOTS_HISTORIES_ID,
             ErrorCode.NOT_FOOD_SPOTS_HISTORIES_OWNER,
         ],
     )
