@@ -6,7 +6,7 @@ import kr.weit.roadyfoody.search.address.config.KakaoProperties
 import kr.weit.roadyfoody.search.address.dto.AddressResponseWrapper
 import kr.weit.roadyfoody.search.address.dto.AddressSearchResponse
 import kr.weit.roadyfoody.search.address.dto.AddressSearchResponses
-import kr.weit.roadyfoody.search.address.dto.RoadAddressResponse
+import kr.weit.roadyfoody.search.address.dto.Point2AddressResponse
 import kr.weit.roadyfoody.search.address.presentation.client.KakaoAddressClientInterface
 import kr.weit.roadyfoody.search.address.presentation.client.KakaoPointClientInterface
 import org.springframework.stereotype.Service
@@ -41,11 +41,11 @@ class AddressSearchService(
     fun searchPoint2Address(
         longitude: String,
         latitude: String,
-    ): RoadAddressResponse {
+    ): Point2AddressResponse {
         val originalResponse = kakaoPointClientInterface.searchPointToAddress(longitude, latitude)
         if (originalResponse.documents.isEmpty()) {
             throw RoadyFoodyBadRequestException(ErrorCode.INVALID_POINT_TO_ADDRESS)
         }
-        return RoadAddressResponse.from(originalResponse.documents[0])
+        return Point2AddressResponse.from(originalResponse.documents[0], latitude, longitude)
     }
 }

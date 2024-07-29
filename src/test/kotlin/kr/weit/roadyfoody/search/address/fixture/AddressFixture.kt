@@ -3,8 +3,8 @@ package kr.weit.roadyfoody.search.address.fixture
 import kr.weit.roadyfoody.search.address.dto.AddressResponseWrapper
 import kr.weit.roadyfoody.search.address.dto.AddressSearchResponse
 import kr.weit.roadyfoody.search.address.dto.AddressSearchResponses
+import kr.weit.roadyfoody.search.address.dto.Point2AddressResponse
 import kr.weit.roadyfoody.search.address.dto.Point2AddressWrapper
-import kr.weit.roadyfoody.search.address.dto.RoadAddressResponse
 import org.springframework.core.io.ClassPathResource
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper
 
@@ -53,17 +53,11 @@ object AddressFixture {
             ),
         )
 
-    fun createRoadAddressResponse(): RoadAddressResponse =
-        RoadAddressResponse(
-            addressName = "경기도 안성시 죽산면 죽산초교길 69-4",
-            region1DepthName = "경기",
-            region2DepthName = "안성시",
-            region3DepthName = "죽산면",
-            roadName = "죽산초교길",
-            undergroundYn = "N",
-            mainBuildingNo = "69",
-            subBuildingNo = "4",
-            buildingName = "무지개아파트",
-            zoneNo = "17519",
+    fun createPoint2AddressResponse(): Point2AddressResponse =
+        Point2AddressResponse(
+            roadAddressName = "경기도 안성시 죽산면 죽산초교길 69-4",
+            addressName = "경기 안성시 죽산면 죽산리 343-1",
+            latitude = "37.0789561558879",
+            longitude = "127.423084873712",
         )
 }
