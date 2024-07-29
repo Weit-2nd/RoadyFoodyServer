@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.user.application
+package kr.weit.roadyfoody.user.application.service
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
@@ -17,6 +17,7 @@ class UserCommandServiceTest :
         val userRepository = mockk<UserRepository>()
         val userCommandService = UserCommandService(userRepository)
         val user = createTestUser()
+
         given("decreaseCoin 테스트") {
             val minusCoin = 100
             val expectedCoin = user.coin - minusCoin
@@ -39,16 +40,16 @@ class UserCommandServiceTest :
                     ex.message shouldBe ErrorCode.COIN_NOT_ENOUGH.errorMessage
                 }
             }
+        }
 
-            given("increaseCoin 테스트") {
-                val plusCoin = 100
-                val expectedCoin = user.coin + plusCoin
-                every { userRepository.findById(TEST_USER_ID) } returns Optional.of(user)
-                `when`("코인을 증가시키면") {
-                    userCommandService.increaseCoin(user.id, plusCoin)
-                    then("코인이 증가한다.") {
-                        user.coin shouldBe expectedCoin
-                    }
+        given("increaseCoin 테스트") {
+            val plusCoin = 100
+            val expectedCoin = user.coin + plusCoin
+            every { userRepository.findById(TEST_USER_ID) } returns Optional.of(user)
+            `when`("코인을 증가시키면") {
+                userCommandService.increaseCoin(user.id, plusCoin)
+                then("코인이 증가한다.") {
+                    user.coin shouldBe expectedCoin
                 }
             }
         }

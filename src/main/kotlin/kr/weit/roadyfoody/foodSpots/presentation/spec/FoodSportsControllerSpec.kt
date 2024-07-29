@@ -14,6 +14,7 @@ import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.ErrorResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoriesResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
 import kr.weit.roadyfoody.foodSpots.utils.SliceReportHistories
@@ -129,6 +130,39 @@ interface FoodSportsControllerSpec {
     ): SliceResponse<ReportHistoriesResponse>
 
     @Operation(
+        description = "음식점 정보 수정 API",
+        responses = [
+            ApiResponse(
+                responseCode = "201",
+                description = "음식점 정보 수정 성공",
+            ),
+        ],
+    )
+    @ApiErrorCodeExamples(
+        [
+            ErrorCode.INVALID_LENGTH_FOOD_SPOTS_NAME,
+            ErrorCode.INVALID_CHARACTERS_FOOD_SPOTS_NAME,
+            ErrorCode.LATITUDE_TOO_HIGH,
+            ErrorCode.LATITUDE_TOO_LOW,
+            ErrorCode.LONGITUDE_TOO_HIGH,
+            ErrorCode.LONGITUDE_TOO_LOW,
+            ErrorCode.NO_CATEGORY_SELECTED,
+            ErrorCode.INVALID_FORMAT_OPERATION_HOURS,
+            ErrorCode.NOT_FOUND_FOOD_CATEGORY,
+            ErrorCode.INVALID_CHANGE_VALUE,
+            ErrorCode.NON_POSITIVE_FOOD_SPOT_ID,
+        ],
+    )
+    fun updateFoodSpots(
+        user: User,
+        @Positive(message = "음식점 ID는 양수여야 합니다.")
+        @Parameter(description = "음식점 ID", required = true, example = "1")
+        foodSpotsId: Long,
+        @Valid
+        request: FoodSpotsUpdateRequest,
+    )
+
+    @Operation(
         description = "음식점 정보 리포트 삭제 API",
         responses = [
             ApiResponse(
@@ -140,7 +174,7 @@ interface FoodSportsControllerSpec {
     @ApiErrorCodeExamples(
         [
             ErrorCode.NOT_FOUND_FOOD_SPOTS_HISTORIES,
-            ErrorCode.FOOD_SPOTS_HISTORIES_ID_NON_POSITIVE,
+            ErrorCode.NON_POSITIVE_FOOD_SPOTS_HISTORIES_ID,
             ErrorCode.NOT_FOOD_SPOTS_HISTORIES_OWNER,
         ],
     )

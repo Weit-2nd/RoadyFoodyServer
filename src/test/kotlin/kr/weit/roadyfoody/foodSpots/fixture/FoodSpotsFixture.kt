@@ -1,6 +1,7 @@
 package kr.weit.roadyfoody.foodSpots.fixture
 
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodCategoryResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.OperationHoursRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportCategoryResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoriesResponse
@@ -59,9 +60,24 @@ const val TEST_OPERATION_HOURS_OPEN = "00:00"
 const val TEST_OPERATION_HOURS_CLOSE = "23:59"
 const val TEST_INVALID_TIME_FORMAT = "25:60"
 const val TEST_CATEGORY_NAME = "붕어빵"
+const val TEST_NEW_CATEGORY_NAME = "백반"
+const val TEST_UPDATE_FOOD_SPOT_NAME = "updateFoodSpot"
+const val TEST_UPDATE_FOOD_SPOT_LATITUDE = 11.1111111
+const val TEST_UPDATE_FOOD_SPOT_LONGITUDE = 11.2222222
+const val TEST_UPDATE_OPERATION_HOURS_OPEN = "10:00"
+const val TEST_UPDATE_OPERATION_HOURS_CLOSE = "13:59"
 const val TEST_FOOD_SPOTS_HISTORY_ID = 1L
 
-fun createMockTestFoodSpot(id: Long = 0L) = MockTestFoodSpot(id)
+fun createMockTestFoodSpot(
+    id: Long = 0L,
+    name: String = TEST_FOOD_SPOT_NAME,
+    foodTruck: Boolean = TEST_FOOD_SPOT_FOOD_TRUCK,
+    open: Boolean = TEST_FOOD_SPOT_OPEN,
+    storeClosure: Boolean = TEST_FOOD_SPOT_STORE_CLOSURE,
+    point: Point = TEST_FOOD_SPOT_POINT,
+    operationHours: MutableList<FoodSpotsOperationHours> = mutableListOf(createTestFoodOperationHours()),
+    foodCategories: MutableList<FoodSpotsFoodCategory> = createTestFoodSpotsFoodCategories(foodSpotsSize = 1),
+) = MockTestFoodSpot(id, name, foodTruck, open, storeClosure, point, operationHours, foodCategories)
 
 fun createMockTestFoodHistory(
     user: User = createTestUser(0L),
@@ -87,9 +103,9 @@ fun createTestFoodSpots(
 ) = FoodSpots(id, name, foodTruck, open, storeClosure, point, operationHours, foodCategories)
 
 fun createTestFoodSpotsFoodCategory(
-    id: Long = 0L,
     foodSpots: FoodSpots = createTestFoodSpots(),
     foodCategory: FoodCategory = createTestFoodCategory(),
+    id: Long = 0L,
 ) = FoodSpotsFoodCategory(id, foodSpots, foodCategory)
 
 fun createTestFoodCategory(
@@ -170,16 +186,13 @@ fun createTestFoodCategories(): List<FoodCategory> =
         createTestFoodCategory(4L, "술"),
     )
 
-fun createTestFoodSpotsFoodCategory(): List<FoodSpotsFoodCategory> =
-    listOf(
-        createTestFoodSpotsFoodCategory(1L, createTestFoodSpots(1L), createTestFoodCategory(1L)),
-        createTestFoodSpotsFoodCategory(2L, createTestFoodSpots(2L), createTestFoodCategory(2L)),
-        createTestFoodSpotsFoodCategory(3L, createTestFoodSpots(1L), createTestFoodCategory(2L)),
-        createTestFoodSpotsFoodCategory(4L, createTestFoodSpots(2L), createTestFoodCategory(3L)),
-        createTestFoodSpotsFoodCategory(5L, createTestFoodSpots(3L), createTestFoodCategory(1L)),
-        createTestFoodSpotsFoodCategory(6L, createTestFoodSpots(3L), createTestFoodCategory(2L)),
-        createTestFoodSpotsFoodCategory(7L, createTestFoodSpots(3L), createTestFoodCategory(3L)),
-    )
+fun createTestFoodSpotsFoodCategories(foodSpotsSize: Int = 3): MutableList<FoodSpotsFoodCategory> =
+    (1L..foodSpotsSize)
+        .flatMap { foodSpotsIndex ->
+            createTestFoodCategories().map { foodCategory ->
+                createTestFoodSpotsFoodCategory(createTestFoodSpots(foodSpotsIndex), foodCategory)
+            }
+        }.toMutableList()
 
 fun createFoodSpotsForDistance(): List<FoodSpots> =
     listOf(
@@ -262,11 +275,6 @@ fun createOperationHoursRequest(
 
 fun createTestFoodCategory(name: String = TEST_CATEGORY_NAME) = FoodCategory(name = name)
 
-fun createTestFoodSpotsFoodCategory(
-    foodSpots: FoodSpots = createTestFoodSpots(),
-    foodCategory: FoodCategory = createTestFoodCategory(),
-) = FoodSpotsFoodCategory(0L, foodSpots, foodCategory)
-
 fun createTestReportFoodCategory(
     foodSpotsHistory: FoodSpotsHistory = createTestFoodHistory(),
     foodCategory: FoodCategory = createTestFoodCategory(),
@@ -341,6 +349,43 @@ fun createFoodSpotsSearchResponses(): FoodSpotsSearchResponses =
 
 fun createFoodCategoryResponse(foodCategory: FoodCategory = createTestFoodCategory()): FoodCategoryResponse =
     FoodCategoryResponse.of(foodCategory)
+
+fun createTestFoodSpotsUpdateRequest(
+    name: String = TEST_UPDATE_FOOD_SPOT_NAME,
+    longitude: Double = TEST_UPDATE_FOOD_SPOT_LONGITUDE,
+    latitude: Double = TEST_UPDATE_FOOD_SPOT_LATITUDE,
+    open: Boolean = TEST_FOOD_SPOT_OPEN,
+    closed: Boolean = TEST_FOOD_SPOT_STORE_CLOSURE,
+    categories: Set<Long> = createTestFoodCategories().map { it.id }.toSet(),
+    operationHours: List<OperationHoursRequest> = listOf(createOperationHoursRequest()),
+): FoodSpotsUpdateRequest =
+    FoodSpotsUpdateRequest(
+        name,
+        longitude,
+        latitude,
+        open,
+        closed,
+        categories,
+        operationHours,
+    )
+
+// Entity 로부터 역으로 Request 를 만들어냅니다.
+// 원본 FoodSpots Entity 로부터 변경내용이 없는 FoodSpotsUpdateRequest 를 생성하여 유효하지 않은 FoodSpots Update 요청 테스트에 사용됩니다.
+fun createTestFoodSpotsUpdateRequestFromEntity(foodSpots: FoodSpots = createTestFoodSpots()): FoodSpotsUpdateRequest =
+    FoodSpotsUpdateRequest(
+        foodSpots.name,
+        foodSpots.point.x,
+        foodSpots.point.y,
+        foodSpots.open,
+        foodSpots.storeClosure,
+        foodSpots.foodCategoryList.map { it.foodCategory.id }.toSet(),
+        createTestFoodSpotsOperationHoursRequestsFromEntities(foodSpots.operationHoursList),
+    )
+
+fun createTestFoodSpotsOperationHoursRequestsFromEntities(operationHours: List<FoodSpotsOperationHours>): List<OperationHoursRequest> =
+    operationHours.map {
+        createOperationHoursRequest(it.dayOfWeek, it.openingHours, it.closingHours)
+    }
 
 fun createMockSearchCoinCaches(userId: Long): List<SearchCoinCache> =
     listOf(
