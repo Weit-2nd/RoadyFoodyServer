@@ -1,7 +1,10 @@
 package kr.weit.roadyfoody.foodSpots.application.service
 
+import TEST_FOOD_SPOT_ID
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.data.forAll
+import io.kotest.data.row
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
@@ -9,19 +12,31 @@ import io.mockk.runs
 import io.mockk.spyk
 import io.mockk.verify
 import jakarta.persistence.EntityManager
+import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
+import kr.weit.roadyfoody.foodSpots.application.dto.OperationHoursRequest
+import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsOperationHours
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
 import kr.weit.roadyfoody.foodSpots.domain.ReportFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHours
 import kr.weit.roadyfoody.foodSpots.exception.CategoriesNotFoundException
+import kr.weit.roadyfoody.foodSpots.fixture.TEST_NEW_CATEGORY_NAME
+import kr.weit.roadyfoody.foodSpots.fixture.TEST_UPDATE_FOOD_SPOT_LATITUDE
+import kr.weit.roadyfoody.foodSpots.fixture.TEST_UPDATE_FOOD_SPOT_LONGITUDE
+import kr.weit.roadyfoody.foodSpots.fixture.TEST_UPDATE_FOOD_SPOT_NAME
+import kr.weit.roadyfoody.foodSpots.fixture.TEST_UPDATE_OPERATION_HOURS_CLOSE
+import kr.weit.roadyfoody.foodSpots.fixture.TEST_UPDATE_OPERATION_HOURS_OPEN
 import kr.weit.roadyfoody.foodSpots.fixture.createMockPhotoList
 import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodHistory
 import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodSpot
+import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodCategories
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodCategory
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodOperationHours
-import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsFoodCategory
+import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsFoodCategories
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsPhoto
+import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsUpdateRequest
+import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsUpdateRequestFromEntity
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportFoodCategory
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportOperationHours
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportRequest
@@ -94,7 +109,7 @@ class FoodSpotsCommandServiceTest :
                 every { reportFoodCategoryRepository.saveAll(any<List<ReportFoodCategory>>()) } returns
                     listOf(createTestReportFoodCategory())
                 every { foodSpotsCategoryRepository.saveAll(any<List<FoodSpotsFoodCategory>>()) } returns
-                    createTestFoodSpotsFoodCategory()
+                    createTestFoodSpotsFoodCategories()
                 every { foodSpotsPhotoRepository.saveAll(any<List<FoodSpotsPhoto>>()) } returns
                     listOf(createTestFoodSpotsPhoto())
                 every { executor.execute(any()) } answers {
@@ -125,7 +140,7 @@ class FoodSpotsCommandServiceTest :
                 `when`("카테고리가 전부 존재하지 않을 경우") {
                     every { userRepository.findById(TEST_USER_ID) } returns Optional.of(user)
                     every { foodCategoryRepository.findFoodCategoryByIdIn(any()) } returns emptyList()
-                    then("CategoriesNotFoundException이 발생한다.") {
+                    then("CategoriesNotFoundException 이 발생한다.") {
                         shouldThrow<CategoriesNotFoundException> {
                             foodSpotsCommandService.createReport(
                                 createTestUser(),
@@ -136,6 +151,276 @@ class FoodSpotsCommandServiceTest :
                     }
                 }
             }
+
+            given("doUpdateReport 테스트") {
+                `when`("정상적인 데이터가 들어올 경우") {
+                    every { foodSpotsRepository.findById(any()) } returns Optional.of(createMockTestFoodSpot())
+                    every { foodSpotsCategoryRepository.deleteAll(any<List<FoodSpotsFoodCategory>>()) } just runs
+                    every { foodCategoryRepository.findFoodCategoryByIdIn(any()) } returns createTestFoodCategories()
+                    every { foodSpotsCategoryRepository.saveAll(any<List<FoodSpotsFoodCategory>>()) } returns
+                        createTestFoodSpotsFoodCategories()
+                    every { foodSportsOperationHoursRepository.deleteAll(any<List<FoodSpotsOperationHours>>()) } just runs
+                    every { foodSportsOperationHoursRepository.saveAll(any<List<FoodSpotsOperationHours>>()) } returns
+                        listOf(createTestFoodOperationHours())
+                    every { foodSpotsHistoryRepository.save(any()) } returns createMockTestFoodHistory()
+                    every { reportFoodCategoryRepository.saveAll(any<List<ReportFoodCategory>>()) } returns
+                        listOf(createTestReportFoodCategory())
+                    every { reportOperationHoursRepository.saveAll(any<List<ReportOperationHours>>()) } returns
+                        listOf(createTestReportOperationHours())
+                    every { entityManager.flush() } just runs
+                    every { imageService.upload(any(), any()) } just runs
+                    every { userCommandService.increaseCoin(any(), any()) } just runs
+
+                    val foodSpotsUpdateRequest = createTestFoodSpotsUpdateRequest()
+
+                    then("정상적으로 업데이트 되어야 한다.") {
+                        foodSpotsCommandService.doUpdateReport(
+                            createTestUser(),
+                            TEST_FOOD_SPOT_ID,
+                            foodSpotsUpdateRequest,
+                        )
+                    }
+                }
+
+                `when`("음식점 이름만 변경할 경우") {
+                    val foodSpots = createMockTestFoodSpot()
+                    every { foodSpotsRepository.findById(any()) } returns Optional.of(foodSpots)
+                    every { foodSpotsCategoryRepository.deleteAll(any<List<FoodSpotsFoodCategory>>()) } just runs
+                    every { foodCategoryRepository.findFoodCategoryByIdIn(any()) } returns createTestFoodCategories()
+                    every { foodSpotsCategoryRepository.saveAll(any<List<FoodSpotsFoodCategory>>()) } returns
+                        createTestFoodSpotsFoodCategories()
+                    every { foodSportsOperationHoursRepository.deleteAll(any<List<FoodSpotsOperationHours>>()) } just runs
+                    every { foodSportsOperationHoursRepository.saveAll(any<List<FoodSpotsOperationHours>>()) } returns
+                        listOf(createTestFoodOperationHours())
+                    every { foodSpotsHistoryRepository.save(any()) } returns createMockTestFoodHistory()
+                    every { reportFoodCategoryRepository.saveAll(any<List<ReportFoodCategory>>()) } returns
+                        listOf(createTestReportFoodCategory())
+                    every { reportOperationHoursRepository.saveAll(any<List<ReportOperationHours>>()) } returns
+                        listOf(createTestReportOperationHours())
+                    val onlyNameChangeRequest =
+                        createTestFoodSpotsUpdateRequestFromEntity(
+                            foodSpots,
+                        ).copy(name = TEST_UPDATE_FOOD_SPOT_NAME)
+
+                    then("정상적으로 업데이트 되어야 한다.") {
+                        foodSpotsCommandService.doUpdateReport(
+                            createTestUser(),
+                            TEST_FOOD_SPOT_ID,
+                            onlyNameChangeRequest,
+                        )
+                    }
+                }
+
+                `when`("경도와 위도만 변경할 경우") {
+                    val foodSpots = createMockTestFoodSpot()
+                    every { foodSpotsRepository.findById(any()) } returns Optional.of(foodSpots)
+                    every { foodSpotsCategoryRepository.deleteAll(any<List<FoodSpotsFoodCategory>>()) } just runs
+                    every { foodCategoryRepository.findFoodCategoryByIdIn(any()) } returns createTestFoodCategories()
+                    every { foodSpotsCategoryRepository.saveAll(any<List<FoodSpotsFoodCategory>>()) } returns
+                        createTestFoodSpotsFoodCategories()
+                    every { foodSportsOperationHoursRepository.deleteAll(any<List<FoodSpotsOperationHours>>()) } just runs
+                    every { foodSportsOperationHoursRepository.saveAll(any<List<FoodSpotsOperationHours>>()) } returns
+                        listOf(createTestFoodOperationHours())
+                    every { foodSpotsHistoryRepository.save(any()) } returns createMockTestFoodHistory()
+                    every { reportFoodCategoryRepository.saveAll(any<List<ReportFoodCategory>>()) } returns
+                        listOf(createTestReportFoodCategory())
+                    every { reportOperationHoursRepository.saveAll(any<List<ReportOperationHours>>()) } returns
+                        listOf(createTestReportOperationHours())
+                    val onlyCoordinateChangeRequest = createTestFoodSpotsUpdateRequestFromEntity(foodSpots)
+
+                    then("정상적으로 업데이트 되어야 한다.") {
+                        forAll(
+                            row(onlyCoordinateChangeRequest.copy(longitude = TEST_UPDATE_FOOD_SPOT_LONGITUDE)),
+                            row(onlyCoordinateChangeRequest.copy(latitude = TEST_UPDATE_FOOD_SPOT_LATITUDE)),
+                            row(
+                                onlyCoordinateChangeRequest.copy(
+                                    longitude = TEST_UPDATE_FOOD_SPOT_LONGITUDE,
+                                    latitude = TEST_UPDATE_FOOD_SPOT_LATITUDE,
+                                ),
+                            ),
+                        ) { request ->
+                            foodSpotsCommandService.doUpdateReport(
+                                createTestUser(),
+                                TEST_FOOD_SPOT_ID,
+                                request,
+                            )
+                        }
+                    }
+                }
+
+                `when`("카테고리만 추가될 경우") {
+                    val foodSpots = createMockTestFoodSpot()
+                    every { foodSpotsRepository.findById(any()) } returns Optional.of(foodSpots)
+                    every { foodSpotsCategoryRepository.deleteAll(any<List<FoodSpotsFoodCategory>>()) } just runs
+                    val newCategory = createTestFoodCategory(id = 10, name = TEST_NEW_CATEGORY_NAME)
+                    // storeReport 시 request category 전체를 조회
+                    every { foodCategoryRepository.findFoodCategoryByIdIn(any()) } returns createTestFoodCategories() + newCategory
+                    // updateFoodSpotsCategory 시 새로 추가되어야하는 category 만 조회
+                    every { foodCategoryRepository.findFoodCategoryByIdIn(setOf(newCategory.id)) } returns listOf(newCategory)
+                    every { foodSpotsCategoryRepository.saveAll(any<List<FoodSpotsFoodCategory>>()) } returns
+                        createTestFoodSpotsFoodCategories()
+                    every { foodSportsOperationHoursRepository.deleteAll(any<List<FoodSpotsOperationHours>>()) } just runs
+                    every { foodSportsOperationHoursRepository.saveAll(any<List<FoodSpotsOperationHours>>()) } returns
+                        listOf(createTestFoodOperationHours())
+                    every { foodSpotsHistoryRepository.save(any()) } returns createMockTestFoodHistory()
+                    every { reportFoodCategoryRepository.saveAll(any<List<ReportFoodCategory>>()) } returns
+                        listOf(createTestReportFoodCategory())
+                    every { reportOperationHoursRepository.saveAll(any<List<ReportOperationHours>>()) } returns
+                        listOf(createTestReportOperationHours())
+                    val onlyCategoryAddRequest =
+                        createTestFoodSpotsUpdateRequestFromEntity(foodSpots)
+                            .copy(
+                                foodCategories =
+                                    foodSpots.foodCategoryList.map { it.foodCategory.id }.toSet() +
+                                        newCategory.id,
+                            )
+
+                    then("정상적으로 업데이트 되어야 한다.") {
+                        foodSpotsCommandService.doUpdateReport(
+                            createTestUser(),
+                            TEST_FOOD_SPOT_ID,
+                            onlyCategoryAddRequest,
+                        )
+                    }
+                }
+
+                `when`("카테고리만 삭제될 경우") {
+                    val foodSpots = createMockTestFoodSpot()
+                    every { foodSpotsRepository.findById(any()) } returns Optional.of(foodSpots)
+                    every { foodSpotsCategoryRepository.deleteAll(any<List<FoodSpotsFoodCategory>>()) } just runs
+                    val lastCategoryId = createTestFoodCategories().last().id
+                    every { foodCategoryRepository.findFoodCategoryByIdIn(any()) } returns createTestFoodCategories().dropLast(1)
+                    every { foodSpotsCategoryRepository.saveAll(any<List<FoodSpotsFoodCategory>>()) } returns
+                        createTestFoodSpotsFoodCategories()
+                    every { foodSportsOperationHoursRepository.deleteAll(any<List<FoodSpotsOperationHours>>()) } just runs
+                    every { foodSportsOperationHoursRepository.saveAll(any<List<FoodSpotsOperationHours>>()) } returns
+                        listOf(createTestFoodOperationHours())
+                    every { foodSpotsHistoryRepository.save(any()) } returns createMockTestFoodHistory()
+                    every { reportFoodCategoryRepository.saveAll(any<List<ReportFoodCategory>>()) } returns
+                        listOf(createTestReportFoodCategory())
+                    every { reportOperationHoursRepository.saveAll(any<List<ReportOperationHours>>()) } returns
+                        listOf(createTestReportOperationHours())
+                    val onlyCategoryDeleteRequest =
+                        createTestFoodSpotsUpdateRequestFromEntity(foodSpots)
+                            .copy(
+                                foodCategories =
+                                    foodSpots.foodCategoryList.map { it.foodCategory.id }.toSet() -
+                                        lastCategoryId,
+                            )
+
+                    then("정상적으로 업데이트 되어야 한다.") {
+                        foodSpotsCommandService.doUpdateReport(
+                            createTestUser(),
+                            TEST_FOOD_SPOT_ID,
+                            onlyCategoryDeleteRequest,
+                        )
+                    }
+                }
+
+                `when`("카테고리 추가와 삭제가 동시에 일어날 경우") {
+                    val foodSpots = createMockTestFoodSpot()
+                    every { foodSpotsRepository.findById(any()) } returns Optional.of(foodSpots)
+                    every { foodSpotsCategoryRepository.deleteAll(any<List<FoodSpotsFoodCategory>>()) } just runs
+                    val newCategory = createTestFoodCategory(id = 10, name = TEST_NEW_CATEGORY_NAME)
+                    val lastCategoryIdToRemove = createTestFoodCategories().last().id
+                    every { foodCategoryRepository.findFoodCategoryByIdIn(any()) } returns
+                        createTestFoodCategories().dropLast(1) + newCategory
+                    every { foodCategoryRepository.findFoodCategoryByIdIn(setOf(newCategory.id)) } returns listOf(newCategory)
+                    every { foodSpotsCategoryRepository.saveAll(any<List<FoodSpotsFoodCategory>>()) } returns
+                        createTestFoodSpotsFoodCategories()
+                    every { foodSportsOperationHoursRepository.deleteAll(any<List<FoodSpotsOperationHours>>()) } just runs
+                    every { foodSportsOperationHoursRepository.saveAll(any<List<FoodSpotsOperationHours>>()) } returns
+                        listOf(createTestFoodOperationHours())
+                    every { foodSpotsHistoryRepository.save(any()) } returns createMockTestFoodHistory()
+                    every { reportFoodCategoryRepository.saveAll(any<List<ReportFoodCategory>>()) } returns
+                        listOf(createTestReportFoodCategory())
+                    every { reportOperationHoursRepository.saveAll(any<List<ReportOperationHours>>()) } returns
+                        listOf(createTestReportOperationHours())
+                    val categoryAddAndDeleteRequest =
+                        createTestFoodSpotsUpdateRequestFromEntity(foodSpots)
+                            .copy(
+                                foodCategories =
+                                    foodSpots.foodCategoryList.map { it.foodCategory.id }.toSet() +
+                                        newCategory.id -
+                                        lastCategoryIdToRemove,
+                            )
+
+                    then("정상적으로 업데이트 되어야 한다.") {
+                        foodSpotsCommandService.doUpdateReport(
+                            createTestUser(),
+                            TEST_FOOD_SPOT_ID,
+                            categoryAddAndDeleteRequest,
+                        )
+                    }
+                }
+
+                `when`("운영시간이 변경될 경우") {
+                    val foodSpots = createMockTestFoodSpot()
+                    every { foodSpotsRepository.findById(any()) } returns Optional.of(foodSpots)
+                    every { foodSpotsCategoryRepository.deleteAll(any<List<FoodSpotsFoodCategory>>()) } just runs
+                    every { foodCategoryRepository.findFoodCategoryByIdIn(any()) } returns createTestFoodCategories()
+                    every { foodSpotsCategoryRepository.saveAll(any<List<FoodSpotsFoodCategory>>()) } returns
+                        createTestFoodSpotsFoodCategories()
+                    every { foodSportsOperationHoursRepository.deleteAll(any<List<FoodSpotsOperationHours>>()) } just runs
+                    every { foodSportsOperationHoursRepository.saveAll(any<List<FoodSpotsOperationHours>>()) } returns
+                        listOf(createTestFoodOperationHours())
+                    every { foodSpotsHistoryRepository.save(any()) } returns createMockTestFoodHistory()
+                    every { reportFoodCategoryRepository.saveAll(any<List<ReportFoodCategory>>()) } returns
+                        listOf(createTestReportFoodCategory())
+                    every { reportOperationHoursRepository.saveAll(any<List<ReportOperationHours>>()) } returns
+                        listOf(createTestReportOperationHours())
+                    val onlyOperationHoursChangeRequest =
+                        createTestFoodSpotsUpdateRequestFromEntity(foodSpots)
+                            .copy(
+                                operationHours =
+                                    listOf(
+                                        OperationHoursRequest(
+                                            dayOfWeek = DayOfWeek.MON,
+                                            openingHours = TEST_UPDATE_OPERATION_HOURS_OPEN,
+                                            closingHours = TEST_UPDATE_OPERATION_HOURS_CLOSE,
+                                        ),
+                                    ),
+                            )
+
+                    then("정상적으로 업데이트 되어야 한다.") {
+                        foodSpotsCommandService.doUpdateReport(
+                            createTestUser(),
+                            TEST_FOOD_SPOT_ID,
+                            onlyOperationHoursChangeRequest,
+                        )
+                    }
+                }
+
+                `when`("변경된 값이 없을 경우") {
+                    val foodSpots = createMockTestFoodSpot()
+                    every { foodSpotsRepository.findById(any()) } returns Optional.of(foodSpots)
+                    every { foodSpotsCategoryRepository.deleteAll(any<List<FoodSpotsFoodCategory>>()) } just runs
+                    every { foodCategoryRepository.findFoodCategoryByIdIn(any()) } returns createTestFoodCategories()
+                    every { foodSpotsCategoryRepository.saveAll(any<List<FoodSpotsFoodCategory>>()) } returns
+                        createTestFoodSpotsFoodCategories()
+                    every { foodSportsOperationHoursRepository.deleteAll(any<List<FoodSpotsOperationHours>>()) } just runs
+                    every { foodSportsOperationHoursRepository.saveAll(any<List<FoodSpotsOperationHours>>()) } returns
+                        listOf(createTestFoodOperationHours())
+                    every { foodSpotsHistoryRepository.save(any()) } returns createMockTestFoodHistory()
+                    every { reportFoodCategoryRepository.saveAll(any<List<ReportFoodCategory>>()) } returns
+                        listOf(createTestReportFoodCategory())
+                    every { reportOperationHoursRepository.saveAll(any<List<ReportOperationHours>>()) } returns
+                        listOf(createTestReportOperationHours())
+
+                    val noChangeRequest = createTestFoodSpotsUpdateRequestFromEntity(foodSpots)
+
+                    then("변경된 값이 없으므로 RoadyFoodyBadRequestException 이 발생해야 한다.") {
+                        shouldThrow<RoadyFoodyBadRequestException> {
+                            foodSpotsCommandService.doUpdateReport(
+                                createTestUser(),
+                                TEST_FOOD_SPOT_ID,
+                                noChangeRequest,
+                            )
+                        }
+                    }
+                }
+            }
+
             given("deleteWithdrawUserReport 테스트") {
                 `when`("유저 삭제 요청이 들어올 경우") {
                     every { foodSpotsHistoryRepository.findByUser(any()) } returns
