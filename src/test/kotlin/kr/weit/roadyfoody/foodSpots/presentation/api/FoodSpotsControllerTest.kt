@@ -350,7 +350,7 @@ class FoodSpotsControllerTest(
                                 patchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
                                     .content(objectMapper.writeValueAsString(request))
                                     .contentType("application/json"),
-                            ).andExpect(status().isNoContent)
+                            ).andExpect(status().isCreated)
                     }
                 }
 

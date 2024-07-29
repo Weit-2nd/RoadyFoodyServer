@@ -133,7 +133,7 @@ interface FoodSportsControllerSpec {
         description = "음식점 정보 수정 API",
         responses = [
             ApiResponse(
-                responseCode = "204",
+                responseCode = "201",
                 description = "음식점 정보 수정 성공",
             ),
         ],
