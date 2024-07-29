@@ -90,7 +90,8 @@ class AddressSearchServiceTest :
                 val result = addressService.searchPoint2Address("127.0", "37.0")
 
                 then("주소를 반환한다.") {
-                    result.addressName shouldBe "경기도 안성시 죽산면 죽산초교길 69-4"
+                    result.roadAddressName shouldBe "경기도 안성시 죽산면 죽산초교길 69-4"
+                    result.addressName shouldBe "경기 안성시 죽산면 죽산리 343-1"
                 }
             }
 

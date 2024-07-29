@@ -16,7 +16,7 @@ import kr.weit.roadyfoody.global.swagger.ApiErrorCodeExamples
 import kr.weit.roadyfoody.global.swagger.v1.SwaggerTag
 import kr.weit.roadyfoody.search.address.dto.AddressSearchResponse
 import kr.weit.roadyfoody.search.address.dto.AddressSearchResponses
-import kr.weit.roadyfoody.search.address.dto.RoadAddressResponse
+import kr.weit.roadyfoody.search.address.dto.Point2AddressResponse
 import org.springframework.web.bind.annotation.RequestParam
 
 @Tag(name = SwaggerTag.SEARCH)
@@ -66,7 +66,7 @@ interface AddressSearchControllerSpec {
                 content = [
                     Content(
                         mediaType = "application/json",
-                        schema = Schema(implementation = RoadAddressResponse::class),
+                        schema = Schema(implementation = Point2AddressResponse::class),
                     ),
                 ],
             ),
@@ -90,5 +90,5 @@ interface AddressSearchControllerSpec {
         @NotNull(message = "위도는 필수입니다.")
         @Latitude
         latitude: Double,
-    ): RoadAddressResponse
+    ): Point2AddressResponse
 }

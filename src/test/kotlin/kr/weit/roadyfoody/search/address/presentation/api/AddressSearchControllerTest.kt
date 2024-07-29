@@ -7,7 +7,7 @@ import io.mockk.every
 import io.mockk.verify
 import kr.weit.roadyfoody.global.TEST_KEYWORD
 import kr.weit.roadyfoody.search.address.application.service.AddressSearchService
-import kr.weit.roadyfoody.search.address.fixture.AddressFixture.createRoadAddressResponse
+import kr.weit.roadyfoody.search.address.fixture.AddressFixture.createPoint2AddressResponse
 import kr.weit.roadyfoody.search.address.fixture.AddressFixture.createSearchResponses
 import kr.weit.roadyfoody.support.annotation.ControllerTest
 import kr.weit.roadyfoody.support.utils.getWithAuth
@@ -90,7 +90,7 @@ class AddressSearchControllerTest(
                         "0.0",
                         "0.0",
                     )
-                } returns createRoadAddressResponse()
+                } returns createPoint2AddressResponse()
                 then("200 상태 번호와 RoadAddressResponse 반환한다.") {
                     mockMvc
                         .perform(
@@ -101,7 +101,7 @@ class AddressSearchControllerTest(
                         .andExpect(
                             content().json(
                                 objectMapper.writeValueAsString(
-                                    createRoadAddressResponse(),
+                                    createPoint2AddressResponse(),
                                 ),
                             ),
                         )
