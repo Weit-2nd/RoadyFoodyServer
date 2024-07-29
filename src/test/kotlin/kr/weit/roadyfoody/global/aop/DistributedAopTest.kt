@@ -2,6 +2,7 @@ package kr.weit.roadyfoody.global.aop
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kr.weit.roadyfoody.global.annotation.DistributedLock
@@ -31,7 +32,7 @@ class DistributedAopTest(
                                 }
                             }
 
-                        jobs.forEach { it.join() }
+                        jobs.joinAll()
                         coinService.coin shouldBe expectedCoin
                     }
                 }

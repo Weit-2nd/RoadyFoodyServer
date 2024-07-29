@@ -18,6 +18,7 @@ import kr.weit.roadyfoody.foodSpots.domain.ReportFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHours
 import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_MAX_LENGTH
 import kr.weit.roadyfoody.global.utils.CoordinateUtils
+import kr.weit.roadyfoody.search.foodSpots.domain.SearchCoinCache
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponse
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponses
 import kr.weit.roadyfoody.search.foodSpots.dto.OperationStatus
@@ -201,6 +202,24 @@ fun createFoodSpotsForDistance(): List<FoodSpots> =
             name = "Food Spot 5 - 1km",
             point = CoordinateUtils.createCoordinate(TEST_FOOD_SPOT_LONGITUDE, TEST_FOOD_SPOT_LATITUDE + 0.01),
         ),
+        createTestFoodSpots(
+            name = "Food Spot 6 - 1km",
+            open = false,
+            point =
+                CoordinateUtils.createCoordinate(
+                    TEST_FOOD_SPOT_LONGITUDE,
+                    TEST_FOOD_SPOT_LATITUDE + 0.01,
+                ),
+        ),
+        createTestFoodSpots(
+            name = "Food Spot 7 - 1km",
+            open = false,
+            point =
+                CoordinateUtils.createCoordinate(
+                    TEST_FOOD_SPOT_LONGITUDE,
+                    TEST_FOOD_SPOT_LATITUDE + 0.01,
+                ),
+        ),
     )
 
 fun createTestFoodSpotsForDistance(): List<FoodSpots> =
@@ -321,3 +340,19 @@ fun createFoodSpotsSearchResponses(): FoodSpotsSearchResponses =
 
 fun createFoodCategoryResponse(foodCategory: FoodCategory = createTestFoodCategory()): FoodCategoryResponse =
     FoodCategoryResponse.of(foodCategory)
+
+fun createMockSearchCoinCaches(userId: Long): List<SearchCoinCache> =
+    listOf(
+        SearchCoinCache.of(
+            userId = userId,
+            latitude = TEST_FOOD_SPOT_LATITUDE,
+            longitude = TEST_FOOD_SPOT_LONGITUDE + 0.001,
+            radius = 1000,
+        ),
+        SearchCoinCache.of(
+            userId = userId,
+            latitude = TEST_FOOD_SPOT_LATITUDE + 0.001,
+            longitude = TEST_FOOD_SPOT_LONGITUDE,
+            radius = 1500,
+        ),
+    )
