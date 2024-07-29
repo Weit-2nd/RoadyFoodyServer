@@ -7,12 +7,13 @@ import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsCommandService
-import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsQueryService
 import kr.weit.roadyfoody.foodSpots.presentation.spec.FoodSportsControllerSpec
 import kr.weit.roadyfoody.foodSpots.validator.WebPImageList
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.http.HttpStatus.CREATED
+import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -27,7 +28,6 @@ import org.springframework.web.multipart.MultipartFile
 @RequestMapping("/api/v1/food-spots")
 class FoodSpotsController(
     private val foodSpotsCommandService: FoodSpotsCommandService,
-    private val foodSpotsQueryService: FoodSpotsQueryService,
 ) : FoodSportsControllerSpec {
     @ResponseStatus(CREATED)
     @PostMapping(consumes = [MULTIPART_FORM_DATA_VALUE])
@@ -57,4 +57,14 @@ class FoodSpotsController(
     ) {
         foodSpotsCommandService.doUpdateReport(user, foodSpotsId, request)
     }
+
+    @ResponseStatus(NO_CONTENT)
+    @DeleteMapping("/histories/{historyId}")
+    override fun deleteFoodSpotsHistories(
+        @LoginUser
+        user: User,
+        @Positive(message = "음식점 리포트 ID는 양수여야 합니다.")
+        @PathVariable("historyId")
+        historyId: Long,
+    ) = foodSpotsCommandService.deleteFoodSpotsHistories(user, historyId)
 }
