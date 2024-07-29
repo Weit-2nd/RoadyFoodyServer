@@ -150,6 +150,7 @@ interface FoodSportsControllerSpec {
             ErrorCode.INVALID_FORMAT_OPERATION_HOURS,
             ErrorCode.NOT_FOUND_FOOD_CATEGORY,
             ErrorCode.INVALID_CHANGE_VALUE,
+            ErrorCode.NON_POSITIVE_FOOD_SPOT_ID,
         ],
     )
     fun updateFoodSpots(
