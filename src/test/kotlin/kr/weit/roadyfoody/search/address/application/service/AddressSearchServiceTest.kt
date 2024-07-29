@@ -87,7 +87,7 @@ class AddressSearchServiceTest :
                     )
                 } returns point2AddressWrapper
 
-                val result = addressService.searchPoint2Address("127.0", "37.0")
+                val result = addressService.searchPoint2Address(127.0, 37.0)
 
                 then("주소를 반환한다.") {
                     result.roadAddressName shouldBe "경기도 안성시 죽산면 죽산초교길 69-4"
@@ -106,7 +106,7 @@ class AddressSearchServiceTest :
                 then("예외를 반환한다.") {
                     val exception =
                         shouldThrow<RoadyFoodyBadRequestException> {
-                            addressService.searchPoint2Address("127.0", "37.0")
+                            addressService.searchPoint2Address(127.0, 37.0)
                         }
                     exception.errorCode shouldBe ErrorCode.INVALID_POINT_TO_ADDRESS
                 }

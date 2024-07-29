@@ -25,7 +25,7 @@ class AddressSearchController(
         latitude: Double,
     ): Point2AddressResponse =
         addressSearchService.searchPoint2Address(
-            longitude.toString(),
-            latitude.toString(),
+            longitude,
+            latitude,
         )
 }

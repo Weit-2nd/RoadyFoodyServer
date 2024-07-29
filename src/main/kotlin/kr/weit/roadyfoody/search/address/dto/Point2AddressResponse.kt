@@ -9,15 +9,15 @@ data class Point2AddressResponse(
     @Schema(description = "지번 주소", example = "경기 안성시 죽산면 죽산리 343-1")
     val addressName: String,
     @Schema(description = "위도", example = "37.0789561558879")
-    val latitude: String,
+    val latitude: Double,
     @Schema(description = "경도", example = "127.423084873712")
-    val longitude: String,
+    val longitude: Double,
 ) {
     companion object {
         fun from(
             document: Point2AddressData,
-            latitude: String,
-            longitude: String,
+            latitude: Double,
+            longitude: Double,
         ): Point2AddressResponse =
             Point2AddressResponse(
                 addressName = document.address.addressName,
