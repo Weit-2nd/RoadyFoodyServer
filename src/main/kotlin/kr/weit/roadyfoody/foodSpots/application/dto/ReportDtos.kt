@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
+import jakarta.validation.constraints.Size
 import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
@@ -195,11 +196,15 @@ data class FoodSpotsUpdateRequest(
     val open: Boolean?,
     @Schema(description = "폐업 여부", example = "false")
     val closed: Boolean?,
-    @Schema(description = "음식 카테고리", example = "[1, 2]")
+    @field:Size(min = 1, message = "음식 카테고리는 최소 1개 이상 선택해야 합니다.")
+    @Schema(
+        description = "음식 카테고리 ex) 변경된, 변경되지 않은 카테고리 모두 입력해주세요. 없을 경우, 생략해주세요",
+        example = "[1, 2]",
+    )
     val foodCategories: Set<Long>?,
     @field:Valid
     @Schema(
-        description = "운영시간 리스트 ex) 사용자가 월/수/금의 운영시간 입력-> 월/수/금 데이터만 보내주세요. 없을 경우, 빈 배열",
+        description = "운영시간 리스트 ex) 변경된, 변경되지 않은 운영시간 모두 입력해주세요. 없을 경우, 생략해주세요",
     )
     val operationHours: List<OperationHoursRequest>?,
 ) {

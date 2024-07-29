@@ -65,6 +65,7 @@ class FoodSpotsController(
     override fun updateFoodSpots(
         @LoginUser
         user: User,
+        @Positive(message = "음식점 ID는 양수여야 합니다.")
         @PathVariable("foodSpotsId")
         foodSpotsId: Long,
         @Valid

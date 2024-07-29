@@ -154,6 +154,7 @@ interface FoodSportsControllerSpec {
     )
     fun updateFoodSpots(
         user: User,
+        @Positive(message = "음식점 ID는 양수여야 합니다.")
         @Parameter(description = "음식점 ID", required = true, example = "1")
         foodSpotsId: Long,
         @Valid
