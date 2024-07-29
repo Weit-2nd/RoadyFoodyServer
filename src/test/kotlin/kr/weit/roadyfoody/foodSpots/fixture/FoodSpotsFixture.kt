@@ -3,9 +3,6 @@ package kr.weit.roadyfoody.foodSpots.fixture
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodCategoryResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.OperationHoursRequest
-import kr.weit.roadyfoody.foodSpots.application.dto.ReportCategoryResponse
-import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoriesResponse
-import kr.weit.roadyfoody.foodSpots.application.dto.ReportPhotoResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
 import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodCategory
@@ -156,26 +153,6 @@ fun createMockPhotoList(
     List(size) {
         createTestImageFile(format, name)
     }
-
-fun createTestReportPhotoResponse(
-    id: Long = 0L,
-    url: String = TEST_FOOD_SPOTS_PHOTO_URL,
-) = ReportPhotoResponse(id, url)
-
-fun createTestReportCategoryResponse(
-    id: Long = 0L,
-    name: String = "testCategory",
-) = ReportCategoryResponse(id, name)
-
-fun createTestReportHistoriesResponse(
-    foodSpotsHistory: FoodSpotsHistory = createMockTestFoodHistory(),
-    reportPhotoResponse: List<ReportPhotoResponse> = listOf(createTestReportPhotoResponse()),
-    reportCategoryResponse: List<ReportCategoryResponse> = listOf(createTestReportCategoryResponse()),
-) = ReportHistoriesResponse(
-    foodSpotsHistory,
-    reportPhotoResponse,
-    reportCategoryResponse,
-)
 
 fun createTestFoodCategories(): List<FoodCategory> =
     listOf(
