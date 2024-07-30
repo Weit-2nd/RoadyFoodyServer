@@ -108,5 +108,25 @@ class AddressSearchControllerTest(
                     verify(exactly = 1) { addressSearchService.searchPoint2Address(0.0, 0.0) }
                 }
             }
+            `when`("longitude가 범위를 벗어나는 경우") {
+                then("400을 반환") {
+                    mockMvc
+                        .perform(
+                            getWithAuth("$requestPath/point")
+                                .param("longitude", "190.0")
+                                .param("latitude", "0.0"),
+                        ).andExpect(status().isBadRequest)
+                }
+            }
+            `when`("latitude가 범위를 벗어나는 경우") {
+                then("400을 반환") {
+                    mockMvc
+                        .perform(
+                            getWithAuth("$requestPath/point")
+                                .param("longitude", "0.0")
+                                .param("latitude", "-190.0"),
+                        ).andExpect(status().isBadRequest)
+                }
+            }
         }
     })

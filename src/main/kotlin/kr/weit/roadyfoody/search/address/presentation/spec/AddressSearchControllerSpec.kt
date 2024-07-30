@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Positive
 import jakarta.validation.constraints.Size
 import kr.weit.roadyfoody.common.exception.ErrorCode
@@ -83,11 +82,9 @@ interface AddressSearchControllerSpec {
     )
     fun searchPoint2Address(
         @Schema(description = "경도", example = "127.12312219099")
-        @NotNull(message = "경도는 필수입니다.")
         @Longitude
         longitude: Double,
         @Schema(description = "위도", example = "37.4940529587731")
-        @NotNull(message = "위도는 필수입니다.")
         @Latitude
         latitude: Double,
     ): Point2AddressResponse
