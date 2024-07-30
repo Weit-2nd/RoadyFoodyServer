@@ -1,24 +1,12 @@
 package kr.weit.roadyfoody.foodSpots.application.service
 
-import kr.weit.roadyfoody.common.dto.SliceResponse
-import kr.weit.roadyfoody.foodSpots.application.dto.ReportCategoryResponse
-import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoriesResponse
-import kr.weit.roadyfoody.foodSpots.application.dto.ReportPhotoResponse
 import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
-import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
-import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsPhotoRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
-import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
-import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
-import kr.weit.roadyfoody.foodSpots.repository.getHistoriesByUser
-import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponse
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponses
 import kr.weit.roadyfoody.search.foodSpots.dto.OperationStatus
-import kr.weit.roadyfoody.user.repository.UserRepository
-import kr.weit.roadyfoody.user.repository.getByUserId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -28,35 +16,8 @@ import java.time.temporal.ChronoField
 
 @Service
 class FoodSpotsQueryService(
-    private val userRepository: UserRepository,
-    private val foodSpotsHistoryRepository: FoodSpotsHistoryRepository,
-    private val foodSpotsPhotoRepository: FoodSpotsPhotoRepository,
-    private val reportFoodCategoryRepository: ReportFoodCategoryRepository,
-    private val imageService: ImageService,
     private val foodSpotsRepository: FoodSpotsRepository,
 ) {
-    @Transactional(readOnly = true)
-    fun getReportHistories(
-        userId: Long,
-        size: Int,
-        lastId: Long?,
-    ): SliceResponse<ReportHistoriesResponse> {
-        val user = userRepository.getByUserId(userId)
-        val reportResponse =
-            foodSpotsHistoryRepository.getHistoriesByUser(user, size, lastId).map {
-                val reportPhotoResponse =
-                    foodSpotsPhotoRepository.getByHistoryId(it.id).map { photo ->
-                        ReportPhotoResponse(photo, imageService.getDownloadUrl(photo.fileName))
-                    }
-                val reportCategoryResponse =
-                    reportFoodCategoryRepository.getByHistoryId(it.id).map { category ->
-                        ReportCategoryResponse(category)
-                    }
-                ReportHistoriesResponse(it, reportPhotoResponse, reportCategoryResponse)
-            }
-        return SliceResponse(reportResponse)
-    }
-
     @Transactional(readOnly = true)
     fun searchFoodSpots(foodSpotsSearchQuery: FoodSpotsSearchCondition): FoodSpotsSearchResponses {
         val result: List<FoodSpots> =
