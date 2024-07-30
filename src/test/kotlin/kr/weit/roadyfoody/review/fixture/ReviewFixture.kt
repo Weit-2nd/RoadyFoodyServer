@@ -23,6 +23,7 @@ const val TEST_INVALID_FOOD_SPOT_ID = -1L
 const val TEST_INVALID_RATING = -1
 const val TEST_INVALID_RATING_OVER = 11
 const val TEST_REVIEW_REQUEST_PHOTO = "reviewPhotos"
+const val TEST_REVIEW_ID = 1L
 const val TEST_REVIEW_PHOTO_URL = "reviewPhotoUrl"
 
 fun createTestReviewRequest(

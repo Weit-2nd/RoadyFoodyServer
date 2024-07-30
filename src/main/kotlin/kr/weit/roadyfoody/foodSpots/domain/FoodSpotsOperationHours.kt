@@ -43,4 +43,23 @@ class FoodSpotsOperationHours(
         require(OPERATION_HOURS_REGEX.matches(openingHours)) { OPERATION_HOURS_REGEX_DESC }
         require(OPERATION_HOURS_REGEX.matches(closingHours)) { OPERATION_HOURS_REGEX_DESC }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is FoodSpotsOperationHours) return false
+        if (foodSpots.id != other.foodSpots.id) return false
+        if (dayOfWeek != other.dayOfWeek) return false
+        if (openingHours != other.openingHours) return false
+        if (closingHours != other.closingHours) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = foodSpots.id.hashCode()
+        result = 31 * result + dayOfWeek.hashCode()
+        result = 31 * result + openingHours.hashCode()
+        result = 31 * result + closingHours.hashCode()
+        return result
+    }
 }

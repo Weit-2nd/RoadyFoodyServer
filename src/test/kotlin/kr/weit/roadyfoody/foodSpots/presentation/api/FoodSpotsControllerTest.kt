@@ -1,5 +1,7 @@
 package kr.weit.roadyfoody.foodSpots.presentation.api
 
+import TEST_FOOD_SPOT_ID
+import TEST_INVALID_FOOD_SPOT_ID
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.BehaviorSpec
@@ -8,14 +10,12 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
-import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsCommandService
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsQueryService
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_HAS_NEXT
-import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_HISTORY_ID
+import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_LAST_ID
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_REQUEST_NAME
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_REQUEST_PHOTO
-import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_SIZE
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOT_NAME_EMPTY
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOT_NAME_INVALID_STR
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOT_NAME_TOO_LONG
@@ -25,6 +25,7 @@ import kr.weit.roadyfoody.foodSpots.fixture.createMockPhotoList
 import kr.weit.roadyfoody.foodSpots.fixture.createOperationHoursRequest
 import kr.weit.roadyfoody.foodSpots.fixture.createReportHistoryDetailResponse
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportHistoriesResponse
+import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportRequest
 import kr.weit.roadyfoody.global.TEST_LAST_ID
 import kr.weit.roadyfoody.support.annotation.ControllerTest
@@ -32,9 +33,9 @@ import kr.weit.roadyfoody.support.utils.ImageFormat
 import kr.weit.roadyfoody.support.utils.ImageFormat.WEBP
 import kr.weit.roadyfoody.support.utils.createMultipartFile
 import kr.weit.roadyfoody.support.utils.createTestImageFile
-import kr.weit.roadyfoody.support.utils.getWithAuth
+import kr.weit.roadyfoody.support.utils.deleteWithAuth
 import kr.weit.roadyfoody.support.utils.multipartWithAuth
-import kr.weit.roadyfoody.user.fixture.TEST_USER_ID
+import kr.weit.roadyfoody.support.utils.patchWithAuth
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.web.servlet.MockMvc
@@ -44,7 +45,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @ControllerTest
 class FoodSpotsControllerTest(
     @MockkBean private val foodSpotsCommandService: FoodSpotsCommandService,
-    @MockkBean private val foodSpotsQueryService: FoodSpotsQueryService,
     private val mockMvc: MockMvc,
     private val objectMapper: ObjectMapper,
 ) : BehaviorSpec(
@@ -286,55 +286,137 @@ class FoodSpotsControllerTest(
                 }
             }
 
-            given("GET $requestPath/users/{userId}/histories Test") {
-                val response =
-                    SliceResponse(
-                        listOf(createTestReportHistoriesResponse()),
-                        TEST_FOOD_SPOTS_HAS_NEXT,
-                    )
-                every {
-                    foodSpotsQueryService.getReportHistories(any(), any(), any())
-                } returns response
+            given("PATCH $requestPath/{foodSpotsId} Test") {
+                every { foodSpotsCommandService.doUpdateReport(any(), any(), any()) } just runs
                 `when`("정상적인 요청이 들어올 경우") {
-                    then("해당 유저의 리포트 이력을 반환한다.") {
+                    val request = createTestFoodSpotsUpdateRequest()
+                    then("해당 가게 정보를 수정한다.") {
                         mockMvc
                             .perform(
-                                getWithAuth("$requestPath/users/$TEST_USER_ID/histories")
-                                    .param("size", TEST_FOOD_SPOTS_SIZE.toString())
-                                    .param("lastId", TEST_LAST_ID.toString()),
-                            ).andExpect(status().isOk)
+                                patchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                    .content(objectMapper.writeValueAsString(request))
+                                    .contentType("application/json"),
+                            ).andExpect(status().isCreated)
                     }
                 }
 
-                `when`("size와 lastId가 없는 경우") {
-                    every {
-                        foodSpotsQueryService.getReportHistories(any(), any(), any())
-                    } returns response
-                    then("기본값으로 해당 유저의 리포트 이력을 반환한다.") {
-                        mockMvc
-                            .perform(
-                                getWithAuth("$requestPath/users/$TEST_USER_ID/histories"),
-                            ).andExpect(status().isOk)
-                    }
-                }
-
-                `when`("size가 양수가 아닌 경우") {
+                `when`("음식점 ID가 양수가 아닌 경우") {
                     then("400을 반환") {
                         mockMvc
                             .perform(
-                                getWithAuth("$requestPath/users/$TEST_USER_ID/histories")
-                                    .param("size", "0"),
+                                patchWithAuth("$requestPath/$TEST_INVALID_FOOD_SPOT_ID")
+                                    .content(objectMapper.writeValueAsString(createTestFoodSpotsUpdateRequest()))
+                                    .contentType("application/json"),
                             ).andExpect(status().isBadRequest)
                     }
                 }
 
-                `when`("lastId가 양수가 아닌 경우") {
+                `when`("상호명이 공백인 경우") {
+                    val request = createTestFoodSpotsUpdateRequest(name = TEST_FOOD_SPOT_NAME_EMPTY)
                     then("400을 반환") {
                         mockMvc
                             .perform(
-                                getWithAuth("$requestPath/users/$TEST_USER_ID/histories")
-                                    .param("lastId", "-1"),
+                                patchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                    .content(
+                                        objectMapper.writeValueAsString(request),
+                                    ).contentType("application/json"),
                             ).andExpect(status().isBadRequest)
+                    }
+                }
+
+                `when`("상호명에 허용되지 않은 특수문자가 포함된 경우") {
+                    val request = createTestFoodSpotsUpdateRequest(name = TEST_FOOD_SPOT_NAME_INVALID_STR)
+                    then("400을 반환") {
+                        mockMvc
+                            .perform(
+                                patchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                    .content(
+                                        objectMapper.writeValueAsString(request),
+                                    ).contentType("application/json"),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+
+                `when`("상호명이 30자 초과인 경우") {
+                    val request = createTestFoodSpotsUpdateRequest(name = TEST_FOOD_SPOT_NAME_TOO_LONG)
+                    then("400을 반환") {
+                        mockMvc
+                            .perform(
+                                patchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                    .content(
+                                        objectMapper.writeValueAsString(request),
+                                    ).contentType("application/json"),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+
+                `when`("경도가 범위를 벗어난 경우") {
+                    val request = createTestFoodSpotsUpdateRequest(longitude = 190.0)
+                    then("400을 반환") {
+                        mockMvc
+                            .perform(
+                                patchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                    .content(
+                                        objectMapper.writeValueAsString(request),
+                                    ).contentType("application/json"),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+
+                `when`("위도가 범위를 벗어난 경우") {
+                    val request = createTestFoodSpotsUpdateRequest(latitude = -190.0)
+                    then("400을 반환") {
+                        mockMvc
+                            .perform(
+                                patchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                    .content(
+                                        objectMapper.writeValueAsString(request),
+                                    ).contentType("application/json"),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+
+                `when`("운영시간 형식이 잘못된 경우") {
+                    val request =
+                        createTestFoodSpotsUpdateRequest(
+                            operationHours =
+                                listOf(
+                                    createOperationHoursRequest(openingHours = TEST_INVALID_TIME_FORMAT),
+                                ),
+                        )
+                    then("400을 반환") {
+                        mockMvc
+                            .perform(
+                                patchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                    .content(
+                                        objectMapper.writeValueAsString(request),
+                                    ).contentType("application/json"),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+            }
+
+            given("DELETE $requestPath/histories/{historyId}") {
+                `when`("음수인 리포트 ID가 들어올 경우") {
+                    then("400을 반환한다.") {
+                        val it =
+                            mockMvc
+                                .perform(
+                                    deleteWithAuth("$requestPath/histories/-1"),
+                                )
+                        it.andExpect(status().isBadRequest)
+                    }
+                }
+
+                every {
+                    foodSpotsCommandService.deleteFoodSpotsHistories(any(), any())
+                } just runs
+                `when`("정상적인 요청이 들어올 경우") {
+                    then("해당 리포트를 삭제한다.") {
+                        mockMvc
+                            .perform(
+                                deleteWithAuth("$requestPath/histories/$TEST_FOOD_SPOTS_HISTORY_ID"),
+                            ).andExpect(status().isNoContent)
                     }
                 }
             }

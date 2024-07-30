@@ -4,6 +4,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
+import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
 import kr.weit.roadyfoody.foodSpots.exception.FoodSpotsHistoryNotFoundException
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_SIZE
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_INVALID_FOOD_SPOTS_HISTORY_ID
@@ -24,17 +25,19 @@ class FoodSpotsHistoryRepositoryTest(
         lateinit var otherUser: User
         lateinit var foodSpots: FoodSpots
         lateinit var otherFoodSpots: FoodSpots
+        lateinit var foodSpotsHistories: List<FoodSpotsHistory>
         beforeEach {
             user = userRepository.save(createTestUser(0L))
             otherUser = userRepository.save(createTestUser(0L, nickname = "otherUser"))
             foodSpots = foodSpotsRepository.save(createTestFoodSpots())
             otherFoodSpots = foodSpotsRepository.save(createTestFoodSpots())
-            foodSpotsHistoryRepository.saveAll(
-                listOf(
-                    createTestFoodHistory(user = user, foodSpots = foodSpots),
-                    createTestFoodHistory(user = user, foodSpots = otherFoodSpots),
-                ),
-            )
+            foodSpotsHistories =
+                foodSpotsHistoryRepository.saveAll(
+                    listOf(
+                        createTestFoodHistory(user = user, foodSpots = foodSpots),
+                        createTestFoodHistory(user = user, foodSpots = otherFoodSpots),
+                    ),
+                )
         }
 
         describe("getHistoriesByUser 메소드는") {
@@ -74,18 +77,18 @@ class FoodSpotsHistoryRepositoryTest(
             }
         }
 
-        describe("findByFoodSpots 메소드는") {
-            context("존재하는 id 를 받는 경우") {
-                it("해당 FoodSpotsHistory를 반환한다.") {
-                    val history = foodSpotsHistoryRepository.findAll().first()
-                    foodSpotsHistoryRepository.getByHistoryId(history.id) shouldBe history
+        describe("getByHistoryId 메소드는") {
+            context("존재하는 historyId 를 받는 경우") {
+                it("해당 historyId 의 FoodSpotsHistory 를 반환한다.") {
+                    val history = foodSpotsHistoryRepository.getByHistoryId(foodSpotsHistories[0].id)
+                    history shouldBe foodSpotsHistories[0]
                 }
             }
 
-            context("존재하지 않는 id 를 받는 경우") {
-                it("FoodSpotsHistoryNotFoundException 을 던진다.") {
+            context("존재하지 않는 historyId 를 받는 경우") {
+                it("에러가 발생한다") {
                     shouldThrow<FoodSpotsHistoryNotFoundException> {
-                        foodSpotsHistoryRepository.getByHistoryId(TEST_INVALID_FOOD_SPOTS_HISTORY_ID)
+                        foodSpotsHistoryRepository.getByHistoryId(0L)
                     }
                 }
             }

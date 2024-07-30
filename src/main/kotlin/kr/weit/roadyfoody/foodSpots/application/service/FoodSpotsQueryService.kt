@@ -40,28 +40,6 @@ class FoodSpotsQueryService(
     private val reportOperationHoursRepository: ReportOperationHoursRepository,
 ) {
     @Transactional(readOnly = true)
-    fun getReportHistories(
-        userId: Long,
-        size: Int,
-        lastId: Long?,
-    ): SliceResponse<ReportHistoriesResponse> {
-        val user = userRepository.getByUserId(userId)
-        val reportResponse =
-            foodSpotsHistoryRepository.getHistoriesByUser(user, size, lastId).map {
-                val reportPhotoResponse =
-                    foodSpotsPhotoRepository.getByHistoryId(it.id).map { photo ->
-                        ReportPhotoResponse(photo, imageService.getDownloadUrl(photo.fileName))
-                    }
-                val reportCategoryResponse =
-                    reportFoodCategoryRepository.getByHistoryId(it.id).map { category ->
-                        ReportCategoryResponse(category)
-                    }
-                ReportHistoriesResponse(it, reportPhotoResponse, reportCategoryResponse)
-            }
-        return SliceResponse(reportResponse)
-    }
-
-    @Transactional(readOnly = true)
     fun searchFoodSpots(foodSpotsSearchQuery: FoodSpotsSearchCondition): FoodSpotsSearchResponses {
         val result: List<FoodSpots> =
             foodSpotsRepository.findFoodSpotsByPointWithinRadius(

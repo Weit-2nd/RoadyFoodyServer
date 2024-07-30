@@ -1,13 +1,11 @@
 package kr.weit.roadyfoody.foodSpots.application.service
 
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.spyk
 import io.mockk.verify
 import kr.weit.roadyfoody.foodSpots.exception.FoodSpotsHistoryNotFoundException
 import kr.weit.roadyfoody.foodSpots.fixture.MockTestFoodSpot
@@ -57,49 +55,7 @@ class FoodSpotsQueryServiceTest :
                     foodSpotsRepository,
                     reportOperationHoursRepository,
                 )
-            val user = createTestUser()
             afterEach { clearAllMocks() }
-            given("getReportHistories 테스트") {
-                every { userRepository.findById(TEST_USER_ID) } returns Optional.of(user)
-                every {
-                    foodSpotsHistoryRepository.getHistoriesByUser(
-                        user,
-                        TEST_FOOD_SPOTS_SIZE,
-                        TEST_LAST_ID,
-                    )
-                } returns createMockSliceFoodHistory()
-                every { foodSpotsPhotoRepository.getByHistoryId(any()) } returns
-                    listOf(
-                        createTestFoodSpotsPhoto(),
-                    )
-                every { imageService.getDownloadUrl(any()) } returns TEST_FOOD_SPOTS_PHOTO_URL
-                every { reportFoodCategoryRepository.getByHistoryId(any()) } returns
-                    listOf(
-                        createTestReportFoodCategory(),
-                    )
-                `when`("정상적인 데이터가 들어올 경우") {
-                    then("정상적으로 조회되어야 한다.") {
-                        foodSPotsQueryService.getReportHistories(
-                            TEST_USER_ID,
-                            TEST_FOOD_SPOTS_SIZE,
-                            TEST_LAST_ID,
-                        )
-                    }
-                }
-
-                `when`("사용자가 존재하지 않는 경우") {
-                    every { userRepository.findById(TEST_USER_ID) } returns Optional.empty()
-                    then("UserNotFoundException이 발생한다.") {
-                        shouldThrow<UserNotFoundException> {
-                            foodSPotsQueryService.getReportHistories(
-                                TEST_USER_ID,
-                                TEST_FOOD_SPOTS_SIZE,
-                                TEST_LAST_ID,
-                            )
-                        }
-                    }
-                }
-            }
 
             given("searchFoodSpots 테스트") {
                 val query500m =

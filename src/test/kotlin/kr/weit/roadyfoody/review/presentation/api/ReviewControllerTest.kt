@@ -4,6 +4,7 @@ import TEST_INVALID_FOOD_SPOT_ID
 import TEST_INVALID_RATING
 import TEST_INVALID_RATING_OVER
 import TEST_REVIEW_CONTENT_MAX_LENGTH
+import TEST_REVIEW_ID
 import TEST_REVIEW_REQUEST_NAME
 import TEST_REVIEW_REQUEST_PHOTO
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -28,6 +29,7 @@ import kr.weit.roadyfoody.support.utils.ImageFormat.PNG
 import kr.weit.roadyfoody.support.utils.ImageFormat.WEBP
 import kr.weit.roadyfoody.support.utils.createMultipartFile
 import kr.weit.roadyfoody.support.utils.createTestImageFile
+import kr.weit.roadyfoody.support.utils.deleteWithAuth
 import kr.weit.roadyfoody.support.utils.getWithAuth
 import kr.weit.roadyfoody.support.utils.multipartWithAuth
 import kr.weit.roadyfoody.user.fixture.TEST_USER_ID
@@ -229,6 +231,31 @@ class ReviewControllerTest(
                                 any(),
                             )
                         }
+                    }
+                }
+            }
+
+            given("DELETE $requestPath/{reviewId}") {
+                `when`("음수인 리뷰 ID가 들어올 경우") {
+                    then("400을 반환한다.") {
+                        val it =
+                            mockMvc
+                                .perform(
+                                    deleteWithAuth("$requestPath/-1"),
+                                )
+                        it.andExpect(status().isBadRequest)
+                    }
+                }
+
+                every {
+                    reviewCommandService.deleteReview(any(), any())
+                } just runs
+                `when`("정상적인 요청이 들어올 경우") {
+                    then("해당 리뷰를 삭제한다.") {
+                        mockMvc
+                            .perform(
+                                deleteWithAuth("$requestPath/$TEST_REVIEW_ID"),
+                            ).andExpect(status().isNoContent)
                     }
                 }
             }

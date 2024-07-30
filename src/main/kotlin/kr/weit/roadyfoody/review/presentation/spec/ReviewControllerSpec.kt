@@ -22,6 +22,7 @@ import kr.weit.roadyfoody.review.repository.ReviewSortType
 import kr.weit.roadyfoody.review.utils.SliceFoodSpotsReview
 import kr.weit.roadyfoody.review.utils.SliceUserReview
 import kr.weit.roadyfoody.user.domain.User
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestParam
@@ -169,4 +170,28 @@ interface ReviewControllerSpec {
         @PathVariable("reviewId")
         reviewId: Long,
     ): ReviewDetailResponse
+
+    @Operation(
+        description = "리뷰 삭제 API",
+        responses = [
+            ApiResponse(
+                responseCode = "204",
+                description = "리뷰 삭제 성공",
+            ),
+        ],
+    )
+    @ApiErrorCodeExamples(
+        [
+            ErrorCode.NOT_FOUND_FOOD_SPOTS_REVIEW,
+            ErrorCode.REVIEW_ID_NON_POSITIVE,
+            ErrorCode.NOT_FOOD_SPOTS_REVIEW_OWNER,
+        ],
+    )
+    fun deleteFoodSpotsReviews(
+        @LoginUser
+        user: User,
+        @Positive(message = "리뷰 ID는 양수여야 합니다.")
+        @PathVariable("reviewId")
+        reviewId: Long,
+    )
 }
