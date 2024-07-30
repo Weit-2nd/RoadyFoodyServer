@@ -12,8 +12,7 @@ import io.mockk.runs
 import io.mockk.verify
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsCommandService
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsQueryService
-import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_HAS_NEXT
-import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_LAST_ID
+import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_HISTORY_ID
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_REQUEST_NAME
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_REQUEST_PHOTO
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOT_NAME_EMPTY
@@ -24,16 +23,21 @@ import kr.weit.roadyfoody.foodSpots.fixture.TEST_INVALID_TIME_FORMAT
 import kr.weit.roadyfoody.foodSpots.fixture.createMockPhotoList
 import kr.weit.roadyfoody.foodSpots.fixture.createOperationHoursRequest
 import kr.weit.roadyfoody.foodSpots.fixture.createReportHistoryDetailResponse
-import kr.weit.roadyfoody.foodSpots.fixture.createTestReportHistoriesResponse
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportRequest
+import kr.weit.roadyfoody.foodSpots.fixture.createTestSliceFoodSpotsReviewResponse
 import kr.weit.roadyfoody.global.TEST_LAST_ID
+import kr.weit.roadyfoody.global.TEST_NON_POSITIVE_ID
+import kr.weit.roadyfoody.global.TEST_NON_POSITIVE_SIZE
+import kr.weit.roadyfoody.global.TEST_PAGE_SIZE
+import kr.weit.roadyfoody.global.TEST_SORT_TYPE
 import kr.weit.roadyfoody.support.annotation.ControllerTest
 import kr.weit.roadyfoody.support.utils.ImageFormat
 import kr.weit.roadyfoody.support.utils.ImageFormat.WEBP
 import kr.weit.roadyfoody.support.utils.createMultipartFile
 import kr.weit.roadyfoody.support.utils.createTestImageFile
 import kr.weit.roadyfoody.support.utils.deleteWithAuth
+import kr.weit.roadyfoody.support.utils.getWithAuth
 import kr.weit.roadyfoody.support.utils.multipartWithAuth
 import kr.weit.roadyfoody.support.utils.patchWithAuth
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -45,6 +49,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @ControllerTest
 class FoodSpotsControllerTest(
     @MockkBean private val foodSpotsCommandService: FoodSpotsCommandService,
+    @MockkBean private val foodSpotsQueryService: FoodSpotsQueryService,
     private val mockMvc: MockMvc,
     private val objectMapper: ObjectMapper,
 ) : BehaviorSpec(
@@ -440,6 +445,60 @@ class FoodSpotsControllerTest(
                         mockMvc
                             .perform(
                                 getWithAuth("$requestPath/histories/$TEST_INVALID_FOOD_SPOTS_HISTORY_ID"),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+            }
+
+            given("GET $requestPath/{foodSpotsId}/reviews Test") {
+                val response = createTestSliceFoodSpotsReviewResponse()
+                every {
+                    foodSpotsQueryService.getFoodSpotsReview(any(), any(), any(), any())
+                } returns response
+                `when`("정상적인 데이터가 들어올 경우") {
+                    then("음식점의 리뷰 리스트가 조회된다.") {
+                        mockMvc
+                            .perform(
+                                getWithAuth("$requestPath/$TEST_FOOD_SPOT_ID/reviews")
+                                    .param("size", "$TEST_PAGE_SIZE")
+                                    .param("lastId", "$TEST_LAST_ID")
+                                    .param("sortType", TEST_SORT_TYPE),
+                            ).andExpect(status().isOk)
+                    }
+                }
+
+                `when`("음식점 ID가 양수가 아닌 경우") {
+                    then("400 반환") {
+                        mockMvc
+                            .perform(
+                                getWithAuth("$requestPath/$TEST_INVALID_FOOD_SPOT_ID/reviews")
+                                    .param("size", "$TEST_PAGE_SIZE")
+                                    .param("lastId", "$TEST_LAST_ID")
+                                    .param("sortType", TEST_SORT_TYPE),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+
+                `when`("조회할 개수가 양수가 아닌 경우") {
+                    then("400 반환") {
+                        mockMvc
+                            .perform(
+                                getWithAuth("$requestPath/$TEST_FOOD_SPOT_ID/reviews")
+                                    .param("size", "$TEST_NON_POSITIVE_SIZE")
+                                    .param("lastId", "$TEST_LAST_ID")
+                                    .param("sortType", TEST_SORT_TYPE),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+
+                `when`("마지막 ID가 양수가 아닌 경우") {
+                    then("400 반환") {
+                        mockMvc
+                            .perform(
+                                getWithAuth("$requestPath/$TEST_FOOD_SPOT_ID/reviews")
+                                    .param("size", "$TEST_PAGE_SIZE")
+                                    .param("lastId", "$TEST_NON_POSITIVE_ID")
+                                    .param("sortType", TEST_SORT_TYPE),
                             ).andExpect(status().isBadRequest)
                     }
                 }

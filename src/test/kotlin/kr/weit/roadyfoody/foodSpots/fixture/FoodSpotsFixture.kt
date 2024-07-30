@@ -1,10 +1,12 @@
 package kr.weit.roadyfoody.foodSpots.fixture
 
+import createMockSliceReview
+import createTestReviewPhotoResponse
+import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodCategoryResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.OperationHoursRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportCategoryResponse
-import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoriesResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoryDetailResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportOperationHoursResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportPhotoResponse
@@ -21,6 +23,7 @@ import kr.weit.roadyfoody.foodSpots.domain.ReportFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHours
 import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_MAX_LENGTH
 import kr.weit.roadyfoody.global.utils.CoordinateUtils
+import kr.weit.roadyfoody.review.application.dto.ReviewResponse
 import kr.weit.roadyfoody.search.foodSpots.domain.SearchCoinCache
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponse
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponses
@@ -28,6 +31,7 @@ import kr.weit.roadyfoody.search.foodSpots.dto.OperationStatus
 import kr.weit.roadyfoody.support.utils.ImageFormat
 import kr.weit.roadyfoody.support.utils.createTestImageFile
 import kr.weit.roadyfoody.user.domain.User
+import kr.weit.roadyfoody.user.fixture.createTestReviewerInfoResponse
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.GeometryFactory
@@ -53,6 +57,7 @@ const val TEST_PHOTO_NAME = "test_photo_name"
 const val TEST_FOOD_SPOTS_REQUEST_NAME = "reportRequest"
 const val TEST_FOOD_SPOTS_REQUEST_PHOTO = "reportPhotos"
 const val TEST_FOOD_SPOTS_SIZE = 10
+const val TEST_FOOD_SPOTS_LAST_ID = 1L
 const val TEST_FOOD_SPOTS_PHOTO_URL = "test_url"
 const val TEST_FOOD_SPOTS_HAS_NEXT = false
 const val TEST_INVALID_FOOD_CATEGORY_ID = -1L
@@ -103,12 +108,6 @@ fun createTestFoodSpots(
     operationHours: MutableList<FoodSpotsOperationHours> = mutableListOf(),
     foodCategories: MutableList<FoodSpotsFoodCategory> = mutableListOf(),
 ) = FoodSpots(id, name, foodTruck, open, storeClosure, point, operationHours, foodCategories)
-
-fun createTestFoodSpotsFoodCategory(
-    foodSpots: FoodSpots = createTestFoodSpots(),
-    foodCategory: FoodCategory = createTestFoodCategory(),
-    id: Long = 0L,
-) = FoodSpotsFoodCategory(id, foodSpots, foodCategory)
 
 fun createTestFoodCategory(
     id: Long = 0L,
@@ -169,16 +168,6 @@ fun createTestReportCategoryResponse(
     id: Long = 0L,
     name: String = "testCategory",
 ) = ReportCategoryResponse(id, name)
-
-fun createTestReportHistoriesResponse(
-    foodSpotsHistory: FoodSpotsHistory = createMockTestFoodHistory(),
-    reportPhotoResponse: List<ReportPhotoResponse> = listOf(createTestReportPhotoResponse()),
-    reportCategoryResponse: List<ReportCategoryResponse> = listOf(createTestReportCategoryResponse()),
-) = ReportHistoriesResponse(
-    foodSpotsHistory,
-    reportPhotoResponse,
-    reportCategoryResponse,
-)
 
 fun createTestFoodCategories(): List<FoodCategory> =
     listOf(
@@ -421,4 +410,15 @@ fun createReportHistoryDetailResponse(): ReportHistoryDetailResponse =
         listOf(createTestReportPhotoResponse()),
         listOf(createTestReportCategoryResponse()),
         listOf(createReportOperationHoursResponse()),
+    )
+
+fun createTestSliceFoodSpotsReviewResponse(): SliceResponse<ReviewResponse> =
+    SliceResponse(
+        createMockSliceReview().map {
+            ReviewResponse.of(
+                it,
+                createTestReviewerInfoResponse(),
+                listOf(createTestReviewPhotoResponse()),
+            )
+        },
     )

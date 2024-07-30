@@ -1,5 +1,6 @@
 package kr.weit.roadyfoody.user.application.service
 
+import createMockSliceReview
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.nulls.shouldBeNull
@@ -19,7 +20,10 @@ import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsPhotoRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
 import kr.weit.roadyfoody.foodSpots.repository.getHistoriesByUser
+import kr.weit.roadyfoody.global.TEST_LAST_ID
+import kr.weit.roadyfoody.global.TEST_PAGE_SIZE
 import kr.weit.roadyfoody.global.service.ImageService
+import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
 import kr.weit.roadyfoody.user.exception.UserNotFoundException
 import kr.weit.roadyfoody.user.fixture.TEST_USER_ID
 import kr.weit.roadyfoody.user.fixture.TEST_USER_PROFILE_IMAGE_URL
@@ -34,7 +38,7 @@ class UserQueryServiceTest :
         val foodSpotsHistoryRepository = mockk<FoodSpotsHistoryRepository>()
         val foodSpotsPhotoRepository = mockk<FoodSpotsPhotoRepository>()
         val reportFoodCategoryRepository = mockk<ReportFoodCategoryRepository>()
-
+        val reviewRepository = mockk<FoodSpotsReviewRepository>()
         val userQueryService =
             UserQueryService(
                 userRepository,
@@ -42,6 +46,7 @@ class UserQueryServiceTest :
                 foodSpotsHistoryRepository,
                 foodSpotsPhotoRepository,
                 reportFoodCategoryRepository,
+                reviewRepository,
             )
 
         afterEach { clearAllMocks() }
@@ -106,6 +111,43 @@ class UserQueryServiceTest :
                             TEST_USER_ID,
                             TEST_FOOD_SPOTS_SIZE,
                             TEST_FOOD_SPOTS_LAST_ID,
+                        )
+                    }
+                }
+            }
+        }
+
+        given("getUserReviews 테스트") {
+            every { userRepository.findById(any()) } returns Optional.of(createTestUser())
+            every {
+                reviewRepository.sliceByUser(
+                    any(),
+                    any(),
+                    any(),
+                )
+            } returns createMockSliceReview()
+            `when`("정상적인 데이터가 들어올 경우") {
+                then("정상적으로 리뷰가 조회되어야 한다.") {
+                    userQueryService.getUserReviews(
+                        TEST_USER_ID,
+                        TEST_PAGE_SIZE,
+                        TEST_LAST_ID,
+                    )
+                    verify(exactly = 1) {
+                        userRepository.findById(any())
+                        reviewRepository.sliceByUser(any(), any(), any())
+                    }
+                }
+            }
+
+            `when`("유저가 없을 경우") {
+                every { userRepository.findById(any()) } returns Optional.empty()
+                then("UserNotFoundException 예외 발생") {
+                    shouldThrow<UserNotFoundException> {
+                        userQueryService.getUserReviews(
+                            TEST_USER_ID,
+                            TEST_PAGE_SIZE,
+                            TEST_LAST_ID,
                         )
                     }
                 }

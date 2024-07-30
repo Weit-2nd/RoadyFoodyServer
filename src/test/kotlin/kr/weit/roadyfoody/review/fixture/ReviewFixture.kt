@@ -1,13 +1,14 @@
-import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_PHOTO_NAME
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpots
 import kr.weit.roadyfoody.global.TEST_PAGE_SIZE
+import kr.weit.roadyfoody.review.application.dto.ReviewPhotoResponse
 import kr.weit.roadyfoody.review.application.dto.ReviewRequest
-import kr.weit.roadyfoody.review.application.dto.UserReviewResponse
+import kr.weit.roadyfoody.review.application.dto.ReviewResponse
 import kr.weit.roadyfoody.review.domain.FoodSpotsReview
 import kr.weit.roadyfoody.review.domain.FoodSpotsReviewPhoto
 import kr.weit.roadyfoody.user.domain.User
+import kr.weit.roadyfoody.user.fixture.createTestReviewerInfoResponse
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
@@ -25,6 +26,7 @@ const val TEST_INVALID_RATING_OVER = 11
 const val TEST_REVIEW_REQUEST_PHOTO = "reviewPhotos"
 const val TEST_REVIEW_ID = 1L
 const val TEST_REVIEW_PHOTO_URL = "reviewPhotoUrl"
+const val TEST_REVIEW_PHOTO_ID = 1L
 
 fun createTestReviewRequest(
     foodSpotsId: Long = TEST_FOOD_SPOT_ID,
@@ -53,11 +55,13 @@ fun createMockSliceReview(): Slice<FoodSpotsReview> =
         false,
     )
 
-fun createSliceResponseUserReview(): SliceResponse<UserReviewResponse> =
-    SliceResponse(
-        createMockSliceReview().map {
-            UserReviewResponse(it)
-        },
+fun createTestReviewPhotoResponse(): ReviewPhotoResponse = ReviewPhotoResponse(TEST_REVIEW_PHOTO_ID, TEST_REVIEW_PHOTO_URL)
+
+fun createTestReviewDetailResponse(): ReviewResponse =
+    ReviewResponse.of(
+        createMockTestReview(),
+        createTestReviewerInfoResponse(),
+        listOf(createTestReviewPhotoResponse()),
     )
 
 class MockTestReview(

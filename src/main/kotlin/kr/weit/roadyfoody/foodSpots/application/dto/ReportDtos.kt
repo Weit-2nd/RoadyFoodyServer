@@ -11,6 +11,8 @@ import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsOperationHours
+import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
+import kr.weit.roadyfoody.foodSpots.domain.ReportFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHours
 import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_REGEX_DESC
 import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_REGEX_STR
@@ -20,6 +22,7 @@ import kr.weit.roadyfoody.foodSpots.validator.Latitude
 import kr.weit.roadyfoody.foodSpots.validator.Longitude
 import kr.weit.roadyfoody.global.utils.CoordinateUtils.Companion.createCoordinate
 import kr.weit.roadyfoody.user.domain.User
+import java.time.LocalDateTime
 
 data class ReportRequest(
     @Schema(
@@ -180,6 +183,30 @@ data class FoodSpotsUpdateRequest(
                     closingHours = it.closingHours,
                 )
             }
+}
+
+data class ReportPhotoResponse(
+    @Schema(description = "리포트 사진 ID", example = "1")
+    val id: Long,
+    @Schema(description = "리포트 사진 URL")
+    val url: String,
+) {
+    constructor(reportPhoto: FoodSpotsPhoto, url: String) : this(
+        id = reportPhoto.id,
+        url = url,
+    )
+}
+
+data class ReportCategoryResponse(
+    @Schema(description = "리포트 카테고리 ID", example = "1")
+    val id: Long,
+    @Schema(description = "음식 카테고리명", example = "한식")
+    val name: String,
+) {
+    constructor(reportFoodCategory: ReportFoodCategory) : this(
+        id = reportFoodCategory.id,
+        name = reportFoodCategory.foodCategory.name,
+    )
 }
 
 data class ReportHistoryDetailResponse(

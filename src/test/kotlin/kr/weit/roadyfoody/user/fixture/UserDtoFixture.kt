@@ -1,12 +1,16 @@
 package kr.weit.roadyfoody.user.fixture
 
+import createMockSliceReview
+import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_PHOTO_URL
 import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodHistory
+import kr.weit.roadyfoody.user.application.dto.ReviewerInfoResponse
 import kr.weit.roadyfoody.user.application.dto.UserInfoResponse
 import kr.weit.roadyfoody.user.application.dto.UserReportCategoryResponse
 import kr.weit.roadyfoody.user.application.dto.UserReportHistoriesResponse
 import kr.weit.roadyfoody.user.application.dto.UserReportPhotoResponse
+import kr.weit.roadyfoody.user.application.dto.UserReviewResponse
 
 fun createTestUserInfoResponse(
     nickname: String = TEST_USER_NICKNAME,
@@ -37,3 +41,12 @@ fun createTestUserReportHistoriesResponse(
     reportPhotoResponse,
     reportCategoryResponse,
 )
+
+fun createTestSliceResponseUserReview(): SliceResponse<UserReviewResponse> =
+    SliceResponse(
+        createMockSliceReview().map {
+            UserReviewResponse(it)
+        },
+    )
+
+fun createTestReviewerInfoResponse(): ReviewerInfoResponse = ReviewerInfoResponse.of(createTestUser(), TEST_USER_PROFILE_IMAGE_URL)
