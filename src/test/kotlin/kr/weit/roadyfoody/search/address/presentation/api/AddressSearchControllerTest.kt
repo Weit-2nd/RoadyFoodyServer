@@ -83,7 +83,7 @@ class AddressSearchControllerTest(
             }
         }
 
-        given("GET $requestPath/point 테스트") {
+        given("GET $requestPath/coordinate 테스트") {
             `when`("좌표로 주소 검색 요청을 보내면") {
                 every {
                     addressSearchService.searchPoint2Address(
@@ -94,7 +94,7 @@ class AddressSearchControllerTest(
                 then("200 상태 번호와 RoadAddressResponse 반환한다.") {
                     mockMvc
                         .perform(
-                            getWithAuth("$requestPath/point")
+                            getWithAuth("$requestPath/coordinate")
                                 .param("longitude", "0.0")
                                 .param("latitude", "0.0"),
                         ).andExpect(status().isOk)
@@ -106,6 +106,26 @@ class AddressSearchControllerTest(
                             ),
                         )
                     verify(exactly = 1) { addressSearchService.searchPoint2Address(0.0, 0.0) }
+                }
+            }
+            `when`("longitude가 범위를 벗어나는 경우") {
+                then("400을 반환") {
+                    mockMvc
+                        .perform(
+                            getWithAuth("$requestPath/coordinate")
+                                .param("longitude", "190.0")
+                                .param("latitude", "0.0"),
+                        ).andExpect(status().isBadRequest)
+                }
+            }
+            `when`("latitude가 범위를 벗어나는 경우") {
+                then("400을 반환") {
+                    mockMvc
+                        .perform(
+                            getWithAuth("$requestPath/coordinate")
+                                .param("longitude", "0.0")
+                                .param("latitude", "-190.0"),
+                        ).andExpect(status().isBadRequest)
                 }
             }
         }

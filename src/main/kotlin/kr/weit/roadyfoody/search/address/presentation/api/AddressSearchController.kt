@@ -19,7 +19,7 @@ class AddressSearchController(
         keyword: String,
     ): AddressSearchResponses = addressSearchService.searchAddress(keyword, numOfRows)
 
-    @GetMapping("/point")
+    @GetMapping("/coordinate")
     override fun searchPoint2Address(
         longitude: Double,
         latitude: Double,
