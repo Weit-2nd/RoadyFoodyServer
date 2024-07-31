@@ -4,11 +4,9 @@ import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpots
 import kr.weit.roadyfoody.global.TEST_PAGE_SIZE
 import kr.weit.roadyfoody.review.application.dto.ReviewPhotoResponse
 import kr.weit.roadyfoody.review.application.dto.ReviewRequest
-import kr.weit.roadyfoody.review.application.dto.ReviewResponse
 import kr.weit.roadyfoody.review.domain.FoodSpotsReview
 import kr.weit.roadyfoody.review.domain.FoodSpotsReviewPhoto
 import kr.weit.roadyfoody.user.domain.User
-import kr.weit.roadyfoody.user.fixture.createTestReviewerInfoResponse
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
@@ -56,13 +54,6 @@ fun createMockSliceReview(): Slice<FoodSpotsReview> =
     )
 
 fun createTestReviewPhotoResponse(): ReviewPhotoResponse = ReviewPhotoResponse(TEST_REVIEW_PHOTO_ID, TEST_REVIEW_PHOTO_URL)
-
-fun createTestReviewDetailResponse(): ReviewResponse =
-    ReviewResponse.of(
-        createMockTestReview(),
-        createTestReviewerInfoResponse(),
-        listOf(createTestReviewPhotoResponse()),
-    )
 
 class MockTestReview(
     id: Long = 0L,

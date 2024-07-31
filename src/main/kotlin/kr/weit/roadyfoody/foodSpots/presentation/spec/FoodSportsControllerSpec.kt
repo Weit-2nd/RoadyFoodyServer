@@ -12,6 +12,7 @@ import jakarta.validation.constraints.Size
 import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.common.exception.ErrorCode
+import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsReviewResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoryDetailResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
@@ -19,7 +20,6 @@ import kr.weit.roadyfoody.foodSpots.utils.SliceFoodSpotsReview
 import kr.weit.roadyfoody.foodSpots.validator.WebPImageList
 import kr.weit.roadyfoody.global.swagger.ApiErrorCodeExamples
 import kr.weit.roadyfoody.global.swagger.v1.SwaggerTag
-import kr.weit.roadyfoody.review.application.dto.ReviewResponse
 import kr.weit.roadyfoody.review.repository.ReviewSortType
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.http.MediaType
@@ -191,5 +191,5 @@ interface FoodSportsControllerSpec {
         lastId: Long?,
         @RequestParam(defaultValue = "LATEST", required = false)
         sortType: ReviewSortType,
-    ): SliceResponse<ReviewResponse>
+    ): SliceResponse<FoodSpotsReviewResponse>
 }

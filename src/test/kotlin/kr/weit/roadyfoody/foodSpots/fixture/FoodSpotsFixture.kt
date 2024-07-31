@@ -4,6 +4,7 @@ import createMockSliceReview
 import createTestReviewPhotoResponse
 import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodCategoryResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsReviewResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.OperationHoursRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportCategoryResponse
@@ -23,7 +24,6 @@ import kr.weit.roadyfoody.foodSpots.domain.ReportFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHours
 import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_MAX_LENGTH
 import kr.weit.roadyfoody.global.utils.CoordinateUtils
-import kr.weit.roadyfoody.review.application.dto.ReviewResponse
 import kr.weit.roadyfoody.search.foodSpots.domain.SearchCoinCache
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponse
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponses
@@ -412,10 +412,10 @@ fun createReportHistoryDetailResponse(): ReportHistoryDetailResponse =
         listOf(createReportOperationHoursResponse()),
     )
 
-fun createTestSliceFoodSpotsReviewResponse(): SliceResponse<ReviewResponse> =
+fun createTestSliceFoodSpotsReviewResponse(): SliceResponse<FoodSpotsReviewResponse> =
     SliceResponse(
         createMockSliceReview().map {
-            ReviewResponse.of(
+            FoodSpotsReviewResponse.of(
                 it,
                 createTestReviewerInfoResponse(),
                 listOf(createTestReviewPhotoResponse()),

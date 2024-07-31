@@ -1,6 +1,7 @@
 package kr.weit.roadyfoody.user.application.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
+import kr.weit.roadyfoody.review.application.dto.ReviewPhotoResponse
 import kr.weit.roadyfoody.review.domain.FoodSpotsReview
 import kr.weit.roadyfoody.user.domain.User
 import java.time.LocalDateTime
@@ -28,13 +29,16 @@ data class UserReviewResponse(
     val contents: String,
     @Schema(description = "별점")
     val rate: Int,
+    @Schema(description = "사진 리스트")
+    val photos: List<ReviewPhotoResponse>,
     @Schema(description = "리뷰 작성일")
     val createdAt: LocalDateTime,
 ) {
-    constructor(review: FoodSpotsReview) : this(
+    constructor(review: FoodSpotsReview, photos: List<ReviewPhotoResponse>) : this(
         id = review.id,
         contents = review.contents,
         rate = review.rate,
+        photos = photos,
         createdAt = review.createdDateTime,
     )
 }

@@ -1,8 +1,6 @@
 package kr.weit.roadyfoody.review.presentation.spec
 
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
@@ -14,9 +12,7 @@ import kr.weit.roadyfoody.foodSpots.validator.WebPImageList
 import kr.weit.roadyfoody.global.swagger.ApiErrorCodeExamples
 import kr.weit.roadyfoody.global.swagger.v1.SwaggerTag
 import kr.weit.roadyfoody.review.application.dto.ReviewRequest
-import kr.weit.roadyfoody.review.application.dto.ReviewResponse
 import kr.weit.roadyfoody.user.domain.User
-import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.multipart.MultipartFile
@@ -80,34 +76,4 @@ interface ReviewControllerSpec {
         @PathVariable("reviewId")
         reviewId: Long,
     )
-
-    @Operation(
-        description = "리뷰 상세 조회 API",
-        responses = [
-            ApiResponse(
-                responseCode = "200",
-                description = "리뷰 상세 조회 성공",
-                content = [
-                    Content(
-                        mediaType = MediaType.APPLICATION_JSON_VALUE,
-                        schema =
-                            Schema(
-                                implementation = ReviewResponse::class,
-                            ),
-                    ),
-                ],
-            ),
-        ],
-    )
-    @ApiErrorCodeExamples(
-        [
-            ErrorCode.REVIEW_ID_NON_POSITIVE,
-            ErrorCode.NOT_FOUND_FOOD_SPOTS_REVIEW,
-        ],
-    )
-    fun getReviewDetail(
-        @PathVariable("reviewId")
-        @Positive(message = "리뷰 ID는 양수여야 합니다.")
-        reviewId: Long,
-    ): ReviewResponse
 }

@@ -2,11 +2,11 @@ package kr.weit.roadyfoody.foodSpots.utils
 
 import io.swagger.v3.oas.annotations.media.Schema
 import kr.weit.roadyfoody.common.dto.SliceResponse
-import kr.weit.roadyfoody.review.application.dto.ReviewResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsReviewResponse
 
 class SliceFoodSpotsReview(
     @Schema(description = "조회된 데이터 리스트")
-    contents: List<ReviewResponse>,
+    contents: List<FoodSpotsReviewResponse>,
     @Schema(description = "다음 페이지 존재 여부")
     hasNext: Boolean,
-) : SliceResponse<ReviewResponse>(contents, hasNext)
+) : SliceResponse<FoodSpotsReviewResponse>(contents, hasNext)

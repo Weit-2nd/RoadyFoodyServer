@@ -21,6 +21,9 @@ import kr.weit.roadyfoody.foodSpots.utils.OPERATION_HOURS_REGEX_STR
 import kr.weit.roadyfoody.foodSpots.validator.Latitude
 import kr.weit.roadyfoody.foodSpots.validator.Longitude
 import kr.weit.roadyfoody.global.utils.CoordinateUtils.Companion.createCoordinate
+import kr.weit.roadyfoody.review.application.dto.ReviewPhotoResponse
+import kr.weit.roadyfoody.review.domain.FoodSpotsReview
+import kr.weit.roadyfoody.user.application.dto.ReviewerInfoResponse
 import kr.weit.roadyfoody.user.domain.User
 import java.time.LocalDateTime
 
@@ -275,4 +278,37 @@ data class ReportOperationHoursResponse(
         openingHours = operationHours.openingHours,
         closingHours = operationHours.closingHours,
     )
+}
+
+data class FoodSpotsReviewResponse(
+    @Schema(description = "리뷰 ID")
+    val id: Long,
+    @Schema(description = "음식점 ID")
+    val foodSpotId: Long,
+    @Schema(description = "직성지 정보")
+    val userInfo: ReviewerInfoResponse,
+    @Schema(description = "리뷰 내용")
+    val contents: String,
+    @Schema(description = "별점")
+    val rate: Int,
+    @Schema(description = "사진 리스트")
+    val photos: List<ReviewPhotoResponse>,
+    @Schema(description = "리뷰 작성일")
+    val createdAt: LocalDateTime,
+) {
+    companion object {
+        fun of(
+            review: FoodSpotsReview,
+            userInfo: ReviewerInfoResponse,
+            photoList: List<ReviewPhotoResponse>,
+        ) = FoodSpotsReviewResponse(
+            id = review.id,
+            foodSpotId = review.foodSpots.id,
+            userInfo = userInfo,
+            contents = review.contents,
+            rate = review.rate,
+            photos = photoList,
+            createdAt = review.createdDateTime,
+        )
+    }
 }

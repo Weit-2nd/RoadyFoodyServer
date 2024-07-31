@@ -1,6 +1,7 @@
 package kr.weit.roadyfoody.user.application.service
 
 import createMockSliceReview
+import createTestReviewPhoto
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.nulls.shouldBeNull
@@ -23,7 +24,9 @@ import kr.weit.roadyfoody.foodSpots.repository.getHistoriesByUser
 import kr.weit.roadyfoody.global.TEST_LAST_ID
 import kr.weit.roadyfoody.global.TEST_PAGE_SIZE
 import kr.weit.roadyfoody.global.service.ImageService
+import kr.weit.roadyfoody.review.repository.FoodSpotsReviewPhotoRepository
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
+import kr.weit.roadyfoody.review.repository.getByReview
 import kr.weit.roadyfoody.user.exception.UserNotFoundException
 import kr.weit.roadyfoody.user.fixture.TEST_USER_ID
 import kr.weit.roadyfoody.user.fixture.TEST_USER_PROFILE_IMAGE_URL
@@ -39,6 +42,7 @@ class UserQueryServiceTest :
         val foodSpotsPhotoRepository = mockk<FoodSpotsPhotoRepository>()
         val reportFoodCategoryRepository = mockk<ReportFoodCategoryRepository>()
         val reviewRepository = mockk<FoodSpotsReviewRepository>()
+        val reviewPhotoRepository = mockk<FoodSpotsReviewPhotoRepository>()
         val userQueryService =
             UserQueryService(
                 userRepository,
@@ -47,6 +51,7 @@ class UserQueryServiceTest :
                 foodSpotsPhotoRepository,
                 reportFoodCategoryRepository,
                 reviewRepository,
+                reviewPhotoRepository,
             )
 
         afterEach { clearAllMocks() }
@@ -126,6 +131,8 @@ class UserQueryServiceTest :
                     any(),
                 )
             } returns createMockSliceReview()
+            every { reviewPhotoRepository.getByReview(any()) } returns listOf(createTestReviewPhoto())
+            every { imageService.getDownloadUrl(any()) } returns TEST_FOOD_SPOTS_PHOTO_URL
             `when`("정상적인 데이터가 들어올 경우") {
                 then("정상적으로 리뷰가 조회되어야 한다.") {
                     userQueryService.getUserReviews(
@@ -136,6 +143,8 @@ class UserQueryServiceTest :
                     verify(exactly = 1) {
                         userRepository.findById(any())
                         reviewRepository.sliceByUser(any(), any(), any())
+                        reviewPhotoRepository.getByReview(any())
+                        imageService.getDownloadUrl(any())
                     }
                 }
             }

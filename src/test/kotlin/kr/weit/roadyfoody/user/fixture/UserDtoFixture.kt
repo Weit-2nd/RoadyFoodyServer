@@ -1,6 +1,7 @@
 package kr.weit.roadyfoody.user.fixture
 
 import createMockSliceReview
+import createTestReviewPhotoResponse
 import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_PHOTO_URL
@@ -45,7 +46,10 @@ fun createTestUserReportHistoriesResponse(
 fun createTestSliceResponseUserReview(): SliceResponse<UserReviewResponse> =
     SliceResponse(
         createMockSliceReview().map {
-            UserReviewResponse(it)
+            UserReviewResponse(
+                it,
+                listOf(createTestReviewPhotoResponse()),
+            )
         },
     )
 
