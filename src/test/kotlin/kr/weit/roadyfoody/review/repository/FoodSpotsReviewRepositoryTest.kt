@@ -1,11 +1,13 @@
 package kr.weit.roadyfoody.review.repository
 
 import createTestFoodSpotsReview
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpots
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
+import kr.weit.roadyfoody.review.exception.FoodSpotsReviewNotFoundException
 import kr.weit.roadyfoody.support.annotation.RepositoryTest
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.fixture.createTestUser
@@ -50,6 +52,22 @@ class FoodSpotsReviewRepositoryTest(
                         val reviews = reviewRepository.findByUser(user)
                         reviewRepository.deleteAll(reviews)
                         reviewRepository.findAll().size shouldBe 1
+                    }
+                }
+            }
+            describe("getReviewByReviewId 메소드는") {
+                context("리뷰 ID를 받는 경우") {
+                    it("해당 ID의 리뷰를 반환한다.") {
+                        val review = reviewRepository.findByUser(user).first()
+                        reviewRepository.getReviewByReviewId(review.id) shouldBe review
+                    }
+                }
+
+                context("존재하지 않는 리뷰 ID 를 받는 경우") {
+                    it("에러가 발생한다") {
+                        shouldThrow<FoodSpotsReviewNotFoundException> {
+                            reviewRepository.getReviewByReviewId(0L)
+                        }
                     }
                 }
             }

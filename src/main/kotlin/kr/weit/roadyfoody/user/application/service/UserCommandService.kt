@@ -1,4 +1,4 @@
-package kr.weit.roadyfoody.user.application
+package kr.weit.roadyfoody.user.application.service
 
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException

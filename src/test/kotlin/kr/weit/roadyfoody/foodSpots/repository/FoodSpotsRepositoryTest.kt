@@ -132,7 +132,7 @@ class FoodSpotsRepositoryTest(
                 it("업데이트하지 않는다.") {
                     foodSpotsRepository.updateOpeningStatus()
                     foodSpotsRepository.updateOpeningStatus() shouldBe 0
+                }
             }
         }
-    }
     })

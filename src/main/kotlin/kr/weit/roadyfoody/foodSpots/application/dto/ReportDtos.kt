@@ -6,12 +6,11 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
+import jakarta.validation.constraints.Size
 import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsOperationHours
-import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
-import kr.weit.roadyfoody.foodSpots.domain.ReportFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHours
 import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_REGEX_DESC
 import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_REGEX_STR
@@ -21,7 +20,6 @@ import kr.weit.roadyfoody.foodSpots.validator.Latitude
 import kr.weit.roadyfoody.foodSpots.validator.Longitude
 import kr.weit.roadyfoody.global.utils.CoordinateUtils.Companion.createCoordinate
 import kr.weit.roadyfoody.user.domain.User
-import java.time.LocalDateTime
 
 data class ReportRequest(
     @Schema(
@@ -116,63 +114,70 @@ data class OperationHoursRequest(
     val closingHours: String,
 )
 
-data class ReportHistoriesResponse(
-    @Schema(description = "리포트 이력 ID", example = "1")
-    val id: Long,
-    @Schema(description = "유저 ID", example = "1")
-    val userId: Long,
-    @Schema(description = "음식점 ID", example = "1")
-    val foodSpotsId: Long,
-    @Schema(description = "상호명", example = "명륜진사갈비 본사")
-    val name: String,
+data class FoodSpotsUpdateRequest(
+    @field:Pattern(regexp = FOOD_SPOTS_NAME_REGEX_STR, message = FOOD_SPOTS_NAME_REGEX_DESC)
+    @Schema(
+        description =
+            "상호명 : $FOOD_SPOTS_NAME_REGEX_DESC\t(허용된 특수문자 : 마침표 (.) 쉼표 (,) 작은따옴표 (') 가운데점 (·) 앰퍼샌드 (&) 하이픈 (-))",
+        example = "명륜진사갈비 본사",
+    )
+    val name: String?,
+    @field:Longitude
     @Schema(description = "경도", example = "127.12312219099")
-    val longitude: Double,
+    val longitude: Double?,
+    @field:Latitude
     @Schema(description = "위도", example = "37.4940529587731")
-    val latitude: Double,
-    @Schema(description = "생성일시", example = "2021-08-01T00:00:00")
-    val createdDateTime: LocalDateTime,
-    @Schema(description = "리포트 사진 리스트")
-    val reportPhotos: List<ReportPhotoResponse>,
-    @Schema(description = "음식 카테고리 리스트")
-    val categories: List<ReportCategoryResponse>,
-) {
-    constructor(
-        foodSpotsHistory: FoodSpotsHistory,
-        reportPhotoResponse: List<ReportPhotoResponse>,
-        categories: List<ReportCategoryResponse>,
-    ) : this(
-        id = foodSpotsHistory.id,
-        userId = foodSpotsHistory.user.id,
-        foodSpotsId = foodSpotsHistory.foodSpots.id,
-        name = foodSpotsHistory.name,
-        longitude = foodSpotsHistory.point.x,
-        latitude = foodSpotsHistory.point.y,
-        createdDateTime = foodSpotsHistory.createdDateTime,
-        reportPhotos = reportPhotoResponse,
-        categories = categories,
+    val latitude: Double?,
+    @Schema(description = "영업 여부", example = "true")
+    val open: Boolean?,
+    @Schema(description = "폐업 여부", example = "false")
+    val closed: Boolean?,
+    @field:Size(min = 1, message = "음식 카테고리는 최소 1개 이상 선택해야 합니다.")
+    @Schema(
+        description = "음식 카테고리 ex) 변경된, 변경되지 않은 카테고리 모두 입력해주세요. 없을 경우, 생략해주세요",
+        example = "[1, 2]",
     )
-}
+    val foodCategories: Set<Long>?,
+    @field:Valid
+    @Schema(
+        description = "운영시간 리스트 ex) 변경된, 변경되지 않은 운영시간 모두 입력해주세요. 없을 경우, 생략해주세요",
+    )
+    val operationHours: List<OperationHoursRequest>?,
+) {
+    fun toFoodSpotsHistoryEntity(
+        foodSpots: FoodSpots,
+        user: User,
+    ) = FoodSpotsHistory(
+        name = name ?: foodSpots.name,
+        foodSpots = foodSpots,
+        user = user,
+        point = if (longitude != null && latitude != null) createCoordinate(longitude, latitude) else foodSpots.point,
+        foodTruck = foodSpots.foodTruck,
+        open = open ?: foodSpots.open,
+        storeClosure = closed ?: foodSpots.storeClosure,
+        foodCategoryList = mutableListOf(),
+        operationHoursList = mutableListOf(),
+    )
 
-data class ReportPhotoResponse(
-    @Schema(description = "리포트 사진 ID", example = "1")
-    val id: Long,
-    @Schema(description = "리포트 사진 URL")
-    val url: String,
-) {
-    constructor(reportPhoto: FoodSpotsPhoto, url: String) : this(
-        id = reportPhoto.id,
-        url = url,
-    )
-}
+    fun toOperationHoursEntity(foodSpots: FoodSpots) =
+        operationHours
+            ?.map {
+                FoodSpotsOperationHours(
+                    foodSpots = foodSpots,
+                    dayOfWeek = it.dayOfWeek,
+                    openingHours = it.openingHours,
+                    closingHours = it.closingHours,
+                )
+            }?.toSet()
 
-data class ReportCategoryResponse(
-    @Schema(description = "리포트 카테고리 ID", example = "1")
-    val id: Long,
-    @Schema(description = "음식 카테고리명", example = "한식")
-    val name: String,
-) {
-    constructor(reportFoodCategory: ReportFoodCategory) : this(
-        id = reportFoodCategory.id,
-        name = reportFoodCategory.foodCategory.name,
-    )
+    fun toReportOperationHoursEntity(foodSpotsHistory: FoodSpotsHistory) =
+        operationHours
+            ?.map {
+                ReportOperationHours(
+                    foodSpotsHistory = foodSpotsHistory,
+                    dayOfWeek = it.dayOfWeek,
+                    openingHours = it.openingHours,
+                    closingHours = it.closingHours,
+                )
+            }
 }
