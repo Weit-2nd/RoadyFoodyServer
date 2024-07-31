@@ -7,10 +7,8 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Positive
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.review.domain.FoodSpotsReview
-import kr.weit.roadyfoody.user.application.dto.ReviewerInfoResponse
 import kr.weit.roadyfoody.user.domain.User
 import org.hibernate.validator.constraints.Length
-import java.time.LocalDateTime
 
 data class ReviewRequest(
     @Schema(description = "음식점 ID")
@@ -29,42 +27,6 @@ data class ReviewRequest(
         user: User,
         foodSpot: FoodSpots,
     ): FoodSpotsReview = FoodSpotsReview(id = 0L, foodSpot, user, rating, contents)
-}
-
-data class ReviewResponse(
-    @Schema(description = "리뷰 ID")
-    val id: Long,
-    @Schema(description = "음식점 ID")
-    val foodSpotId: Long,
-    @Schema(description = "음식점 이름")
-    val foodSpotName: String,
-    @Schema(description = "직성지 정보")
-    val userInfo: ReviewerInfoResponse,
-    @Schema(description = "리뷰 내용")
-    val contents: String,
-    @Schema(description = "별점")
-    val rate: Int,
-    @Schema(description = "사진 리스트")
-    val photos: List<ReviewPhotoResponse>,
-    @Schema(description = "리뷰 작성일")
-    val createdAt: LocalDateTime,
-) {
-    companion object {
-        fun of(
-            review: FoodSpotsReview,
-            userInfo: ReviewerInfoResponse,
-            photoList: List<ReviewPhotoResponse>,
-        ) = ReviewResponse(
-            id = review.id,
-            foodSpotId = review.foodSpots.id,
-            foodSpotName = review.foodSpots.name,
-            userInfo = userInfo,
-            contents = review.contents,
-            rate = review.rate,
-            photos = photoList,
-            createdAt = review.createdDateTime,
-        )
-    }
 }
 
 data class ReviewPhotoResponse(

@@ -1,6 +1,7 @@
 package kr.weit.roadyfoody.foodSpots.application.service
 
 import kr.weit.roadyfoody.common.dto.SliceResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsReviewResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportCategoryResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoryDetailResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportOperationHoursResponse
@@ -15,7 +16,6 @@ import kr.weit.roadyfoody.foodSpots.repository.ReportOperationHoursRepository
 import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.review.application.dto.ReviewPhotoResponse
-import kr.weit.roadyfoody.review.application.dto.ReviewResponse
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewPhotoRepository
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
 import kr.weit.roadyfoody.review.repository.ReviewSortType
@@ -105,7 +105,7 @@ class FoodSpotsQueryService(
         size: Int,
         lastId: Long?,
         sortType: ReviewSortType,
-    ): SliceResponse<ReviewResponse> {
+    ): SliceResponse<FoodSpotsReviewResponse> {
         val response =
             reviewRepository.sliceByFoodSpots(foodSpotsId, size, lastId, sortType).map {
                 val user = userRepository.getByUserId(it.user.id)
@@ -117,7 +117,7 @@ class FoodSpotsQueryService(
                     reviewPhotoRepository.getByReview(it).map { photo ->
                         ReviewPhotoResponse(photo.id, imageService.getDownloadUrl(photo.fileName))
                     }
-                ReviewResponse.of(it, ReviewerInfoResponse.of(user, url), photoResponses)
+                FoodSpotsReviewResponse.of(it, ReviewerInfoResponse.of(user, url), photoResponses)
             }
         return SliceResponse(response)
     }

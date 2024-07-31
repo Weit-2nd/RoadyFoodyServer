@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Positive
 import jakarta.validation.constraints.Size
 import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.common.dto.SliceResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsReviewResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoryDetailResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
@@ -12,7 +13,6 @@ import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsCommandService
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsQueryService
 import kr.weit.roadyfoody.foodSpots.presentation.spec.FoodSportsControllerSpec
 import kr.weit.roadyfoody.foodSpots.validator.WebPImageList
-import kr.weit.roadyfoody.review.application.dto.ReviewResponse
 import kr.weit.roadyfoody.review.repository.ReviewSortType
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.http.HttpStatus.CREATED
@@ -95,5 +95,5 @@ class FoodSpotsController(
         lastId: Long?,
         @RequestParam(required = false, defaultValue = "LATEST")
         sortType: ReviewSortType,
-    ): SliceResponse<ReviewResponse> = foodSpotsQueryService.getFoodSpotsReview(foodSpotsId, size, lastId, sortType)
+    ): SliceResponse<FoodSpotsReviewResponse> = foodSpotsQueryService.getFoodSpotsReview(foodSpotsId, size, lastId, sortType)
 }

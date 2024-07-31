@@ -6,16 +6,13 @@ import jakarta.validation.constraints.Size
 import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.foodSpots.validator.WebPImageList
 import kr.weit.roadyfoody.review.application.dto.ReviewRequest
-import kr.weit.roadyfoody.review.application.dto.ReviewResponse
 import kr.weit.roadyfoody.review.application.service.ReviewCommandService
-import kr.weit.roadyfoody.review.application.service.ReviewQueryService
 import kr.weit.roadyfoody.review.presentation.spec.ReviewControllerSpec
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
 import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -28,7 +25,6 @@ import org.springframework.web.multipart.MultipartFile
 @RequestMapping("/api/v1/review")
 class ReviewController(
     private val reviewCommandService: ReviewCommandService,
-    private val reviewQueryService: ReviewQueryService,
 ) : ReviewControllerSpec {
     @ResponseStatus(CREATED)
     @PostMapping(consumes = [MULTIPART_FORM_DATA_VALUE])
@@ -55,11 +51,4 @@ class ReviewController(
         @PathVariable("reviewId")
         reviewId: Long,
     ) = reviewCommandService.deleteReview(user, reviewId)
-
-    @GetMapping("/{reviewId}")
-    override fun getReviewDetail(
-        @PathVariable("reviewId")
-        @Positive(message = "리뷰 ID는 양수여야 합니다.")
-        reviewId: Long,
-    ): ReviewResponse = reviewQueryService.getReviewDetail(reviewId)
 }

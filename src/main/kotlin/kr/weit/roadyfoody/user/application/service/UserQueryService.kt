@@ -7,7 +7,10 @@ import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
 import kr.weit.roadyfoody.foodSpots.repository.getHistoriesByUser
 import kr.weit.roadyfoody.global.service.ImageService
+import kr.weit.roadyfoody.review.application.dto.ReviewPhotoResponse
+import kr.weit.roadyfoody.review.repository.FoodSpotsReviewPhotoRepository
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
+import kr.weit.roadyfoody.review.repository.getByReview
 import kr.weit.roadyfoody.user.application.dto.UserInfoResponse
 import kr.weit.roadyfoody.user.application.dto.UserReportCategoryResponse
 import kr.weit.roadyfoody.user.application.dto.UserReportHistoriesResponse
@@ -27,6 +30,7 @@ class UserQueryService(
     private val foodSpotsPhotoRepository: FoodSpotsPhotoRepository,
     private val reportFoodCategoryRepository: ReportFoodCategoryRepository,
     private val reviewRepository: FoodSpotsReviewRepository,
+    private val reviewPhotoRepository: FoodSpotsReviewPhotoRepository,
 ) {
     fun getUserInfo(user: User): UserInfoResponse {
         val user = userRepository.getByUserId(user.id)
@@ -71,7 +75,16 @@ class UserQueryService(
         val response =
             reviewRepository
                 .sliceByUser(user, size, lastId)
-                .map { UserReviewResponse(it) }
+                .map {
+                    val reviewPhotos =
+                        reviewPhotoRepository.getByReview(it).map { photo ->
+                            ReviewPhotoResponse(
+                                photo.id,
+                                imageService.getDownloadUrl(photo.fileName),
+                            )
+                        }
+                    UserReviewResponse(it, reviewPhotos)
+                }
         return SliceResponse(response)
     }
 }
