@@ -27,7 +27,7 @@ class ReviewQueryService(
         val reviewInfo =
             ReviewerInfoResponse.of(
                 user,
-                user.profile.profileImageName?.let { imageService.getDownloadUrl(it) }
+                user.profile.profileImageName?.let { imageService.getDownloadUrl(it) },
             )
         val photoResponses =
             reviewPhotoRepository.getByReview(review).map {
