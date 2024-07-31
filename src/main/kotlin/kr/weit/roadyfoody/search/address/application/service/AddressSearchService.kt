@@ -1,10 +1,14 @@
 package kr.weit.roadyfoody.search.address.application.service
 
+import kr.weit.roadyfoody.common.exception.ErrorCode
+import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
 import kr.weit.roadyfoody.search.address.config.KakaoProperties
 import kr.weit.roadyfoody.search.address.dto.AddressResponseWrapper
 import kr.weit.roadyfoody.search.address.dto.AddressSearchResponse
 import kr.weit.roadyfoody.search.address.dto.AddressSearchResponses
+import kr.weit.roadyfoody.search.address.dto.Point2AddressResponse
 import kr.weit.roadyfoody.search.address.presentation.client.KakaoAddressClientInterface
+import kr.weit.roadyfoody.search.address.presentation.client.KakaoPointClientInterface
 import org.springframework.stereotype.Service
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -15,6 +19,7 @@ const val KAKAO_AK = "KakaoAK "
 class AddressSearchService(
     private val kakaoProperties: KakaoProperties,
     private val kakaoAddressClientInterface: KakaoAddressClientInterface,
+    private val kakaoPointClientInterface: KakaoPointClientInterface,
 ) {
     fun searchAddress(
         keyword: String,
@@ -31,5 +36,16 @@ class AddressSearchService(
                 AddressSearchResponse.from(it)
             }
         return AddressSearchResponses(items = items)
+    }
+
+    fun searchPoint2Address(
+        longitude: Double,
+        latitude: Double,
+    ): Point2AddressResponse {
+        val originalResponse = kakaoPointClientInterface.searchPointToAddress(longitude.toString(), latitude.toString())
+        if (originalResponse.documents.isEmpty()) {
+            throw RoadyFoodyBadRequestException(ErrorCode.INVALID_POINT_TO_ADDRESS)
+        }
+        return Point2AddressResponse.from(originalResponse.documents[0], latitude, longitude)
     }
 }
