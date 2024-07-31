@@ -9,6 +9,7 @@ import TEST_REVIEW_REQUEST_NAME
 import TEST_REVIEW_REQUEST_PHOTO
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
+import createTestReviewDetailResponse
 import createTestReviewRequest
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
@@ -17,13 +18,16 @@ import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
 import kr.weit.roadyfoody.foodSpots.fixture.createMockPhotoList
+import kr.weit.roadyfoody.global.TEST_NON_POSITIVE_ID
 import kr.weit.roadyfoody.review.application.service.ReviewCommandService
+import kr.weit.roadyfoody.review.application.service.ReviewQueryService
 import kr.weit.roadyfoody.support.annotation.ControllerTest
 import kr.weit.roadyfoody.support.utils.ImageFormat.PNG
 import kr.weit.roadyfoody.support.utils.ImageFormat.WEBP
 import kr.weit.roadyfoody.support.utils.createMultipartFile
 import kr.weit.roadyfoody.support.utils.createTestImageFile
 import kr.weit.roadyfoody.support.utils.deleteWithAuth
+import kr.weit.roadyfoody.support.utils.getWithAuth
 import kr.weit.roadyfoody.support.utils.multipartWithAuth
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.mock.web.MockMultipartFile
@@ -34,6 +38,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @ControllerTest
 class ReviewControllerTest(
     @MockkBean private val reviewCommandService: ReviewCommandService,
+    @MockkBean private val reviewQueryService: ReviewQueryService,
     private val mockMvc: MockMvc,
     private val objectMapper: ObjectMapper,
 ) : BehaviorSpec(
@@ -247,6 +252,30 @@ class ReviewControllerTest(
                             .perform(
                                 deleteWithAuth("$requestPath/$TEST_REVIEW_ID"),
                             ).andExpect(status().isNoContent)
+                    }
+                }
+            }
+
+            given("GET $requestPath/{reviewId}") {
+                val response = createTestReviewDetailResponse()
+                every {
+                    reviewQueryService.getReviewDetail(any())
+                } returns response
+                `when`("정상적인 요청이 들어올 경우") {
+                    then("리뷰 상세 정보를 반환한다.") {
+                        mockMvc
+                            .perform(
+                                getWithAuth("$requestPath/$TEST_REVIEW_ID"),
+                            ).andExpect(status().isOk)
+                    }
+                }
+
+                `when`("리뷰 ID가 양수가 아닌 경우") {
+                    then("400을 반환한다.") {
+                        mockMvc
+                            .perform(
+                                getWithAuth("$requestPath/$TEST_NON_POSITIVE_ID"),
+                            ).andExpect(status().isBadRequest)
                     }
                 }
             }

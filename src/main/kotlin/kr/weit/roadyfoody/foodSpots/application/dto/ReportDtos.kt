@@ -11,6 +11,8 @@ import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsOperationHours
+import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
+import kr.weit.roadyfoody.foodSpots.domain.ReportFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHours
 import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_REGEX_DESC
 import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_REGEX_STR
@@ -20,6 +22,7 @@ import kr.weit.roadyfoody.foodSpots.validator.Latitude
 import kr.weit.roadyfoody.foodSpots.validator.Longitude
 import kr.weit.roadyfoody.global.utils.CoordinateUtils.Companion.createCoordinate
 import kr.weit.roadyfoody.user.domain.User
+import java.time.LocalDateTime
 
 data class ReportRequest(
     @Schema(
@@ -180,4 +183,96 @@ data class FoodSpotsUpdateRequest(
                     closingHours = it.closingHours,
                 )
             }
+}
+
+data class ReportPhotoResponse(
+    @Schema(description = "리포트 사진 ID", example = "1")
+    val id: Long,
+    @Schema(description = "리포트 사진 URL")
+    val url: String,
+) {
+    constructor(reportPhoto: FoodSpotsPhoto, url: String) : this(
+        id = reportPhoto.id,
+        url = url,
+    )
+}
+
+data class ReportCategoryResponse(
+    @Schema(description = "리포트 카테고리 ID", example = "1")
+    val id: Long,
+    @Schema(description = "음식 카테고리명", example = "한식")
+    val name: String,
+) {
+    constructor(reportFoodCategory: ReportFoodCategory) : this(
+        id = reportFoodCategory.id,
+        name = reportFoodCategory.foodCategory.name,
+    )
+}
+
+data class ReportHistoryDetailResponse(
+    @Schema(description = "리포트 이력 ID", example = "1")
+    val id: Long,
+    @Schema(description = "유저 ID", example = "1")
+    val userId: Long,
+    @Schema(description = "음식점 ID", example = "1")
+    val foodSpotsId: Long,
+    @Schema(description = "상호명", example = "명륜진사갈비 본사")
+    val name: String,
+    @Schema(description = "경도", example = "127.12312219099")
+    val longitude: Double,
+    @Schema(description = "위도", example = "37.4940529587731")
+    val latitude: Double,
+    @Schema(description = "푸드트럭여부(이동여부)", example = "false")
+    val foodTruck: Boolean,
+    @Schema(description = "영업 여부", example = "true")
+    val open: Boolean,
+    @Schema(description = "폐업 여부", example = "false")
+    val closed: Boolean,
+    @Schema(description = "생성일시", example = "2021-08-01T00:00:00")
+    val createdDateTime: LocalDateTime,
+    @Schema(description = "리포트 사진 리스트")
+    val reportPhotos: List<ReportPhotoResponse>,
+    @Schema(description = "음식 카테고리 리스트")
+    val categories: List<ReportCategoryResponse>,
+    @Schema(description = "운영 시간 리스트")
+    val operationHours: List<ReportOperationHoursResponse>,
+) {
+    constructor(
+        foodSpotsHistory: FoodSpotsHistory,
+        reportPhotos: List<ReportPhotoResponse>,
+        categories: List<ReportCategoryResponse>,
+        operationHours: List<ReportOperationHoursResponse>,
+    ) : this(
+        id = foodSpotsHistory.id,
+        userId = foodSpotsHistory.user.id,
+        foodSpotsId = foodSpotsHistory.foodSpots.id,
+        name = foodSpotsHistory.name,
+        longitude = foodSpotsHistory.point.x,
+        latitude = foodSpotsHistory.point.y,
+        foodTruck = foodSpotsHistory.foodTruck,
+        open = foodSpotsHistory.open,
+        closed = foodSpotsHistory.storeClosure,
+        createdDateTime = foodSpotsHistory.createdDateTime,
+        reportPhotos = reportPhotos,
+        categories = categories,
+        operationHours = operationHours,
+    )
+}
+
+data class ReportOperationHoursResponse(
+    @Schema(description = "리포트 ID", example = "1")
+    val historyId: Long,
+    @Schema(description = "요일", example = "MON")
+    val dayOfWeek: DayOfWeek,
+    @Schema(description = "오픈 시간", example = "01:00")
+    val openingHours: String,
+    @Schema(description = "마감 시간", example = "23:59")
+    val closingHours: String,
+) {
+    constructor(operationHours: ReportOperationHours) : this(
+        historyId = operationHours.foodSpotsHistory.id,
+        dayOfWeek = operationHours.dayOfWeek,
+        openingHours = operationHours.openingHours,
+        closingHours = operationHours.closingHours,
+    )
 }

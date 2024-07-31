@@ -1,8 +1,15 @@
 package kr.weit.roadyfoody.foodSpots.fixture
 
+import createMockSliceReview
+import createTestReviewPhotoResponse
+import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodCategoryResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.OperationHoursRequest
+import kr.weit.roadyfoody.foodSpots.application.dto.ReportCategoryResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoryDetailResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.ReportOperationHoursResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.ReportPhotoResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
 import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodCategory
@@ -16,6 +23,7 @@ import kr.weit.roadyfoody.foodSpots.domain.ReportFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHours
 import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_MAX_LENGTH
 import kr.weit.roadyfoody.global.utils.CoordinateUtils
+import kr.weit.roadyfoody.review.application.dto.ReviewResponse
 import kr.weit.roadyfoody.search.foodSpots.domain.SearchCoinCache
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponse
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponses
@@ -23,6 +31,7 @@ import kr.weit.roadyfoody.search.foodSpots.dto.OperationStatus
 import kr.weit.roadyfoody.support.utils.ImageFormat
 import kr.weit.roadyfoody.support.utils.createTestImageFile
 import kr.weit.roadyfoody.user.domain.User
+import kr.weit.roadyfoody.user.fixture.createTestReviewerInfoResponse
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.GeometryFactory
@@ -64,6 +73,7 @@ const val TEST_UPDATE_FOOD_SPOT_LONGITUDE = 11.2222222
 const val TEST_UPDATE_OPERATION_HOURS_OPEN = "10:00"
 const val TEST_UPDATE_OPERATION_HOURS_CLOSE = "13:59"
 const val TEST_FOOD_SPOTS_HISTORY_ID = 1L
+const val TEST_INVALID_FOOD_SPOTS_HISTORY_ID = -1L
 
 fun createMockTestFoodSpot(
     id: Long = 0L,
@@ -98,12 +108,6 @@ fun createTestFoodSpots(
     operationHours: MutableList<FoodSpotsOperationHours> = mutableListOf(),
     foodCategories: MutableList<FoodSpotsFoodCategory> = mutableListOf(),
 ) = FoodSpots(id, name, foodTruck, open, storeClosure, point, operationHours, foodCategories)
-
-fun createTestFoodSpotsFoodCategory(
-    foodSpots: FoodSpots = createTestFoodSpots(),
-    foodCategory: FoodCategory = createTestFoodCategory(),
-    id: Long = 0L,
-) = FoodSpotsFoodCategory(id, foodSpots, foodCategory)
 
 fun createTestFoodCategory(
     id: Long = 0L,
@@ -155,30 +159,15 @@ fun createMockPhotoList(
         createTestImageFile(format, name)
     }
 
-fun createOperationHoursRequest(
-    dayOfWeek: DayOfWeek = DayOfWeek.MON,
-    openingHours: String = TEST_OPERATION_HOURS_OPEN,
-    closingHours: String = TEST_OPERATION_HOURS_CLOSE,
-) = OperationHoursRequest(dayOfWeek, openingHours, closingHours)
+fun createTestReportPhotoResponse(
+    id: Long = 0L,
+    url: String = TEST_FOOD_SPOTS_PHOTO_URL,
+) = ReportPhotoResponse(id, url)
 
-fun createTestReportFoodCategory(
-    foodSpotsHistory: FoodSpotsHistory = createTestFoodHistory(),
-    foodCategory: FoodCategory = createTestFoodCategory(),
-) = ReportFoodCategory(0L, foodSpotsHistory, foodCategory)
-
-fun createTestFoodOperationHours(
-    foodSpots: FoodSpots = createTestFoodSpots(),
-    dayOfWeek: DayOfWeek = DayOfWeek.MON,
-    openingHours: String = TEST_OPERATION_HOURS_OPEN,
-    closingHours: String = TEST_OPERATION_HOURS_CLOSE,
-) = FoodSpotsOperationHours(foodSpots, dayOfWeek, openingHours, closingHours)
-
-fun createTestReportOperationHours(
-    foodSpotsHistory: FoodSpotsHistory = createTestFoodHistory(),
-    dayOfWeek: DayOfWeek = DayOfWeek.MON,
-    openingHours: String = TEST_OPERATION_HOURS_OPEN,
-    closingHours: String = TEST_OPERATION_HOURS_CLOSE,
-) = ReportOperationHours(foodSpotsHistory, dayOfWeek, openingHours, closingHours)
+fun createTestReportCategoryResponse(
+    id: Long = 0L,
+    name: String = "testCategory",
+) = ReportCategoryResponse(id, name)
 
 fun createTestFoodCategories(): List<FoodCategory> =
     listOf(
@@ -269,7 +258,37 @@ fun createMockTestFoodSpotList(): List<FoodSpots> =
         createMockTestFoodSpot(3L),
     )
 
+fun createOperationHoursRequest(
+    dayOfWeek: DayOfWeek = DayOfWeek.MON,
+    openingHours: String = TEST_OPERATION_HOURS_OPEN,
+    closingHours: String = TEST_OPERATION_HOURS_CLOSE,
+) = OperationHoursRequest(dayOfWeek, openingHours, closingHours)
+
 fun createTestFoodCategory(name: String = TEST_CATEGORY_NAME) = FoodCategory(name = name)
+
+fun createTestFoodSpotsFoodCategory(
+    foodSpots: FoodSpots = createTestFoodSpots(),
+    foodCategory: FoodCategory = createTestFoodCategory(),
+) = FoodSpotsFoodCategory(0L, foodSpots, foodCategory)
+
+fun createTestReportFoodCategory(
+    foodSpotsHistory: FoodSpotsHistory = createTestFoodHistory(),
+    foodCategory: FoodCategory = createTestFoodCategory(),
+) = ReportFoodCategory(0L, foodSpotsHistory, foodCategory)
+
+fun createTestFoodOperationHours(
+    foodSpots: FoodSpots = createTestFoodSpots(),
+    dayOfWeek: DayOfWeek = DayOfWeek.MON,
+    openingHours: String = TEST_OPERATION_HOURS_OPEN,
+    closingHours: String = TEST_OPERATION_HOURS_CLOSE,
+) = FoodSpotsOperationHours(foodSpots, dayOfWeek, openingHours, closingHours)
+
+fun createTestReportOperationHours(
+    foodSpotsHistory: FoodSpotsHistory = createTestFoodHistory(),
+    dayOfWeek: DayOfWeek = DayOfWeek.MON,
+    openingHours: String = TEST_OPERATION_HOURS_OPEN,
+    closingHours: String = TEST_OPERATION_HOURS_CLOSE,
+) = ReportOperationHours(foodSpotsHistory, dayOfWeek, openingHours, closingHours)
 
 class MockTestFoodSpot(
     id: Long = 0L,
@@ -278,9 +297,9 @@ class MockTestFoodSpot(
     open: Boolean = TEST_FOOD_SPOT_OPEN,
     closed: Boolean = TEST_FOOD_SPOT_STORE_CLOSURE,
     point: Point = TEST_FOOD_SPOT_POINT,
-    operationHoursList: MutableList<FoodSpotsOperationHours> = mutableListOf(),
-    categoryList: MutableList<FoodSpotsFoodCategory> = mutableListOf(),
-) : FoodSpots(id, name, foodTruck, open, closed, point, operationHoursList, categoryList) {
+    operationHours: MutableList<FoodSpotsOperationHours> = mutableListOf(),
+    foodCategories: MutableList<FoodSpotsFoodCategory> = mutableListOf(),
+) : FoodSpots(id, name, foodTruck, open, closed, point, operationHours, foodCategories) {
     override var createdDateTime: LocalDateTime = LocalDateTime.now()
     override var updatedDateTime: LocalDateTime = LocalDateTime.now()
 }
@@ -294,9 +313,9 @@ class MockTestFoodSpotsHistory(
     open: Boolean = TEST_FOOD_SPOT_OPEN,
     closed: Boolean = TEST_FOOD_SPOT_STORE_CLOSURE,
     point: Point = TEST_FOOD_SPOT_POINT,
-    operationHours: MutableList<ReportOperationHours> = mutableListOf(),
-    category: MutableList<ReportFoodCategory> = mutableListOf(),
-) : FoodSpotsHistory(id, foodSpots, user, name, foodTruck, open, closed, point, operationHours, category) {
+    operationHours: List<ReportOperationHours> = listOf(),
+    foodCategories: List<ReportFoodCategory> = listOf(),
+) : FoodSpotsHistory(id, foodSpots, user, name, foodTruck, open, closed, point, operationHours, foodCategories) {
     override var createdDateTime: LocalDateTime = LocalDateTime.now()
 }
 
@@ -378,4 +397,28 @@ fun createMockSearchCoinCaches(userId: Long): List<SearchCoinCache> =
             longitude = TEST_FOOD_SPOT_LONGITUDE,
             radius = 1500,
         ),
+    )
+
+fun createReportOperationHoursResponse(): ReportOperationHoursResponse =
+    ReportOperationHoursResponse(
+        createTestReportOperationHours(),
+    )
+
+fun createReportHistoryDetailResponse(): ReportHistoryDetailResponse =
+    ReportHistoryDetailResponse(
+        createMockTestFoodHistory(),
+        listOf(createTestReportPhotoResponse()),
+        listOf(createTestReportCategoryResponse()),
+        listOf(createReportOperationHoursResponse()),
+    )
+
+fun createTestSliceFoodSpotsReviewResponse(): SliceResponse<ReviewResponse> =
+    SliceResponse(
+        createMockSliceReview().map {
+            ReviewResponse.of(
+                it,
+                createTestReviewerInfoResponse(),
+                listOf(createTestReviewPhotoResponse()),
+            )
+        },
     )

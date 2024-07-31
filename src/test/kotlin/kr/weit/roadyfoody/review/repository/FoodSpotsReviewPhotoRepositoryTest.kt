@@ -65,5 +65,14 @@ class FoodSpotsReviewPhotoRepositoryTest(
                     }
                 }
             }
+
+            describe("getByReview 메소드는") {
+                context("리뷰를 받는 경우") {
+                    it("해당 리뷰의 사진 리스트를 반환한다.") {
+                        val result = reviewPhotoRepository.getByReview(review)
+                        result.map { it.foodSpotsReview } shouldBe listOf(review)
+                    }
+                }
+            }
         },
     )
