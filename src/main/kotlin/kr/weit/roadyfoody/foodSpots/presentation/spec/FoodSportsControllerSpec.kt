@@ -2,20 +2,29 @@ package kr.weit.roadyfoody.foodSpots.presentation.spec
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Positive
 import jakarta.validation.constraints.Size
 import kr.weit.roadyfoody.auth.security.LoginUser
+import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.common.exception.ErrorCode
+import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsReviewResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsUpdateRequest
+import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoryDetailResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
+import kr.weit.roadyfoody.foodSpots.utils.SliceFoodSpotsReview
 import kr.weit.roadyfoody.foodSpots.validator.WebPImageList
 import kr.weit.roadyfoody.global.swagger.ApiErrorCodeExamples
 import kr.weit.roadyfoody.global.swagger.v1.SwaggerTag
+import kr.weit.roadyfoody.review.repository.ReviewSortType
 import kr.weit.roadyfoody.user.domain.User
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.multipart.MultipartFile
 
@@ -114,4 +123,73 @@ interface FoodSportsControllerSpec {
         @PathVariable("historyId")
         historyId: Long,
     )
+
+    @Operation(
+        description = "음식점 리포트 이력 상세 조회 API",
+        parameters = [
+            Parameter(name = "historyId", description = "조회할 리포트 이력 ID", example = "1"),
+        ],
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "리포트 상세 조회 성공",
+                content = [
+                    Content(
+                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                        schema = Schema(implementation = ReportHistoryDetailResponse::class),
+                    ),
+                ],
+            ),
+        ],
+    )
+    @ApiErrorCodeExamples(
+        [
+            ErrorCode.NON_POSITIVE_FOOD_SPOTS_HISTORIES_ID,
+            ErrorCode.NOT_FOUND_FOOD_SPOTS_HISTORIES,
+        ],
+    )
+    fun getReportHistory(
+        @PathVariable("historyId")
+        @Positive
+        historyId: Long,
+    ): ReportHistoryDetailResponse
+
+    @Operation(
+        description = "음식점의 리뷰 리스트 조회 API",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "리뷰 리스트 조회 성공",
+                content = [
+                    Content(
+                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                        schema =
+                            Schema(
+                                implementation = SliceFoodSpotsReview::class,
+                            ),
+                    ),
+                ],
+            ),
+        ],
+    )
+    @ApiErrorCodeExamples(
+        [
+            ErrorCode.SIZE_NON_POSITIVE,
+            ErrorCode.LAST_ID_NON_POSITIVE,
+            ErrorCode.FOOD_SPOT_ID_NON_POSITIVE,
+        ],
+    )
+    fun getFoodSpotsReviews(
+        @PathVariable("foodSpotsId")
+        @Positive(message = "음식점 ID는 양수여야 합니다.")
+        foodSpotsId: Long,
+        @Positive(message = "조회할 개수는 양수여야 합니다.")
+        @RequestParam(defaultValue = "10", required = false)
+        size: Int,
+        @Positive(message = "마지막 ID는 양수여야 합니다.")
+        @RequestParam(required = false)
+        lastId: Long?,
+        @RequestParam(defaultValue = "LATEST", required = false)
+        sortType: ReviewSortType,
+    ): SliceResponse<FoodSpotsReviewResponse>
 }

@@ -1,8 +1,16 @@
 package kr.weit.roadyfoody.foodSpots.fixture
 
+import createMockSliceReview
+import createTestReviewPhotoResponse
+import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodCategoryResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsReviewResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.OperationHoursRequest
+import kr.weit.roadyfoody.foodSpots.application.dto.ReportCategoryResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoryDetailResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.ReportOperationHoursResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.ReportPhotoResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
 import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodCategory
@@ -23,6 +31,7 @@ import kr.weit.roadyfoody.search.foodSpots.dto.OperationStatus
 import kr.weit.roadyfoody.support.utils.ImageFormat
 import kr.weit.roadyfoody.support.utils.createTestImageFile
 import kr.weit.roadyfoody.user.domain.User
+import kr.weit.roadyfoody.user.fixture.createTestReviewerInfoResponse
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.GeometryFactory
@@ -64,6 +73,7 @@ const val TEST_UPDATE_FOOD_SPOT_LONGITUDE = 11.2222222
 const val TEST_UPDATE_OPERATION_HOURS_OPEN = "10:00"
 const val TEST_UPDATE_OPERATION_HOURS_CLOSE = "13:59"
 const val TEST_FOOD_SPOTS_HISTORY_ID = 1L
+const val TEST_INVALID_FOOD_SPOTS_HISTORY_ID = -1L
 
 fun createMockTestFoodSpot(
     id: Long = 0L,
@@ -98,12 +108,6 @@ fun createTestFoodSpots(
     operationHours: MutableList<FoodSpotsOperationHours> = mutableListOf(),
     foodCategories: MutableList<FoodSpotsFoodCategory> = mutableListOf(),
 ) = FoodSpots(id, name, foodTruck, open, storeClosure, point, operationHours, foodCategories)
-
-fun createTestFoodSpotsFoodCategory(
-    foodSpots: FoodSpots = createTestFoodSpots(),
-    foodCategory: FoodCategory = createTestFoodCategory(),
-    id: Long = 0L,
-) = FoodSpotsFoodCategory(id, foodSpots, foodCategory)
 
 fun createTestFoodCategory(
     id: Long = 0L,
@@ -154,6 +158,16 @@ fun createMockPhotoList(
     List(size) {
         createTestImageFile(format, name)
     }
+
+fun createTestReportPhotoResponse(
+    id: Long = 0L,
+    url: String = TEST_FOOD_SPOTS_PHOTO_URL,
+) = ReportPhotoResponse(id, url)
+
+fun createTestReportCategoryResponse(
+    id: Long = 0L,
+    name: String = "testCategory",
+) = ReportCategoryResponse(id, name)
 
 fun createTestFoodCategories(): List<FoodCategory> =
     listOf(
@@ -251,6 +265,11 @@ fun createOperationHoursRequest(
 ) = OperationHoursRequest(dayOfWeek, openingHours, closingHours)
 
 fun createTestFoodCategory(name: String = TEST_CATEGORY_NAME) = FoodCategory(name = name)
+
+fun createTestFoodSpotsFoodCategory(
+    foodSpots: FoodSpots = createTestFoodSpots(),
+    foodCategory: FoodCategory = createTestFoodCategory(),
+) = FoodSpotsFoodCategory(0L, foodSpots, foodCategory)
 
 fun createTestReportFoodCategory(
     foodSpotsHistory: FoodSpotsHistory = createTestFoodHistory(),
@@ -378,4 +397,28 @@ fun createMockSearchCoinCaches(userId: Long): List<SearchCoinCache> =
             longitude = TEST_FOOD_SPOT_LONGITUDE,
             radius = 1500,
         ),
+    )
+
+fun createReportOperationHoursResponse(): ReportOperationHoursResponse =
+    ReportOperationHoursResponse(
+        createTestReportOperationHours(),
+    )
+
+fun createReportHistoryDetailResponse(): ReportHistoryDetailResponse =
+    ReportHistoryDetailResponse(
+        createMockTestFoodHistory(),
+        listOf(createTestReportPhotoResponse()),
+        listOf(createTestReportCategoryResponse()),
+        listOf(createReportOperationHoursResponse()),
+    )
+
+fun createTestSliceFoodSpotsReviewResponse(): SliceResponse<FoodSpotsReviewResponse> =
+    SliceResponse(
+        createMockSliceReview().map {
+            FoodSpotsReviewResponse.of(
+                it,
+                createTestReviewerInfoResponse(),
+                listOf(createTestReviewPhotoResponse()),
+            )
+        },
     )

@@ -5,6 +5,10 @@ import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHours
 import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHoursId
 import org.springframework.data.jpa.repository.JpaRepository
 
+fun ReportOperationHoursRepository.getByHistoryId(historyId: Long): List<ReportOperationHours> = findByFoodSpotsHistoryId(historyId)
+
 interface ReportOperationHoursRepository : JpaRepository<ReportOperationHours, ReportOperationHoursId> {
     fun deleteByFoodSpotsHistoryIn(foodSpotsHistories: List<FoodSpotsHistory>)
+
+    fun findByFoodSpotsHistoryId(historyId: Long): List<ReportOperationHours>
 }

@@ -5,6 +5,7 @@ import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.user.application.dto.UserInfoResponse
 import kr.weit.roadyfoody.user.application.dto.UserReportHistoriesResponse
+import kr.weit.roadyfoody.user.application.dto.UserReviewResponse
 import kr.weit.roadyfoody.user.application.service.UserQueryService
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.presentation.spec.UserControllerSpec
@@ -35,4 +36,17 @@ class UserController(
         @RequestParam(required = false)
         lastId: Long?,
     ): SliceResponse<UserReportHistoriesResponse> = userQueryService.getReportHistories(userId, size, lastId)
+
+    @GetMapping("{userId}/reviews")
+    override fun getUserReviews(
+        @PathVariable("userId")
+        @Positive(message = "유저 ID는 양수여야 합니다.")
+        userId: Long,
+        @Positive(message = "조회할 개수는 양수여야 합니다.")
+        @RequestParam(defaultValue = "10", required = false)
+        size: Int,
+        @Positive(message = "마지막 ID는 양수여야 합니다.")
+        @RequestParam(required = false)
+        lastId: Long?,
+    ): SliceResponse<UserReviewResponse> = userQueryService.getUserReviews(userId, size, lastId)
 }

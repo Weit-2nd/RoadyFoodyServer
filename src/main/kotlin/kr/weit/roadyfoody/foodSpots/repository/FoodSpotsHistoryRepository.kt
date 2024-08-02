@@ -16,7 +16,7 @@ fun FoodSpotsHistoryRepository.getHistoriesByUser(
 ): Slice<FoodSpotsHistory> = findSliceByUser(user, size, lastId)
 
 fun FoodSpotsHistoryRepository.getByHistoryId(historyId: Long): FoodSpotsHistory =
-    findById(historyId).orElseThrow { FoodSpotsHistoryNotFoundException("해당 음식점 리포트가 존재하지 않습니다.") }
+    findById(historyId).orElseThrow { FoodSpotsHistoryNotFoundException() }
 
 interface FoodSpotsHistoryRepository :
     JpaRepository<FoodSpotsHistory, Long>,
