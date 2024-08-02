@@ -45,7 +45,7 @@ data class ReportRequest(
     @field:Latitude
     val latitude: Double,
     @NotNull(message = "음식점 여부는 필수입니다.")
-    @Schema(description = "푸드트럭여부(이동여부)", example = "false")
+    @Schema(description = "노포 여부(이동여부)", example = "false")
     val foodTruck: Boolean,
     @Schema(description = "영업 여부", example = "true")
     @NotNull(message = "영업 여부는 필수입니다.")
@@ -225,7 +225,7 @@ data class ReportHistoryDetailResponse(
     val longitude: Double,
     @Schema(description = "위도", example = "37.4940529587731")
     val latitude: Double,
-    @Schema(description = "푸드트럭여부(이동여부)", example = "false")
+    @Schema(description = "노포 여부(이동여부)", example = "false")
     val foodTruck: Boolean,
     @Schema(description = "영업 여부", example = "true")
     val open: Boolean,
@@ -284,8 +284,8 @@ data class FoodSpotsReviewResponse(
     @Schema(description = "리뷰 ID")
     val id: Long,
     @Schema(description = "음식점 ID")
-    val foodSpotId: Long,
-    @Schema(description = "직성지 정보")
+    val foodSpotsId: Long,
+    @Schema(description = "직성자 정보")
     val userInfo: ReviewerInfoResponse,
     @Schema(description = "리뷰 내용")
     val contents: String,
@@ -303,7 +303,7 @@ data class FoodSpotsReviewResponse(
             photoList: List<ReviewPhotoResponse>,
         ) = FoodSpotsReviewResponse(
             id = review.id,
-            foodSpotId = review.foodSpots.id,
+            foodSpotsId = review.foodSpots.id,
             userInfo = userInfo,
             contents = review.contents,
             rate = review.rate,
