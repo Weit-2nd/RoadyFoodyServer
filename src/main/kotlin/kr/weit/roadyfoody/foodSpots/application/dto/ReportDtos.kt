@@ -45,7 +45,7 @@ data class ReportRequest(
     @field:Latitude
     val latitude: Double,
     @NotNull(message = "음식점 여부는 필수입니다.")
-    @Schema(description = "이동여부(푸드 트럭, 푸드 스탠드 등 여부)", example = "false")
+    @Schema(description = "이동여부(푸드 트럭, 푸드 카트 등 여부)", example = "false")
     val foodTruck: Boolean,
     @Schema(description = "영업 여부", example = "true")
     @NotNull(message = "영업 여부는 필수입니다.")
@@ -225,8 +225,8 @@ data class ReportHistoryDetailResponse(
     val longitude: Double,
     @Schema(description = "위도", example = "37.4940529587731")
     val latitude: Double,
-    @Schema(description = "이동여부(푸드 트럭, 푸드 스탠드 등 여부)", example = "false")
-    val foodTruck: Boolean,
+    @Schema(description = "이동여부(푸드 트럭, 푸드 카트 등 여부)", example = "false")
+    val movableFoodSpots: Boolean,
     @Schema(description = "영업 여부", example = "true")
     val open: Boolean,
     @Schema(description = "폐업 여부", example = "false")
@@ -252,7 +252,7 @@ data class ReportHistoryDetailResponse(
         name = foodSpotsHistory.name,
         longitude = foodSpotsHistory.point.x,
         latitude = foodSpotsHistory.point.y,
-        foodTruck = foodSpotsHistory.foodTruck,
+        movableFoodSpots = foodSpotsHistory.foodTruck,
         open = foodSpotsHistory.open,
         closed = foodSpotsHistory.storeClosure,
         createdDateTime = foodSpotsHistory.createdDateTime,
