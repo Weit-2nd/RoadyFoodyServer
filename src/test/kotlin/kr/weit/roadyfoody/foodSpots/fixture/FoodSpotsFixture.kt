@@ -22,6 +22,7 @@ import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsOperationHours
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
 import kr.weit.roadyfoody.foodSpots.domain.ReportFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHours
+import kr.weit.roadyfoody.foodSpots.domain.ReportType
 import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_MAX_LENGTH
 import kr.weit.roadyfoody.global.utils.CoordinateUtils
 import kr.weit.roadyfoody.search.foodSpots.domain.SearchCoinCache
@@ -123,9 +124,10 @@ fun createTestFoodHistory(
     open: Boolean = TEST_FOOD_SPOT_OPEN,
     storeClosure: Boolean = TEST_FOOD_SPOT_STORE_CLOSURE,
     point: Point = TEST_FOOD_SPOT_POINT,
+    reportType: ReportType = ReportType.STORE_CREATE,
     operationHours: List<ReportOperationHours> = listOf(),
     foodCategories: List<ReportFoodCategory> = listOf(),
-) = FoodSpotsHistory(id, foodSpots, user, name, foodTruck, open, storeClosure, point, operationHours, foodCategories)
+) = FoodSpotsHistory(id, foodSpots, user, name, foodTruck, open, storeClosure, point, reportType, operationHours, foodCategories)
 
 fun createTestFoodSpotsPhoto(foodSpotsHistory: FoodSpotsHistory = createTestFoodHistory()) =
     FoodSpotsPhoto(0L, foodSpotsHistory, TEST_PHOTO_NAME)
@@ -313,9 +315,10 @@ class MockTestFoodSpotsHistory(
     open: Boolean = TEST_FOOD_SPOT_OPEN,
     closed: Boolean = TEST_FOOD_SPOT_STORE_CLOSURE,
     point: Point = TEST_FOOD_SPOT_POINT,
+    reportType: ReportType = ReportType.STORE_CREATE,
     operationHours: List<ReportOperationHours> = listOf(),
     foodCategories: List<ReportFoodCategory> = listOf(),
-) : FoodSpotsHistory(id, foodSpots, user, name, foodTruck, open, closed, point, operationHours, foodCategories) {
+) : FoodSpotsHistory(id, foodSpots, user, name, foodTruck, open, closed, point, reportType, operationHours, foodCategories) {
     override var createdDateTime: LocalDateTime = LocalDateTime.now()
 }
 
