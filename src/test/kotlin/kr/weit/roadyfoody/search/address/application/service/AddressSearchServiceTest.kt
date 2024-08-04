@@ -95,6 +95,24 @@ class AddressSearchServiceTest :
                 }
             }
 
+            `when`("도로명 주소가 null인 경우") {
+                val point2AddressWrapper = AddressFixture.loadPoint2AddressWithoutRoadAddressResponse()
+
+                every {
+                    kakaoPointClientInterface.searchPointToAddress(
+                        "127.0",
+                        "37.0",
+                    )
+                } returns point2AddressWrapper
+
+                val result = addressService.searchPoint2Address(127.0, 37.0)
+
+                then("주소를 반환한다.") {
+                    result.roadAddressName shouldBe null
+                    result.addressName shouldBe "경기 안성시 죽산면 죽산리 343-1"
+                }
+            }
+
             `when`("주소를 찾을 수 없는 경우") {
                 every {
                     kakaoPointClientInterface.searchPointToAddress(
