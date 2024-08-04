@@ -108,7 +108,7 @@ class FoodSpotsHistoryRepositoryTest(
                 it("빈 리스트를 반환한다.") {
                     val histories = foodSpotsHistoryRepository.getByFoodSpots(notExistFoodSpots)
                     histories shouldBe emptyList()
+                }
             }
         }
-    }
     })
