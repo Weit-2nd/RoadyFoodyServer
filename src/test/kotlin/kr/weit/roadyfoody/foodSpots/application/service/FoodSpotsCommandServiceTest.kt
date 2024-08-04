@@ -480,6 +480,24 @@ class FoodSpotsCommandServiceTest :
                 `when`("리포트 삭제 요청이 들어올 경우") {
                     every { foodSpotsHistoryRepository.getByHistoryId(any()) } returns createMockTestFoodHistory(user)
                     every { foodSpotsHistoryRepository.deleteById(any()) } returns Unit
+                    every { reportFoodCategoryRepository.findByFoodSpotsHistoryId(any()) } returns
+                        listOf(
+                            createTestReportFoodCategory(),
+                        )
+                    every { reportFoodCategoryRepository.deleteAll(any()) } returns Unit
+                    every { reportOperationHoursRepository.findByFoodSpotsHistoryId(any()) } returns
+                        listOf(
+                            createTestReportOperationHours(),
+                        )
+                    every { reportOperationHoursRepository.deleteAll(any()) } returns Unit
+                    every { foodSpotsPhotoRepository.findByHistoryId(any()) } returns
+                        listOf(
+                            createTestFoodSpotsPhoto(),
+                        )
+                    every { foodSpotsPhotoRepository.deleteAll(any()) } returns Unit
+                    every { entityManager.flush() } returns Unit
+                    every { userCommandService.decreaseCoin(any(), any()) } returns Unit
+                    every { imageService.remove(any()) } returns Unit
                     then("정상적으로 삭제되어야 한다.") {
                         foodSpotsCommandService.deleteFoodSpotsHistories(user, TEST_FOOD_SPOTS_HISTORY_ID)
                         verify(exactly = 1) {
