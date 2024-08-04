@@ -4,6 +4,7 @@ import createMockSliceReview
 import createTestReviewPhotoResponse
 import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodCategoryResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsDetailResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsReviewResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.OperationHoursRequest
@@ -421,4 +422,11 @@ fun createTestSliceFoodSpotsReviewResponse(): SliceResponse<FoodSpotsReviewRespo
                 listOf(createTestReviewPhotoResponse()),
             )
         },
+    )
+
+fun createTestFoodSpotsDetailResponse(): FoodSpotsDetailResponse =
+    FoodSpotsDetailResponse(
+        createMockTestFoodSpot(),
+        OperationStatus.OPEN,
+        listOf(createTestReportPhotoResponse()),
     )
