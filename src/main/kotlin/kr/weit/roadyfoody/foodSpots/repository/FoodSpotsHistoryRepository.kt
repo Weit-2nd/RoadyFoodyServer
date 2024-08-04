@@ -19,8 +19,7 @@ fun FoodSpotsHistoryRepository.getHistoriesByUser(
 fun FoodSpotsHistoryRepository.getByHistoryId(historyId: Long): FoodSpotsHistory =
     findById(historyId).orElseThrow { FoodSpotsHistoryNotFoundException() }
 
-fun FoodSpotsHistoryRepository.getByFoodSpots(foodSpots: FoodSpots): List<FoodSpotsHistory> =
-    findByFoodSpots(foodSpots).also { if (it.isEmpty()) throw FoodSpotsHistoryNotFoundException() }
+fun FoodSpotsHistoryRepository.getByFoodSpots(foodSpots: FoodSpots): List<FoodSpotsHistory> = findByFoodSpots(foodSpots)
 
 interface FoodSpotsHistoryRepository :
     JpaRepository<FoodSpotsHistory, Long>,
