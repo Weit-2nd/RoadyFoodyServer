@@ -125,6 +125,7 @@ class FoodSpotsQueryService(
         return SliceResponse(response)
     }
 
+    @Transactional(readOnly = true)
     fun getFoodSpotsDetail(foodSpotsId: Long): FoodSpotsDetailResponse =
         foodSpotsRepository.getByFoodSpotsId(foodSpotsId).let { foodSpots ->
             val foodSpotsPhotos =

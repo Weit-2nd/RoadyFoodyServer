@@ -105,9 +105,10 @@ class FoodSpotsHistoryRepositoryTest(
             }
 
             context("존재하지 않는 FoodSpots 를 받는 경우") {
-                it("빈 리스트를 반환한다.") {
-                    val histories = foodSpotsHistoryRepository.getByFoodSpots(notExistFoodSpots)
-                    histories shouldBe emptyList()
+                it("에러가 발생한다") {
+                    shouldThrow<FoodSpotsHistoryNotFoundException> {
+                        foodSpotsHistoryRepository.getByFoodSpots(notExistFoodSpots)
+                    }
                 }
             }
         }
