@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
+import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsOperationHours
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
@@ -24,6 +25,7 @@ import kr.weit.roadyfoody.foodSpots.validator.Longitude
 import kr.weit.roadyfoody.global.utils.CoordinateUtils.Companion.createCoordinate
 import kr.weit.roadyfoody.review.application.dto.ReviewPhotoResponse
 import kr.weit.roadyfoody.review.domain.FoodSpotsReview
+import kr.weit.roadyfoody.search.foodSpots.dto.OperationStatus
 import kr.weit.roadyfoody.user.application.dto.ReviewerInfoResponse
 import kr.weit.roadyfoody.user.domain.User
 import java.time.LocalDateTime
@@ -314,4 +316,83 @@ data class FoodSpotsReviewResponse(
             createdAt = review.createdDateTime,
         )
     }
+}
+
+data class FoodSpotsDetailResponse(
+    @Schema(description = "음식점 ID")
+    val id: Long,
+    @Schema(description = "음식점 이름")
+    val name: String,
+    @Schema(description = "경도")
+    val longitude: Double,
+    @Schema(description = "위도")
+    val latitude: Double,
+    @Schema(description = "이동여부(푸드 트럭, 푸드 카트 등)")
+    val movableFoodSpots: Boolean,
+    @Schema(description = "영업 상태", example = "OPEN")
+    val open: OperationStatus,
+    @Schema(description = "페업 여부")
+    var storeClosure: Boolean,
+    @Schema(description = "영업 시간 리스트")
+    val operationHoursList: List<FoodSpotsOperationHoursResponse>,
+    @Schema(description = "음식 카테고리 리스트")
+    val foodCategoryList: List<FoodSpotsFoodCategoryResponse>,
+    @Schema(description = "음식점 사진 리스트")
+    val foodSpotsPhotos: List<ReportPhotoResponse>,
+    @Schema(description = "음식점 생성 일자")
+    val createdDateTime: LocalDateTime,
+) {
+    constructor(
+        foodSpots: FoodSpots,
+        openStatus: OperationStatus,
+        foodSpotsPhotos: List<ReportPhotoResponse>,
+    ) :
+        this(
+            id = foodSpots.id,
+            name = foodSpots.name,
+            movableFoodSpots = foodSpots.foodTruck,
+            longitude = foodSpots.point.x,
+            latitude = foodSpots.point.y,
+            storeClosure = foodSpots.storeClosure,
+            operationHoursList =
+                foodSpots.operationHoursList.map {
+                    FoodSpotsOperationHoursResponse(
+                        it,
+                    )
+                },
+            open = openStatus,
+            foodCategoryList = foodSpots.foodCategoryList.map { FoodSpotsFoodCategoryResponse(it) },
+            foodSpotsPhotos = foodSpotsPhotos,
+            createdDateTime = foodSpots.createdDateTime,
+        )
+}
+
+data class FoodSpotsOperationHoursResponse(
+    @Schema(description = "음식점 ID", example = "1")
+    val foodSpotsId: Long,
+    @Schema(description = "요일", example = "MON")
+    val dayOfWeek: DayOfWeek,
+    @Schema(description = "오픈 시간", example = "01:00")
+    val openingHours: String,
+    @Schema(description = "마감 시간", example = "23:59")
+    val closingHours: String,
+) {
+    constructor(operationHours: FoodSpotsOperationHours) : this(
+        foodSpotsId = operationHours.foodSpots.id,
+        dayOfWeek = operationHours.dayOfWeek,
+        openingHours = operationHours.openingHours,
+        closingHours = operationHours.closingHours,
+    )
+}
+
+data class FoodSpotsFoodCategoryResponse(
+    @Schema(description = "음식점 카테고리 ID")
+    val id: Long,
+    @Schema(description = "카테고리명")
+    val name: String,
+) {
+    constructor(foodSpotsFoodCategory: FoodSpotsFoodCategory) : this(
+        id = foodSpotsFoodCategory.id,
+        name = foodSpotsFoodCategory.foodCategory.name,
+    )
 }

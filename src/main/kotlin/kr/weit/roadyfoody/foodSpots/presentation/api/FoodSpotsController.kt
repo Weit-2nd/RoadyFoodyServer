@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Positive
 import jakarta.validation.constraints.Size
 import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.common.dto.SliceResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsDetailResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsReviewResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoryDetailResponse
@@ -96,4 +97,11 @@ class FoodSpotsController(
         @RequestParam(required = false, defaultValue = "LATEST")
         sortType: ReviewSortType,
     ): SliceResponse<FoodSpotsReviewResponse> = foodSpotsQueryService.getFoodSpotsReview(foodSpotsId, size, lastId, sortType)
+
+    @GetMapping("/{foodSpotsId}")
+    override fun getFoodSpotsDetail(
+        @PathVariable("foodSpotsId")
+        @Positive(message = "음식점 ID는 양수여야 합니다.")
+        foodSpotsId: Long,
+    ): FoodSpotsDetailResponse = foodSpotsQueryService.getFoodSpotsDetail(foodSpotsId)
 }
