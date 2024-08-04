@@ -216,6 +216,7 @@ interface FoodSportsControllerSpec {
         [
             ErrorCode.NOT_FOUND_FOOD_SPOTS,
             ErrorCode.FOOD_SPOT_ID_NON_POSITIVE,
+            ErrorCode.NOT_FOUND_FOOD_SPOTS_HISTORIES,
         ],
     )
     fun getFoodSpotsDetail(

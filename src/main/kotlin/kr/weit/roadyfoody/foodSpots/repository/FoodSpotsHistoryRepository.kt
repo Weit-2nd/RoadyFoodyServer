@@ -19,8 +19,8 @@ fun FoodSpotsHistoryRepository.getHistoriesByUser(
 fun FoodSpotsHistoryRepository.getByHistoryId(historyId: Long): FoodSpotsHistory =
     findById(historyId).orElseThrow { FoodSpotsHistoryNotFoundException() }
 
-// TODO: 리포트 삭제시, 음식점에 대한 리포트가 존재하지 않으면 가게 삭제 처리 이후에 이곳 에러 처리 추가하기
-fun FoodSpotsHistoryRepository.getByFoodSpots(foodSpots: FoodSpots): List<FoodSpotsHistory> = findByFoodSpots(foodSpots)
+fun FoodSpotsHistoryRepository.getByFoodSpots(foodSpots: FoodSpots): List<FoodSpotsHistory> =
+    findByFoodSpots(foodSpots).also { if (it.isEmpty()) throw FoodSpotsHistoryNotFoundException() }
 
 interface FoodSpotsHistoryRepository :
     JpaRepository<FoodSpotsHistory, Long>,

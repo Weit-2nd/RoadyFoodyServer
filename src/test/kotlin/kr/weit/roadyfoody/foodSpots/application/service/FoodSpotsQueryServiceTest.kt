@@ -19,6 +19,7 @@ import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_HISTORY_ID
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_PHOTO_URL
 import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodHistory
 import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodSpotList
+import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodHistory
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsForDistance
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsPhoto
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportFoodCategory
@@ -28,7 +29,6 @@ import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsPhotoRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportOperationHoursRepository
-import kr.weit.roadyfoody.foodSpots.repository.getByFoodSpots
 import kr.weit.roadyfoody.foodSpots.repository.getByFoodSpotsId
 import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
 import kr.weit.roadyfoody.global.TEST_LAST_ID
@@ -278,8 +278,10 @@ class FoodSpotsQueryServiceTest :
 
             given("getFoodSpotsDetail 테스트") {
                 every { foodSpotsRepository.getByFoodSpotsId(any()) } returns MockTestFoodSpot()
-                every { foodSpotsHistoryRepository.getByFoodSpots(any()) } returns
-                    listOf(createMockTestFoodHistory())
+                every { foodSpotsHistoryRepository.findByFoodSpots(any()) } returns
+                    listOf(
+                        createTestFoodHistory(),
+                    )
                 every { foodSpotsPhotoRepository.findByHistoryIn(any()) } returns
                     listOf(createTestFoodSpotsPhoto())
                 every { imageService.getDownloadUrl(any()) } returns TEST_FOOD_SPOTS_PHOTO_URL
@@ -288,7 +290,7 @@ class FoodSpotsQueryServiceTest :
                         foodSPotsQueryService.getFoodSpotsDetail(TEST_FOOD_SPOT_ID)
                         verify(exactly = 1) {
                             foodSpotsRepository.getByFoodSpotsId(any())
-                            foodSpotsHistoryRepository.getByFoodSpots(any())
+                            foodSpotsHistoryRepository.findByFoodSpots(any())
                             foodSpotsPhotoRepository.findByHistoryIn(any())
                             imageService.getDownloadUrl(any())
                         }
@@ -297,7 +299,7 @@ class FoodSpotsQueryServiceTest :
 
                 `when`("해당 음식점이 존재하지 않는 경우") {
                     every { foodSpotsRepository.findById(any()) } returns Optional.empty()
-                    then("해당 음식점이 존재하지 않는다.") {
+                    then("FoodSpotsNotFoundException 이 발생한다.") {
                         shouldThrow<FoodSpotsNotFoundException> {
                             foodSPotsQueryService.getFoodSpotsDetail(TEST_FOOD_SPOT_ID)
                         }
