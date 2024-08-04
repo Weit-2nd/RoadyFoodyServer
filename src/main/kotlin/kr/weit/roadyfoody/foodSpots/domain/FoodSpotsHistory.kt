@@ -2,6 +2,8 @@ package kr.weit.roadyfoody.foodSpots.domain
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -48,6 +50,9 @@ class FoodSpotsHistory(
     val storeClosure: Boolean,
     @Column(columnDefinition = "SDO_GEOMETRY", nullable = false, updatable = false)
     val point: Point,
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, updatable = false)
+    val reportType: ReportType,
     @OneToMany(mappedBy = "foodSpotsHistory")
     val operationHoursList: List<ReportOperationHours>,
     @OneToMany(mappedBy = "foodSpotsHistory")
@@ -61,6 +66,7 @@ class FoodSpotsHistory(
         open = false,
         storeClosure = false,
         point = createCoordinate(0.0, 0.0),
+        reportType = ReportType.STORE_CREATE,
         operationHoursList = emptyList(),
         foodCategoryList = emptyList(),
     )

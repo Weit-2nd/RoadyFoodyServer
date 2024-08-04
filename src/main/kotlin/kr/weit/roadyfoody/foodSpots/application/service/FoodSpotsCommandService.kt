@@ -26,7 +26,6 @@ import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
 import kr.weit.roadyfoody.foodSpots.repository.getFoodCategories
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.global.utils.CoordinateUtils.Companion.createCoordinate
-import kr.weit.roadyfoody.mission.domain.RewardPoint
 import kr.weit.roadyfoody.user.application.service.UserCommandService
 import kr.weit.roadyfoody.user.domain.User
 import org.redisson.api.RedissonClient
@@ -90,7 +89,7 @@ class FoodSpotsCommandService(
 
         entityManager.flush()
 
-        userCommandService.increaseCoin(user.id, RewardPoint.FIRST_REPORT.point)
+        userCommandService.increaseCoin(user.id, foodSpotsHistory.reportType.rewardPoint)
 
         generatorPhotoNameMap
             .map {
@@ -149,11 +148,7 @@ class FoodSpotsCommandService(
 
         entityManager.flush()
 
-        if (request.closed != null && request.closed) {
-            userCommandService.increaseCoin(user.id, RewardPoint.CLOSED_REPORT.point)
-        } else {
-            userCommandService.increaseCoin(user.id, RewardPoint.REPORT.point)
-        }
+        userCommandService.increaseCoin(user.id, foodSpotsHistory.reportType.rewardPoint)
     }
 
     private fun storeReport(
@@ -286,9 +281,27 @@ class FoodSpotsCommandService(
         if (foodSpotsHistory.user.id != user.id) {
             throw NotFoodSpotsHistoriesOwnerException("해당 음식점 리포트의 소유자가 아닙니다.")
         }
+
+        val categories = reportFoodCategoryRepository.getByHistoryId(historyId)
+        reportFoodCategoryRepository.deleteAll(categories)
+
+        val operationHours = reportOperationHoursRepository.getByHistoryId(historyId)
+        reportOperationHoursRepository.deleteAll(operationHours)
+
+        val photos = foodSpotsPhotoRepository.getByHistoryId(historyId)
+        foodSpotsPhotoRepository.deleteAll(photos)
+
         foodSpotsHistoryRepository.deleteById(historyId)
-        // TODO 유저 코인을 감소 시켜야 하는데 첫 리포트인지, 수정 혹은 폐업 리포트인지 구별할수 없어서 추후 구현
-        // entityManager.flush()
-        // user.decreaseCoin(RewardPoint.REPORT)
+
+        entityManager.flush()
+
+        userCommandService.decreaseCoin(user.id, foodSpotsHistory.reportType.rewardPoint)
+
+        photos
+            .map {
+                CompletableFuture.supplyAsync({
+                    imageService.remove(it.fileName)
+                }, executor)
+            }.forEach { it.join() }
     }
 }
