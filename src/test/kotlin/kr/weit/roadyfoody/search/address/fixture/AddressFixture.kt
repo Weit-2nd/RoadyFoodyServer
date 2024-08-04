@@ -14,6 +14,7 @@ object AddressFixture {
     private const val ADDRESS_RESPONSE_SIZE_10 = "payload/address-search-response.json"
     private const val ADDRESS_RESPONSE_SIZE_0 = "payload/address-search-response-size-0.json"
     private const val POINT_TO_ADDRESS_RESPONSE = "payload/point-to-address-response.json"
+    private const val POINT_TO_ADDRESS_WITHOUT_ROAD_ADDRESS_RESPONSE = "payload/point-to-address-without-road-address-response.json"
 
     private fun loadAddressJson(resourcePath: String): AddressResponseWrapper {
         val resource = ClassPathResource(resourcePath)
@@ -30,6 +31,9 @@ object AddressFixture {
     fun loadAddressResponseSize0(): AddressResponseWrapper = loadAddressJson(ADDRESS_RESPONSE_SIZE_0)
 
     fun loadPoint2AddressResponse(): Point2AddressWrapper = loadPointToAddressJson(POINT_TO_ADDRESS_RESPONSE)
+
+    fun loadPoint2AddressWithoutRoadAddressResponse(): Point2AddressWrapper =
+        loadPointToAddressJson(POINT_TO_ADDRESS_WITHOUT_ROAD_ADDRESS_RESPONSE)
 
     fun createSearchResponses(): AddressSearchResponses =
         AddressSearchResponses(

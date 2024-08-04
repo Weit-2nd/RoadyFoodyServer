@@ -1,0 +1,18 @@
+{
+  "meta": {
+    "total_count": 1
+  },
+  "documents": [
+    {
+      "address": {
+        "address_name": "경기 안성시 죽산면 죽산리 343-1",
+        "region_1depth_name": "경기",
+        "region_2depth_name": "안성시",
+        "region_3depth_name": "죽산면 죽산리",
+        "mountain_yn": "N",
+        "main_address_no": "343",
+        "sub_address_no": "1"
+      }
+    }
+  ]
+}
