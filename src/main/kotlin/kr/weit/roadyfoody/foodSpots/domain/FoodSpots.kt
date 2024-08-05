@@ -44,7 +44,9 @@ class FoodSpots(
     val foodCategoryList: MutableList<FoodSpotsFoodCategory>,
 ) : BaseModifiableEntity() {
     init {
-        require(FOOD_SPOTS_NAME_REGEX.matches(name)) { FOOD_SPOTS_NAME_REGEX_DESC }
+        name?.let {
+            require(FOOD_SPOTS_NAME_REGEX.matches(name)) { FOOD_SPOTS_NAME_REGEX_DESC }
+        }
     }
 
     companion object {
