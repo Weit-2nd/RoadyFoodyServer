@@ -5,6 +5,7 @@ import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
+import kr.weit.roadyfoody.foodSpots.application.service.event.ReportErrorCompensatingTxSync
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
@@ -14,6 +15,7 @@ import kr.weit.roadyfoody.foodSpots.domain.ReportFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHours
 import kr.weit.roadyfoody.foodSpots.exception.AlreadyClosedFoodSpotsException
 import kr.weit.roadyfoody.foodSpots.exception.NotFoodSpotsHistoriesOwnerException
+import kr.weit.roadyfoody.foodSpots.exception.TooManyReportRequestException
 import kr.weit.roadyfoody.foodSpots.repository.FoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSportsOperationHoursRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsFoodCategoryRepository
@@ -30,13 +32,20 @@ import kr.weit.roadyfoody.global.utils.CoordinateUtils.Companion.createCoordinat
 import kr.weit.roadyfoody.user.application.service.UserCommandService
 import kr.weit.roadyfoody.user.domain.User
 import org.redisson.api.RedissonClient
+import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.web.multipart.MultipartFile
 import java.time.Duration
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.temporal.ChronoUnit
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.TimeUnit
 
 @Service
 class FoodSpotsCommandService(
@@ -53,11 +62,15 @@ class FoodSpotsCommandService(
     private val userCommandService: UserCommandService,
     private val entityManager: EntityManager,
     private val redissonClient: RedissonClient,
+    private val redisTemplate: RedisTemplate<String, String>,
 ) {
     companion object {
         private const val FOOD_SPOTS_OPEN_SCHEDULER_LOCK = "foodSpotsOpenSchedulerLock"
         private val FOOD_SPOTS_OPEN_SCHEDULER_LOCK_DURATION: Duration =
             Duration.ofHours(23) + Duration.ofMinutes(50)
+
+        private const val FOOD_SPOTS_REPORT_LIMIT_PREFIX = "rofo:report-request-limit:"
+        private const val FOOD_SPOTS_REPORT_LIMIT_COUNT = 5
     }
 
     @Transactional
@@ -66,6 +79,16 @@ class FoodSpotsCommandService(
         reportRequest: ReportRequest,
         photos: List<MultipartFile>?,
     ) {
+        val today = LocalDate.now()
+        val key = "$FOOD_SPOTS_REPORT_LIMIT_PREFIX${user.id}:$today"
+        check(canGenerateReport(key, today)) {
+            throw TooManyReportRequestException()
+        }
+
+        TransactionSynchronizationManager.registerSynchronization(
+            ReportErrorCompensatingTxSync(key, redisTemplate),
+        )
+
         val foodSpots = reportRequest.toFoodSpotsEntity()
         storeFoodSpots(
             foodSpots,
@@ -122,6 +145,16 @@ class FoodSpotsCommandService(
         foodSpotsId: Long,
         request: FoodSpotsUpdateRequest,
     ) {
+        val today = LocalDate.now()
+        val key = "$FOOD_SPOTS_REPORT_LIMIT_PREFIX${user.id}:$today"
+        check(canGenerateReport(key, today)) {
+            throw TooManyReportRequestException()
+        }
+
+        TransactionSynchronizationManager.registerSynchronization(
+            ReportErrorCompensatingTxSync(key, redisTemplate),
+        )
+
         val foodSpots = foodSpotsRepository.getByFoodSpotsId(foodSpotsId)
 
         if (request.closed != null && request.closed && foodSpots.storeClosure) {
@@ -245,6 +278,28 @@ class FoodSpotsCommandService(
 
         val changed = foodSpotsOperationHoursToRemove.isNotEmpty() || foodSpotsOperationHoursToAdd.isNotEmpty()
         return changed
+    }
+
+    private fun canGenerateReport(
+        key: String,
+        today: LocalDate,
+    ): Boolean {
+        // redis 내에 존재하지 않을 시 1L 반환
+        val count = redisTemplate.opsForValue().increment(key)!!
+
+        if (count > FOOD_SPOTS_REPORT_LIMIT_COUNT) {
+            return false
+        }
+        if (count == 1L) {
+            val secondsUntilDue =
+                ChronoUnit.SECONDS
+                    .between(
+                        LocalDateTime.now(),
+                        LocalDateTime.of(today.plusDays(1), LocalTime.MIDNIGHT),
+                    )
+            redisTemplate.expire(key, secondsUntilDue, TimeUnit.SECONDS)
+        }
+        return true
     }
 
     @Transactional
