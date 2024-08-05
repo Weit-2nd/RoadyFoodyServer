@@ -12,6 +12,7 @@ import jakarta.validation.constraints.Size
 import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.common.exception.ErrorCode
+import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsDetailResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsReviewResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoryDetailResponse
@@ -192,4 +193,35 @@ interface FoodSportsControllerSpec {
         @RequestParam(defaultValue = "LATEST", required = false)
         sortType: ReviewSortType,
     ): SliceResponse<FoodSpotsReviewResponse>
+
+    @Operation(
+        description = "음식점 상세 조회 API",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "음식점 정보 조회 성공",
+                content = [
+                    Content(
+                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                        schema =
+                            Schema(
+                                implementation = FoodSpotsDetailResponse::class,
+                            ),
+                    ),
+                ],
+            ),
+        ],
+    )
+    @ApiErrorCodeExamples(
+        [
+            ErrorCode.NOT_FOUND_FOOD_SPOTS,
+            ErrorCode.FOOD_SPOT_ID_NON_POSITIVE,
+            ErrorCode.NOT_FOUND_FOOD_SPOTS_HISTORIES,
+        ],
+    )
+    fun getFoodSpotsDetail(
+        @PathVariable("foodSpotsId")
+        @Positive(message = "음식점 ID는 양수여야 합니다.")
+        foodSpotsId: Long,
+    ): FoodSpotsDetailResponse
 }
