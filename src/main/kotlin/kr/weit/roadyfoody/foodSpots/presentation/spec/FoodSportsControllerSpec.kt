@@ -89,6 +89,7 @@ interface FoodSportsControllerSpec {
             ErrorCode.NOT_FOUND_FOOD_CATEGORY,
             ErrorCode.INVALID_CHANGE_VALUE,
             ErrorCode.NON_POSITIVE_FOOD_SPOT_ID,
+            ErrorCode.FOOD_SPOTS_ALREADY_CLOSED,
         ],
     )
     fun updateFoodSpots(
