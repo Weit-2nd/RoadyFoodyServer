@@ -19,6 +19,7 @@ enum class ErrorCode(
     PAYLOAD_TOO_LARGE(HttpStatus.PAYLOAD_TOO_LARGE, -10008, "Payload too large"),
     NOT_FOUND_USER(HttpStatus.NOT_FOUND, -10009, "Not found user"),
     NOT_FOUND_TERM(HttpStatus.NOT_FOUND, -10010, "Not found term"),
+    TOO_MANY_REQUESTS(HttpStatus.TOO_MANY_REQUESTS, -10011, "Too many requests"),
     REDISSON_LOCK_TOO_MANY_REQUEST(HttpStatus.TOO_MANY_REQUESTS, -10012, "동시에 많은 요청이 발생했습니다. 잠시 후 다시 시도해주세요"),
     REDISSON_LOCK_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, -10013, "레디스 락을 사용할 수 없습니다."),
     BAD_REDISSON_IDENTIFIER(HttpStatus.INTERNAL_SERVER_ERROR, -10014, "레디스 락 식별자가 잘못되었습니다."),
