@@ -44,7 +44,7 @@ interface FoodSportsControllerSpec {
             ErrorCode.INVALID_IMAGE_TYPE,
             ErrorCode.IMAGES_SIZE_TOO_LARGE,
             ErrorCode.NOT_FOUND_FOOD_CATEGORY,
-            ErrorCode.TOO_MANY_REQUESTS,
+            ErrorCode.TOO_MANY_REPORT_REQUESTS,
         ],
     )
     fun createReport(
@@ -81,7 +81,7 @@ interface FoodSportsControllerSpec {
             ErrorCode.NOT_FOUND_FOOD_CATEGORY,
             ErrorCode.INVALID_CHANGE_VALUE,
             ErrorCode.NON_POSITIVE_FOOD_SPOT_ID,
-            ErrorCode.TOO_MANY_REQUESTS,
+            ErrorCode.TOO_MANY_REPORT_REQUESTS,
         ],
     )
     fun updateFoodSpots(
