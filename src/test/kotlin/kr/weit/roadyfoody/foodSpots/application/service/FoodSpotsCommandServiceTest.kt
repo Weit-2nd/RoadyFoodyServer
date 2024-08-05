@@ -20,6 +20,7 @@ import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsOperationHours
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
 import kr.weit.roadyfoody.foodSpots.domain.ReportFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHours
+import kr.weit.roadyfoody.foodSpots.exception.AlreadyClosedFoodSpotsException
 import kr.weit.roadyfoody.foodSpots.exception.CategoriesNotFoundException
 import kr.weit.roadyfoody.foodSpots.exception.NotFoodSpotsHistoriesOwnerException
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_HISTORY_ID
@@ -419,6 +420,23 @@ class FoodSpotsCommandServiceTest :
                                 createTestUser(),
                                 TEST_FOOD_SPOT_ID,
                                 noChangeRequest,
+                            )
+                        }
+                    }
+                }
+
+                `when`("이미 폐업한 음식점에 폐업 리포트를 작성한 경우") {
+                    val alreadyClosedFoodSpots = createMockTestFoodSpot(open = false, storeClosure = true)
+                    every { foodSpotsRepository.findById(any()) } returns Optional.of(alreadyClosedFoodSpots)
+
+                    val closeUpdateRequest = createTestFoodSpotsUpdateRequest().copy(open = false, closed = true)
+
+                    then("AlreadyClosedFoodSpotsException 이 발생해야 한다.") {
+                        shouldThrow<AlreadyClosedFoodSpotsException> {
+                            foodSpotsCommandService.doUpdateReport(
+                                createTestUser(),
+                                TEST_FOOD_SPOT_ID,
+                                closeUpdateRequest,
                             )
                         }
                     }
