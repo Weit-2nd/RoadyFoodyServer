@@ -88,6 +88,7 @@ enum class ErrorCode(
     NOT_FOUND_FOOD_CATEGORY(HttpStatus.NOT_FOUND, -13001, "해당 카테고리가 존재하지 않습니다."),
     NOT_FOUND_FOOD_SPOTS_HISTORIES(HttpStatus.NOT_FOUND, -13002, "해당 음식점 리포트가 존재하지 않습니다."),
     NOT_FOOD_SPOTS_HISTORIES_OWNER(HttpStatus.FORBIDDEN, -13003, "해당 음식점 리포트의 소유자가 아닙니다."),
+    FOOD_SPOTS_ALREADY_CLOSED(HttpStatus.CONFLICT, -13004, "이미 폐업 처리가 된 음식점입니다."),
 
     // Review API error 14000대
     FOOD_SPOT_ID_NON_POSITIVE(HttpStatus.BAD_REQUEST, -14000, "음식점 ID는 양수여야 합니다."),
