@@ -28,3 +28,10 @@ data class ReviewRequest(
         foodSpot: FoodSpots,
     ): FoodSpotsReview = FoodSpotsReview(id = 0L, foodSpot, user, rating, contents)
 }
+
+data class ReviewPhotoResponse(
+    @Schema(description = "리뷰 사진 ID", example = "1")
+    val id: Long,
+    @Schema(description = "리뷰 사진 URL")
+    val url: String,
+)

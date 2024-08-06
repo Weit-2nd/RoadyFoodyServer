@@ -15,11 +15,19 @@ enum class ErrorCode(
     NO_SUCH_ELEMENT(HttpStatus.NOT_FOUND, -10003, "No such element"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, -10004, "Internal server error"),
     EXIST_RESOURCE(HttpStatus.CONFLICT, -10005, "Exist resource"),
-    NOT_FOUND_DEFAULT_RESOURCE(HttpStatus.INTERNAL_SERVER_ERROR, -10007, "Not found default resource"),
+    NOT_FOUND_DEFAULT_RESOURCE(
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        -10007,
+        "Not found default resource",
+    ),
     PAYLOAD_TOO_LARGE(HttpStatus.PAYLOAD_TOO_LARGE, -10008, "Payload too large"),
     NOT_FOUND_USER(HttpStatus.NOT_FOUND, -10009, "Not found user"),
     NOT_FOUND_TERM(HttpStatus.NOT_FOUND, -10010, "Not found term"),
-    REDISSON_LOCK_TOO_MANY_REQUEST(HttpStatus.TOO_MANY_REQUESTS, -10012, "동시에 많은 요청이 발생했습니다. 잠시 후 다시 시도해주세요"),
+    REDISSON_LOCK_TOO_MANY_REQUEST(
+        HttpStatus.TOO_MANY_REQUESTS,
+        -10012,
+        "동시에 많은 요청이 발생했습니다. 잠시 후 다시 시도해주세요",
+    ),
     REDISSON_LOCK_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, -10013, "레디스 락을 사용할 수 없습니다."),
     BAD_REDISSON_IDENTIFIER(HttpStatus.INTERNAL_SERVER_ERROR, -10014, "레디스 락 식별자가 잘못되었습니다."),
 
@@ -36,12 +44,15 @@ enum class ErrorCode(
     INVALID_WEBP_IMAGE(HttpStatus.BAD_REQUEST, -10000, "webp 형식이 아닙니다."),
     MAX_FILE_SIZE_EXCEEDED(HttpStatus.BAD_REQUEST, -10000, "파일 사이즈가 초과하였습니다."),
 
+    // FORBIDDEN -10002로 코드 통일
+    COIN_NOT_ENOUGH(HttpStatus.FORBIDDEN, -10002, "코인이 부족합니다."),
+
     // Search API error 11000대
-    REST_CLIENT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, -11000, "외부 API 호출 중 에러 발생"),
-    RETRIES_EXCEEDED_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, -11001, "외부 API 호출 재시도 횟수 초과"),
-    SEARCH_KEYWORD_LENGTH(HttpStatus.BAD_REQUEST, -10000, "검색어는 1자 이상 60자 이하로 입력해주세요."),
-    RADIUS_SIZE_TOO_SMALL(HttpStatus.BAD_REQUEST, -10000, "검색 반경은 500m 이상 4000m 이하로 입력해주세요."),
-    COIN_NOT_ENOUGH(HttpStatus.BAD_REQUEST, -10000, "코인이 부족합니다."),
+    SEARCH_KEYWORD_LENGTH(HttpStatus.BAD_REQUEST, -11000, "검색어는 1자 이상 60자 이하로 입력해주세요."),
+    RADIUS_SIZE_TOO_SMALL(HttpStatus.BAD_REQUEST, -11000, "검색 반경은 500m 이상 4000m 이하로 입력해주세요."),
+    INVALID_POINT_TO_ADDRESS(HttpStatus.BAD_REQUEST, -11000, "좌표를 주소로 변환할 수 없습니다."),
+    REST_CLIENT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, -11001, "외부 API 호출 중 에러 발생"),
+    RETRIES_EXCEEDED_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, -11002, "외부 API 호출 재시도 횟수 초과"),
 
     // Auth API error 12000대
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, -12000, "유효하지 않은 토큰입니다."),
@@ -89,4 +100,7 @@ enum class ErrorCode(
     NOT_FOUND_FOOD_SPOTS(HttpStatus.NOT_FOUND, -14001, "해당 음식점이 존재하지 않습니다."),
     NOT_FOUND_FOOD_SPOTS_REVIEW(HttpStatus.NOT_FOUND, -14002, "해당 리뷰가 존재하지 않습니다."),
     NOT_FOOD_SPOTS_REVIEW_OWNER(HttpStatus.FORBIDDEN, -14003, "해당 리뷰의 소유자가 아닙니다."),
+
+    // User API error 15000대
+    USER_ID_NON_POSITIVE(HttpStatus.BAD_REQUEST, -15000, "유저 ID는 양수여야 합니다."),
 }

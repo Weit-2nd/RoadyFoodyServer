@@ -15,8 +15,10 @@ import kr.weit.roadyfoody.global.swagger.ApiErrorCodeExamples
 import kr.weit.roadyfoody.global.swagger.v1.SwaggerTag
 import kr.weit.roadyfoody.user.application.dto.UserInfoResponse
 import kr.weit.roadyfoody.user.application.dto.UserReportHistoriesResponse
+import kr.weit.roadyfoody.user.application.dto.UserReviewResponse
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.utils.SliceReportHistories
+import kr.weit.roadyfoody.user.utils.SliceUserReview
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestParam
@@ -103,4 +105,41 @@ interface UserControllerSpec {
         @RequestParam(required = false)
         lastId: Long?,
     ): SliceResponse<UserReportHistoriesResponse>
+
+    @Operation(
+        description = "유저의 리뷰 리스트 조회 API",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "리뷰 리스트 조회 성공",
+                content = [
+                    Content(
+                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                        schema =
+                            Schema(
+                                implementation = SliceUserReview::class,
+                            ),
+                    ),
+                ],
+            ),
+        ],
+    )
+    @ApiErrorCodeExamples(
+        [
+            ErrorCode.SIZE_NON_POSITIVE,
+            ErrorCode.LAST_ID_NON_POSITIVE,
+            ErrorCode.USER_ID_NON_POSITIVE,
+        ],
+    )
+    fun getUserReviews(
+        @PathVariable("userId")
+        @Positive(message = "유저 ID는 양수여야 합니다.")
+        userId: Long,
+        @Positive(message = "조회할 개수는 양수여야 합니다.")
+        @RequestParam(defaultValue = "10", required = false)
+        size: Int,
+        @Positive(message = "마지막 ID는 양수여야 합니다.")
+        @RequestParam(required = false)
+        lastId: Long?,
+    ): SliceResponse<UserReviewResponse>
 }

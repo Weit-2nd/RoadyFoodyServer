@@ -7,7 +7,7 @@ import kotlin.reflect.KClass
 
 @Min(-90, message = "위도는 -90 이상이어야 합니다.")
 @Max(90, message = "위도는 90 이하여야 합니다.")
-@Target(AnnotationTarget.FIELD)
+@Target(AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
 @Constraint(validatedBy = [])
 annotation class Latitude(
