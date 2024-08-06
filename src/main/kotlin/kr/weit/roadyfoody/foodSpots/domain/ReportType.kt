@@ -1,9 +1,9 @@
 package kr.weit.roadyfoody.foodSpots.domain
 
 enum class ReportType(
-    val rewardPoint: Int,
+    val reportReward: ReportReward,
 ) {
-    STORE_CREATE(200),
-    STORE_UPDATE(100),
-    STORE_CLOSE(150),
+    STORE_CREATE(ReportReward.CREATE_REWARD),
+    STORE_UPDATE(ReportReward.UPDATE_REWARD),
+    STORE_CLOSE(ReportReward.CLOSE_REWARD),
 }
