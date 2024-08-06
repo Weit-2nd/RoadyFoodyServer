@@ -88,13 +88,15 @@ class FoodSpotsCommandServiceIntegrationTest(
                             val jobs =
                                 List(10) {
                                     launch {
-                                        runCatching {
+                                        try {
                                             foodSpotsCommandService.createReport(
                                                 user,
                                                 createTestReportRequest(),
                                                 null,
                                             )
-                                        }.onFailure { exceptions.add(it) }
+                                        } catch (ex: Throwable) {
+                                            exceptions.add(ex)
+                                        }
                                     }
                                 }
                             jobs.joinAll()
