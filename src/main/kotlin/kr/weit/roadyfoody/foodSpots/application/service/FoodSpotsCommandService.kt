@@ -90,7 +90,7 @@ class FoodSpotsCommandService(
 
         entityManager.flush()
 
-        userCommandService.increaseCoin(user.id, foodSpotsHistory.reportType.rewardPoint)
+        userCommandService.increaseCoin(user.id, foodSpotsHistory.reportType.reportReward.point)
 
         generatorPhotoNameMap
             .map {
@@ -153,7 +153,7 @@ class FoodSpotsCommandService(
 
         entityManager.flush()
 
-        userCommandService.increaseCoin(user.id, foodSpotsHistory.reportType.rewardPoint)
+        userCommandService.increaseCoin(user.id, foodSpotsHistory.reportType.reportReward.point)
     }
 
     private fun storeReport(
@@ -300,7 +300,7 @@ class FoodSpotsCommandService(
 
         entityManager.flush()
 
-        userCommandService.decreaseCoin(user.id, foodSpotsHistory.reportType.rewardPoint)
+        userCommandService.decreaseCoin(user.id, foodSpotsHistory.reportType.reportReward.point)
 
         photos
             .map {
