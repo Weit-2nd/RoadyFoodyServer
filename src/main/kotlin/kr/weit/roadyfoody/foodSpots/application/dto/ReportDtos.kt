@@ -15,6 +15,7 @@ import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsOperationHours
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
 import kr.weit.roadyfoody.foodSpots.domain.ReportFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHours
+import kr.weit.roadyfoody.foodSpots.domain.ReportType
 import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_REGEX_DESC
 import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_REGEX_STR
 import kr.weit.roadyfoody.foodSpots.utils.OPERATION_HOURS_REGEX_DESC
@@ -83,6 +84,7 @@ data class ReportRequest(
         foodSpots = foodSpots,
         user = user,
         point = createCoordinate(longitude, latitude),
+        reportType = ReportType.STORE_CREATE,
         foodTruck = foodTruck,
         open = open,
         storeClosure = closed,
@@ -160,6 +162,7 @@ data class FoodSpotsUpdateRequest(
         foodSpots = foodSpots,
         user = user,
         point = if (longitude != null && latitude != null) createCoordinate(longitude, latitude) else foodSpots.point,
+        reportType = if (closed != null && closed) ReportType.STORE_CLOSE else ReportType.STORE_UPDATE,
         foodTruck = foodSpots.foodTruck,
         open = open ?: foodSpots.open,
         storeClosure = closed ?: foodSpots.storeClosure,
