@@ -88,15 +88,13 @@ class FoodSpotsCommandServiceIntegrationTest(
                             val jobs =
                                 List(10) {
                                     launch {
-                                        try {
+                                        runCatching {
                                             foodSpotsCommandService.createReport(
                                                 user,
-                                                createTestReportRequest(foodCategories = categories.map { it.id }.toSet()),
+                                                createTestReportRequest(),
                                                 null,
                                             )
-                                        } catch (e: Throwable) {
-                                            exceptions.add(e)
-                                        }
+                                        }.onFailure { exceptions.add(it) }
                                     }
                                 }
                             jobs.joinAll()
@@ -115,13 +113,12 @@ class FoodSpotsCommandServiceIntegrationTest(
                     every { redisTemplate.opsForValue() } returns ops
                     then("그 값만큼 감소한다.") {
                         repeat(5) {
-                            try {
+                            runCatching {
                                 foodSpotsCommandService.createReport(
                                     user,
                                     createTestReportRequest(foodCategories = categories.map { it.id }.toSet()),
                                     null,
                                 )
-                            } catch (ignored: Throwable) {
                             }
                         }
                         verify(exactly = 5) { ops.decrement(any()) }

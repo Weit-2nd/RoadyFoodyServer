@@ -42,10 +42,10 @@ import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.temporal.ChronoUnit
+import java.time.ZoneId
+import java.util.Date
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutorService
-import java.util.concurrent.TimeUnit
 
 @Service
 class FoodSpotsCommandService(
@@ -71,6 +71,8 @@ class FoodSpotsCommandService(
 
         private const val FOOD_SPOTS_REPORT_LIMIT_PREFIX = "rofo:report-request-limit:"
         private const val FOOD_SPOTS_REPORT_LIMIT_COUNT = 5
+
+        fun getFoodSpotsReportCountKey(userId: Long) = "$FOOD_SPOTS_REPORT_LIMIT_PREFIX$userId"
     }
 
     @Transactional
@@ -79,9 +81,8 @@ class FoodSpotsCommandService(
         reportRequest: ReportRequest,
         photos: List<MultipartFile>?,
     ) {
-        val today = LocalDate.now()
-        val key = "$FOOD_SPOTS_REPORT_LIMIT_PREFIX${user.id}:$today"
-        check(canGenerateReport(key, today)) {
+        val key = getFoodSpotsReportCountKey(user.id)
+        check(canGenerateReport(key)) {
             throw TooManyReportRequestException()
         }
 
@@ -145,9 +146,8 @@ class FoodSpotsCommandService(
         foodSpotsId: Long,
         request: FoodSpotsUpdateRequest,
     ) {
-        val today = LocalDate.now()
-        val key = "$FOOD_SPOTS_REPORT_LIMIT_PREFIX${user.id}:$today"
-        check(canGenerateReport(key, today)) {
+        val key = getFoodSpotsReportCountKey(user.id)
+        check(canGenerateReport(key)) {
             throw TooManyReportRequestException()
         }
 
@@ -280,10 +280,7 @@ class FoodSpotsCommandService(
         return changed
     }
 
-    private fun canGenerateReport(
-        key: String,
-        today: LocalDate,
-    ): Boolean {
+    private fun canGenerateReport(key: String): Boolean {
         // redis 내에 존재하지 않을 시 1L 반환
         val count = redisTemplate.opsForValue().increment(key)!!
 
@@ -291,13 +288,9 @@ class FoodSpotsCommandService(
             return false
         }
         if (count == 1L) {
-            val secondsUntilDue =
-                ChronoUnit.SECONDS
-                    .between(
-                        LocalDateTime.now(),
-                        LocalDateTime.of(today.plusDays(1), LocalTime.MIDNIGHT),
-                    )
-            redisTemplate.expire(key, secondsUntilDue, TimeUnit.SECONDS)
+            val tomorrowMidnight = LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.MIDNIGHT)
+            val expirationDate = Date.from(tomorrowMidnight.atZone(ZoneId.systemDefault()).toInstant())
+            redisTemplate.expireAt(key, expirationDate)
         }
         return true
     }
