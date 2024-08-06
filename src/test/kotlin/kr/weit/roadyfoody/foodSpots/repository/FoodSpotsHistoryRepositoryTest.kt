@@ -24,12 +24,14 @@ class FoodSpotsHistoryRepositoryTest(
         lateinit var otherUser: User
         lateinit var foodSpots: FoodSpots
         lateinit var otherFoodSpots: FoodSpots
+        lateinit var notExistFoodSpots: FoodSpots
         lateinit var foodSpotsHistories: List<FoodSpotsHistory>
         beforeEach {
             user = userRepository.save(createTestUser(0L))
             otherUser = userRepository.save(createTestUser(0L, nickname = "otherUser"))
             foodSpots = foodSpotsRepository.save(createTestFoodSpots())
             otherFoodSpots = foodSpotsRepository.save(createTestFoodSpots())
+            notExistFoodSpots = foodSpotsRepository.save(createTestFoodSpots())
             foodSpotsHistories =
                 foodSpotsHistoryRepository.saveAll(
                     listOf(
@@ -89,6 +91,23 @@ class FoodSpotsHistoryRepositoryTest(
                     shouldThrow<FoodSpotsHistoryNotFoundException> {
                         foodSpotsHistoryRepository.getByHistoryId(0L)
                     }
+                }
+            }
+        }
+
+        describe("getByFoodSpots 메소드는") {
+            context("존재하는 FoodSpots 를 받는 경우") {
+                it("해당 FoodSpots 에 대한 FoodSpotsHistory 리스트를 반환한다.") {
+                    val histories = foodSpotsHistoryRepository.getByFoodSpots(foodSpots)
+                    histories.size shouldBe 1
+                    histories[0].foodSpots shouldBe foodSpots
+                }
+            }
+
+            context("존재하지 않는 FoodSpots 를 받는 경우") {
+                it("빈 리스트를 반환한다.") {
+                    val histories = foodSpotsHistoryRepository.getByFoodSpots(notExistFoodSpots)
+                    histories shouldBe emptyList()
                 }
             }
         }

@@ -19,6 +19,7 @@ import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_HISTORY_ID
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_PHOTO_URL
 import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodHistory
 import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodSpotList
+import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodHistory
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsForDistance
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsPhoto
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportFoodCategory
@@ -28,10 +29,12 @@ import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsPhotoRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportOperationHoursRepository
+import kr.weit.roadyfoody.foodSpots.repository.getByFoodSpotsId
 import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
 import kr.weit.roadyfoody.global.TEST_LAST_ID
 import kr.weit.roadyfoody.global.TEST_PAGE_SIZE
 import kr.weit.roadyfoody.global.service.ImageService
+import kr.weit.roadyfoody.review.exception.FoodSpotsNotFoundException
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewPhotoRepository
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
 import kr.weit.roadyfoody.review.repository.ReviewSortType
@@ -269,6 +272,37 @@ class FoodSpotsQueryServiceTest :
                             reviewPhotoRepository.getByReview(any())
                         }
                         verify(exactly = 2) { imageService.getDownloadUrl(any()) }
+                    }
+                }
+            }
+
+            given("getFoodSpotsDetail 테스트") {
+                every { foodSpotsRepository.getByFoodSpotsId(any()) } returns MockTestFoodSpot()
+                every { foodSpotsHistoryRepository.findByFoodSpots(any()) } returns
+                    listOf(
+                        createTestFoodHistory(),
+                    )
+                every { foodSpotsPhotoRepository.findByHistoryIn(any()) } returns
+                    listOf(createTestFoodSpotsPhoto())
+                every { imageService.getDownloadUrl(any()) } returns TEST_FOOD_SPOTS_PHOTO_URL
+                `when`("정상적인 데이터가 들어올 경우") {
+                    then("정상적으로 음식점 상세가 조회되어야 한다.") {
+                        foodSPotsQueryService.getFoodSpotsDetail(TEST_FOOD_SPOT_ID)
+                        verify(exactly = 1) {
+                            foodSpotsRepository.getByFoodSpotsId(any())
+                            foodSpotsHistoryRepository.findByFoodSpots(any())
+                            foodSpotsPhotoRepository.findByHistoryIn(any())
+                            imageService.getDownloadUrl(any())
+                        }
+                    }
+                }
+
+                `when`("해당 음식점이 존재하지 않는 경우") {
+                    every { foodSpotsRepository.findById(any()) } returns Optional.empty()
+                    then("FoodSpotsNotFoundException 이 발생한다.") {
+                        shouldThrow<FoodSpotsNotFoundException> {
+                            foodSPotsQueryService.getFoodSpotsDetail(TEST_FOOD_SPOT_ID)
+                        }
                     }
                 }
             }

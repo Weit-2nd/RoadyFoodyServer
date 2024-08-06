@@ -1,6 +1,7 @@
 package kr.weit.roadyfoody.foodSpots.application.service
 
 import kr.weit.roadyfoody.common.dto.SliceResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsDetailResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsReviewResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportCategoryResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoryDetailResponse
@@ -13,6 +14,8 @@ import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsPhotoRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportOperationHoursRepository
+import kr.weit.roadyfoody.foodSpots.repository.getByFoodSpots
+import kr.weit.roadyfoody.foodSpots.repository.getByFoodSpotsId
 import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.review.application.dto.ReviewPhotoResponse
@@ -121,6 +124,18 @@ class FoodSpotsQueryService(
             }
         return SliceResponse(response)
     }
+
+    @Transactional(readOnly = true)
+    fun getFoodSpotsDetail(foodSpotsId: Long): FoodSpotsDetailResponse =
+        foodSpotsRepository.getByFoodSpotsId(foodSpotsId).let { foodSpots ->
+            val foodSpotsPhotos =
+                foodSpotsHistoryRepository.getByFoodSpots(foodSpots).let {
+                    foodSpotsPhotoRepository.findByHistoryIn(it).map { photo ->
+                        ReportPhotoResponse(photo, imageService.getDownloadUrl(photo.fileName))
+                    }
+                }
+            FoodSpotsDetailResponse(foodSpots, determineOpenStatus(foodSpots), foodSpotsPhotos)
+        }
 
     private fun determineOpenStatus(foodSpot: FoodSpots): OperationStatus {
         val today = LocalDate.now()

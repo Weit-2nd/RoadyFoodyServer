@@ -31,7 +31,7 @@ data class Address(
 )
 
 data class Point2AddressData(
-    @JsonProperty("road_address") val roadAddress: RoadAddress,
+    @JsonProperty("road_address") val roadAddress: RoadAddress?,
     @JsonProperty("address") val address: Address,
 )
 

@@ -60,6 +60,8 @@ import kr.weit.roadyfoody.user.fixture.TEST_USER_ID
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import kr.weit.roadyfoody.user.repository.UserRepository
 import org.redisson.api.RedissonClient
+import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.transaction.support.TransactionSynchronizationManager
 import java.util.Optional
 import java.util.concurrent.ExecutorService
 
@@ -80,6 +82,7 @@ class FoodSpotsCommandServiceTest :
             val userCommandService = mockk<UserCommandService>()
             val entityManager = mockk<EntityManager>()
             val redissonClient = mockk<RedissonClient>()
+            val redisTemplate = mockk<RedisTemplate<String, String>>()
             val foodSpotsCommandService =
                 FoodSpotsCommandService(
                     foodSpotsRepository,
@@ -95,10 +98,13 @@ class FoodSpotsCommandServiceTest :
                     userCommandService,
                     entityManager,
                     redissonClient,
+                    redisTemplate,
                 )
             val user = createTestUser()
 
             given("createReport 테스트") {
+                TransactionSynchronizationManager.initSynchronization()
+                every { redisTemplate.opsForValue().increment(any()) } returns 2 // 1 일 시 redisTemplate expire 를 호출합니다.
                 every { foodSpotsRepository.save(any()) } returns createMockTestFoodSpot()
                 every { foodSpotsHistoryRepository.save(any()) } returns createMockTestFoodHistory()
                 every { userRepository.findById(TEST_USER_ID) } returns Optional.of(user)
@@ -155,9 +161,12 @@ class FoodSpotsCommandServiceTest :
                         }
                     }
                 }
+                TransactionSynchronizationManager.clearSynchronization()
             }
 
             given("doUpdateReport 테스트") {
+                TransactionSynchronizationManager.initSynchronization()
+                every { redisTemplate.opsForValue().increment(any()) } returns 2 // 1 일 시 redisTemplate expire 를 호출합니다.
                 every { foodSpotsCategoryRepository.deleteAll(any<List<FoodSpotsFoodCategory>>()) } just runs
                 every { foodCategoryRepository.findFoodCategoryByIdIn(any()) } returns createTestFoodCategories()
                 every { foodSpotsCategoryRepository.saveAll(any<List<FoodSpotsFoodCategory>>()) } returns
@@ -401,6 +410,7 @@ class FoodSpotsCommandServiceTest :
                         }
                     }
                 }
+                TransactionSynchronizationManager.clearSynchronization()
             }
 
             given("deleteWithdrawUserReport 테스트") {
