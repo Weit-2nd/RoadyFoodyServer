@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RequestPart
@@ -53,7 +52,7 @@ class FoodSpotsController(
     ) = foodSpotsCommandService.createReport(user, reportRequest, reportPhotos)
 
     @ResponseStatus(CREATED)
-    @PatchMapping("/{foodSpotsId}")
+    @PatchMapping("/{foodSpotsId}", consumes = [MULTIPART_FORM_DATA_VALUE])
     override fun updateFoodSpots(
         @LoginUser
         user: User,
@@ -61,10 +60,14 @@ class FoodSpotsController(
         @PathVariable("foodSpotsId")
         foodSpotsId: Long,
         @Valid
-        @RequestBody
-        request: FoodSpotsUpdateRequest,
+        @RequestPart(required = false)
+        request: FoodSpotsUpdateRequest?,
+        @Size(max = 3, message = "이미지는 최대 3개까지 업로드할 수 있습니다.")
+        @WebPImageList
+        @RequestPart(required = false)
+        reportPhotos: List<MultipartFile>?,
     ) {
-        foodSpotsCommandService.doUpdateReport(user, foodSpotsId, request)
+        foodSpotsCommandService.doUpdateReport(user, foodSpotsId, request, reportPhotos)
     }
 
     @ResponseStatus(NO_CONTENT)
