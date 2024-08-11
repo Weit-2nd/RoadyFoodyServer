@@ -78,6 +78,7 @@ const val TEST_FOOD_SPOTS_HISTORY_ID = 1L
 const val TEST_INVALID_FOOD_SPOTS_HISTORY_ID = -1L
 const val TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME = "request"
 const val TEST_FOOD_SPOTS_UPDATE_REQUEST_PHOTO = "reportPhotos"
+const val TEST_REST_DAILY_REPORT_CREATION_COUNT = 5
 
 fun createMockTestFoodSpot(
     id: Long = 0L,
