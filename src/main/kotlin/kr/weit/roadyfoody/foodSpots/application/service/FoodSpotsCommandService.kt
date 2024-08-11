@@ -82,7 +82,7 @@ class FoodSpotsCommandService(
         photos: List<MultipartFile>?,
     ) {
         val key = getFoodSpotsReportCountKey(user.id)
-        check(incrementAndCheckReport(key)) {
+        check(incrementAndCheckReportCount(key)) {
             throw TooManyReportRequestException()
         }
 
@@ -144,7 +144,7 @@ class FoodSpotsCommandService(
         reportPhotos: List<MultipartFile>?,
     ) {
         val key = getFoodSpotsReportCountKey(user.id)
-        check(incrementAndCheckReport(key)) {
+        check(incrementAndCheckReportCount(key)) {
             throw TooManyReportRequestException()
         }
 
@@ -307,7 +307,7 @@ class FoodSpotsCommandService(
         return changed
     }
 
-    private fun incrementAndCheckReport(key: String): Boolean {
+    private fun incrementAndCheckReportCount(key: String): Boolean {
         // redis 내에 존재하지 않을 시 1L 반환
         val count = redisTemplate.opsForValue().increment(key)!!
 
