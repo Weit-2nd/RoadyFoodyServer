@@ -55,6 +55,10 @@ class User(
         this.coin += plusCoin
         return this.coin
     }
+
+    fun changeNickname(nickname: String) {
+        profile = profile.copy(nickname = nickname)
+    }
 }
 
 @Embeddable
@@ -64,7 +68,9 @@ class Profile(
     @Column(length = 50)
     var profileImageName: String? = null,
 ) {
-    fun changeProfileImageName(profileImageName: String) {
+    fun changeProfileImageName(profileImageName: String? = null) {
         this.profileImageName = profileImageName
     }
+
+    fun copy(nickname: String): Profile = Profile(nickname, this.profileImageName)
 }

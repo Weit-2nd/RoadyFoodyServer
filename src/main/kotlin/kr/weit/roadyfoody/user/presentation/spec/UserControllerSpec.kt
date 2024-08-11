@@ -7,13 +7,18 @@ import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import jakarta.validation.constraints.Positive
+import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.ErrorResponse
 import kr.weit.roadyfoody.global.swagger.ApiErrorCodeExamples
 import kr.weit.roadyfoody.global.swagger.v1.SwaggerTag
+import kr.weit.roadyfoody.global.validator.MaxFileSize
+import kr.weit.roadyfoody.global.validator.WebPImage
 import kr.weit.roadyfoody.user.application.dto.UserInfoResponse
+import kr.weit.roadyfoody.user.application.dto.UserNicknameRequest
 import kr.weit.roadyfoody.user.application.dto.UserReportHistoriesResponse
 import kr.weit.roadyfoody.user.application.dto.UserReviewResponse
 import kr.weit.roadyfoody.user.domain.User
@@ -21,7 +26,10 @@ import kr.weit.roadyfoody.user.utils.SliceReportHistories
 import kr.weit.roadyfoody.user.utils.SliceUserReview
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RequestPart
+import org.springframework.web.multipart.MultipartFile
 
 @Tag(name = SwaggerTag.USER)
 interface UserControllerSpec {
@@ -142,4 +150,69 @@ interface UserControllerSpec {
         @RequestParam(required = false)
         lastId: Long?,
     ): SliceResponse<UserReviewResponse>
+
+    @Operation(
+        description = "유저의 닉네임 변경 API",
+        responses = [
+            ApiResponse(
+                responseCode = "204",
+                description = "닉네임 변경 성공",
+            ),
+        ],
+    )
+    @ApiErrorCodeExamples(
+        [
+            ErrorCode.NICKNAME_ALREADY_EXISTS,
+            ErrorCode.INVALID_NICKNAME,
+        ],
+    )
+    fun updateNickname(
+        @LoginUser
+        user: User,
+        @RequestBody
+        @Valid
+        userNicknameRequest: UserNicknameRequest,
+    )
+
+    @Operation(
+        description = "유저의 프로필 이미지 변경 API",
+        responses = [
+            ApiResponse(
+                responseCode = "204",
+                description = "프로필 이미지 변경 성공",
+            ),
+        ],
+    )
+    @ApiErrorCodeExamples(
+        [
+            ErrorCode.INVALID_WEBP_IMAGE,
+            ErrorCode.MAX_FILE_SIZE_EXCEEDED,
+        ],
+    )
+    fun updateProfile(
+        @LoginUser
+        user: User,
+        @RequestPart
+        @MaxFileSize
+        @WebPImage
+        profileImage: MultipartFile,
+    )
+
+    @Operation(
+        description = "유저의 프로필 이미지 삭제 API",
+        responses = [
+            ApiResponse(
+                responseCode = "204",
+                description = "프로필 이미지 삭제 성공",
+            ),
+        ],
+    )
+    @ApiErrorCodeExamples(
+        [
+            ErrorCode.PROFILE_IMAGE_NOT_EXISTS,
+        ],
+    )
+    fun deleteProfile(
+        @LoginUser user: User,
+    )
 }
