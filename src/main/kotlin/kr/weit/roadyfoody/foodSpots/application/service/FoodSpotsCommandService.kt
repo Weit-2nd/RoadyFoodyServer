@@ -214,19 +214,20 @@ class FoodSpotsCommandService(
 
         userCommandService.increaseCoin(user.id, foodSpotsHistory.reportType.reportReward.point)
 
-        generatorPhotoNameMap
-            .map {
-                CompletableFuture.supplyAsync({
-                    imageService.upload(it.key, it.value)
-                }, executor)
-            }.forEach { it.join() }
-
-        photosToRemove
-            .map {
-                CompletableFuture.supplyAsync({
-                    imageService.remove(it.fileName)
-                }, executor)
-            }.forEach { it.join() }
+        (
+            generatorPhotoNameMap
+                .map {
+                    CompletableFuture.supplyAsync({
+                        imageService.upload(it.key, it.value)
+                    }, executor)
+                } +
+                photosToRemove
+                    .map {
+                        CompletableFuture.supplyAsync({
+                            imageService.remove(it.fileName)
+                        }, executor)
+                    }
+        ).forEach { it.join() }
     }
 
     private fun isNotPhotosBelongingToFoodSpots(
