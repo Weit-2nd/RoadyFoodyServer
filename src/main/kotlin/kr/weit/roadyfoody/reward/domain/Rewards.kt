@@ -10,8 +10,8 @@ import jakarta.persistence.Index
 @Table(
     name = "rewards",
     indexes = [
-        Index(name = "idx_user", columnList = "user_id"),
-        Index(name = "idx_food_spots_history", columnList = "food_spots_history_id")
+        Index(name = "rewards_user_id_index", columnList = "user_id"),
+        Index(name = "rewards_food_spots_history_id_index", columnList = "food_spots_history_id")
     ]
 )
 @SequenceGenerator(
@@ -30,11 +30,11 @@ class Rewards(
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = true)
     val foodSpotsHistory: FoodSpotsHistory,
-    @Column(nullable = false, length = 3)
+    @Column(nullable = false)
     val rewardPoint: Int,
     @Column(nullable = false)
     val rewardType: Boolean,
-    @Column
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     val rewardReason: RewardReason,
 

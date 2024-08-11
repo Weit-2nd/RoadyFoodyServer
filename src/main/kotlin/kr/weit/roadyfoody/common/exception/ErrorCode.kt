@@ -90,6 +90,7 @@ enum class ErrorCode(
     NOT_FOOD_SPOTS_HISTORIES_OWNER(HttpStatus.FORBIDDEN, -13003, "해당 음식점 리포트의 소유자가 아닙니다."),
     FOOD_SPOTS_ALREADY_CLOSED(HttpStatus.CONFLICT, -13004, "이미 폐업 처리가 된 음식점입니다."),
     TOO_MANY_REPORT_REQUESTS(HttpStatus.TOO_MANY_REQUESTS, -13005, "일일 리포트 생성 횟수를 초과하였습니다."),
+    UNAUTHORIZED_PHOTO_REMOVE(HttpStatus.FORBIDDEN, -13006, "사진을 삭제할 권한이 없습니다."),
 
     // Review API error 14000대
     FOOD_SPOT_ID_NON_POSITIVE(HttpStatus.BAD_REQUEST, -14000, "음식점 ID는 양수여야 합니다."),
@@ -104,4 +105,6 @@ enum class ErrorCode(
 
     // User API error 15000대
     USER_ID_NON_POSITIVE(HttpStatus.BAD_REQUEST, -15000, "유저 ID는 양수여야 합니다."),
+    NICKNAME_ALREADY_EXISTS(HttpStatus.CONFLICT, -15001, "이미 사용중인 닉네임입니다."),
+    PROFILE_IMAGE_NOT_EXISTS(HttpStatus.NOT_FOUND, -15002, "프로필 이미지가 존재하지 않습니다."),
 }

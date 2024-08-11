@@ -93,6 +93,10 @@ interface FoodSportsControllerSpec {
             ErrorCode.NON_POSITIVE_FOOD_SPOT_ID,
             ErrorCode.FOOD_SPOTS_ALREADY_CLOSED,
             ErrorCode.TOO_MANY_REPORT_REQUESTS,
+            ErrorCode.IMAGES_TOO_MANY,
+            ErrorCode.INVALID_IMAGE_TYPE,
+            ErrorCode.IMAGES_SIZE_TOO_LARGE,
+            ErrorCode.UNAUTHORIZED_PHOTO_REMOVE,
         ],
     )
     fun updateFoodSpots(
@@ -101,7 +105,10 @@ interface FoodSportsControllerSpec {
         @Parameter(description = "음식점 ID", required = true, example = "1")
         foodSpotsId: Long,
         @Valid
-        request: FoodSpotsUpdateRequest,
+        request: FoodSpotsUpdateRequest?,
+        @Size(max = 3, message = "이미지는 최대 3개까지 업로드할 수 있습니다.")
+        @WebPImageList
+        reportPhotos: List<MultipartFile>?,
     )
 
     @Operation(

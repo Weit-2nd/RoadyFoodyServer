@@ -1,5 +1,6 @@
 package kr.weit.roadyfoody.user.fixture
 
+import kr.weit.roadyfoody.user.application.dto.UserNicknameRequest
 import kr.weit.roadyfoody.user.domain.Profile
 import kr.weit.roadyfoody.user.domain.SocialLoginType
 import kr.weit.roadyfoody.user.domain.User
@@ -36,6 +37,8 @@ fun createTestUser(
 )
 
 fun createTestUsers(size: Int = 5) = List(size) { createTestUser(it.toLong() + 1) }
+
+fun createTestUserNicknameRequest(nickname: String = TEST_USER_NICKNAME) = UserNicknameRequest(nickname)
 
 // fail case
 const val TEST_NONEXISTENT_ID = 0L
