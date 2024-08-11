@@ -133,14 +133,16 @@ fun createTestFoodHistory(
     foodCategories: List<ReportFoodCategory> = listOf(),
 ) = FoodSpotsHistory(id, foodSpots, user, name, foodTruck, open, storeClosure, point, reportType, operationHours, foodCategories)
 
-fun createTestFoodSpotsPhoto(foodSpotsHistory: FoodSpotsHistory = createTestFoodHistory()) =
-    FoodSpotsPhoto(0L, foodSpotsHistory, TEST_PHOTO_NAME)
+fun createTestFoodSpotsPhoto(
+    foodSpotsHistory: FoodSpotsHistory = createTestFoodHistory(),
+    id: Long = 0L,
+) = FoodSpotsPhoto(id, foodSpotsHistory, TEST_PHOTO_NAME)
 
 fun createTestFoodSpotsPhotos(
     size: Int = 2,
     foodSpotsHistory: FoodSpotsHistory = createTestFoodHistory(),
-) = List(size) {
-    createTestFoodSpotsPhoto(foodSpotsHistory)
+) = List(size) { id ->
+    createTestFoodSpotsPhoto(foodSpotsHistory, id + 1L)
 }
 
 fun createTestReportRequest(

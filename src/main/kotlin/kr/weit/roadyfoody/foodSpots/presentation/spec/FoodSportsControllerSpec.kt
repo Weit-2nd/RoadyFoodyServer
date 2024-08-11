@@ -96,6 +96,7 @@ interface FoodSportsControllerSpec {
             ErrorCode.IMAGES_TOO_MANY,
             ErrorCode.INVALID_IMAGE_TYPE,
             ErrorCode.IMAGES_SIZE_TOO_LARGE,
+            ErrorCode.UNAUTHORIZED_PHOTO_REMOVE,
         ],
     )
     fun updateFoodSpots(

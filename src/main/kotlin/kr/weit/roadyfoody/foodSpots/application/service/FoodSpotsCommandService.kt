@@ -16,6 +16,7 @@ import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHours
 import kr.weit.roadyfoody.foodSpots.exception.AlreadyClosedFoodSpotsException
 import kr.weit.roadyfoody.foodSpots.exception.NotFoodSpotsHistoriesOwnerException
 import kr.weit.roadyfoody.foodSpots.exception.TooManyReportRequestException
+import kr.weit.roadyfoody.foodSpots.exception.UnauthorizedPhotoRemoveException
 import kr.weit.roadyfoody.foodSpots.repository.FoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSportsOperationHoursRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsFoodCategoryRepository
@@ -190,12 +191,16 @@ class FoodSpotsCommandService(
                 FoodSpotsPhoto.of(foodSpotsHistory, it.key)
             }.also { foodSpotsPhotoRepository.saveAll(it) }
 
-        val photosToRemove =
-            request?.photoIdsToRemove?.let {
-                foodSpotsPhotoRepository.findAllById(request.photoIdsToRemove).also {
-                    foodSpotsPhotoRepository.deleteAll(it)
-                }
-            } ?: emptyList()
+        val requestedPhotoIdsToRemove = request?.photoIdsToRemove ?: emptyList()
+        val photosToRemove = foodSpotsPhotoRepository.findAllById(requestedPhotoIdsToRemove)
+
+        if (requestedPhotoIdsToRemove.size != photosToRemove.size ||
+            isNotPhotosBelongingToFoodSpots(foodSpots.id, photosToRemove)
+        ) {
+            throw UnauthorizedPhotoRemoveException()
+        }
+
+        foodSpotsPhotoRepository.deleteAll(photosToRemove)
 
         entityManager.flush()
 
@@ -215,6 +220,11 @@ class FoodSpotsCommandService(
                 }, executor)
             }.forEach { it.join() }
     }
+
+    private fun isNotPhotosBelongingToFoodSpots(
+        foodSpotsId: Long,
+        photosToRemove: List<FoodSpotsPhoto>,
+    ): Boolean = photosToRemove.any { it.history.foodSpots.id != foodSpotsId }
 
     private fun storeReport(
         foodStoreHistory: FoodSpotsHistory,
