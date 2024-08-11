@@ -1,5 +1,6 @@
 package kr.weit.roadyfoody.support.utils
 
+import org.springframework.http.HttpMethod
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
@@ -21,6 +22,8 @@ fun postWithAuth(url: String) = post(url).withAuth()
 fun multipartWithAuth(url: String) = multipart(url).apply { header("userid", 1) }
 
 fun patchWithAuth(url: String) = patch(url).withAuth()
+
+fun multipartPatchWithAuth(url: String) = multipart(HttpMethod.PATCH, url).apply { header("userid", 1) }
 
 fun putWithAuth(url: String) = put(url).withAuth()
 
