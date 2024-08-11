@@ -63,7 +63,7 @@ class User(
 
 @Embeddable
 class Profile(
-    @Column(length = 48, updatable = false, nullable = false, unique = true)
+    @Column(length = 48, nullable = false, unique = true)
     val nickname: String,
     @Column(length = 50)
     var profileImageName: String? = null,
