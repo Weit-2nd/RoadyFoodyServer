@@ -5,17 +5,23 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import kr.weit.roadyfoody.auth.fixture.PROFILE_IMAGE_FILE_NAME
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
+import kr.weit.roadyfoody.global.service.ImageService
+import kr.weit.roadyfoody.user.fixture.TEST_MAX_LENGTH_NICKNAME
 import kr.weit.roadyfoody.user.fixture.TEST_USER_ID
+import kr.weit.roadyfoody.user.fixture.TEST_USER_PROFILE_IMAGE_NAME
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import kr.weit.roadyfoody.user.repository.UserRepository
+import org.springframework.web.multipart.MultipartFile
 import java.util.Optional
 
 class UserCommandServiceTest :
     BehaviorSpec({
         val userRepository = mockk<UserRepository>()
-        val userCommandService = UserCommandService(userRepository)
+        val imageService = mockk<ImageService>()
+        val userCommandService = UserCommandService(userRepository, imageService)
         val user = createTestUser()
 
         given("decreaseCoin 테스트") {
@@ -50,6 +56,84 @@ class UserCommandServiceTest :
                 userCommandService.increaseCoin(user.id, plusCoin)
                 then("코인이 증가한다.") {
                     user.coin shouldBe expectedCoin
+                }
+            }
+        }
+
+        given("updateNickname 테스트") {
+            val nickname = TEST_MAX_LENGTH_NICKNAME
+            `when`("닉네임을 변경하면") {
+                user.changeNickname(nickname)
+                every { userRepository.save(user) } returns user
+                every { userRepository.existsByProfileNickname(nickname) } returns false
+                userCommandService.updateNickname(user, nickname)
+                then("닉네임이 변경된다.") {
+                    user.profile.nickname shouldBe nickname
+                }
+            }
+
+            `when`("닉네임이 이미 존재하면") {
+                every { userRepository.existsByProfileNickname(nickname) } returns true
+                then("NICKNAME_ALREADY_EXISTS 에러가 발생한다.") {
+                    val ex =
+                        shouldThrow<RoadyFoodyBadRequestException> {
+                            userCommandService.updateNickname(user, nickname)
+                        }
+                    ex.message shouldBe ErrorCode.NICKNAME_ALREADY_EXISTS.errorMessage
+                }
+            }
+        }
+
+        given("updateProfileImage 테스트") {
+            val profileImage = mockk<MultipartFile>()
+            var imageName = TEST_USER_PROFILE_IMAGE_NAME
+            `when`("기본 프로필에서 프로필을 변경하면") {
+                user.profile.changeProfileImageName()
+                every { imageService.generateImageName(profileImage) } returns imageName
+                every { userRepository.save(user) } returns user
+                every { imageService.upload(imageName, profileImage) } returns Unit
+                user.profile.profileImageName shouldBe null
+                userCommandService.updateProfileImage(user, profileImage)
+                then("프로필 이미지가 변경된다.") {
+                    user.profile.profileImageName shouldBe imageName
+                }
+            }
+
+            `when`("기존 프로필 이미지가 존재하면") {
+                val beforeProfile = user.profile.profileImageName
+                imageName = "${PROFILE_IMAGE_FILE_NAME}_new"
+                every { imageService.generateImageName(any()) } returns imageName
+                every { userRepository.save(user) } returns user
+                every { imageService.upload(imageName, profileImage) } returns Unit
+                every { imageService.remove(beforeProfile!!) } returns Unit
+                user.profile.profileImageName shouldBe beforeProfile
+                userCommandService.updateProfileImage(user, profileImage)
+                then("기존 프로필 이미지가 삭제되고 새로운 이미지가 등록된다.") {
+                    user.profile.profileImageName shouldBe imageName
+                }
+            }
+        }
+
+        given("deleteProfileImage 테스트") {
+            `when`("프로필 이미지를 삭제하면") {
+                val imageName = user.profile.profileImageName
+                every { userRepository.save(user) } returns user
+                every { imageService.remove(imageName!!) } returns Unit
+                user.profile.profileImageName shouldBe imageName
+                userCommandService.deleteProfileImage(user)
+                then("프로필 이미지가 삭제된다.") {
+                    user.profile.profileImageName shouldBe null
+                }
+            }
+
+            `when`("프로필 이미지가 존재하지 않으면") {
+                user.profile.profileImageName = null
+                then("PROFILE_IMAGE_NOT_EXISTS 에러가 발생한다.") {
+                    val ex =
+                        shouldThrow<RoadyFoodyBadRequestException> {
+                            userCommandService.deleteProfileImage(user)
+                        }
+                    ex.message shouldBe ErrorCode.PROFILE_IMAGE_NOT_EXISTS.errorMessage
                 }
             }
         }
