@@ -144,7 +144,8 @@ class FoodSpotsCommandService(
     fun doUpdateReport(
         user: User,
         foodSpotsId: Long,
-        request: FoodSpotsUpdateRequest,
+        request: FoodSpotsUpdateRequest?,
+        reportPhotos: List<MultipartFile>?,
     ) {
         val key = getFoodSpotsReportCountKey(user.id)
         check(canGenerateReport(key)) {
@@ -157,36 +158,70 @@ class FoodSpotsCommandService(
 
         val foodSpots = foodSpotsRepository.getByFoodSpotsId(foodSpotsId)
 
-        if (request.closed != null && request.closed && foodSpots.storeClosure) {
+        if (request?.closed != null && request.closed && foodSpots.storeClosure) {
             throw AlreadyClosedFoodSpotsException()
         }
 
         val changed =
             run {
-                val foodSpotsUpdated = updateFoodSpots(foodSpots, request)
-                val categoriesUpdated = updateFoodSpotsCategories(foodSpots, request)
-                val operationHoursUpdated = updateFoodSpotsOperationHours(foodSpots, request)
-                foodSpotsUpdated || categoriesUpdated || operationHoursUpdated
+                val foodSpotsUpdated = request?.let { updateFoodSpots(foodSpots, request) } ?: false
+                val categoriesUpdated = request?.let { updateFoodSpotsCategories(foodSpots, request) } ?: false
+                val operationHoursUpdated = request?.let { updateFoodSpotsOperationHours(foodSpots, request) } ?: false
+                val photosUpdated =
+                    reportPhotos?.isNotEmpty() ?: false ||
+                        request?.photoIdsToRemove?.isNotEmpty() ?: false
+                foodSpotsUpdated || categoriesUpdated || operationHoursUpdated || photosUpdated
             }
 
         if (!changed) {
             throw RoadyFoodyBadRequestException(ErrorCode.INVALID_CHANGE_VALUE)
         }
 
-        val foodSpotsHistory = request.toFoodSpotsHistoryEntity(foodSpots, user)
+        val foodSpotsHistory =
+            request?.toFoodSpotsHistoryEntity(foodSpots, user) ?: FoodSpotsHistory.from(foodSpots, user)
+
         storeReport(
             foodSpotsHistory,
             // 카테고리나 운영시간을 미기재할 시 기존 FoodSpots 의 값을 그대로 사용
-            request.foodCategories ?: foodSpots.foodCategoryList.map { it.foodCategory.id }.toSet(),
-            request.toReportOperationHoursEntity(foodSpotsHistory)
+            request?.foodCategories ?: foodSpots.foodCategoryList.map { it.foodCategory.id }.toSet(),
+            request?.toReportOperationHoursEntity(foodSpotsHistory)
                 ?: foodSpots.operationHoursList.map {
                     ReportOperationHours(foodSpotsHistory, it.dayOfWeek, it.openingHours, it.closingHours)
                 },
         )
 
+        val generatorPhotoNameMap =
+            reportPhotos?.associateBy { imageService.generateImageName(it) } ?: emptyMap()
+
+        generatorPhotoNameMap
+            .map {
+                FoodSpotsPhoto.of(foodSpotsHistory, it.key)
+            }.also { foodSpotsPhotoRepository.saveAll(it) }
+
+        val photosToRemove =
+            request?.photoIdsToRemove?.let {
+                foodSpotsPhotoRepository.findAllById(request.photoIdsToRemove).also {
+                    foodSpotsPhotoRepository.deleteAll(it)
+                }
+            } ?: emptyList()
+
         entityManager.flush()
 
         userCommandService.increaseCoin(user.id, foodSpotsHistory.reportType.reportReward.point)
+
+        generatorPhotoNameMap
+            .map {
+                CompletableFuture.supplyAsync({
+                    imageService.upload(it.key, it.value)
+                }, executor)
+            }.forEach { it.join() }
+
+        photosToRemove
+            .map {
+                CompletableFuture.supplyAsync({
+                    imageService.remove(it.fileName)
+                }, executor)
+            }.forEach { it.join() }
     }
 
     private fun storeReport(
