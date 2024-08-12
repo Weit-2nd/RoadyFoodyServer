@@ -78,7 +78,7 @@ class UserController(
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PatchMapping("/profile", consumes = [MULTIPART_FORM_DATA_VALUE])
-    override fun updateProfile(
+    override fun updateProfileImage(
         @LoginUser
         user: User,
         @RequestPart
