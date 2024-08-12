@@ -57,7 +57,11 @@ class User(
     }
 
     fun changeNickname(nickname: String) {
-        profile = profile.copy(nickname = nickname)
+        profile = profile.changeNickname(nickname)
+    }
+
+    fun changeProfileImageName(profileImageName: String? = null) {
+        profile = profile.changeProfileImageName(profileImageName)
     }
 }
 
@@ -66,11 +70,9 @@ class Profile(
     @Column(length = 48, nullable = false, unique = true)
     val nickname: String,
     @Column(length = 50)
-    var profileImageName: String? = null,
+    val profileImageName: String? = null,
 ) {
-    fun changeProfileImageName(profileImageName: String? = null) {
-        this.profileImageName = profileImageName
-    }
+    fun changeProfileImageName(profileImageName: String? = null) = Profile(this.nickname, profileImageName)
 
-    fun copy(nickname: String): Profile = Profile(nickname, this.profileImageName)
+    fun changeNickname(nickname: String) = Profile(nickname, this.profileImageName)
 }
