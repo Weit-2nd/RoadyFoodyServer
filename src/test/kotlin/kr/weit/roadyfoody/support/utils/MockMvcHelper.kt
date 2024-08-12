@@ -9,7 +9,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multi
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
-import org.springframework.test.web.servlet.request.RequestPostProcessor
 
 fun MockHttpServletRequestBuilder.withAuth(): MockHttpServletRequestBuilder = this.header("userid", 1)
 
@@ -28,9 +27,3 @@ fun multipartPatchWithAuth(url: String) = multipart(HttpMethod.PATCH, url).apply
 fun putWithAuth(url: String) = put(url).withAuth()
 
 fun deleteWithAuth(url: String) = delete(url).withAuth()
-
-fun toPatch(): RequestPostProcessor =
-    RequestPostProcessor { request ->
-        request.method = "PATCH"
-        request
-    }

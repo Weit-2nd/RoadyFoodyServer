@@ -41,8 +41,8 @@ import kr.weit.roadyfoody.support.utils.createMultipartFile
 import kr.weit.roadyfoody.support.utils.createTestImageFile
 import kr.weit.roadyfoody.support.utils.deleteWithAuth
 import kr.weit.roadyfoody.support.utils.getWithAuth
+import kr.weit.roadyfoody.support.utils.multipartPatchWithAuth
 import kr.weit.roadyfoody.support.utils.multipartWithAuth
-import kr.weit.roadyfoody.support.utils.toPatch
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.web.servlet.MockMvc
@@ -304,7 +304,7 @@ class FoodSpotsControllerTest(
                     then("해당 가게 정보를 수정한다.") {
                         mockMvc
                             .perform(
-                                multipartWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                multipartPatchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
                                     .file(
                                         createMultipartFile(
                                             TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME,
@@ -316,7 +316,7 @@ class FoodSpotsControllerTest(
                                     ).file(
                                         TEST_FOOD_SPOTS_UPDATE_REQUEST_PHOTO,
                                         reportPhotos[1].bytes,
-                                    ).with(toPatch()),
+                                    ),
                             ).andExpect(status().isCreated)
                     }
                 }
@@ -325,13 +325,13 @@ class FoodSpotsControllerTest(
                     then("해당 가게 정보를 수정하며 201 을 반환한다.") {
                         mockMvc
                             .perform(
-                                multipartWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                multipartPatchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
                                     .file(
                                         createMultipartFile(
                                             TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME,
                                             objectMapper.writeValueAsString(createTestFoodSpotsUpdateRequest()).byteInputStream(),
                                         ),
-                                    ).with(toPatch()),
+                                    ),
                             ).andExpect(status().isCreated)
                     }
                 }
@@ -340,14 +340,14 @@ class FoodSpotsControllerTest(
                     then("해당 가게 정보를 수정하며 201 을 반환한다.") {
                         mockMvc
                             .perform(
-                                multipartWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                multipartPatchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
                                     .file(
                                         TEST_FOOD_SPOTS_UPDATE_REQUEST_PHOTO,
                                         reportPhotos[0].bytes,
                                     ).file(
                                         TEST_FOOD_SPOTS_UPDATE_REQUEST_PHOTO,
                                         reportPhotos[1].bytes,
-                                    ).with(toPatch()),
+                                    ),
                             ).andExpect(status().isCreated)
                     }
                 }
@@ -357,13 +357,13 @@ class FoodSpotsControllerTest(
                     then("400을 반환") {
                         mockMvc
                             .perform(
-                                multipartWithAuth("$requestPath/$TEST_INVALID_FOOD_SPOT_ID")
+                                multipartPatchWithAuth("$requestPath/$TEST_INVALID_FOOD_SPOT_ID")
                                     .file(
                                         createMultipartFile(
                                             TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME,
                                             objectMapper.writeValueAsString(request).byteInputStream(),
                                         ),
-                                    ).with(toPatch()),
+                                    ),
                             ).andExpect(status().isBadRequest)
                     }
                 }
@@ -373,13 +373,13 @@ class FoodSpotsControllerTest(
                     then("400을 반환") {
                         mockMvc
                             .perform(
-                                multipartWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                multipartPatchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
                                     .file(
                                         createMultipartFile(
                                             TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME,
                                             objectMapper.writeValueAsString(request).byteInputStream(),
                                         ),
-                                    ).with(toPatch()),
+                                    ),
                             ).andExpect(status().isBadRequest)
                     }
                 }
@@ -389,13 +389,13 @@ class FoodSpotsControllerTest(
                     then("400을 반환") {
                         mockMvc
                             .perform(
-                                multipartWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                multipartPatchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
                                     .file(
                                         createMultipartFile(
                                             TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME,
                                             objectMapper.writeValueAsString(request).byteInputStream(),
                                         ),
-                                    ).with(toPatch()),
+                                    ),
                             ).andExpect(status().isBadRequest)
                     }
                 }
@@ -405,13 +405,13 @@ class FoodSpotsControllerTest(
                     then("400을 반환") {
                         mockMvc
                             .perform(
-                                multipartWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                multipartPatchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
                                     .file(
                                         createMultipartFile(
                                             TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME,
                                             objectMapper.writeValueAsString(request).byteInputStream(),
                                         ),
-                                    ).with(toPatch()),
+                                    ),
                             ).andExpect(status().isBadRequest)
                     }
                 }
@@ -421,13 +421,13 @@ class FoodSpotsControllerTest(
                     then("400을 반환") {
                         mockMvc
                             .perform(
-                                multipartWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                multipartPatchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
                                     .file(
                                         createMultipartFile(
                                             TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME,
                                             objectMapper.writeValueAsString(request).byteInputStream(),
                                         ),
-                                    ).with(toPatch()),
+                                    ),
                             ).andExpect(status().isBadRequest)
                     }
                 }
@@ -437,13 +437,13 @@ class FoodSpotsControllerTest(
                     then("400을 반환") {
                         mockMvc
                             .perform(
-                                multipartWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                multipartPatchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
                                     .file(
                                         createMultipartFile(
                                             TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME,
                                             objectMapper.writeValueAsString(request).byteInputStream(),
                                         ),
-                                    ).with(toPatch()),
+                                    ),
                             ).andExpect(status().isBadRequest)
                     }
                 }
@@ -459,13 +459,13 @@ class FoodSpotsControllerTest(
                     then("400을 반환") {
                         mockMvc
                             .perform(
-                                multipartWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                multipartPatchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
                                     .file(
                                         createMultipartFile(
                                             TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME,
                                             objectMapper.writeValueAsString(request).byteInputStream(),
                                         ),
-                                    ).with(toPatch()),
+                                    ),
                             ).andExpect(status().isBadRequest)
                     }
                 }
@@ -476,7 +476,7 @@ class FoodSpotsControllerTest(
                     then("400을 반환") {
                         mockMvc
                             .perform(
-                                multipartWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                multipartPatchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
                                     .file(
                                         createMultipartFile(
                                             TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME,
@@ -494,7 +494,7 @@ class FoodSpotsControllerTest(
                                     ).file(
                                         TEST_FOOD_SPOTS_UPDATE_REQUEST_PHOTO,
                                         tooLargeReportPhotos[3].bytes,
-                                    ).with(toPatch()),
+                                    ),
                             ).andExpect(status().isBadRequest)
                     }
                 }
@@ -505,7 +505,7 @@ class FoodSpotsControllerTest(
                     then("400을 반환") {
                         mockMvc
                             .perform(
-                                multipartWithAuth(requestPath)
+                                multipartPatchWithAuth(requestPath)
                                     .file(
                                         createMultipartFile(
                                             TEST_FOOD_SPOTS_REQUEST_NAME,
@@ -514,8 +514,7 @@ class FoodSpotsControllerTest(
                                                 .inputStream(),
                                         ),
                                     ).file(TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME, reportPhotosJpeg[0].bytes)
-                                    .file(TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME, reportPhotosJpeg[1].bytes)
-                                    .with(toPatch()),
+                                    .file(TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME, reportPhotosJpeg[1].bytes),
                             ).andExpect(status().isBadRequest)
                     }
                 }
@@ -529,14 +528,13 @@ class FoodSpotsControllerTest(
                     then("400을 반환") {
                         mockMvc
                             .perform(
-                                multipartWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                multipartPatchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
                                     .file(
                                         createMultipartFile(
                                             TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME,
                                             objectMapper.writeValueAsString(request).byteInputStream(),
                                         ),
-                                    ).file(mockFile)
-                                    .with(toPatch()),
+                                    ).file(mockFile),
                             ).andExpect(status().isBadRequest)
                     }
                 }
