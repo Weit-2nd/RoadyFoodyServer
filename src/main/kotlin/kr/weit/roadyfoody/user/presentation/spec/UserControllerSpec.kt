@@ -189,7 +189,7 @@ interface UserControllerSpec {
             ErrorCode.MAX_FILE_SIZE_EXCEEDED,
         ],
     )
-    fun updateProfile(
+    fun updateProfileImage(
         @LoginUser
         user: User,
         @RequestPart

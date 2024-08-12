@@ -56,16 +56,20 @@ class UserCommandService(
     ) {
         val beforeProfile = user.profile.profileImageName
         val imageName = imageService.generateImageName(profileImage)
-        user.profile.changeProfileImageName(imageName)
+        user.changeProfileImageName(imageName)
         userRepository.save(user)
         imageService.upload(imageName, profileImage)
-        beforeProfile?.let { imageService.remove(it) }
+        beforeProfile?.let {
+            if (it != imageName) {
+                imageService.remove(it)
+            }
+        }
     }
 
     @Transactional
     fun deleteProfileImage(user: User) {
         user.profile.profileImageName?.let { imageName ->
-            user.profile.changeProfileImageName()
+            user.changeProfileImageName()
             userRepository.save(user)
             imageService.remove(imageName)
         } ?: throw RoadyFoodyBadRequestException(ErrorCode.PROFILE_IMAGE_NOT_EXISTS)
