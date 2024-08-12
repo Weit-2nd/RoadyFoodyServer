@@ -3,6 +3,7 @@ package kr.weit.roadyfoody.user.application.service
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
 import kr.weit.roadyfoody.auth.fixture.PROFILE_IMAGE_FILE_NAME
@@ -63,9 +64,9 @@ class UserCommandServiceTest :
         given("updateNickname 테스트") {
             val nickname = TEST_MAX_LENGTH_NICKNAME
             `when`("닉네임을 변경하면") {
-                user.changeNickname(nickname)
                 every { userRepository.save(user) } returns user
                 every { userRepository.existsByProfileNickname(nickname) } returns false
+                user.profile.nickname shouldNotBe nickname
                 userCommandService.updateNickname(user, nickname)
                 then("닉네임이 변경된다.") {
                     user.profile.nickname shouldBe nickname
@@ -88,7 +89,7 @@ class UserCommandServiceTest :
             val profileImage = mockk<MultipartFile>()
             var imageName = TEST_USER_PROFILE_IMAGE_NAME
             `when`("기본 프로필에서 프로필을 변경하면") {
-                user.profile.changeProfileImageName()
+                user.changeProfileImageName()
                 every { imageService.generateImageName(profileImage) } returns imageName
                 every { userRepository.save(user) } returns user
                 every { imageService.upload(imageName, profileImage) } returns Unit
@@ -127,8 +128,9 @@ class UserCommandServiceTest :
             }
 
             `when`("프로필 이미지가 존재하지 않으면") {
-                user.profile.profileImageName = null
+                user.changeProfileImageName()
                 then("PROFILE_IMAGE_NOT_EXISTS 에러가 발생한다.") {
+                    user.profile.profileImageName shouldBe null
                     val ex =
                         shouldThrow<RoadyFoodyBadRequestException> {
                             userCommandService.deleteProfileImage(user)

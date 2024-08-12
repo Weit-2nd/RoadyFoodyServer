@@ -50,7 +50,7 @@ class AuthCommandService(
 
         if (profileImage != null) {
             val imageName = imageService.generateImageName(profileImage)
-            user.profile.changeProfileImageName(imageName)
+            user.changeProfileImageName(imageName)
             imageService.upload(imageName, profileImage)
         }
 
