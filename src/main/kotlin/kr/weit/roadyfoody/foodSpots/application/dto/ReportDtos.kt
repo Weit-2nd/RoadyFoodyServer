@@ -153,6 +153,8 @@ data class FoodSpotsUpdateRequest(
         description = "운영시간 리스트 ex) 변경된, 변경되지 않은 운영시간 모두 입력해주세요. 없을 경우, 생략해주세요",
     )
     val operationHours: List<OperationHoursRequest>?,
+    @Schema(description = "삭제할 이미지 ID 리스트", example = "[1, 2]")
+    val photoIdsToRemove: Set<Long>?,
 ) {
     fun toFoodSpotsHistoryEntity(
         foodSpots: FoodSpots,

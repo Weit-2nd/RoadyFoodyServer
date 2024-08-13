@@ -70,4 +70,24 @@ class FoodSpotsHistory(
         operationHoursList = emptyList(),
         foodCategoryList = emptyList(),
     )
+
+    companion object {
+        fun from(
+            foodSpots: FoodSpots,
+            user: User,
+            reportType: ReportType = ReportType.STORE_UPDATE,
+        ): FoodSpotsHistory =
+            FoodSpotsHistory(
+                foodSpots = foodSpots,
+                user = user,
+                name = foodSpots.name,
+                foodTruck = foodSpots.foodTruck,
+                open = foodSpots.open,
+                storeClosure = foodSpots.storeClosure,
+                point = foodSpots.point,
+                reportType = reportType,
+                operationHoursList = emptyList(),
+                foodCategoryList = emptyList(),
+            )
+    }
 }

@@ -23,6 +23,7 @@ import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHours
 import kr.weit.roadyfoody.foodSpots.exception.AlreadyClosedFoodSpotsException
 import kr.weit.roadyfoody.foodSpots.exception.CategoriesNotFoundException
 import kr.weit.roadyfoody.foodSpots.exception.NotFoodSpotsHistoriesOwnerException
+import kr.weit.roadyfoody.foodSpots.exception.UnauthorizedPhotoRemoveException
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_HISTORY_ID
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_NEW_CATEGORY_NAME
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_UPDATE_FOOD_SPOT_LATITUDE
@@ -38,6 +39,7 @@ import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodCategory
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodOperationHours
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsFoodCategories
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsPhoto
+import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsPhotos
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsUpdateRequestFromEntity
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportFoodCategory
@@ -131,7 +133,7 @@ class FoodSpotsCommandServiceTest :
                 `when`("정상적인 데이터와 이미지가 들어올 경우") {
                     then("정상적으로 저장되어야 한다.") {
                         foodSpotsCommandService.createReport(
-                            createTestUser(),
+                            user,
                             createTestReportRequest(),
                             createMockPhotoList(ImageFormat.WEBP),
                         )
@@ -141,7 +143,7 @@ class FoodSpotsCommandServiceTest :
                 `when`("정상적인 데이터만 들어올 경우") {
                     then("정상적으로 저장되어야 한다.") {
                         foodSpotsCommandService.createReport(
-                            createTestUser(),
+                            user,
                             createTestReportRequest(),
                             null,
                         )
@@ -154,7 +156,7 @@ class FoodSpotsCommandServiceTest :
                     then("CategoriesNotFoundException 이 발생한다.") {
                         shouldThrow<CategoriesNotFoundException> {
                             foodSpotsCommandService.createReport(
-                                createTestUser(),
+                                user,
                                 createTestReportRequest(),
                                 createMockPhotoList(ImageFormat.WEBP),
                             )
@@ -179,9 +181,15 @@ class FoodSpotsCommandServiceTest :
                     listOf(createTestReportFoodCategory())
                 every { reportOperationHoursRepository.saveAll(any<List<ReportOperationHours>>()) } returns
                     listOf(createTestReportOperationHours())
+                every { foodSpotsPhotoRepository.saveAll(any<List<FoodSpotsPhoto>>()) } returns
+                    listOf(createTestFoodSpotsPhoto())
+                every { foodSpotsPhotoRepository.findAllById(any()) } returns emptyList()
+                every { foodSpotsPhotoRepository.deleteAll(any()) } just runs
                 every { entityManager.flush() } just runs
-                every { imageService.upload(any(), any()) } just runs
                 every { userCommandService.increaseCoin(any(), any()) } just runs
+                every { executor.execute(any()) } answers {
+                    firstArg<Runnable>().run()
+                }
 
                 `when`("음식점 이름만 변경할 경우") {
                     val foodSpots = createMockTestFoodSpot()
@@ -194,9 +202,10 @@ class FoodSpotsCommandServiceTest :
 
                     then("정상적으로 업데이트 되어야 한다.") {
                         foodSpotsCommandService.doUpdateReport(
-                            createTestUser(),
+                            user,
                             TEST_FOOD_SPOT_ID,
                             onlyNameChangeRequest,
+                            null,
                         )
                     }
                 }
@@ -219,9 +228,10 @@ class FoodSpotsCommandServiceTest :
                             ),
                         ) { request ->
                             foodSpotsCommandService.doUpdateReport(
-                                createTestUser(),
+                                user,
                                 TEST_FOOD_SPOT_ID,
                                 request,
+                                null,
                             )
                         }
                     }
@@ -235,9 +245,10 @@ class FoodSpotsCommandServiceTest :
 
                     then("정상적으로 업데이트 되어야 한다.") {
                         foodSpotsCommandService.doUpdateReport(
-                            createTestUser(),
+                            user,
                             TEST_FOOD_SPOT_ID,
                             closeUpdateRequest,
+                            null,
                         )
                     }
                 }
@@ -250,9 +261,10 @@ class FoodSpotsCommandServiceTest :
 
                     then("정상적으로 업데이트 되어야 한다.") {
                         foodSpotsCommandService.doUpdateReport(
-                            createTestUser(),
+                            user,
                             TEST_FOOD_SPOT_ID,
                             openUpdateRequest,
+                            null,
                         )
                     }
                 }
@@ -265,9 +277,10 @@ class FoodSpotsCommandServiceTest :
 
                     then("정상적으로 업데이트 되어야 한다.") {
                         foodSpotsCommandService.doUpdateReport(
-                            createTestUser(),
+                            user,
                             TEST_FOOD_SPOT_ID,
                             openUpdateRequest,
+                            null,
                         )
                     }
                 }
@@ -292,9 +305,10 @@ class FoodSpotsCommandServiceTest :
 
                     then("정상적으로 업데이트 되어야 한다.") {
                         foodSpotsCommandService.doUpdateReport(
-                            createTestUser(),
+                            user,
                             TEST_FOOD_SPOT_ID,
                             onlyCategoryAddRequest,
+                            null,
                         )
                     }
                 }
@@ -316,9 +330,10 @@ class FoodSpotsCommandServiceTest :
 
                     then("정상적으로 업데이트 되어야 한다.") {
                         foodSpotsCommandService.doUpdateReport(
-                            createTestUser(),
+                            user,
                             TEST_FOOD_SPOT_ID,
                             onlyCategoryDeleteRequest,
+                            null,
                         )
                     }
                 }
@@ -344,9 +359,10 @@ class FoodSpotsCommandServiceTest :
 
                     then("정상적으로 업데이트 되어야 한다.") {
                         foodSpotsCommandService.doUpdateReport(
-                            createTestUser(),
+                            user,
                             TEST_FOOD_SPOT_ID,
                             categoryAddAndDeleteRequest,
+                            null,
                         )
                     }
                 }
@@ -370,9 +386,47 @@ class FoodSpotsCommandServiceTest :
 
                     then("정상적으로 업데이트 되어야 한다.") {
                         foodSpotsCommandService.doUpdateReport(
-                            createTestUser(),
+                            user,
                             TEST_FOOD_SPOT_ID,
                             onlyOperationHoursChangeRequest,
+                            null,
+                        )
+                    }
+                }
+
+                `when`("기존 자신의 사진을 제거할 경우") {
+                    val foodSpots = createMockTestFoodSpot()
+                    every { foodSpotsRepository.findById(any()) } returns Optional.of(foodSpots)
+                    val foodSpotsHistory = createMockTestFoodHistory(user = user, foodSpots = foodSpots)
+                    val foodSpotsPhotosToRemove = createTestFoodSpotsPhotos(foodSpotsHistory = foodSpotsHistory)
+                    every { foodSpotsPhotoRepository.findAllById(any()) } returns foodSpotsPhotosToRemove
+                    every { foodSpotsPhotoRepository.deleteAll(any()) } just runs
+                    every { imageService.remove(any()) } just runs
+
+                    val photoRemoveRequest =
+                        createTestFoodSpotsUpdateRequest(photoIdsToRemove = foodSpotsPhotosToRemove.map { it.id }.toSet())
+
+                    then("정상적으로 업데이트 되어야 한다.") {
+                        foodSpotsCommandService.doUpdateReport(
+                            user,
+                            TEST_FOOD_SPOT_ID,
+                            photoRemoveRequest,
+                            null,
+                        )
+                    }
+                }
+
+                `when`("사진을 새로 추가할 경우") {
+                    every { foodSpotsPhotoRepository.findAllById(any()) } returns emptyList()
+                    every { foodSpotsPhotoRepository.saveAll(any<List<FoodSpotsPhoto>>()) } returns createTestFoodSpotsPhotos()
+                    every { imageService.upload(any(), any()) } just runs
+
+                    then("정상적으로 업데이트 되어야 한다.") {
+                        foodSpotsCommandService.doUpdateReport(
+                            user,
+                            TEST_FOOD_SPOT_ID,
+                            null,
+                            createMockPhotoList(ImageFormat.WEBP),
                         )
                     }
                 }
@@ -386,9 +440,23 @@ class FoodSpotsCommandServiceTest :
                     then("변경된 값이 없으므로 RoadyFoodyBadRequestException 이 발생해야 한다.") {
                         shouldThrow<RoadyFoodyBadRequestException> {
                             foodSpotsCommandService.doUpdateReport(
-                                createTestUser(),
+                                user,
                                 TEST_FOOD_SPOT_ID,
                                 noChangeRequest,
+                                null,
+                            )
+                        }
+                    }
+                }
+
+                `when`("아무런 값도 전달하지 않을 경우") {
+                    then("RoadyFoodyBadRequestException 이 발생해야 한다.") {
+                        shouldThrow<RoadyFoodyBadRequestException> {
+                            foodSpotsCommandService.doUpdateReport(
+                                user,
+                                TEST_FOOD_SPOT_ID,
+                                null,
+                                null,
                             )
                         }
                     }
@@ -403,9 +471,131 @@ class FoodSpotsCommandServiceTest :
                     then("AlreadyClosedFoodSpotsException 이 발생해야 한다.") {
                         shouldThrow<AlreadyClosedFoodSpotsException> {
                             foodSpotsCommandService.doUpdateReport(
-                                createTestUser(),
+                                user,
                                 TEST_FOOD_SPOT_ID,
                                 closeUpdateRequest,
+                                null,
+                            )
+                        }
+                    }
+                }
+
+                `when`("삭제하려는 사진이 전부 다른 회원의 것일 경우") {
+                    val foodSpots = createMockTestFoodSpot(id = TEST_FOOD_SPOT_ID)
+                    every { foodSpotsRepository.findById(any()) } returns Optional.of(foodSpots)
+
+                    val otherUser = createTestUser(TEST_OTHER_USER_ID)
+                    val otherUserFoodSpotsHistory = createMockTestFoodHistory(user = otherUser, foodSpots = foodSpots)
+                    val otherUserFoodSpotsPhotosToRemove = createTestFoodSpotsPhotos(foodSpotsHistory = otherUserFoodSpotsHistory)
+                    every { foodSpotsPhotoRepository.findAllById(any()) } returns otherUserFoodSpotsPhotosToRemove
+
+                    val photoRemoveRequest =
+                        createTestFoodSpotsUpdateRequest(photoIdsToRemove = otherUserFoodSpotsPhotosToRemove.map { it.id }.toSet())
+
+                    then("UnauthorizedPhotoRemoveException 이 발생해야 한다.") {
+                        shouldThrow<UnauthorizedPhotoRemoveException> {
+                            foodSpotsCommandService.doUpdateReport(
+                                user,
+                                TEST_FOOD_SPOT_ID,
+                                photoRemoveRequest,
+                                null,
+                            )
+                        }
+                    }
+                }
+
+                `when`("삭제하려는 사진 중 다른 회원의 것도 섞여 있을 경우") {
+                    val foodSpots = createMockTestFoodSpot(id = TEST_FOOD_SPOT_ID)
+                    every { foodSpotsRepository.findById(any()) } returns Optional.of(foodSpots)
+                    val foodSpotsHistory = createMockTestFoodHistory(user = user, foodSpots = foodSpots)
+                    val foodSpotsPhotos =
+                        createTestFoodSpotsPhoto(foodSpotsHistory = foodSpotsHistory)
+
+                    val otherUser = createTestUser(TEST_OTHER_USER_ID)
+                    val otherUserFoodSpotsHistory = createMockTestFoodHistory(user = otherUser, foodSpots = foodSpots)
+                    val otherUserFoodSpotsPhoto = createTestFoodSpotsPhoto(foodSpotsHistory = otherUserFoodSpotsHistory)
+
+                    val photosToRemove = listOf(foodSpotsPhotos, otherUserFoodSpotsPhoto)
+                    every { foodSpotsPhotoRepository.findAllById(any()) } returns photosToRemove
+
+                    val photoRemoveRequest =
+                        createTestFoodSpotsUpdateRequest(photoIdsToRemove = photosToRemove.map { it.id }.toSet())
+
+                    then("UnauthorizedPhotoRemoveException 이 발생해야 한다.") {
+                        shouldThrow<UnauthorizedPhotoRemoveException> {
+                            foodSpotsCommandService.doUpdateReport(
+                                user,
+                                TEST_FOOD_SPOT_ID,
+                                photoRemoveRequest,
+                                null,
+                            )
+                        }
+                    }
+                }
+
+                `when`("삭제하려는 사진이 전부 다른 음식점의 것일 경우") {
+                    val foodSpots = createMockTestFoodSpot(id = TEST_FOOD_SPOT_ID)
+                    every { foodSpotsRepository.findById(any()) } returns Optional.of(foodSpots)
+
+                    val otherFoodSpots = createMockTestFoodSpot(id = TEST_FOOD_SPOT_ID + 1)
+                    val otherFoodSpotsHistory = createMockTestFoodHistory(foodSpots = otherFoodSpots)
+                    val otherPhotosToRemove = createTestFoodSpotsPhotos(foodSpotsHistory = otherFoodSpotsHistory)
+                    every { foodSpotsPhotoRepository.findAllById(any()) } returns otherPhotosToRemove
+
+                    val photoRemoveRequest = createTestFoodSpotsUpdateRequest(photoIdsToRemove = otherPhotosToRemove.map { it.id }.toSet())
+
+                    then("UnauthorizedPhotoRemoveException 이 발생해야 한다.") {
+                        shouldThrow<UnauthorizedPhotoRemoveException> {
+                            foodSpotsCommandService.doUpdateReport(
+                                user,
+                                TEST_FOOD_SPOT_ID,
+                                photoRemoveRequest,
+                                null,
+                            )
+                        }
+                    }
+                }
+
+                `when`("삭제하려는 사진 중 다른 음식점의 것도 섞여 있을 경우") {
+                    val foodSpots = createMockTestFoodSpot(id = TEST_FOOD_SPOT_ID)
+                    every { foodSpotsRepository.findById(any()) } returns Optional.of(foodSpots)
+                    val foodSpotsPhotos = createTestFoodSpotsPhoto(foodSpotsHistory = createMockTestFoodHistory(foodSpots = foodSpots))
+
+                    val otherFoodSpots = createMockTestFoodSpot(id = TEST_FOOD_SPOT_ID + 1)
+                    val otherFoodSpotsPhoto =
+                        createTestFoodSpotsPhoto(foodSpotsHistory = createMockTestFoodHistory(foodSpots = otherFoodSpots))
+
+                    val photosToRemove = listOf(foodSpotsPhotos, otherFoodSpotsPhoto)
+                    every { foodSpotsPhotoRepository.findAllById(any()) } returns photosToRemove
+
+                    val photoRemoveRequest =
+                        createTestFoodSpotsUpdateRequest(photoIdsToRemove = photosToRemove.map { it.id }.toSet())
+
+                    then("UnauthorizedPhotoRemoveException 이 발생해야 한다.") {
+                        shouldThrow<UnauthorizedPhotoRemoveException> {
+                            foodSpotsCommandService.doUpdateReport(
+                                user,
+                                TEST_FOOD_SPOT_ID,
+                                photoRemoveRequest,
+                                null,
+                            )
+                        }
+                    }
+                }
+
+                `when`("삭제하려는 사진이 전부 존재하지 않는 사진일 경우") {
+                    every { foodSpotsPhotoRepository.findAllById(any()) } returns emptyList()
+
+                    val photoIdsToRemove = createTestFoodSpotsPhotos().map { it.id }.toSet()
+                    val photoRemoveRequest = createTestFoodSpotsUpdateRequest(photoIdsToRemove = photoIdsToRemove)
+
+                    then("UnauthorizedPhotoRemoveException 이 발생해야 한다.") {
+                        shouldThrow<UnauthorizedPhotoRemoveException> {
+                            foodSpotsCommandService.doUpdateReport(
+                                user,
+                                TEST_FOOD_SPOT_ID,
+                                photoRemoveRequest,
+                                null,
                             )
                         }
                     }

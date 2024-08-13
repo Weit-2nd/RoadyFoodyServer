@@ -15,6 +15,8 @@ import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsQueryService
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_HISTORY_ID
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_REQUEST_NAME
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_REQUEST_PHOTO
+import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME
+import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_UPDATE_REQUEST_PHOTO
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOT_NAME_EMPTY
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOT_NAME_INVALID_STR
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOT_NAME_TOO_LONG
@@ -39,8 +41,8 @@ import kr.weit.roadyfoody.support.utils.createMultipartFile
 import kr.weit.roadyfoody.support.utils.createTestImageFile
 import kr.weit.roadyfoody.support.utils.deleteWithAuth
 import kr.weit.roadyfoody.support.utils.getWithAuth
+import kr.weit.roadyfoody.support.utils.multipartPatchWithAuth
 import kr.weit.roadyfoody.support.utils.multipartWithAuth
-import kr.weit.roadyfoody.support.utils.patchWithAuth
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.web.servlet.MockMvc
@@ -293,26 +295,75 @@ class FoodSpotsControllerTest(
             }
 
             given("PATCH $requestPath/{foodSpotsId} Test") {
-                every { foodSpotsCommandService.doUpdateReport(any(), any(), any()) } just runs
+                beforeEach {
+                    every { foodSpotsCommandService.doUpdateReport(any(), any(), any(), any()) } just runs
+                }
+                val reportPhotos = createMockPhotoList(WEBP)
                 `when`("정상적인 요청이 들어올 경우") {
                     val request = createTestFoodSpotsUpdateRequest()
                     then("해당 가게 정보를 수정한다.") {
                         mockMvc
                             .perform(
-                                patchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
-                                    .content(objectMapper.writeValueAsString(request))
-                                    .contentType("application/json"),
+                                multipartPatchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                    .file(
+                                        createMultipartFile(
+                                            TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME,
+                                            objectMapper.writeValueAsString(request).byteInputStream(),
+                                        ),
+                                    ).file(
+                                        TEST_FOOD_SPOTS_UPDATE_REQUEST_PHOTO,
+                                        reportPhotos[0].bytes,
+                                    ).file(
+                                        TEST_FOOD_SPOTS_UPDATE_REQUEST_PHOTO,
+                                        reportPhotos[1].bytes,
+                                    ),
+                            ).andExpect(status().isCreated)
+                    }
+                }
+
+                `when`("이미지 파일을 제외한 수정 요청이 들어올 경우") {
+                    then("해당 가게 정보를 수정하며 201 을 반환한다.") {
+                        mockMvc
+                            .perform(
+                                multipartPatchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                    .file(
+                                        createMultipartFile(
+                                            TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME,
+                                            objectMapper.writeValueAsString(createTestFoodSpotsUpdateRequest()).byteInputStream(),
+                                        ),
+                                    ),
+                            ).andExpect(status().isCreated)
+                    }
+                }
+
+                `when`("이미지 파일만 들어올 경우") {
+                    then("해당 가게 정보를 수정하며 201 을 반환한다.") {
+                        mockMvc
+                            .perform(
+                                multipartPatchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                    .file(
+                                        TEST_FOOD_SPOTS_UPDATE_REQUEST_PHOTO,
+                                        reportPhotos[0].bytes,
+                                    ).file(
+                                        TEST_FOOD_SPOTS_UPDATE_REQUEST_PHOTO,
+                                        reportPhotos[1].bytes,
+                                    ),
                             ).andExpect(status().isCreated)
                     }
                 }
 
                 `when`("음식점 ID가 양수가 아닌 경우") {
+                    val request = createTestFoodSpotsUpdateRequest()
                     then("400을 반환") {
                         mockMvc
                             .perform(
-                                patchWithAuth("$requestPath/$TEST_INVALID_FOOD_SPOT_ID")
-                                    .content(objectMapper.writeValueAsString(createTestFoodSpotsUpdateRequest()))
-                                    .contentType("application/json"),
+                                multipartPatchWithAuth("$requestPath/$TEST_INVALID_FOOD_SPOT_ID")
+                                    .file(
+                                        createMultipartFile(
+                                            TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME,
+                                            objectMapper.writeValueAsString(request).byteInputStream(),
+                                        ),
+                                    ),
                             ).andExpect(status().isBadRequest)
                     }
                 }
@@ -322,10 +373,13 @@ class FoodSpotsControllerTest(
                     then("400을 반환") {
                         mockMvc
                             .perform(
-                                patchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
-                                    .content(
-                                        objectMapper.writeValueAsString(request),
-                                    ).contentType("application/json"),
+                                multipartPatchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                    .file(
+                                        createMultipartFile(
+                                            TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME,
+                                            objectMapper.writeValueAsString(request).byteInputStream(),
+                                        ),
+                                    ),
                             ).andExpect(status().isBadRequest)
                     }
                 }
@@ -335,10 +389,13 @@ class FoodSpotsControllerTest(
                     then("400을 반환") {
                         mockMvc
                             .perform(
-                                patchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
-                                    .content(
-                                        objectMapper.writeValueAsString(request),
-                                    ).contentType("application/json"),
+                                multipartPatchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                    .file(
+                                        createMultipartFile(
+                                            TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME,
+                                            objectMapper.writeValueAsString(request).byteInputStream(),
+                                        ),
+                                    ),
                             ).andExpect(status().isBadRequest)
                     }
                 }
@@ -348,10 +405,13 @@ class FoodSpotsControllerTest(
                     then("400을 반환") {
                         mockMvc
                             .perform(
-                                patchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
-                                    .content(
-                                        objectMapper.writeValueAsString(request),
-                                    ).contentType("application/json"),
+                                multipartPatchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                    .file(
+                                        createMultipartFile(
+                                            TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME,
+                                            objectMapper.writeValueAsString(request).byteInputStream(),
+                                        ),
+                                    ),
                             ).andExpect(status().isBadRequest)
                     }
                 }
@@ -361,10 +421,13 @@ class FoodSpotsControllerTest(
                     then("400을 반환") {
                         mockMvc
                             .perform(
-                                patchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
-                                    .content(
-                                        objectMapper.writeValueAsString(request),
-                                    ).contentType("application/json"),
+                                multipartPatchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                    .file(
+                                        createMultipartFile(
+                                            TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME,
+                                            objectMapper.writeValueAsString(request).byteInputStream(),
+                                        ),
+                                    ),
                             ).andExpect(status().isBadRequest)
                     }
                 }
@@ -374,10 +437,13 @@ class FoodSpotsControllerTest(
                     then("400을 반환") {
                         mockMvc
                             .perform(
-                                patchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
-                                    .content(
-                                        objectMapper.writeValueAsString(request),
-                                    ).contentType("application/json"),
+                                multipartPatchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                    .file(
+                                        createMultipartFile(
+                                            TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME,
+                                            objectMapper.writeValueAsString(request).byteInputStream(),
+                                        ),
+                                    ),
                             ).andExpect(status().isBadRequest)
                     }
                 }
@@ -393,10 +459,82 @@ class FoodSpotsControllerTest(
                     then("400을 반환") {
                         mockMvc
                             .perform(
-                                patchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
-                                    .content(
-                                        objectMapper.writeValueAsString(request),
-                                    ).contentType("application/json"),
+                                multipartPatchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                    .file(
+                                        createMultipartFile(
+                                            TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME,
+                                            objectMapper.writeValueAsString(request).byteInputStream(),
+                                        ),
+                                    ),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+
+                `when`("이미지가 3개 초과인 경우") {
+                    val request = createTestReportRequest()
+                    val tooLargeReportPhotos = createMockPhotoList(WEBP, size = 4)
+                    then("400을 반환") {
+                        mockMvc
+                            .perform(
+                                multipartPatchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                    .file(
+                                        createMultipartFile(
+                                            TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME,
+                                            objectMapper.writeValueAsString(request).byteInputStream(),
+                                        ),
+                                    ).file(
+                                        TEST_FOOD_SPOTS_UPDATE_REQUEST_PHOTO,
+                                        tooLargeReportPhotos[0].bytes,
+                                    ).file(
+                                        TEST_FOOD_SPOTS_UPDATE_REQUEST_PHOTO,
+                                        tooLargeReportPhotos[1].bytes,
+                                    ).file(
+                                        TEST_FOOD_SPOTS_UPDATE_REQUEST_PHOTO,
+                                        tooLargeReportPhotos[2].bytes,
+                                    ).file(
+                                        TEST_FOOD_SPOTS_UPDATE_REQUEST_PHOTO,
+                                        tooLargeReportPhotos[3].bytes,
+                                    ),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+
+                `when`("이미지 형식이 webp가 아닌 경우") {
+                    val request = createTestReportRequest()
+                    val reportPhotosJpeg = createMockPhotoList(ImageFormat.JPEG)
+                    then("400을 반환") {
+                        mockMvc
+                            .perform(
+                                multipartPatchWithAuth(requestPath)
+                                    .file(
+                                        createMultipartFile(
+                                            TEST_FOOD_SPOTS_REQUEST_NAME,
+                                            objectMapper
+                                                .writeValueAsBytes(request)
+                                                .inputStream(),
+                                        ),
+                                    ).file(TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME, reportPhotosJpeg[0].bytes)
+                                    .file(TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME, reportPhotosJpeg[1].bytes),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+
+                `when`("파일의 크기가 1MB를 초과하면") {
+                    val request = createTestReportRequest()
+                    val mockFile: MockMultipartFile = mockk<MockMultipartFile>()
+                    every { mockFile.size } returns 1024 * 1024 + 1
+                    every { mockFile.name } returns TEST_FOOD_SPOTS_UPDATE_REQUEST_PHOTO
+                    every { mockFile.inputStream } returns createTestImageFile(WEBP).inputStream
+                    then("400을 반환") {
+                        mockMvc
+                            .perform(
+                                multipartPatchWithAuth("$requestPath/$TEST_FOOD_SPOT_ID")
+                                    .file(
+                                        createMultipartFile(
+                                            TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME,
+                                            objectMapper.writeValueAsString(request).byteInputStream(),
+                                        ),
+                                    ).file(mockFile),
                             ).andExpect(status().isBadRequest)
                     }
                 }

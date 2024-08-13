@@ -16,6 +16,7 @@ import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHours
 import kr.weit.roadyfoody.foodSpots.exception.AlreadyClosedFoodSpotsException
 import kr.weit.roadyfoody.foodSpots.exception.NotFoodSpotsHistoriesOwnerException
 import kr.weit.roadyfoody.foodSpots.exception.TooManyReportRequestException
+import kr.weit.roadyfoody.foodSpots.exception.UnauthorizedPhotoRemoveException
 import kr.weit.roadyfoody.foodSpots.repository.FoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSportsOperationHoursRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsFoodCategoryRepository
@@ -70,7 +71,7 @@ class FoodSpotsCommandService(
             Duration.ofHours(23) + Duration.ofMinutes(50)
 
         private const val FOOD_SPOTS_REPORT_LIMIT_PREFIX = "rofo:report-request-limit:"
-        private const val FOOD_SPOTS_REPORT_LIMIT_COUNT = 5
+        const val FOOD_SPOTS_REPORT_LIMIT_COUNT = 5
 
         fun getFoodSpotsReportCountKey(userId: Long) = "$FOOD_SPOTS_REPORT_LIMIT_PREFIX$userId"
     }
@@ -82,13 +83,9 @@ class FoodSpotsCommandService(
         photos: List<MultipartFile>?,
     ) {
         val key = getFoodSpotsReportCountKey(user.id)
-        check(canGenerateReport(key)) {
+        check(incrementAndCheckReportCount(key)) {
             throw TooManyReportRequestException()
         }
-
-        TransactionSynchronizationManager.registerSynchronization(
-            ReportErrorCompensatingTxSync(key, redisTemplate),
-        )
 
         val foodSpots = reportRequest.toFoodSpotsEntity()
         storeFoodSpots(
@@ -144,50 +141,92 @@ class FoodSpotsCommandService(
     fun doUpdateReport(
         user: User,
         foodSpotsId: Long,
-        request: FoodSpotsUpdateRequest,
+        request: FoodSpotsUpdateRequest?,
+        reportPhotos: List<MultipartFile>?,
     ) {
         val key = getFoodSpotsReportCountKey(user.id)
-        check(canGenerateReport(key)) {
+        check(incrementAndCheckReportCount(key)) {
             throw TooManyReportRequestException()
         }
 
-        TransactionSynchronizationManager.registerSynchronization(
-            ReportErrorCompensatingTxSync(key, redisTemplate),
-        )
-
         val foodSpots = foodSpotsRepository.getByFoodSpotsId(foodSpotsId)
 
-        if (request.closed != null && request.closed && foodSpots.storeClosure) {
+        if (request?.closed != null && request.closed && foodSpots.storeClosure) {
             throw AlreadyClosedFoodSpotsException()
         }
 
         val changed =
             run {
-                val foodSpotsUpdated = updateFoodSpots(foodSpots, request)
-                val categoriesUpdated = updateFoodSpotsCategories(foodSpots, request)
-                val operationHoursUpdated = updateFoodSpotsOperationHours(foodSpots, request)
-                foodSpotsUpdated || categoriesUpdated || operationHoursUpdated
+                val foodSpotsUpdated = request?.let { updateFoodSpots(foodSpots, request) } ?: false
+                val categoriesUpdated = request?.let { updateFoodSpotsCategories(foodSpots, request) } ?: false
+                val operationHoursUpdated = request?.let { updateFoodSpotsOperationHours(foodSpots, request) } ?: false
+                val photosUpdated =
+                    reportPhotos?.isNotEmpty() ?: false ||
+                        request?.photoIdsToRemove?.isNotEmpty() ?: false
+                foodSpotsUpdated || categoriesUpdated || operationHoursUpdated || photosUpdated
             }
 
         if (!changed) {
             throw RoadyFoodyBadRequestException(ErrorCode.INVALID_CHANGE_VALUE)
         }
 
-        val foodSpotsHistory = request.toFoodSpotsHistoryEntity(foodSpots, user)
+        val foodSpotsHistory =
+            request?.toFoodSpotsHistoryEntity(foodSpots, user) ?: FoodSpotsHistory.from(foodSpots, user)
+
         storeReport(
             foodSpotsHistory,
             // 카테고리나 운영시간을 미기재할 시 기존 FoodSpots 의 값을 그대로 사용
-            request.foodCategories ?: foodSpots.foodCategoryList.map { it.foodCategory.id }.toSet(),
-            request.toReportOperationHoursEntity(foodSpotsHistory)
+            request?.foodCategories ?: foodSpots.foodCategoryList.map { it.foodCategory.id }.toSet(),
+            request?.toReportOperationHoursEntity(foodSpotsHistory)
                 ?: foodSpots.operationHoursList.map {
                     ReportOperationHours(foodSpotsHistory, it.dayOfWeek, it.openingHours, it.closingHours)
                 },
         )
 
+        val generatorPhotoNameMap =
+            reportPhotos?.associateBy { imageService.generateImageName(it) } ?: emptyMap()
+
+        generatorPhotoNameMap
+            .map {
+                FoodSpotsPhoto.of(foodSpotsHistory, it.key)
+            }.also { foodSpotsPhotoRepository.saveAll(it) }
+
+        val requestedPhotoIdsToRemove = request?.photoIdsToRemove ?: emptyList()
+        val photosToRemove = foodSpotsPhotoRepository.findAllById(requestedPhotoIdsToRemove)
+
+        if (requestedPhotoIdsToRemove.size != photosToRemove.size ||
+            photosToRemove.any { it.history.user.id != user.id } ||
+            isNotPhotosBelongingToFoodSpots(foodSpots.id, photosToRemove)
+        ) {
+            throw UnauthorizedPhotoRemoveException()
+        }
+
+        foodSpotsPhotoRepository.deleteAll(photosToRemove)
+
         entityManager.flush()
 
         userCommandService.increaseCoin(user.id, foodSpotsHistory.reportType.reportReward.point)
+
+        (
+            generatorPhotoNameMap
+                .map {
+                    CompletableFuture.supplyAsync({
+                        imageService.upload(it.key, it.value)
+                    }, executor)
+                } +
+                photosToRemove
+                    .map {
+                        CompletableFuture.supplyAsync({
+                            imageService.remove(it.fileName)
+                        }, executor)
+                    }
+        ).forEach { it.join() }
     }
+
+    private fun isNotPhotosBelongingToFoodSpots(
+        foodSpotsId: Long,
+        photosToRemove: List<FoodSpotsPhoto>,
+    ): Boolean = photosToRemove.any { it.history.foodSpots.id != foodSpotsId }
 
     private fun storeReport(
         foodStoreHistory: FoodSpotsHistory,
@@ -280,9 +319,13 @@ class FoodSpotsCommandService(
         return changed
     }
 
-    private fun canGenerateReport(key: String): Boolean {
+    private fun incrementAndCheckReportCount(key: String): Boolean {
         // redis 내에 존재하지 않을 시 1L 반환
         val count = redisTemplate.opsForValue().increment(key)!!
+
+        TransactionSynchronizationManager.registerSynchronization(
+            ReportErrorCompensatingTxSync(key, redisTemplate),
+        )
 
         if (count > FOOD_SPOTS_REPORT_LIMIT_COUNT) {
             return false
