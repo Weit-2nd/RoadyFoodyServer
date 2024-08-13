@@ -15,12 +15,11 @@ import io.mockk.spyk
 import io.mockk.verify
 import kr.weit.roadyfoody.foodSpots.exception.FoodSpotsHistoryNotFoundException
 import kr.weit.roadyfoody.foodSpots.fixture.MockTestFoodSpot
-import kr.weit.roadyfoody.foodSpots.fixture.TEST_AVERAGE_RATE
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_HISTORY_ID
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_PHOTO_URL
-import kr.weit.roadyfoody.foodSpots.fixture.TEST_REVIEW_COUNT
 import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodHistory
 import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodSpotList
+import kr.weit.roadyfoody.foodSpots.fixture.createTestAggregatedInfoResponse
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodHistory
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsForDistance
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsPhoto
@@ -40,9 +39,7 @@ import kr.weit.roadyfoody.review.exception.FoodSpotsNotFoundException
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewPhotoRepository
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
 import kr.weit.roadyfoody.review.repository.ReviewSortType
-import kr.weit.roadyfoody.review.repository.countFoodSpotsReview
 import kr.weit.roadyfoody.review.repository.getByReview
-import kr.weit.roadyfoody.review.repository.getFoodSpotsAvgRate
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import kr.weit.roadyfoody.user.repository.UserRepository
@@ -289,8 +286,7 @@ class FoodSpotsQueryServiceTest :
                 every { foodSpotsPhotoRepository.findByHistoryIn(any()) } returns
                     listOf(createTestFoodSpotsPhoto())
                 every { imageService.getDownloadUrl(any()) } returns TEST_FOOD_SPOTS_PHOTO_URL
-                every { reviewRepository.getFoodSpotsAvgRate(any()) } returns TEST_AVERAGE_RATE
-                every { reviewRepository.countFoodSpotsReview(any()) } returns TEST_REVIEW_COUNT
+                every { reviewRepository.getReviewAggregatedInfo(any()) } returns createTestAggregatedInfoResponse()
                 `when`("정상적인 데이터가 들어올 경우") {
                     then("정상적으로 음식점 상세가 조회되어야 한다.") {
                         foodSPotsQueryService.getFoodSpotsDetail(TEST_FOOD_SPOT_ID)
