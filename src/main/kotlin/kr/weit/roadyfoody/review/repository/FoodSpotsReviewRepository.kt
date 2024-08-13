@@ -4,6 +4,7 @@ import com.linecorp.kotlinjdsl.dsl.jpql.Jpql
 import com.linecorp.kotlinjdsl.querymodel.jpql.predicate.Predicate
 import com.linecorp.kotlinjdsl.querymodel.jpql.sort.Sortable
 import com.linecorp.kotlinjdsl.support.spring.data.jpa.repository.KotlinJdslJpqlExecutor
+import kr.weit.roadyfoody.foodSpots.application.dto.ReviewAggregatedInfoResponse
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.global.utils.getSlice
 import kr.weit.roadyfoody.review.domain.FoodSpotsReview
@@ -37,6 +38,8 @@ interface CustomFoodSpotsReviewRepository {
         lastId: Long?,
         sortType: ReviewSortType,
     ): Slice<FoodSpotsReview>
+
+    fun getReviewAggregatedInfo(foodSpots: FoodSpots): ReviewAggregatedInfoResponse
 }
 
 class CustomFoodSpotsReviewRepositoryImpl(
@@ -80,6 +83,16 @@ class CustomFoodSpotsReviewRepositoryImpl(
                 )
         }
     }
+
+    override fun getReviewAggregatedInfo(foodSpots: FoodSpots): ReviewAggregatedInfoResponse =
+        kotlinJdslJpqlExecutor
+            .findAll {
+                selectNew<ReviewAggregatedInfoResponse>(
+                    avg(path(FoodSpotsReview::rate)),
+                    count(path(FoodSpotsReview::id)),
+                ).from(entity(FoodSpotsReview::class))
+                    .where(path(FoodSpotsReview::foodSpots).equal(foodSpots))
+            }.first()!!
 
     private fun Jpql.dynamicOrder(sortType: ReviewSortType): Array<Sortable> =
         when (sortType) {
