@@ -55,16 +55,24 @@ class User(
         this.coin += plusCoin
         return this.coin
     }
+
+    fun changeNickname(nickname: String) {
+        profile = profile.changeNickname(nickname)
+    }
+
+    fun changeProfileImageName(profileImageName: String? = null) {
+        profile = profile.changeProfileImageName(profileImageName)
+    }
 }
 
 @Embeddable
 class Profile(
-    @Column(length = 48, updatable = false, nullable = false, unique = true)
+    @Column(length = 48, nullable = false, unique = true)
     val nickname: String,
     @Column(length = 50)
-    var profileImageName: String? = null,
+    val profileImageName: String? = null,
 ) {
-    fun changeProfileImageName(profileImageName: String) {
-        this.profileImageName = profileImageName
-    }
+    fun changeProfileImageName(profileImageName: String? = null) = Profile(this.nickname, profileImageName)
+
+    fun changeNickname(nickname: String) = Profile(nickname, this.profileImageName)
 }
