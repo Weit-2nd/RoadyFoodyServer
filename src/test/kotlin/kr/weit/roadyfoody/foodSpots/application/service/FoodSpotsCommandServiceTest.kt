@@ -133,7 +133,7 @@ class FoodSpotsCommandServiceTest :
                 `when`("정상적인 데이터와 이미지가 들어올 경우") {
                     then("정상적으로 저장되어야 한다.") {
                         foodSpotsCommandService.createReport(
-                            createTestUser(),
+                            user,
                             createTestReportRequest(),
                             createMockPhotoList(ImageFormat.WEBP),
                         )
@@ -143,7 +143,7 @@ class FoodSpotsCommandServiceTest :
                 `when`("정상적인 데이터만 들어올 경우") {
                     then("정상적으로 저장되어야 한다.") {
                         foodSpotsCommandService.createReport(
-                            createTestUser(),
+                            user,
                             createTestReportRequest(),
                             null,
                         )
@@ -156,7 +156,7 @@ class FoodSpotsCommandServiceTest :
                     then("CategoriesNotFoundException 이 발생한다.") {
                         shouldThrow<CategoriesNotFoundException> {
                             foodSpotsCommandService.createReport(
-                                createTestUser(),
+                                user,
                                 createTestReportRequest(),
                                 createMockPhotoList(ImageFormat.WEBP),
                             )
@@ -202,7 +202,7 @@ class FoodSpotsCommandServiceTest :
 
                     then("정상적으로 업데이트 되어야 한다.") {
                         foodSpotsCommandService.doUpdateReport(
-                            createTestUser(),
+                            user,
                             TEST_FOOD_SPOT_ID,
                             onlyNameChangeRequest,
                             null,
@@ -228,7 +228,7 @@ class FoodSpotsCommandServiceTest :
                             ),
                         ) { request ->
                             foodSpotsCommandService.doUpdateReport(
-                                createTestUser(),
+                                user,
                                 TEST_FOOD_SPOT_ID,
                                 request,
                                 null,
@@ -245,7 +245,7 @@ class FoodSpotsCommandServiceTest :
 
                     then("정상적으로 업데이트 되어야 한다.") {
                         foodSpotsCommandService.doUpdateReport(
-                            createTestUser(),
+                            user,
                             TEST_FOOD_SPOT_ID,
                             closeUpdateRequest,
                             null,
@@ -261,7 +261,7 @@ class FoodSpotsCommandServiceTest :
 
                     then("정상적으로 업데이트 되어야 한다.") {
                         foodSpotsCommandService.doUpdateReport(
-                            createTestUser(),
+                            user,
                             TEST_FOOD_SPOT_ID,
                             openUpdateRequest,
                             null,
@@ -277,7 +277,7 @@ class FoodSpotsCommandServiceTest :
 
                     then("정상적으로 업데이트 되어야 한다.") {
                         foodSpotsCommandService.doUpdateReport(
-                            createTestUser(),
+                            user,
                             TEST_FOOD_SPOT_ID,
                             openUpdateRequest,
                             null,
@@ -305,7 +305,7 @@ class FoodSpotsCommandServiceTest :
 
                     then("정상적으로 업데이트 되어야 한다.") {
                         foodSpotsCommandService.doUpdateReport(
-                            createTestUser(),
+                            user,
                             TEST_FOOD_SPOT_ID,
                             onlyCategoryAddRequest,
                             null,
@@ -330,7 +330,7 @@ class FoodSpotsCommandServiceTest :
 
                     then("정상적으로 업데이트 되어야 한다.") {
                         foodSpotsCommandService.doUpdateReport(
-                            createTestUser(),
+                            user,
                             TEST_FOOD_SPOT_ID,
                             onlyCategoryDeleteRequest,
                             null,
@@ -359,7 +359,7 @@ class FoodSpotsCommandServiceTest :
 
                     then("정상적으로 업데이트 되어야 한다.") {
                         foodSpotsCommandService.doUpdateReport(
-                            createTestUser(),
+                            user,
                             TEST_FOOD_SPOT_ID,
                             categoryAddAndDeleteRequest,
                             null,
@@ -386,7 +386,7 @@ class FoodSpotsCommandServiceTest :
 
                     then("정상적으로 업데이트 되어야 한다.") {
                         foodSpotsCommandService.doUpdateReport(
-                            createTestUser(),
+                            user,
                             TEST_FOOD_SPOT_ID,
                             onlyOperationHoursChangeRequest,
                             null,
@@ -423,7 +423,7 @@ class FoodSpotsCommandServiceTest :
 
                     then("정상적으로 업데이트 되어야 한다.") {
                         foodSpotsCommandService.doUpdateReport(
-                            createTestUser(),
+                            user,
                             TEST_FOOD_SPOT_ID,
                             null,
                             createMockPhotoList(ImageFormat.WEBP),
@@ -440,7 +440,7 @@ class FoodSpotsCommandServiceTest :
                     then("변경된 값이 없으므로 RoadyFoodyBadRequestException 이 발생해야 한다.") {
                         shouldThrow<RoadyFoodyBadRequestException> {
                             foodSpotsCommandService.doUpdateReport(
-                                createTestUser(),
+                                user,
                                 TEST_FOOD_SPOT_ID,
                                 noChangeRequest,
                                 null,
@@ -453,7 +453,7 @@ class FoodSpotsCommandServiceTest :
                     then("RoadyFoodyBadRequestException 이 발생해야 한다.") {
                         shouldThrow<RoadyFoodyBadRequestException> {
                             foodSpotsCommandService.doUpdateReport(
-                                createTestUser(),
+                                user,
                                 TEST_FOOD_SPOT_ID,
                                 null,
                                 null,
@@ -471,7 +471,7 @@ class FoodSpotsCommandServiceTest :
                     then("AlreadyClosedFoodSpotsException 이 발생해야 한다.") {
                         shouldThrow<AlreadyClosedFoodSpotsException> {
                             foodSpotsCommandService.doUpdateReport(
-                                createTestUser(),
+                                user,
                                 TEST_FOOD_SPOT_ID,
                                 closeUpdateRequest,
                                 null,
@@ -547,7 +547,7 @@ class FoodSpotsCommandServiceTest :
                     then("UnauthorizedPhotoRemoveException 이 발생해야 한다.") {
                         shouldThrow<UnauthorizedPhotoRemoveException> {
                             foodSpotsCommandService.doUpdateReport(
-                                createTestUser(),
+                                user,
                                 TEST_FOOD_SPOT_ID,
                                 photoRemoveRequest,
                                 null,
@@ -574,7 +574,7 @@ class FoodSpotsCommandServiceTest :
                     then("UnauthorizedPhotoRemoveException 이 발생해야 한다.") {
                         shouldThrow<UnauthorizedPhotoRemoveException> {
                             foodSpotsCommandService.doUpdateReport(
-                                createTestUser(),
+                                user,
                                 TEST_FOOD_SPOT_ID,
                                 photoRemoveRequest,
                                 null,
@@ -592,7 +592,7 @@ class FoodSpotsCommandServiceTest :
                     then("UnauthorizedPhotoRemoveException 이 발생해야 한다.") {
                         shouldThrow<UnauthorizedPhotoRemoveException> {
                             foodSpotsCommandService.doUpdateReport(
-                                createTestUser(),
+                                user,
                                 TEST_FOOD_SPOT_ID,
                                 photoRemoveRequest,
                                 null,
