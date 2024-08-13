@@ -1,6 +1,8 @@
 package kr.weit.roadyfoody.user.application.service
 
 import kr.weit.roadyfoody.common.dto.SliceResponse
+import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsCommandService.Companion.FOOD_SPOTS_REPORT_LIMIT_COUNT
+import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsCommandService.Companion.getFoodSpotsReportCountKey
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsPhotoRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
@@ -19,6 +21,7 @@ import kr.weit.roadyfoody.user.application.dto.UserReviewResponse
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.repository.UserRepository
 import kr.weit.roadyfoody.user.repository.getByUserId
+import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -31,15 +34,21 @@ class UserQueryService(
     private val reportFoodCategoryRepository: ReportFoodCategoryRepository,
     private val reviewRepository: FoodSpotsReviewRepository,
     private val reviewPhotoRepository: FoodSpotsReviewPhotoRepository,
+    private val redisTemplate: RedisTemplate<String, String>,
 ) {
     fun getUserInfo(user: User): UserInfoResponse {
         val user = userRepository.getByUserId(user.id)
         val profileImageUrl = user.profile.profileImageName?.let { imageService.getDownloadUrl(it) }
 
+        val reportCountKey = getFoodSpotsReportCountKey(user.id)
+        val dailyReportCreationCount = redisTemplate.opsForValue().get(reportCountKey)?.toInt() ?: 0
+        val restDailyReportCreationCount = FOOD_SPOTS_REPORT_LIMIT_COUNT - dailyReportCreationCount
+
         return UserInfoResponse.of(
             user.profile.nickname,
             profileImageUrl,
             user.coin,
+            restDailyReportCreationCount,
         )
     }
 
