@@ -195,6 +195,7 @@ class FoodSpotsCommandService(
         val photosToRemove = foodSpotsPhotoRepository.findAllById(requestedPhotoIdsToRemove)
 
         if (requestedPhotoIdsToRemove.size != photosToRemove.size ||
+            photosToRemove.any { it.history.user.id != user.id } ||
             isNotPhotosBelongingToFoodSpots(foodSpots.id, photosToRemove)
         ) {
             throw UnauthorizedPhotoRemoveException()
