@@ -1,6 +1,7 @@
 package kr.weit.roadyfoody.reward.application.service
 
 import io.kotest.core.spec.style.BehaviorSpec
+import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import kr.weit.roadyfoody.reward.fixture.createTestRewards
@@ -11,6 +12,8 @@ class RewardsCommandServiceTest :
         {
             val rewardsRepository = mockk<RewardsRepository>()
             val rewardsCommandService = RewardsCommandService(rewardsRepository)
+
+            afterEach { clearAllMocks() }
 
             given("createRewards 테스트") {
                 val rewards = createTestRewards()
