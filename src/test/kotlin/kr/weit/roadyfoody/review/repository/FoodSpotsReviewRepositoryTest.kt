@@ -26,12 +26,14 @@ class FoodSpotsReviewRepositoryTest(
             lateinit var otherUser: User
             lateinit var foodSpots: FoodSpots
             lateinit var otherFoodSpots: FoodSpots
+            lateinit var noReviewsFoodSpots: FoodSpots
             lateinit var reviewList: List<FoodSpotsReview>
             beforeEach {
                 user = userRepository.save(createTestUser(0L))
                 otherUser = userRepository.save(createTestUser(0L, "otherUser"))
                 foodSpots = foodSpotsRepository.save(createTestFoodSpots())
                 otherFoodSpots = foodSpotsRepository.save(createTestFoodSpots())
+                noReviewsFoodSpots = foodSpotsRepository.save(createTestFoodSpots())
                 reviewList =
                     reviewRepository.saveAll(
                         listOf(
@@ -154,6 +156,33 @@ class FoodSpotsReviewRepositoryTest(
                                     ReviewSortType.HIGHEST,
                                 )
                         contents.content shouldBe listOf(reviewList[2])
+                    }
+                }
+            }
+            describe("getFoodSpotsAvgRate 메소드는") {
+                context("음식점을 받는 경우") {
+                    it("해당 음식점의 평균 별점을 반환한다.") {
+                        reviewRepository.getFoodSpotsAvgRate(foodSpots) shouldBe 7.0
+                    }
+                }
+
+                context("리뷰가 없는 음식점을 받는 경우") {
+                    it("0.0을 반환한다.") {
+                        reviewRepository.getFoodSpotsAvgRate(noReviewsFoodSpots) shouldBe 0.0
+                    }
+                }
+            }
+
+            describe("countFoodSpotsReview 메소드는") {
+                context("음식점을 받는 경우") {
+                    it("해당 음식점의 리뷰 개수를 반환한다.") {
+                        reviewRepository.countFoodSpotsReview(otherFoodSpots) shouldBe 2
+                    }
+                }
+
+                context("리뷰가 없는 음식점을 받는 경우") {
+                    it("0을 반환한다.") {
+                        reviewRepository.countFoodSpotsReview(noReviewsFoodSpots) shouldBe 0
                     }
                 }
             }

@@ -76,6 +76,8 @@ const val TEST_UPDATE_OPERATION_HOURS_OPEN = "10:00"
 const val TEST_UPDATE_OPERATION_HOURS_CLOSE = "13:59"
 const val TEST_FOOD_SPOTS_HISTORY_ID = 1L
 const val TEST_INVALID_FOOD_SPOTS_HISTORY_ID = -1L
+const val TEST_AVERAGE_RATE = 4.5
+const val TEST_REVIEW_COUNT = 2L
 
 fun createMockTestFoodSpot(
     id: Long = 0L,
@@ -432,4 +434,6 @@ fun createTestFoodSpotsDetailResponse(): FoodSpotsDetailResponse =
         createMockTestFoodSpot(),
         OperationStatus.OPEN,
         listOf(createTestReportPhotoResponse()),
+        TEST_AVERAGE_RATE,
+        TEST_REVIEW_COUNT,
     )

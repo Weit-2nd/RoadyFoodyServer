@@ -18,6 +18,10 @@ fun FoodSpotsReviewRepository.getReviewByReviewId(reviewId: Long): FoodSpotsRevi
         FoodSpotsReviewNotFoundException()
     }
 
+fun FoodSpotsReviewRepository.getFoodSpotsAvgRate(foodSpots: FoodSpots): Double = getAverageRateByFoodSpots(foodSpots)
+
+fun FoodSpotsReviewRepository.countFoodSpotsReview(foodSpots: FoodSpots): Long = countReviewByFoodSpots(foodSpots)
+
 interface FoodSpotsReviewRepository :
     JpaRepository<FoodSpotsReview, Long>,
     CustomFoodSpotsReviewRepository {
@@ -37,6 +41,10 @@ interface CustomFoodSpotsReviewRepository {
         lastId: Long?,
         sortType: ReviewSortType,
     ): Slice<FoodSpotsReview>
+
+    fun getAverageRateByFoodSpots(foodSpots: FoodSpots): Double
+
+    fun countReviewByFoodSpots(foodSpots: FoodSpots): Long
 }
 
 class CustomFoodSpotsReviewRepositoryImpl(
@@ -80,6 +88,22 @@ class CustomFoodSpotsReviewRepositoryImpl(
                 )
         }
     }
+
+    override fun getAverageRateByFoodSpots(foodSpots: FoodSpots): Double =
+        kotlinJdslJpqlExecutor
+            .findAll {
+                select(avg(path(FoodSpotsReview::rate)))
+                    .from(entity(FoodSpotsReview::class))
+                    .where(path(FoodSpotsReview::foodSpots).equal(foodSpots))
+            }.first() ?: 0.0
+
+    override fun countReviewByFoodSpots(foodSpots: FoodSpots): Long =
+        kotlinJdslJpqlExecutor
+            .findAll {
+                select(count(path(FoodSpotsReview::id)))
+                    .from(entity(FoodSpotsReview::class))
+                    .where(path(FoodSpotsReview::foodSpots).equal(foodSpots))
+            }.first() ?: 0
 
     private fun Jpql.dynamicOrder(sortType: ReviewSortType): Array<Sortable> =
         when (sortType) {

@@ -341,11 +341,17 @@ data class FoodSpotsDetailResponse(
     val foodSpotsPhotos: List<ReportPhotoResponse>,
     @Schema(description = "음식점 생성 일자")
     val createdDateTime: LocalDateTime,
+    @Schema(description = "평균 별점")
+    val averageRate: Double,
+    @Schema(description = "리뷰 개수")
+    val reviewCount: Long,
 ) {
     constructor(
         foodSpots: FoodSpots,
         openStatus: OperationStatus,
         foodSpotsPhotos: List<ReportPhotoResponse>,
+        averageRate: Double,
+        reviewCount: Long,
     ) :
         this(
             id = foodSpots.id,
@@ -364,6 +370,8 @@ data class FoodSpotsDetailResponse(
             foodCategoryList = foodSpots.foodCategoryList.map { FoodSpotsFoodCategoryResponse(it) },
             foodSpotsPhotos = foodSpotsPhotos,
             createdDateTime = foodSpots.createdDateTime,
+            averageRate = averageRate,
+            reviewCount = reviewCount,
         )
 }
 

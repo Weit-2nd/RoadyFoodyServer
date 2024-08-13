@@ -22,7 +22,9 @@ import kr.weit.roadyfoody.review.application.dto.ReviewPhotoResponse
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewPhotoRepository
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
 import kr.weit.roadyfoody.review.repository.ReviewSortType
+import kr.weit.roadyfoody.review.repository.countFoodSpotsReview
 import kr.weit.roadyfoody.review.repository.getByReview
+import kr.weit.roadyfoody.review.repository.getFoodSpotsAvgRate
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponse
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponses
@@ -134,7 +136,15 @@ class FoodSpotsQueryService(
                         ReportPhotoResponse(photo, imageService.getDownloadUrl(photo.fileName))
                     }
                 }
-            FoodSpotsDetailResponse(foodSpots, determineOpenStatus(foodSpots), foodSpotsPhotos)
+            val avgRate = (reviewRepository.getFoodSpotsAvgRate(foodSpots) * 10).toInt() / 10.0
+            val reviewCount = reviewRepository.countFoodSpotsReview(foodSpots)
+            FoodSpotsDetailResponse(
+                foodSpots,
+                determineOpenStatus(foodSpots),
+                foodSpotsPhotos,
+                avgRate,
+                reviewCount,
+            )
         }
 
     private fun determineOpenStatus(foodSpot: FoodSpots): OperationStatus {
