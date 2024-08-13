@@ -29,8 +29,8 @@ class RestClientConfig {
         private const val CONNECT_TIME = 1L
         private const val READ_TIME = 5L
         private const val TOURISM_URL = "http://apis.data.go.kr/B551011/KorService1"
-        private const val KAKAO_ADDRESS_URL = "https://dapi.kakao.com"
         private const val KAKAO_LOGIN_URL = "https://kapi.kakao.com"
+        private const val KAKAO_ADDRESS_URL = "https://dapi.kakao.com"
     }
 
     private val log: Logger = LoggerFactory.getLogger(RestClientConfig::class.java)
