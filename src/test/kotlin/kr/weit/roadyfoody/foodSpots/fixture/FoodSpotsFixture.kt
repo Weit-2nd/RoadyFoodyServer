@@ -13,6 +13,7 @@ import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoryDetailResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportOperationHoursResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportPhotoResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
+import kr.weit.roadyfoody.foodSpots.application.dto.ReviewAggregatedInfoResponse
 import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
@@ -449,6 +450,11 @@ fun createTestFoodSpotsDetailResponse(): FoodSpotsDetailResponse =
         createMockTestFoodSpot(),
         OperationStatus.OPEN,
         listOf(createTestReportPhotoResponse()),
+        createTestAggregatedInfoResponse(),
+    )
+
+fun createTestAggregatedInfoResponse(): ReviewAggregatedInfoResponse =
+    ReviewAggregatedInfoResponse(
         TEST_AVERAGE_RATE,
         TEST_REVIEW_COUNT,
     )

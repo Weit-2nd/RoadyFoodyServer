@@ -4,6 +4,7 @@ import createTestFoodSpotsReview
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
+import kr.weit.roadyfoody.foodSpots.application.dto.ReviewAggregatedInfoResponse
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpots
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
@@ -159,30 +160,20 @@ class FoodSpotsReviewRepositoryTest(
                     }
                 }
             }
-            describe("getFoodSpotsAvgRate 메소드는") {
-                context("음식점을 받는 경우") {
-                    it("해당 음식점의 평균 별점을 반환한다.") {
-                        reviewRepository.getFoodSpotsAvgRate(foodSpots) shouldBe 7.0
+            describe("getReviewAggregatedInfo 메소드는") {
+                context("리뷰가 있는 음식점을 받는 경우") {
+                    it("해당 음식점의 리뷰 평균 별점과 리뷰 개수를 반환한다.") {
+                        val reviewAggregatedInfoResponse =
+                            reviewRepository.getReviewAggregatedInfo(foodSpots)
+                        reviewAggregatedInfoResponse shouldBe ReviewAggregatedInfoResponse(7.0, 2)
                     }
                 }
 
                 context("리뷰가 없는 음식점을 받는 경우") {
-                    it("0.0을 반환한다.") {
-                        reviewRepository.getFoodSpotsAvgRate(noReviewsFoodSpots) shouldBe 0.0
-                    }
-                }
-            }
-
-            describe("countFoodSpotsReview 메소드는") {
-                context("음식점을 받는 경우") {
-                    it("해당 음식점의 리뷰 개수를 반환한다.") {
-                        reviewRepository.countFoodSpotsReview(otherFoodSpots) shouldBe 2
-                    }
-                }
-
-                context("리뷰가 없는 음식점을 받는 경우") {
-                    it("0을 반환한다.") {
-                        reviewRepository.countFoodSpotsReview(noReviewsFoodSpots) shouldBe 0
+                    it("해당 음식점의 리뷰 평균 별점과 리뷰 개수를 반환한다.") {
+                        val reviewAggregatedInfoResponse =
+                            reviewRepository.getReviewAggregatedInfo(noReviewsFoodSpots)
+                        reviewAggregatedInfoResponse shouldBe ReviewAggregatedInfoResponse(0.0, 0)
                     }
                 }
             }

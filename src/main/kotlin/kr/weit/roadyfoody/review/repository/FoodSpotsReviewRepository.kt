@@ -4,6 +4,7 @@ import com.linecorp.kotlinjdsl.dsl.jpql.Jpql
 import com.linecorp.kotlinjdsl.querymodel.jpql.predicate.Predicate
 import com.linecorp.kotlinjdsl.querymodel.jpql.sort.Sortable
 import com.linecorp.kotlinjdsl.support.spring.data.jpa.repository.KotlinJdslJpqlExecutor
+import kr.weit.roadyfoody.foodSpots.application.dto.ReviewAggregatedInfoResponse
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.global.utils.getSlice
 import kr.weit.roadyfoody.review.domain.FoodSpotsReview
@@ -17,10 +18,6 @@ fun FoodSpotsReviewRepository.getReviewByReviewId(reviewId: Long): FoodSpotsRevi
     findById(reviewId).orElseThrow {
         FoodSpotsReviewNotFoundException()
     }
-
-fun FoodSpotsReviewRepository.getFoodSpotsAvgRate(foodSpots: FoodSpots): Double = getAverageRateByFoodSpots(foodSpots)
-
-fun FoodSpotsReviewRepository.countFoodSpotsReview(foodSpots: FoodSpots): Long = countReviewByFoodSpots(foodSpots)
 
 interface FoodSpotsReviewRepository :
     JpaRepository<FoodSpotsReview, Long>,
@@ -42,9 +39,7 @@ interface CustomFoodSpotsReviewRepository {
         sortType: ReviewSortType,
     ): Slice<FoodSpotsReview>
 
-    fun getAverageRateByFoodSpots(foodSpots: FoodSpots): Double
-
-    fun countReviewByFoodSpots(foodSpots: FoodSpots): Long
+    fun getReviewAggregatedInfo(foodSpots: FoodSpots): ReviewAggregatedInfoResponse
 }
 
 class CustomFoodSpotsReviewRepositoryImpl(
@@ -89,21 +84,15 @@ class CustomFoodSpotsReviewRepositoryImpl(
         }
     }
 
-    override fun getAverageRateByFoodSpots(foodSpots: FoodSpots): Double =
+    override fun getReviewAggregatedInfo(foodSpots: FoodSpots): ReviewAggregatedInfoResponse =
         kotlinJdslJpqlExecutor
             .findAll {
-                select(avg(path(FoodSpotsReview::rate)))
-                    .from(entity(FoodSpotsReview::class))
+                selectNew<ReviewAggregatedInfoResponse>(
+                    avg(path(FoodSpotsReview::rate)),
+                    count(path(FoodSpotsReview::id)),
+                ).from(entity(FoodSpotsReview::class))
                     .where(path(FoodSpotsReview::foodSpots).equal(foodSpots))
-            }.first() ?: 0.0
-
-    override fun countReviewByFoodSpots(foodSpots: FoodSpots): Long =
-        kotlinJdslJpqlExecutor
-            .findAll {
-                select(count(path(FoodSpotsReview::id)))
-                    .from(entity(FoodSpotsReview::class))
-                    .where(path(FoodSpotsReview::foodSpots).equal(foodSpots))
-            }.first() ?: 0
+            }.first()!!
 
     private fun Jpql.dynamicOrder(sortType: ReviewSortType): Array<Sortable> =
         when (sortType) {
