@@ -55,6 +55,7 @@ import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportOperationHoursRepository
 import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
 import kr.weit.roadyfoody.global.service.ImageService
+import kr.weit.roadyfoody.reward.application.service.RewardsCommandService
 import kr.weit.roadyfoody.support.utils.ImageFormat
 import kr.weit.roadyfoody.user.application.service.UserCommandService
 import kr.weit.roadyfoody.user.fixture.TEST_OTHER_USER_ID
@@ -82,6 +83,7 @@ class FoodSpotsCommandServiceTest :
             val imageService = spyk(ImageService(mockk()))
             val executor = mockk<ExecutorService>()
             val userCommandService = mockk<UserCommandService>()
+            val rewardsCommandService = mockk<RewardsCommandService>()
             val entityManager = mockk<EntityManager>()
             val redissonClient = mockk<RedissonClient>()
             val redisTemplate = mockk<RedisTemplate<String, String>>()
@@ -98,6 +100,7 @@ class FoodSpotsCommandServiceTest :
                     imageService,
                     executor,
                     userCommandService,
+                    rewardsCommandService,
                     entityManager,
                     redissonClient,
                     redisTemplate,
@@ -130,6 +133,7 @@ class FoodSpotsCommandServiceTest :
                 }
                 every { userCommandService.increaseCoin(any(), any()) } just runs
                 every { entityManager.flush() } just runs
+                every { rewardsCommandService.createRewards(any()) } just runs
                 `when`("정상적인 데이터와 이미지가 들어올 경우") {
                     then("정상적으로 저장되어야 한다.") {
                         foodSpotsCommandService.createReport(

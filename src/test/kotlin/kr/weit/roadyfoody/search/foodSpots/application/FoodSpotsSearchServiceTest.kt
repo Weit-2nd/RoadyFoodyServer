@@ -14,6 +14,7 @@ import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOT_LATITUDE
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOT_LONGITUDE
 import kr.weit.roadyfoody.foodSpots.fixture.createFoodSpotsSearchResponses
 import kr.weit.roadyfoody.foodSpots.fixture.createMockSearchCoinCaches
+import kr.weit.roadyfoody.reward.application.service.RewardsCommandService
 import kr.weit.roadyfoody.search.foodSpots.application.service.FoodSpotsSearchService
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
 import kr.weit.roadyfoody.search.foodSpots.repository.SearchCoinCacheRepository
@@ -25,14 +26,17 @@ class FoodSpotsSearchServiceTest :
         val foodSpotsQueryService = mockk<FoodSpotsQueryService>()
         val userCommandService = mockk<UserCommandService>()
         val searchCoinCacheRepository = mockk<SearchCoinCacheRepository>()
+        val rewardsCommandService = mockk<RewardsCommandService>()
 
         val foodSpotsSearchService =
             FoodSpotsSearchService(
                 foodSpotsQueryService,
                 userCommandService,
                 searchCoinCacheRepository,
+                rewardsCommandService
             )
 
+        every { rewardsCommandService.createRewards(any()) } just runs
         afterEach { clearAllMocks() }
 
         given("searchFoodSpots 테스트") {

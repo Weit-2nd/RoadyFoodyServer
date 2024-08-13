@@ -6,13 +6,7 @@ import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
 import kr.weit.roadyfoody.foodSpots.application.service.event.ReportErrorCompensatingTxSync
-import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
-import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
-import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
-import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsOperationHours
-import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
-import kr.weit.roadyfoody.foodSpots.domain.ReportFoodCategory
-import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHours
+import kr.weit.roadyfoody.foodSpots.domain.*
 import kr.weit.roadyfoody.foodSpots.exception.AlreadyClosedFoodSpotsException
 import kr.weit.roadyfoody.foodSpots.exception.NotFoodSpotsHistoriesOwnerException
 import kr.weit.roadyfoody.foodSpots.exception.TooManyReportRequestException
@@ -30,6 +24,9 @@ import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
 import kr.weit.roadyfoody.foodSpots.repository.getFoodCategories
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.global.utils.CoordinateUtils.Companion.createCoordinate
+import kr.weit.roadyfoody.reward.application.service.RewardsCommandService
+import kr.weit.roadyfoody.reward.domain.RewardReason
+import kr.weit.roadyfoody.reward.domain.Rewards
 import kr.weit.roadyfoody.user.application.service.UserCommandService
 import kr.weit.roadyfoody.user.domain.User
 import org.redisson.api.RedissonClient
@@ -61,6 +58,7 @@ class FoodSpotsCommandService(
     private val imageService: ImageService,
     private val executor: ExecutorService,
     private val userCommandService: UserCommandService,
+    private val rewardsCommandService : RewardsCommandService,
     private val entityManager: EntityManager,
     private val redissonClient: RedissonClient,
     private val redisTemplate: RedisTemplate<String, String>,
@@ -95,7 +93,7 @@ class FoodSpotsCommandService(
         )
 
         val foodSpotsHistory = reportRequest.toFoodSpotsHistoryEntity(foodSpots, user)
-        storeReport(
+        val savedFoodSpotsHistory = storeReport(
             foodSpotsHistory,
             reportRequest.foodCategories,
             reportRequest.toReportOperationHoursEntity(foodSpotsHistory),
@@ -111,6 +109,14 @@ class FoodSpotsCommandService(
 
         entityManager.flush()
 
+        rewardsCommandService.createRewards(
+            Rewards.of(
+                user,
+                savedFoodSpotsHistory,
+                foodSpotsHistory.reportType.reportReward.point,
+                true,
+                RewardReason.REPORT_CREATE
+        ))
         userCommandService.increaseCoin(user.id, foodSpotsHistory.reportType.reportReward.point)
 
         generatorPhotoNameMap
@@ -173,7 +179,7 @@ class FoodSpotsCommandService(
         val foodSpotsHistory =
             request?.toFoodSpotsHistoryEntity(foodSpots, user) ?: FoodSpotsHistory.from(foodSpots, user)
 
-        storeReport(
+        val savedFoodSpotsHistory = storeReport(
             foodSpotsHistory,
             // 카테고리나 운영시간을 미기재할 시 기존 FoodSpots 의 값을 그대로 사용
             request?.foodCategories ?: foodSpots.foodCategoryList.map { it.foodCategory.id }.toSet(),
@@ -204,6 +210,19 @@ class FoodSpotsCommandService(
 
         entityManager.flush()
 
+        val rewardsReason = when(foodSpotsHistory.reportType) {
+            ReportType.STORE_CLOSE -> RewardReason.REPORT_CLOSE
+            else -> RewardReason.REPORT_UPDATE
+        }
+        rewardsCommandService.createRewards(
+            Rewards.of(
+                user,
+                savedFoodSpotsHistory,
+                foodSpotsHistory.reportType.reportReward.point,
+                true,
+                rewardsReason
+            )
+        )
         userCommandService.increaseCoin(user.id, foodSpotsHistory.reportType.reportReward.point)
 
         (
@@ -390,6 +409,15 @@ class FoodSpotsCommandService(
 
         entityManager.flush()
 
+        rewardsCommandService.createRewards(
+            Rewards.of(
+                user,
+                null,
+                foodSpotsHistory.reportType.reportReward.point,
+                false,
+                RewardReason.REPORT_DELETE
+            )
+        )
         userCommandService.decreaseCoin(user.id, foodSpotsHistory.reportType.reportReward.point)
 
         photos

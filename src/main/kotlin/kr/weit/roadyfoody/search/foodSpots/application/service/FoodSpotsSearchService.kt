@@ -4,6 +4,9 @@ import jakarta.transaction.Transactional
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsQueryService
+import kr.weit.roadyfoody.reward.application.service.RewardsCommandService
+import kr.weit.roadyfoody.reward.domain.RewardReason
+import kr.weit.roadyfoody.reward.domain.Rewards
 import kr.weit.roadyfoody.search.foodSpots.domain.SearchCoinCache
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponses
@@ -24,6 +27,7 @@ class FoodSpotsSearchService(
     private val foodSpotsQueryService: FoodSpotsQueryService,
     private val userCommandService: UserCommandService,
     private val searchCoinCacheRepository: SearchCoinCacheRepository,
+    private val rewardsCommandService: RewardsCommandService,
 ) {
     @Transactional
     fun searchFoodSpots(
@@ -68,6 +72,16 @@ class FoodSpotsSearchService(
                 radius = searchRadius,
             )
         searchCoinCacheRepository.save(newCache)
+
+        rewardsCommandService.createRewards(
+            Rewards.of(
+                user,
+                null,
+                coinRequired,
+                false,
+                RewardReason.SEARCH_SPOT
+            )
+        )
         userCommandService.decreaseCoin(user.id, coinRequired)
 
         return foodSpotsSearchResponses

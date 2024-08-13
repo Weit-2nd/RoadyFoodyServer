@@ -27,9 +27,9 @@ class Rewards(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(updatable = false)
     val user: User,
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(nullable = true)
-    val foodSpotsHistory: FoodSpotsHistory,
+    val foodSpotsHistory: FoodSpotsHistory?,
     @Column(nullable = false)
     val rewardPoint: Int,
     @Column(nullable = false)
@@ -37,5 +37,20 @@ class Rewards(
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     val rewardReason: RewardReason,
-
-) : BaseTimeEntity()
+) : BaseTimeEntity() {
+    companion object {
+        fun of(
+            user: User,
+            foodSpotsHistory: FoodSpotsHistory?,
+            rewardPoint: Int,
+            rewardType: Boolean,
+            rewardsReason: RewardReason,
+        ) = Rewards(
+                user = user,
+                foodSpotsHistory = foodSpotsHistory,
+                rewardPoint = rewardPoint,
+                rewardType = rewardType,
+                rewardReason = rewardsReason
+        )
+    }
+}
