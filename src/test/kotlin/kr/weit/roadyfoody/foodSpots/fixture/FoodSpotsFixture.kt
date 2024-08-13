@@ -76,6 +76,8 @@ const val TEST_UPDATE_OPERATION_HOURS_OPEN = "10:00"
 const val TEST_UPDATE_OPERATION_HOURS_CLOSE = "13:59"
 const val TEST_FOOD_SPOTS_HISTORY_ID = 1L
 const val TEST_INVALID_FOOD_SPOTS_HISTORY_ID = -1L
+const val TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME = "request"
+const val TEST_FOOD_SPOTS_UPDATE_REQUEST_PHOTO = "reportPhotos"
 const val TEST_REST_DAILY_REPORT_CREATION_COUNT = 5
 
 fun createMockTestFoodSpot(
@@ -131,8 +133,17 @@ fun createTestFoodHistory(
     foodCategories: List<ReportFoodCategory> = listOf(),
 ) = FoodSpotsHistory(id, foodSpots, user, name, foodTruck, open, storeClosure, point, reportType, operationHours, foodCategories)
 
-fun createTestFoodSpotsPhoto(foodSpotsHistory: FoodSpotsHistory = createTestFoodHistory()) =
-    FoodSpotsPhoto(0L, foodSpotsHistory, TEST_PHOTO_NAME)
+fun createTestFoodSpotsPhoto(
+    foodSpotsHistory: FoodSpotsHistory = createTestFoodHistory(),
+    id: Long = 0L,
+) = FoodSpotsPhoto(id, foodSpotsHistory, TEST_PHOTO_NAME)
+
+fun createTestFoodSpotsPhotos(
+    size: Int = 2,
+    foodSpotsHistory: FoodSpotsHistory = createTestFoodHistory(),
+) = List(size) { id ->
+    createTestFoodSpotsPhoto(foodSpotsHistory, id + 1L)
+}
 
 fun createTestReportRequest(
     name: String = TEST_FOOD_SPOT_NAME,
@@ -359,6 +370,7 @@ fun createTestFoodSpotsUpdateRequest(
     closed: Boolean = TEST_FOOD_SPOT_STORE_CLOSURE,
     categories: Set<Long> = createTestFoodCategories().map { it.id }.toSet(),
     operationHours: List<OperationHoursRequest> = listOf(createOperationHoursRequest()),
+    photoIdsToRemove: Set<Long>? = null,
 ): FoodSpotsUpdateRequest =
     FoodSpotsUpdateRequest(
         name,
@@ -368,6 +380,7 @@ fun createTestFoodSpotsUpdateRequest(
         closed,
         categories,
         operationHours,
+        photoIdsToRemove,
     )
 
 // Entity 로부터 역으로 Request 를 만들어냅니다.
@@ -381,6 +394,7 @@ fun createTestFoodSpotsUpdateRequestFromEntity(foodSpots: FoodSpots = createTest
         foodSpots.storeClosure,
         foodSpots.foodCategoryList.map { it.foodCategory.id }.toSet(),
         createTestFoodSpotsOperationHoursRequestsFromEntities(foodSpots.operationHoursList),
+        null,
     )
 
 fun createTestFoodSpotsOperationHoursRequestsFromEntities(operationHours: List<FoodSpotsOperationHours>): List<OperationHoursRequest> =
