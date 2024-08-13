@@ -344,7 +344,7 @@ class UserControllerTest(
                             deleteWithAuth("$requestPath/profile"),
                         ).andExpect(status().isNoContent)
                     verify(exactly = 1) { userCommandService.deleteProfileImage(any<User>()) }
+                }
             }
         }
-    }
     })

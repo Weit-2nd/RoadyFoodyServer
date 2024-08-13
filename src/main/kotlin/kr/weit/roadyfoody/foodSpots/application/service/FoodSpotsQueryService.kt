@@ -134,7 +134,13 @@ class FoodSpotsQueryService(
                         ReportPhotoResponse(photo, imageService.getDownloadUrl(photo.fileName))
                     }
                 }
-            FoodSpotsDetailResponse(foodSpots, determineOpenStatus(foodSpots), foodSpotsPhotos)
+            val reviewAggregatedInfoResponse = reviewRepository.getReviewAggregatedInfo(foodSpots)
+            FoodSpotsDetailResponse(
+                foodSpots,
+                determineOpenStatus(foodSpots),
+                foodSpotsPhotos,
+                reviewAggregatedInfoResponse,
+            )
         }
 
     private fun determineOpenStatus(foodSpot: FoodSpots): OperationStatus {
