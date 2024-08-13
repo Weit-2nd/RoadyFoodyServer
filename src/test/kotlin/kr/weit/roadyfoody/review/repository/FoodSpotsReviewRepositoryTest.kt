@@ -4,6 +4,7 @@ import createTestFoodSpotsReview
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
+import kr.weit.roadyfoody.foodSpots.application.dto.ReviewAggregatedInfoResponse
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpots
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
@@ -26,12 +27,14 @@ class FoodSpotsReviewRepositoryTest(
             lateinit var otherUser: User
             lateinit var foodSpots: FoodSpots
             lateinit var otherFoodSpots: FoodSpots
+            lateinit var noReviewsFoodSpots: FoodSpots
             lateinit var reviewList: List<FoodSpotsReview>
             beforeEach {
                 user = userRepository.save(createTestUser(0L))
                 otherUser = userRepository.save(createTestUser(0L, "otherUser"))
                 foodSpots = foodSpotsRepository.save(createTestFoodSpots())
                 otherFoodSpots = foodSpotsRepository.save(createTestFoodSpots())
+                noReviewsFoodSpots = foodSpotsRepository.save(createTestFoodSpots())
                 reviewList =
                     reviewRepository.saveAll(
                         listOf(
@@ -154,6 +157,23 @@ class FoodSpotsReviewRepositoryTest(
                                     ReviewSortType.HIGHEST,
                                 )
                         contents.content shouldBe listOf(reviewList[2])
+                    }
+                }
+            }
+            describe("getReviewAggregatedInfo 메소드는") {
+                context("리뷰가 있는 음식점을 받는 경우") {
+                    it("해당 음식점의 리뷰 평균 별점과 리뷰 개수를 반환한다.") {
+                        val reviewAggregatedInfoResponse =
+                            reviewRepository.getReviewAggregatedInfo(foodSpots)
+                        reviewAggregatedInfoResponse shouldBe ReviewAggregatedInfoResponse(7.0, 2)
+                    }
+                }
+
+                context("리뷰가 없는 음식점을 받는 경우") {
+                    it("해당 음식점의 리뷰 평균 별점과 리뷰 개수를 반환한다.") {
+                        val reviewAggregatedInfoResponse =
+                            reviewRepository.getReviewAggregatedInfo(noReviewsFoodSpots)
+                        reviewAggregatedInfoResponse shouldBe ReviewAggregatedInfoResponse(0.0, 0)
                     }
                 }
             }

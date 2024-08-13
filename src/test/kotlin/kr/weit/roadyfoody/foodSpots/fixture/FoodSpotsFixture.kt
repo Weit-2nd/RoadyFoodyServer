@@ -13,6 +13,7 @@ import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoryDetailResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportOperationHoursResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportPhotoResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
+import kr.weit.roadyfoody.foodSpots.application.dto.ReviewAggregatedInfoResponse
 import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
@@ -79,6 +80,8 @@ const val TEST_INVALID_FOOD_SPOTS_HISTORY_ID = -1L
 const val TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME = "request"
 const val TEST_FOOD_SPOTS_UPDATE_REQUEST_PHOTO = "reportPhotos"
 const val TEST_REST_DAILY_REPORT_CREATION_COUNT = 5
+const val TEST_AVERAGE_RATE = 4.5
+const val TEST_REVIEW_COUNT = 2L
 
 fun createMockTestFoodSpot(
     id: Long = 0L,
@@ -447,4 +450,11 @@ fun createTestFoodSpotsDetailResponse(): FoodSpotsDetailResponse =
         createMockTestFoodSpot(),
         OperationStatus.OPEN,
         listOf(createTestReportPhotoResponse()),
+        createTestAggregatedInfoResponse(),
+    )
+
+fun createTestAggregatedInfoResponse(): ReviewAggregatedInfoResponse =
+    ReviewAggregatedInfoResponse(
+        TEST_AVERAGE_RATE,
+        TEST_REVIEW_COUNT,
     )

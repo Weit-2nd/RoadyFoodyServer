@@ -19,6 +19,7 @@ import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_HISTORY_ID
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_PHOTO_URL
 import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodHistory
 import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodSpotList
+import kr.weit.roadyfoody.foodSpots.fixture.createTestAggregatedInfoResponse
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodHistory
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsForDistance
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsPhoto
@@ -285,6 +286,7 @@ class FoodSpotsQueryServiceTest :
                 every { foodSpotsPhotoRepository.findByHistoryIn(any()) } returns
                     listOf(createTestFoodSpotsPhoto())
                 every { imageService.getDownloadUrl(any()) } returns TEST_FOOD_SPOTS_PHOTO_URL
+                every { reviewRepository.getReviewAggregatedInfo(any()) } returns createTestAggregatedInfoResponse()
                 `when`("정상적인 데이터가 들어올 경우") {
                     then("정상적으로 음식점 상세가 조회되어야 한다.") {
                         foodSPotsQueryService.getFoodSpotsDetail(TEST_FOOD_SPOT_ID)
