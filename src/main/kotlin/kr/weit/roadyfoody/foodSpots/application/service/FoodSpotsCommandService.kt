@@ -70,7 +70,7 @@ class FoodSpotsCommandService(
             Duration.ofHours(23) + Duration.ofMinutes(50)
 
         private const val FOOD_SPOTS_REPORT_LIMIT_PREFIX = "rofo:report-request-limit:"
-        private const val FOOD_SPOTS_REPORT_LIMIT_COUNT = 5
+        const val FOOD_SPOTS_REPORT_LIMIT_COUNT = 5
 
         fun getFoodSpotsReportCountKey(userId: Long) = "$FOOD_SPOTS_REPORT_LIMIT_PREFIX$userId"
     }
@@ -82,13 +82,9 @@ class FoodSpotsCommandService(
         photos: List<MultipartFile>?,
     ) {
         val key = getFoodSpotsReportCountKey(user.id)
-        check(canGenerateReport(key)) {
+        check(incrementAndCheckReportCount(key)) {
             throw TooManyReportRequestException()
         }
-
-        TransactionSynchronizationManager.registerSynchronization(
-            ReportErrorCompensatingTxSync(key, redisTemplate),
-        )
 
         val foodSpots = reportRequest.toFoodSpotsEntity()
         storeFoodSpots(
@@ -147,13 +143,9 @@ class FoodSpotsCommandService(
         request: FoodSpotsUpdateRequest,
     ) {
         val key = getFoodSpotsReportCountKey(user.id)
-        check(canGenerateReport(key)) {
+        check(incrementAndCheckReportCount(key)) {
             throw TooManyReportRequestException()
         }
-
-        TransactionSynchronizationManager.registerSynchronization(
-            ReportErrorCompensatingTxSync(key, redisTemplate),
-        )
 
         val foodSpots = foodSpotsRepository.getByFoodSpotsId(foodSpotsId)
 
@@ -280,9 +272,13 @@ class FoodSpotsCommandService(
         return changed
     }
 
-    private fun canGenerateReport(key: String): Boolean {
+    private fun incrementAndCheckReportCount(key: String): Boolean {
         // redis 내에 존재하지 않을 시 1L 반환
         val count = redisTemplate.opsForValue().increment(key)!!
+
+        TransactionSynchronizationManager.registerSynchronization(
+            ReportErrorCompensatingTxSync(key, redisTemplate),
+        )
 
         if (count > FOOD_SPOTS_REPORT_LIMIT_COUNT) {
             return false
