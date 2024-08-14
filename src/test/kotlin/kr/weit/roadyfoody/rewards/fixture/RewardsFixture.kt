@@ -65,7 +65,7 @@ fun createTestRewards(
 
 fun createSliceRewards(): Slice<Rewards> =
     SliceImpl(
-        listOf(createTestRewards()),
+        listOf(MockTestRewards()),
         Pageable.ofSize(TEST_PAGE_SIZE),
         false,
     )
