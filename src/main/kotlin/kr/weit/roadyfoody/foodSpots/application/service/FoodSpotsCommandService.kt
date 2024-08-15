@@ -13,6 +13,7 @@ import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsOperationHours
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
 import kr.weit.roadyfoody.foodSpots.domain.ReportFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHours
+import kr.weit.roadyfoody.foodSpots.domain.ReportType
 import kr.weit.roadyfoody.foodSpots.exception.AlreadyClosedFoodSpotsException
 import kr.weit.roadyfoody.foodSpots.exception.NotFoodSpotsHistoriesOwnerException
 import kr.weit.roadyfoody.foodSpots.exception.TooManyReportRequestException
@@ -30,6 +31,9 @@ import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
 import kr.weit.roadyfoody.foodSpots.repository.getFoodCategories
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.global.utils.CoordinateUtils.Companion.createCoordinate
+import kr.weit.roadyfoody.rewards.application.service.RewardsCommandService
+import kr.weit.roadyfoody.rewards.domain.RewardType
+import kr.weit.roadyfoody.rewards.domain.Rewards
 import kr.weit.roadyfoody.user.application.service.UserCommandService
 import kr.weit.roadyfoody.user.domain.User
 import org.redisson.api.RedissonClient
@@ -64,6 +68,7 @@ class FoodSpotsCommandService(
     private val entityManager: EntityManager,
     private val redissonClient: RedissonClient,
     private val redisTemplate: RedisTemplate<String, String>,
+    private val rewardsCommandService: RewardsCommandService,
 ) {
     companion object {
         private const val FOOD_SPOTS_OPEN_SCHEDULER_LOCK = "foodSpotsOpenSchedulerLock"
@@ -95,11 +100,12 @@ class FoodSpotsCommandService(
         )
 
         val foodSpotsHistory = reportRequest.toFoodSpotsHistoryEntity(foodSpots, user)
-        storeReport(
-            foodSpotsHistory,
-            reportRequest.foodCategories,
-            reportRequest.toReportOperationHoursEntity(foodSpotsHistory),
-        )
+        val savedFoodSpotsHistory =
+            storeReport(
+                foodSpotsHistory,
+                reportRequest.foodCategories,
+                reportRequest.toReportOperationHoursEntity(foodSpotsHistory),
+            )
 
         val generatorPhotoNameMap =
             photos?.associateBy { imageService.generateImageName(it) } ?: emptyMap()
@@ -111,6 +117,15 @@ class FoodSpotsCommandService(
 
         entityManager.flush()
 
+        rewardsCommandService.createRewards(
+            Rewards(
+                user = user,
+                foodSpotsHistory = savedFoodSpotsHistory,
+                rewardPoint = foodSpotsHistory.reportType.reportReward.point,
+                coinReceived = true,
+                rewardType = RewardType.REPORT_CREATE,
+            ),
+        )
         userCommandService.increaseCoin(user.id, foodSpotsHistory.reportType.reportReward.point)
 
         generatorPhotoNameMap
@@ -173,15 +188,16 @@ class FoodSpotsCommandService(
         val foodSpotsHistory =
             request?.toFoodSpotsHistoryEntity(foodSpots, user) ?: FoodSpotsHistory.from(foodSpots, user)
 
-        storeReport(
-            foodSpotsHistory,
-            // 카테고리나 운영시간을 미기재할 시 기존 FoodSpots 의 값을 그대로 사용
-            request?.foodCategories ?: foodSpots.foodCategoryList.map { it.foodCategory.id }.toSet(),
-            request?.toReportOperationHoursEntity(foodSpotsHistory)
-                ?: foodSpots.operationHoursList.map {
-                    ReportOperationHours(foodSpotsHistory, it.dayOfWeek, it.openingHours, it.closingHours)
-                },
-        )
+        val savedFoodSpotsHistory =
+            storeReport(
+                foodSpotsHistory,
+                // 카테고리나 운영시간을 미기재할 시 기존 FoodSpots 의 값을 그대로 사용
+                request?.foodCategories ?: foodSpots.foodCategoryList.map { it.foodCategory.id }.toSet(),
+                request?.toReportOperationHoursEntity(foodSpotsHistory)
+                    ?: foodSpots.operationHoursList.map {
+                        ReportOperationHours(foodSpotsHistory, it.dayOfWeek, it.openingHours, it.closingHours)
+                    },
+            )
 
         val generatorPhotoNameMap =
             reportPhotos?.associateBy { imageService.generateImageName(it) } ?: emptyMap()
@@ -205,6 +221,21 @@ class FoodSpotsCommandService(
 
         entityManager.flush()
 
+        val rewardType =
+            when (foodSpotsHistory.reportType) {
+                ReportType.STORE_CLOSE -> RewardType.REPORT_CLOSE
+                else -> RewardType.REPORT_UPDATE
+            }
+
+        rewardsCommandService.createRewards(
+            Rewards(
+                user = user,
+                foodSpotsHistory = savedFoodSpotsHistory,
+                rewardPoint = foodSpotsHistory.reportType.reportReward.point,
+                coinReceived = true,
+                rewardType = rewardType,
+            ),
+        )
         userCommandService.increaseCoin(user.id, foodSpotsHistory.reportType.reportReward.point)
 
         (
@@ -391,6 +422,15 @@ class FoodSpotsCommandService(
 
         entityManager.flush()
 
+        rewardsCommandService.createRewards(
+            Rewards(
+                user = user,
+                foodSpotsHistory = null,
+                rewardPoint = foodSpotsHistory.reportType.reportReward.point,
+                coinReceived = false,
+                rewardType = RewardType.REPORT_DELETE,
+            ),
+        )
         userCommandService.decreaseCoin(user.id, foodSpotsHistory.reportType.reportReward.point)
 
         photos
