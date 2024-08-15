@@ -1,5 +1,3 @@
-@file:Suppress("ktlint:standard:filename")
-
 package kr.weit.roadyfoody.user.application.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
