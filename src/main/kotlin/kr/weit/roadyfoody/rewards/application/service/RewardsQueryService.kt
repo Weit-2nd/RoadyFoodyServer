@@ -20,7 +20,7 @@ class RewardsQueryService(
         val response =
             rewardsRepository
                 .findAllByUser(user, pageable)
-                .map(RewardsResponse::of)
+                .map(RewardsResponse::from)
         return SliceResponse(response)
     }
 }
