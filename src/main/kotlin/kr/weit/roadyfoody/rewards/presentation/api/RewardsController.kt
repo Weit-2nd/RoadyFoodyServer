@@ -15,13 +15,11 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/v1/rewards")
 class RewardsController(
-    private val rewardsQueryService: RewardsQueryService
+    private val rewardsQueryService: RewardsQueryService,
 ) : RewardsControllerSpec {
-    @GetMapping("/user")
+    @GetMapping("/me")
     override fun getUserRewards(
         @LoginUser user: User,
-        @PageableDefault pageable: Pageable
-    ) : SliceResponse<RewardsResponse> {
-        return rewardsQueryService.getUserRewards(user, pageable)
-    }
+        @PageableDefault pageable: Pageable,
+    ): SliceResponse<RewardsResponse> = rewardsQueryService.getUserRewards(user, pageable)
 }

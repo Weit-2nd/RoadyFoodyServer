@@ -22,6 +22,7 @@ import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportOperationHoursRepository
+import kr.weit.roadyfoody.rewards.repository.RewardsRepository
 import kr.weit.roadyfoody.support.annotation.ServiceIntegrateTest
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.fixture.createTestUser
@@ -39,6 +40,7 @@ class FoodSpotsCommandServiceIntegrationTest(
     private val foodSpotsHistoryRepository: FoodSpotsHistoryRepository,
     private val reportFoodCategoryRepository: ReportFoodCategoryRepository,
     private val reportOperationHoursRepository: ReportOperationHoursRepository,
+    private val rewardsRepository: RewardsRepository,
     @SpykBean private val redisTemplate: RedisTemplate<String, String>,
 ) : BehaviorSpec(
         {
@@ -75,6 +77,7 @@ class FoodSpotsCommandServiceIntegrationTest(
                     foodSpotsHistoryRepository.deleteAll()
                     foodSpotsCategoryRepository.deleteAll()
                     foodSportsOperationHoursRepository.deleteAll()
+                    rewardsRepository.deleteAllByUser(user)
                     foodSpotsRepository.deleteAll()
                     userRepository.delete(user)
                     categoryRepository.deleteAll(categories)

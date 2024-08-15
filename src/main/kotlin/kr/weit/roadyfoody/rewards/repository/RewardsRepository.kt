@@ -7,5 +7,10 @@ import org.springframework.data.domain.Slice
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface RewardsRepository : JpaRepository<Rewards, Long> {
-    fun findAllByUser(user: User, pageable: Pageable) : Slice<Rewards>
+    fun findAllByUser(
+        user: User,
+        pageable: Pageable,
+    ): Slice<Rewards>
+
+    fun deleteAllByUser(user: User)
 }

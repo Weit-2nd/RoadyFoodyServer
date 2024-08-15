@@ -1,6 +1,7 @@
 package kr.weit.roadyfoody.rewards.presentation.spec
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.common.dto.SliceResponse
@@ -15,14 +16,15 @@ interface RewardsControllerSpec {
     @Operation(
         description = "유저의 리워드 리스트 조회 API",
         responses = [
-            io.swagger.v3.oas.annotations.responses.ApiResponse(
+            ApiResponse(
                 responseCode = "200",
-                description = "리워드 리스트 조회 성공")
-        ]
+                description = "리워드 리스트 조회 성공",
+            ),
+        ],
     )
     fun getUserRewards(
         @LoginUser
-        user : User,
+        user: User,
         @PageableDefault pageable: Pageable,
-    ) : SliceResponse<RewardsResponse>
+    ): SliceResponse<RewardsResponse>
 }

@@ -20,10 +20,10 @@ class RewardsCommandServiceTest :
 
                 `when`("정상적인 데이터가 들어온 경우") {
                     every { rewardsRepository.save(rewards) } returns rewards
-                    then("정상적으로 저장된다."){
+                    then("정상적으로 저장된다.") {
                         rewardsCommandService.createRewards(rewards)
                     }
                 }
             }
-        }
+        },
     )

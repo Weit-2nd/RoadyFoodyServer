@@ -18,30 +18,32 @@ class RewardsControllerTest(
     @MockkBean private val rewardsQueryService: RewardsQueryService,
     private val mockMvc: MockMvc,
 ) : BehaviorSpec(
-    {
-        val requestPath = "/api/v1/rewards"
+        {
+            val requestPath = "/api/v1/rewards"
 
-        given("GET $requestPath/user Test") {
-            val response = createRewardsResponse()
-            every {
-                rewardsQueryService.getUserRewards(any(), any())
-            } returns response
+            given("GET $requestPath/me Test") {
+                val response = createRewardsResponse()
+                every {
+                    rewardsQueryService.getUserRewards(any(), any())
+                } returns response
 
-            `when`("정상 요청시") {
-                then("유저의 리워드 리스트가 조회된다.") {
-                    val result = mockMvc.perform(
-                        getWithAuth("$requestPath/user")
-                            .param("size", "10")
-                            .param("page", "0")
-                    ).andExpect(status().isOk)
+                `when`("정상 요청시") {
+                    then("유저의 리워드 리스트가 조회된다.") {
+                        val result =
+                            mockMvc
+                                .perform(
+                                    getWithAuth("$requestPath/me")
+                                        .param("size", "10")
+                                        .param("page", "0"),
+                                ).andExpect(status().isOk)
 
-                    result.andExpect(jsonPath("$.contents[0].rewardType").value("지급"))
-                    result.andExpect(jsonPath("$.contents[0].rewardPoint").value(100))
-                    result.andExpect(jsonPath("$.contents[0].rewardReason").value("리포트 업데이트"))
-                    result.andExpect(jsonPath("$.contents[0].createdAt").isNotEmpty)
-                    result.andExpect(jsonPath("$.hasNext").value(false))
+                        result.andExpect(jsonPath("$.contents[0].coinReceived").value("true"))
+                        result.andExpect(jsonPath("$.contents[0].rewardPoint").value(100))
+                        result.andExpect(jsonPath("$.contents[0].rewardType").value("리포트 업데이트"))
+                        result.andExpect(jsonPath("$.contents[0].createdAt").isNotEmpty)
+                        result.andExpect(jsonPath("$.hasNext").value(false))
+                    }
                 }
             }
-        }
-    }
-)
+        },
+    )

@@ -5,7 +5,7 @@ import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsQueryService
 import kr.weit.roadyfoody.rewards.application.service.RewardsCommandService
-import kr.weit.roadyfoody.rewards.domain.RewardReason
+import kr.weit.roadyfoody.rewards.domain.RewardType
 import kr.weit.roadyfoody.rewards.domain.Rewards
 import kr.weit.roadyfoody.search.foodSpots.domain.SearchCoinCache
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
@@ -74,13 +74,13 @@ class FoodSpotsSearchService(
         searchCoinCacheRepository.save(newCache)
 
         rewardsCommandService.createRewards(
-            Rewards.of(
-                user,
-                null,
-                coinRequired,
-                false,
-                RewardReason.SEARCH_SPOT
-            )
+            Rewards(
+                user = user,
+                foodSpotsHistory = null,
+                rewardPoint = coinRequired,
+                coinReceived = false,
+                rewardType = RewardType.SEARCH_SPOT,
+            ),
         )
         userCommandService.decreaseCoin(user.id, coinRequired)
 

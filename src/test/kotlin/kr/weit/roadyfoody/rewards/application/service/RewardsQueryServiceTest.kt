@@ -26,11 +26,11 @@ class RewardsQueryServiceTest :
                     every {
                         rewardsRepository.findAllByUser(any(), any())
                     } returns createSliceRewards()
-                    then("정상적으로 저장된다."){
+                    then("정상적으로 조회된다.") {
                         val userRewards = rewardsQueryService.getUserRewards(rewards.user, pageable)
                         userRewards.contents.size shouldBe 1
                     }
                 }
             }
-        }
+        },
     )

@@ -10,16 +10,17 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class RewardsQueryService(
-    private val rewardsRepository : RewardsRepository,
-)
-{
+    private val rewardsRepository: RewardsRepository,
+) {
     @Transactional(readOnly = true)
-    fun getUserRewards(user: User,pageable: Pageable) : SliceResponse<RewardsResponse> {
+    fun getUserRewards(
+        user: User,
+        pageable: Pageable,
+    ): SliceResponse<RewardsResponse> {
         val response =
-            rewardsRepository.findAllByUser(user, pageable)
-                .map {
-                    RewardsResponse(it)
-                }
+            rewardsRepository
+                .findAllByUser(user, pageable)
+                .map(RewardsResponse::of)
         return SliceResponse(response)
     }
 }

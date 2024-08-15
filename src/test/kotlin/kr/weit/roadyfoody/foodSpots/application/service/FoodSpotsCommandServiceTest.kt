@@ -100,10 +100,10 @@ class FoodSpotsCommandServiceTest :
                     imageService,
                     executor,
                     userCommandService,
-                    rewardsCommandService,
                     entityManager,
                     redissonClient,
                     redisTemplate,
+                    rewardsCommandService,
                 )
             val user = createTestUser()
 

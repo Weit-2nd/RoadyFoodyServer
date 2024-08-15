@@ -1,24 +1,31 @@
 package kr.weit.roadyfoody.rewards.domain
 
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import jakarta.persistence.FetchType
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
+import jakarta.persistence.OneToOne
+import jakarta.persistence.SequenceGenerator
+import jakarta.persistence.Table
 import kr.weit.roadyfoody.common.domain.BaseTimeEntity
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
 import kr.weit.roadyfoody.user.domain.User
-import jakarta.persistence.Index
 
 @Entity
 @Table(
     name = "rewards",
-    indexes = [
-        Index(name = "rewards_user_id_index", columnList = "user_id"),
-        Index(name = "rewards_food_spots_history_id_index", columnList = "food_spots_history_id")
-    ]
 )
 @SequenceGenerator(
     name = "REWARDS_SEQ_GENERATOR",
     sequenceName = "REWARDS_SEQ",
     initialValue = 1,
-    allocationSize = 1
+    allocationSize = 1,
 )
 class Rewards(
     @Id
@@ -33,24 +40,8 @@ class Rewards(
     @Column(nullable = false)
     val rewardPoint: Int,
     @Column(nullable = false)
-    val rewardType: Boolean,
+    val coinReceived: Boolean,
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    val rewardReason: RewardReason,
-) : BaseTimeEntity() {
-    companion object {
-        fun of(
-            user: User,
-            foodSpotsHistory: FoodSpotsHistory?,
-            rewardPoint: Int,
-            rewardType: Boolean,
-            rewardsReason: RewardReason,
-        ) = Rewards(
-            user = user,
-            foodSpotsHistory = foodSpotsHistory,
-            rewardPoint = rewardPoint,
-            rewardType = rewardType,
-            rewardReason = rewardsReason
-        )
-    }
-}
+    val rewardType: RewardType,
+) : BaseTimeEntity()
