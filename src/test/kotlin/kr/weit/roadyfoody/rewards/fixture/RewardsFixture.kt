@@ -20,7 +20,7 @@ fun createRewardsResponse(): SliceResponse<RewardsResponse> =
             listOf(
                 RewardsResponse(
                     id = 0L,
-                    coinReceived = "true",
+                    coinReceived = true,
                     rewardPoint = 100,
                     rewardType = "리포트 업데이트",
                     createdAt = LocalDateTime.now(),
