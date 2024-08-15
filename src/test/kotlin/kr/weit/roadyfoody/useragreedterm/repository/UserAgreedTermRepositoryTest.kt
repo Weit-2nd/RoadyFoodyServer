@@ -2,6 +2,7 @@ package kr.weit.roadyfoody.useragreedterm.repository
 
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.collections.shouldBeEmpty
+import kr.weit.roadyfoody.rewards.repository.RewardsRepository
 import kr.weit.roadyfoody.support.annotation.RepositoryTest
 import kr.weit.roadyfoody.term.domain.Term
 import kr.weit.roadyfoody.term.fixture.createTestTerms
@@ -16,6 +17,7 @@ class UserAgreedTermRepositoryTest(
     private val userRepository: UserRepository,
     private val termRepository: TermRepository,
     private val userAgreedTermRepository: UserAgreedTermRepository,
+    private val rewardsRepository: RewardsRepository,
 ) : DescribeSpec({
         lateinit var user: User
         lateinit var terms: List<Term>

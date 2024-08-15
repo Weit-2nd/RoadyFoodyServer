@@ -31,10 +31,10 @@ class RewardsRepositoryTest(
             lateinit var foodSpotsHistory: FoodSpotsHistory
 
             beforeEach {
-                user = userRepository.save(createTestUser(id = 0L))
+                user = userRepository.save(createTestUser())
                 foodSpotsHistory =
                     createTestFoodHistory(
-                        foodSpots = createTestFoodSpots(0L),
+                        foodSpots = createTestFoodSpots(),
                         user = user,
                     )
                 foodSpots = foodSpotRepository.save(foodSpotsHistory.foodSpots)
