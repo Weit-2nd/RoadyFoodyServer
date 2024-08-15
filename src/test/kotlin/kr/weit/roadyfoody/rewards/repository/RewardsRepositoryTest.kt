@@ -1,6 +1,7 @@
 package kr.weit.roadyfoody.rewards.repository
 
 import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
@@ -50,6 +51,7 @@ class RewardsRepositoryTest(
             afterEach {
                 userRepository.delete(user)
             }
+
             describe("findAllByUser 메소드는") {
                 context("size, page를 받는 경우") {
                     it("해당 유저의 리워드 리스트를 반환한다") {
@@ -58,8 +60,24 @@ class RewardsRepositoryTest(
                                 user,
                                 PageRequest.of(0, 10),
                             )
-
                         result.content.size shouldBe rewardsList.size
+                    }
+                }
+            }
+
+            describe("deleteAllByUser 메소드는") {
+                context("user의 정보를 받으면") {
+                    it("해당 유저의 리워드 내역을 다 삭제한다") {
+                        rewardsRepository.deleteAllByUser(
+                            user,
+                        )
+                        val result =
+                            rewardsRepository.findAllByUser(
+                                user,
+                                PageRequest.of(0, 10),
+                            )
+
+                        result.shouldBeEmpty()
                     }
                 }
             }
