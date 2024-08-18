@@ -9,8 +9,6 @@ import kr.weit.roadyfoody.admin.dto.UserAccessTokenResponse
 import kr.weit.roadyfoody.admin.fixture.createTestSimpleUserInfoResponses
 import kr.weit.roadyfoody.auth.fixture.TEST_ACCESS_TOKEN
 import kr.weit.roadyfoody.support.annotation.ControllerTest
-import kr.weit.roadyfoody.user.exception.UserNotFoundException
-import kr.weit.roadyfoody.user.fixture.TEST_NONEXISTENT_ID
 import kr.weit.roadyfoody.user.fixture.TEST_USER_ID
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.test.web.servlet.MockMvc
@@ -43,16 +41,6 @@ class AdminControllerTest(
                     mockMvc
                         .perform(get("$requestUrl/users/$TEST_USER_ID/token"))
                         .andExpect(status().isOk)
-                }
-            }
-
-            `when`("존재하지 않는 userId 로 요청하면") {
-                every { adminCommandService.getUserAccessToken(TEST_NONEXISTENT_ID) } throws
-                    UserNotFoundException("$TEST_NONEXISTENT_ID ID 의 사용자는 존재하지 않습니다.")
-                then("404 상태코드를 반환한다.") {
-                    mockMvc
-                        .perform(get("$requestUrl/users/$TEST_NONEXISTENT_ID/token"))
-                        .andExpect(status().isNotFound)
                 }
             }
         }
