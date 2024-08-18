@@ -3,9 +3,11 @@ package kr.weit.roadyfoody.admin.application.service
 import kr.weit.roadyfoody.admin.dto.SimpleUserInfoResponse
 import kr.weit.roadyfoody.admin.dto.SimpleUserInfoResponses
 import kr.weit.roadyfoody.user.repository.UserRepository
+import org.springframework.context.annotation.Profile
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 
+@Profile("!stable")
 @Service
 class AdminQueryService(
     private val userRepository: UserRepository,

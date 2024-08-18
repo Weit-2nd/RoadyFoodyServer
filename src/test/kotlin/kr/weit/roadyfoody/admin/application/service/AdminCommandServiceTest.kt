@@ -9,13 +9,15 @@ import kr.weit.roadyfoody.auth.security.jwt.JwtUtil
 import kr.weit.roadyfoody.user.fixture.TEST_USER_ID
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import kr.weit.roadyfoody.user.repository.UserRepository
+import org.springframework.data.redis.core.RedisTemplate
 import java.util.Optional
 
 class AdminCommandServiceTest :
     BehaviorSpec({
         val userRepository = mockk<UserRepository>()
         val jwtUtil = mockk<JwtUtil>()
-        val adminCommandService = AdminCommandService(userRepository, jwtUtil)
+        val redisTemplate = mockk<RedisTemplate<String, String>>()
+        val adminCommandService = AdminCommandService(userRepository, jwtUtil, redisTemplate)
 
         given("getUserAccessToken 테스트") {
             `when`("유저 ID 로 요청하면") {
