@@ -66,7 +66,6 @@ class AdminControllerTest(
 
         given("PUT $requestUrl/users/{userId}/daily-report-count 테스트") {
             val dailyReportCount = 1
-
             `when`("정상적으로 요청하면") {
                 every { adminCommandService.updateUserDailyReportCount(TEST_USER_ID, any()) } just runs
                 then("204 상태코드를 반환한다.") {
@@ -78,7 +77,6 @@ class AdminControllerTest(
 
             `when`("userId 가 0이나 음수로 요청하면") {
                 every { adminCommandService.updateUserDailyReportCount(any(), any()) } just runs
-
                 then("400 상태코드를 반환한다.") {
                     forAll(
                         row(0),
@@ -94,7 +92,6 @@ class AdminControllerTest(
             `when`("dailyReportCount 가 음수로 요청하면") {
                 every { adminCommandService.updateUserDailyReportCount(TEST_USER_ID, -1) } just runs
                 val negativeDailyReportCount = -1
-
                 then("400 상태코드를 반환한다.") {
                     mockMvc
                         .perform(put("$requestUrl/users/$TEST_USER_ID/daily-report-count?dailyReportCount=$negativeDailyReportCount"))
