@@ -3,6 +3,7 @@ package kr.weit.roadyfoody.admin.application.service
 import kr.weit.roadyfoody.admin.dto.UserAccessTokenResponse
 import kr.weit.roadyfoody.auth.security.jwt.JwtUtil
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsCommandService.Companion.getFoodSpotsReportCountKey
+import kr.weit.roadyfoody.user.exception.UserNotFoundException
 import kr.weit.roadyfoody.user.repository.UserRepository
 import kr.weit.roadyfoody.user.repository.getByUserId
 import org.springframework.context.annotation.Profile
@@ -30,6 +31,9 @@ class AdminCommandService(
         userId: Long,
         dailyReportCount: Int,
     ) {
+        if (userRepository.existsById(userId).not()) {
+            throw UserNotFoundException("$userId ID 의 사용자는 존재하지 않습니다.")
+        }
         redisTemplate.opsForValue().set(getFoodSpotsReportCountKey(userId), dailyReportCount.toString())
     }
 }
