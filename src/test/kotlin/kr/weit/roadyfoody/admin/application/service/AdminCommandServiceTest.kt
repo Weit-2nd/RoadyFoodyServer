@@ -41,7 +41,7 @@ class AdminCommandServiceTest :
                 }
             }
 
-            `when`("유저 ID 가 존재하지 않으면") {
+            `when`("유저 ID 에 해당하는 유저가 존재하지 않으면") {
                 every { userRepository.existsById(any()) } returns false
                 then("UserNotFoundException 이 발생한다.") {
                     shouldThrow<UserNotFoundException> {
