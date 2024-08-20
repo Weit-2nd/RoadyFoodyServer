@@ -24,6 +24,8 @@ import kr.weit.roadyfoody.user.repository.getByUserId
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutorService
 
 @Service
 class UserQueryService(
@@ -35,6 +37,7 @@ class UserQueryService(
     private val reviewRepository: FoodSpotsReviewRepository,
     private val reviewPhotoRepository: FoodSpotsReviewPhotoRepository,
     private val redisTemplate: RedisTemplate<String, String>,
+    private val executor: ExecutorService,
 ) {
     fun getUserInfo(user: User): UserInfoResponse {
         val user = userRepository.getByUserId(user.id)
@@ -61,14 +64,24 @@ class UserQueryService(
         val user = userRepository.getByUserId(userId)
         val reportResponse =
             foodSpotsHistoryRepository.getHistoriesByUser(user, size, lastId).map {
-                val reportPhotoResponse =
-                    foodSpotsPhotoRepository.getByHistoryId(it.id).map { photo ->
-                        UserReportPhotoResponse(photo, imageService.getDownloadUrl(photo.fileName))
-                    }
                 val reportCategoryResponse =
                     reportFoodCategoryRepository.getByHistoryId(it.id).map { category ->
                         UserReportCategoryResponse(category)
                     }
+                val photosFutures =
+                    foodSpotsPhotoRepository.getByHistoryId(it.id).map { photo ->
+                        CompletableFuture
+                            .supplyAsync({
+                                imageService.getDownloadUrl(photo.fileName)
+                            }, executor)
+                            .thenApply { url -> UserReportPhotoResponse(photo, url) }
+                    }
+                val reportPhotoResponse =
+                    CompletableFuture
+                        .allOf(*photosFutures.toTypedArray())
+                        .thenApply {
+                            photosFutures.map { it.join() }
+                        }.join()
                 UserReportHistoriesResponse(it, reportPhotoResponse, reportCategoryResponse)
             }
         return SliceResponse(reportResponse)
@@ -85,13 +98,20 @@ class UserQueryService(
             reviewRepository
                 .sliceByUser(user, size, lastId)
                 .map {
-                    val reviewPhotos =
+                    val photosFutures =
                         reviewPhotoRepository.getByReview(it).map { photo ->
-                            ReviewPhotoResponse(
-                                photo.id,
-                                imageService.getDownloadUrl(photo.fileName),
-                            )
+                            CompletableFuture
+                                .supplyAsync({
+                                    imageService.getDownloadUrl(photo.fileName)
+                                }, executor)
+                                .thenApply { url -> ReviewPhotoResponse(photo.id, url) }
                         }
+                    val reviewPhotos =
+                        CompletableFuture
+                            .allOf(*photosFutures.toTypedArray())
+                            .thenApply {
+                                photosFutures.map { it.join() }
+                            }.join()
                     UserReviewResponse(it, reviewPhotos)
                 }
         return SliceResponse(response)

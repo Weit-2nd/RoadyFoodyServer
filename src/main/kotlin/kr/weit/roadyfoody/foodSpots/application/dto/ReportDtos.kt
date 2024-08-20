@@ -12,7 +12,6 @@ import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsOperationHours
-import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
 import kr.weit.roadyfoody.foodSpots.domain.ReportFoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHours
 import kr.weit.roadyfoody.foodSpots.domain.ReportType
@@ -200,12 +199,7 @@ data class ReportPhotoResponse(
     val id: Long,
     @Schema(description = "리포트 사진 URL")
     val url: String,
-) {
-    constructor(reportPhoto: FoodSpotsPhoto, url: String) : this(
-        id = reportPhoto.id,
-        url = url,
-    )
-}
+)
 
 data class ReportCategoryResponse(
     @Schema(description = "리포트 카테고리 ID", example = "1")
