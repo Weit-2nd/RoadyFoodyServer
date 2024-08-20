@@ -117,6 +117,14 @@ class UserQueryServiceTest :
                         TEST_FOOD_SPOTS_SIZE,
                         TEST_FOOD_SPOTS_LAST_ID,
                     )
+                    verify(exactly = 1) {
+                        userRepository.findById(any())
+                        reportFoodCategoryRepository.getByHistoryId(any())
+                        foodSpotsHistoryRepository.getHistoriesByUser(any(), any(), any())
+                        foodSpotsPhotoRepository.getByHistoryId(any())
+                        imageService.getDownloadUrl(any())
+                        executor.execute(any())
+                    }
                 }
             }
 
@@ -160,6 +168,7 @@ class UserQueryServiceTest :
                         reviewRepository.sliceByUser(any(), any(), any())
                         reviewPhotoRepository.getByReview(any())
                         imageService.getDownloadUrl(any())
+                        executor.execute(any())
                     }
                 }
             }
