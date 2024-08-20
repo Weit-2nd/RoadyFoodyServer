@@ -17,6 +17,7 @@ import kr.weit.roadyfoody.global.swagger.ApiErrorCodeExamples
 import kr.weit.roadyfoody.global.swagger.v1.SwaggerTag
 import kr.weit.roadyfoody.global.validator.MaxFileSize
 import kr.weit.roadyfoody.global.validator.WebPImage
+import kr.weit.roadyfoody.user.application.dto.UserCoinBalance
 import kr.weit.roadyfoody.user.application.dto.UserInfoResponse
 import kr.weit.roadyfoody.user.application.dto.UserNicknameRequest
 import kr.weit.roadyfoody.user.application.dto.UserReportHistoriesResponse
@@ -215,4 +216,23 @@ interface UserControllerSpec {
     fun deleteProfile(
         @LoginUser user: User,
     )
+
+    @Operation(
+        summary = "유저의 보유 코인을 조회하는 API",
+        description = "로그인한 유저의 보유 코인을 조회합니다.",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "유저의 보유 코인 조회 성공",
+                content = [
+                    Content(
+                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                        schema =
+                            Schema(implementation = UserCoinBalance::class),
+                    ),
+                ],
+            ),
+        ],
+    )
+    fun getCoinBalance(user: User): UserCoinBalance
 }

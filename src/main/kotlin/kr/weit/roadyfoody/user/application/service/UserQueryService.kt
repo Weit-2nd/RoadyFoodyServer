@@ -13,6 +13,7 @@ import kr.weit.roadyfoody.review.application.dto.ReviewPhotoResponse
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewPhotoRepository
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
 import kr.weit.roadyfoody.review.repository.getByReview
+import kr.weit.roadyfoody.user.application.dto.UserCoinBalance
 import kr.weit.roadyfoody.user.application.dto.UserInfoResponse
 import kr.weit.roadyfoody.user.application.dto.UserReportCategoryResponse
 import kr.weit.roadyfoody.user.application.dto.UserReportHistoriesResponse
@@ -95,5 +96,11 @@ class UserQueryService(
                     UserReviewResponse(it, reviewPhotos)
                 }
         return SliceResponse(response)
+    }
+
+    @Transactional(readOnly = true)
+    fun getCoinBalance(user: User): UserCoinBalance {
+        val userFromDb = userRepository.getByUserId(user.id)
+        return UserCoinBalance(userFromDb.coin)
     }
 }

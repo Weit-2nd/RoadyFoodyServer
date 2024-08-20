@@ -18,4 +18,10 @@ class FoodSpotsSearchController(
         user: User,
         foodSpotsSearchCondition: FoodSpotsSearchCondition,
     ) = foodSpotsSearchService.searchFoodSpots(user, foodSpotsSearchCondition)
+
+    @GetMapping("/search/coin-required")
+    override fun calculateRequiredCoin(
+        user: User,
+        foodSpotsSearchCondition: FoodSpotsSearchCondition,
+    ) = foodSpotsSearchService.calculateRequiredCoin(user, foodSpotsSearchCondition)
 }

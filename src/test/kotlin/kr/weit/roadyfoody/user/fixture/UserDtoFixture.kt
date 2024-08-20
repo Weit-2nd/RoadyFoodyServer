@@ -8,6 +8,7 @@ import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_PHOTO_URL
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_REST_DAILY_REPORT_CREATION_COUNT
 import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodHistory
 import kr.weit.roadyfoody.user.application.dto.ReviewerInfoResponse
+import kr.weit.roadyfoody.user.application.dto.UserCoinBalance
 import kr.weit.roadyfoody.user.application.dto.UserInfoResponse
 import kr.weit.roadyfoody.user.application.dto.UserReportCategoryResponse
 import kr.weit.roadyfoody.user.application.dto.UserReportHistoriesResponse
@@ -57,3 +58,8 @@ fun createTestSliceResponseUserReview(): SliceResponse<UserReviewResponse> =
     )
 
 fun createTestReviewerInfoResponse(): ReviewerInfoResponse = ReviewerInfoResponse.of(createTestUser(), TEST_USER_PROFILE_IMAGE_URL)
+
+fun createTestUserCoinBalance(): UserCoinBalance =
+    UserCoinBalance(
+        200,
+    )

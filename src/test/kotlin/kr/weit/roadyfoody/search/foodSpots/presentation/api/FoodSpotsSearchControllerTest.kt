@@ -6,6 +6,7 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
 import kr.weit.roadyfoody.foodSpots.fixture.createFoodSpotsSearchResponses
 import kr.weit.roadyfoody.search.foodSpots.application.service.FoodSpotsSearchService
+import kr.weit.roadyfoody.search.foodSpots.fixture.createCalculateCoinResponse
 import kr.weit.roadyfoody.support.annotation.ControllerTest
 import kr.weit.roadyfoody.support.utils.getWithAuth
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -43,6 +44,34 @@ class FoodSpotsSearchControllerTest(
                             content().json(
                                 objectMapper.writeValueAsString(
                                     createFoodSpotsSearchResponses(),
+                                ),
+                            ),
+                        )
+                }
+            }
+        }
+        given("GET calculateRequiredCoind API 호출") {
+            every {
+                foodSpotsSearchService.calculateRequiredCoin(any(), any())
+            } returns createCalculateCoinResponse(200)
+
+            `when`("정상적인 요청이 들어온 경우") {
+                then("코인 소모량을 조회한다.") {
+                    mockMvc
+                        .perform(
+                            getWithAuth("$requestPath/search/coin-required")
+                                .contentType("application/json")
+                                .param("centerLongitude", "127.074667")
+                                .param("centerLatitude", "37.147030")
+                                .param("radius", "1000")
+                                .param("name", "pot2")
+                                .param("categoryIds", "1")
+                                .param("categoryIds", "2"),
+                        ).andExpect(status().isOk)
+                        .andExpect(
+                            content().json(
+                                objectMapper.writeValueAsString(
+                                    createCalculateCoinResponse(200),
                                 ),
                             ),
                         )
