@@ -107,4 +107,7 @@ enum class ErrorCode(
     USER_ID_NON_POSITIVE(HttpStatus.BAD_REQUEST, -15000, "유저 ID는 양수여야 합니다."),
     NICKNAME_ALREADY_EXISTS(HttpStatus.CONFLICT, -15001, "이미 사용중인 닉네임입니다."),
     PROFILE_IMAGE_NOT_EXISTS(HttpStatus.NOT_FOUND, -15002, "프로필 이미지가 존재하지 않습니다."),
+
+    // Admin API error 16000대
+    DAILY_REPORT_COUNT_NEGATIVE(HttpStatus.BAD_REQUEST, -16000, "일일 리포트 생성 횟수는 양수 또는 0이여야 합니다."),
 }
