@@ -44,6 +44,7 @@ import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import kr.weit.roadyfoody.user.repository.UserRepository
 import java.util.Optional
+import java.util.concurrent.ExecutorService
 
 class FoodSpotsQueryServiceTest :
     BehaviorSpec(
@@ -57,6 +58,7 @@ class FoodSpotsQueryServiceTest :
             val reviewRepository = mockk<FoodSpotsReviewRepository>()
             val reviewPhotoRepository = mockk<FoodSpotsReviewPhotoRepository>()
             val imageService = spyk(ImageService(mockk()))
+            val executor = mockk<ExecutorService>()
             val foodSPotsQueryService =
                 FoodSpotsQueryService(
                     foodSpotsHistoryRepository,
@@ -68,6 +70,7 @@ class FoodSpotsQueryServiceTest :
                     reviewRepository,
                     userRepository,
                     reviewPhotoRepository,
+                    executor,
                 )
             afterEach { clearAllMocks() }
 
@@ -220,6 +223,9 @@ class FoodSpotsQueryServiceTest :
                     listOf(
                         createTestReportOperationHours(),
                     )
+                every { executor.execute(any()) } answers {
+                    firstArg<Runnable>().run()
+                }
                 `when`("정상적인 데이터가 들어올 경우") {
                     then("해당 리포트 이력 상세가 조회되어야 한다.") {
                         foodSPotsQueryService.getReportHistory(TEST_FOOD_SPOTS_HISTORY_ID)
@@ -258,6 +264,9 @@ class FoodSpotsQueryServiceTest :
                     listOf(
                         createTestReviewPhoto(),
                     )
+                every { executor.execute(any()) } answers {
+                    firstArg<Runnable>().run()
+                }
                 `when`("정상적인 데이터가 들어올 경우") {
                     then("정상적으로 리뷰가 조회되어야 한다.") {
                         foodSPotsQueryService.getFoodSpotsReview(
@@ -287,6 +296,9 @@ class FoodSpotsQueryServiceTest :
                     listOf(createTestFoodSpotsPhoto())
                 every { imageService.getDownloadUrl(any()) } returns TEST_FOOD_SPOTS_PHOTO_URL
                 every { reviewRepository.getReviewAggregatedInfo(any()) } returns createTestAggregatedInfoResponse()
+                every { executor.execute(any()) } answers {
+                    firstArg<Runnable>().run()
+                }
                 `when`("정상적인 데이터가 들어올 경우") {
                     then("정상적으로 음식점 상세가 조회되어야 한다.") {
                         foodSPotsQueryService.getFoodSpotsDetail(TEST_FOOD_SPOT_ID)
