@@ -98,16 +98,10 @@ class FoodSpotsQueryService(
             foodSpotsPhotoRepository.getByHistoryId(historyId).map { photo ->
                 CompletableFuture
                     .supplyAsync({
-                        imageService.getDownloadUrl(photo.fileName)
+                        ReportPhotoResponse(photo.id, imageService.getDownloadUrl(photo.fileName))
                     }, executor)
-                    .thenApply { url -> ReportPhotoResponse(photo.id, url) }
             }
-        val reportPhotoResponse =
-            CompletableFuture
-                .allOf(*photosFutures.toTypedArray())
-                .thenApply {
-                    photosFutures.map { it.join() }
-                }.join()
+        val reportPhotoResponse = photosFutures.map { it.join() }
         return ReportHistoryDetailResponse(
             foodSpotsHistory,
             reportPhotoResponse,
@@ -134,16 +128,13 @@ class FoodSpotsQueryService(
                     reviewPhotoRepository.getByReview(it).map { photo ->
                         CompletableFuture
                             .supplyAsync({
-                                imageService.getDownloadUrl(photo.fileName)
+                                ReviewPhotoResponse(
+                                    photo.id,
+                                    imageService.getDownloadUrl(photo.fileName),
+                                )
                             }, executor)
-                            .thenApply { url -> ReviewPhotoResponse(photo.id, url) }
                     }
-                val photoResponseList =
-                    CompletableFuture
-                        .allOf(*photosFutures.toTypedArray())
-                        .thenApply {
-                            photosFutures.map { it.join() }
-                        }.join()
+                val photoResponseList = photosFutures.map { it.join() }
                 FoodSpotsReviewResponse.of(
                     it,
                     ReviewerInfoResponse.of(user, url),
@@ -162,17 +153,14 @@ class FoodSpotsQueryService(
                     foodSpotsPhotoRepository.findByHistoryIn(it).map { photo ->
                         CompletableFuture
                             .supplyAsync({
-                                imageService.getDownloadUrl(photo.fileName)
+                                ReportPhotoResponse(
+                                    photo.id,
+                                    imageService.getDownloadUrl(photo.fileName),
+                                )
                             }, executor)
-                            .thenApply { url -> ReportPhotoResponse(photo.id, url) }
                     }
                 }
-            val foodSpotsPhotos =
-                CompletableFuture
-                    .allOf(*photosFutures.toTypedArray())
-                    .thenApply {
-                        photosFutures.map { it.join() }
-                    }.join()
+            val foodSpotsPhotos = photosFutures.map { it.join() }
             FoodSpotsDetailResponse(
                 foodSpots,
                 determineOpenStatus(foodSpots),
