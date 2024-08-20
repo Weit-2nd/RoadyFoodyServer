@@ -43,7 +43,7 @@ class FoodSpotsSearchService(
         }
 
         val coinRequired = calculateRequiredCoins(searchRadius)
-        val existingCache = isCacheValidate(user, foodSpotsSearchQuery, coinRequired)
+        val existingCache = isCacheValidate(user, foodSpotsSearchQuery, searchRadius)
 
         if (existingCache != null) {
             return foodSpotsQueryService.searchFoodSpots(foodSpotsSearchQuery)
