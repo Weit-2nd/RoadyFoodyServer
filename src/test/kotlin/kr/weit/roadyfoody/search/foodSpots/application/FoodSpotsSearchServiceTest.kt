@@ -48,7 +48,7 @@ class FoodSpotsSearchServiceTest :
                 )
 
             `when`("1000m이내 가게 검색 요청시 - 코인 캐싱 x") {
-                val user = createTestUser(coin = 1000)
+                val user = createTestUser()
                 every { searchCoinCacheRepository.findByUserId(user.id) } returns emptyList()
 
                 then("소모될 예정인 코인을 리턴한다") {
@@ -64,7 +64,7 @@ class FoodSpotsSearchServiceTest :
                 )
 
             `when`("1000m이내 가게 검색 요청시 - 코인 캐싱 o") {
-                val user = createTestUser(coin = 1000)
+                val user = createTestUser()
                 every { searchCoinCacheRepository.findByUserId(user.id) } returns createMockSearchCoinCaches(user.id)
 
                 then("소모될 코인이 없기 때문에 0을 리턴한다") {
@@ -81,7 +81,7 @@ class FoodSpotsSearchServiceTest :
                 )
 
             `when`("500m 이내에 가게 검색시") {
-                val user = createTestUser(coin = 1000)
+                val user = createTestUser()
 
                 then("소모될 코인이 없기 때문에 0을 리턴한다") {
                     val result = foodSpotsSearchService.calculateRequiredCoin(user, query500m)
