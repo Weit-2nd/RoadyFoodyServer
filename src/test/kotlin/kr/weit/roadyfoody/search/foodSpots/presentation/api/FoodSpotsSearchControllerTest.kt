@@ -50,7 +50,7 @@ class FoodSpotsSearchControllerTest(
                 }
             }
         }
-        given("GET calculateRequiredCoind API 호출") {
+        given("GET calculateRequiredCoin API 호출") {
             every {
                 foodSpotsSearchService.calculateRequiredCoin(any(), any())
             } returns createCalculateCoinResponse(200)
