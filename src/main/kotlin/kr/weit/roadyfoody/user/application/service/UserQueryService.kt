@@ -72,16 +72,13 @@ class UserQueryService(
                     foodSpotsPhotoRepository.getByHistoryId(it.id).map { photo ->
                         CompletableFuture
                             .supplyAsync({
-                                imageService.getDownloadUrl(photo.fileName)
+                                UserReportPhotoResponse(
+                                    photo,
+                                    imageService.getDownloadUrl(photo.fileName),
+                                )
                             }, executor)
-                            .thenApply { url -> UserReportPhotoResponse(photo, url) }
                     }
-                val reportPhotoResponse =
-                    CompletableFuture
-                        .allOf(*photosFutures.toTypedArray())
-                        .thenApply {
-                            photosFutures.map { it.join() }
-                        }.join()
+                val reportPhotoResponse = photosFutures.map { it.join() }
                 UserReportHistoriesResponse(it, reportPhotoResponse, reportCategoryResponse)
             }
         return SliceResponse(reportResponse)
@@ -102,16 +99,13 @@ class UserQueryService(
                         reviewPhotoRepository.getByReview(it).map { photo ->
                             CompletableFuture
                                 .supplyAsync({
-                                    imageService.getDownloadUrl(photo.fileName)
+                                    ReviewPhotoResponse(
+                                        photo.id,
+                                        imageService.getDownloadUrl(photo.fileName),
+                                    )
                                 }, executor)
-                                .thenApply { url -> ReviewPhotoResponse(photo.id, url) }
                         }
-                    val reviewPhotos =
-                        CompletableFuture
-                            .allOf(*photosFutures.toTypedArray())
-                            .thenApply {
-                                photosFutures.map { it.join() }
-                            }.join()
+                    val reviewPhotos = photosFutures.map { it.join() }
                     UserReviewResponse(it, reviewPhotos)
                 }
         return SliceResponse(response)
