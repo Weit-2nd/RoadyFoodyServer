@@ -235,6 +235,7 @@ class FoodSpotsQueryServiceTest :
                             imageService.getDownloadUrl(any())
                             reportFoodCategoryRepository.getByHistoryId(any())
                             reportOperationHoursRepository.getByHistoryId(any())
+                            executor.execute(any())
                         }
                     }
                 }
@@ -280,6 +281,7 @@ class FoodSpotsQueryServiceTest :
                             reviewRepository.sliceByFoodSpots(any(), any(), any(), any())
                             userRepository.findById(any())
                             reviewPhotoRepository.getByReview(any())
+                            executor.execute(any())
                         }
                         verify(exactly = 2) { imageService.getDownloadUrl(any()) }
                     }
@@ -307,6 +309,7 @@ class FoodSpotsQueryServiceTest :
                             foodSpotsHistoryRepository.findByFoodSpots(any())
                             foodSpotsPhotoRepository.findByHistoryIn(any())
                             imageService.getDownloadUrl(any())
+                            executor.execute(any())
                         }
                     }
                 }
