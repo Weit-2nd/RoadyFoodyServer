@@ -35,6 +35,7 @@ import kr.weit.roadyfoody.user.fixture.createTestUser
 import kr.weit.roadyfoody.user.repository.UserRepository
 import org.springframework.data.redis.core.RedisTemplate
 import java.util.Optional
+import java.util.concurrent.ExecutorService
 
 class UserQueryServiceTest :
     BehaviorSpec({
@@ -46,6 +47,7 @@ class UserQueryServiceTest :
         val reviewRepository = mockk<FoodSpotsReviewRepository>()
         val reviewPhotoRepository = mockk<FoodSpotsReviewPhotoRepository>()
         val redisTemplate = mockk<RedisTemplate<String, String>>()
+        val executor = mockk<ExecutorService>()
         val userQueryService =
             UserQueryService(
                 userRepository,
@@ -56,6 +58,7 @@ class UserQueryServiceTest :
                 reviewRepository,
                 reviewPhotoRepository,
                 redisTemplate,
+                executor,
             )
 
         afterEach { clearAllMocks() }
@@ -104,6 +107,9 @@ class UserQueryServiceTest :
                 listOf(
                     createTestReportFoodCategory(),
                 )
+            every { executor.execute(any()) } answers {
+                firstArg<Runnable>().run()
+            }
             `when`("정상적인 데이터가 들어올 경우") {
                 then("정상적으로 조회되어야 한다.") {
                     userQueryService.getReportHistories(
@@ -111,6 +117,14 @@ class UserQueryServiceTest :
                         TEST_FOOD_SPOTS_SIZE,
                         TEST_FOOD_SPOTS_LAST_ID,
                     )
+                    verify(exactly = 1) {
+                        userRepository.findById(any())
+                        reportFoodCategoryRepository.getByHistoryId(any())
+                        foodSpotsHistoryRepository.getHistoriesByUser(any(), any(), any())
+                        foodSpotsPhotoRepository.getByHistoryId(any())
+                        imageService.getDownloadUrl(any())
+                        executor.execute(any())
+                    }
                 }
             }
 
@@ -139,6 +153,9 @@ class UserQueryServiceTest :
             } returns createMockSliceReview()
             every { reviewPhotoRepository.getByReview(any()) } returns listOf(createTestReviewPhoto())
             every { imageService.getDownloadUrl(any()) } returns TEST_FOOD_SPOTS_PHOTO_URL
+            every { executor.execute(any()) } answers {
+                firstArg<Runnable>().run()
+            }
             `when`("정상적인 데이터가 들어올 경우") {
                 then("정상적으로 리뷰가 조회되어야 한다.") {
                     userQueryService.getUserReviews(
@@ -151,6 +168,7 @@ class UserQueryServiceTest :
                         reviewRepository.sliceByUser(any(), any(), any())
                         reviewPhotoRepository.getByReview(any())
                         imageService.getDownloadUrl(any())
+                        executor.execute(any())
                     }
                 }
             }
