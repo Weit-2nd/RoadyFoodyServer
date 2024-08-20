@@ -36,6 +36,8 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoField
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutorService
 
 @Service
 class FoodSpotsQueryService(
@@ -48,6 +50,7 @@ class FoodSpotsQueryService(
     private val reviewRepository: FoodSpotsReviewRepository,
     private val userRepository: UserRepository,
     private val reviewPhotoRepository: FoodSpotsReviewPhotoRepository,
+    private val executor: ExecutorService,
 ) {
     @Transactional(readOnly = true)
     fun searchFoodSpots(foodSpotsSearchQuery: FoodSpotsSearchCondition): FoodSpotsSearchResponses {
@@ -80,10 +83,6 @@ class FoodSpotsQueryService(
     @Transactional(readOnly = true)
     fun getReportHistory(historyId: Long): ReportHistoryDetailResponse {
         val foodSpotsHistory = foodSpotsHistoryRepository.getByHistoryId(historyId)
-        val reportPhotoResponse =
-            foodSpotsPhotoRepository.getByHistoryId(historyId).map { photo ->
-                ReportPhotoResponse(photo, imageService.getDownloadUrl(photo.fileName))
-            }
         val reportCategoryResponse =
             reportFoodCategoryRepository.getByHistoryId(historyId).map { category ->
                 ReportCategoryResponse(category)
@@ -94,6 +93,15 @@ class FoodSpotsQueryService(
                 .map { operationHours ->
                     ReportOperationHoursResponse(operationHours)
                 }
+
+        val photosFutures =
+            foodSpotsPhotoRepository.getByHistoryId(historyId).map { photo ->
+                CompletableFuture
+                    .supplyAsync({
+                        ReportPhotoResponse(photo.id, imageService.getDownloadUrl(photo.fileName))
+                    }, executor)
+            }
+        val reportPhotoResponse = photosFutures.map { it.join() }
         return ReportHistoryDetailResponse(
             foodSpotsHistory,
             reportPhotoResponse,
@@ -116,11 +124,22 @@ class FoodSpotsQueryService(
                     user.profile.profileImageName?.let { fileName ->
                         imageService.getDownloadUrl(fileName)
                     }
-                val photoResponses =
+                val photosFutures =
                     reviewPhotoRepository.getByReview(it).map { photo ->
-                        ReviewPhotoResponse(photo.id, imageService.getDownloadUrl(photo.fileName))
+                        CompletableFuture
+                            .supplyAsync({
+                                ReviewPhotoResponse(
+                                    photo.id,
+                                    imageService.getDownloadUrl(photo.fileName),
+                                )
+                            }, executor)
                     }
-                FoodSpotsReviewResponse.of(it, ReviewerInfoResponse.of(user, url), photoResponses)
+                val photoResponseList = photosFutures.map { it.join() }
+                FoodSpotsReviewResponse.of(
+                    it,
+                    ReviewerInfoResponse.of(user, url),
+                    photoResponseList,
+                )
             }
         return SliceResponse(response)
     }
@@ -128,13 +147,20 @@ class FoodSpotsQueryService(
     @Transactional(readOnly = true)
     fun getFoodSpotsDetail(foodSpotsId: Long): FoodSpotsDetailResponse =
         foodSpotsRepository.getByFoodSpotsId(foodSpotsId).let { foodSpots ->
-            val foodSpotsPhotos =
+            val reviewAggregatedInfoResponse = reviewRepository.getReviewAggregatedInfo(foodSpots)
+            val photosFutures =
                 foodSpotsHistoryRepository.getByFoodSpots(foodSpots).let {
                     foodSpotsPhotoRepository.findByHistoryIn(it).map { photo ->
-                        ReportPhotoResponse(photo, imageService.getDownloadUrl(photo.fileName))
+                        CompletableFuture
+                            .supplyAsync({
+                                ReportPhotoResponse(
+                                    photo.id,
+                                    imageService.getDownloadUrl(photo.fileName),
+                                )
+                            }, executor)
                     }
                 }
-            val reviewAggregatedInfoResponse = reviewRepository.getReviewAggregatedInfo(foodSpots)
+            val foodSpotsPhotos = photosFutures.map { it.join() }
             FoodSpotsDetailResponse(
                 foodSpots,
                 determineOpenStatus(foodSpots),
