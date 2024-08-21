@@ -27,3 +27,9 @@ data class UserInfoResponse(
             )
     }
 }
+
+@Schema(description = "보유중인 코인 응답 데이터")
+data class UserCoinBalance(
+    @Schema(description = "보유중인 코인")
+    val userCoin: Int,
+)

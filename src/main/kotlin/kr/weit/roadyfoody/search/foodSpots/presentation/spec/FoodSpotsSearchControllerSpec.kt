@@ -10,6 +10,8 @@ import kr.weit.roadyfoody.global.swagger.ApiErrorCodeExamples
 import kr.weit.roadyfoody.global.swagger.v1.SwaggerTag
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponses
+import kr.weit.roadyfoody.search.foodSpots.dto.RequiredCoinRequest
+import kr.weit.roadyfoody.search.foodSpots.dto.RequiredCoinResponse
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.web.bind.annotation.ModelAttribute
 
@@ -38,4 +40,26 @@ interface FoodSpotsSearchControllerSpec {
         @LoginUser user: User,
         @ModelAttribute @Valid foodSpotsSearchCondition: FoodSpotsSearchCondition,
     ): FoodSpotsSearchResponses
+
+    @Operation(
+        description = "코인 소모량 조회 API",
+        parameters = [
+            Parameter(name = "centerLongitude", description = "지도 중심 경도", required = true, example = "127.074667"),
+            Parameter(name = "centerLatitude", description = "지도 중심 위도", required = true, example = "37.147030"),
+            Parameter(name = "radius", description = "검색 반경", required = true, example = "500"),
+        ],
+    )
+    @ApiErrorCodeExamples(
+        [
+            ErrorCode.RADIUS_SIZE_TOO_SMALL,
+            ErrorCode.LATITUDE_TOO_LOW,
+            ErrorCode.LONGITUDE_TOO_LOW,
+            ErrorCode.LATITUDE_TOO_HIGH,
+            ErrorCode.LONGITUDE_TOO_HIGH,
+        ],
+    )
+    fun getRequiredCoin(
+        @LoginUser user: User,
+        @ModelAttribute @Valid requiredCoinRequest: RequiredCoinRequest,
+    ): RequiredCoinResponse
 }

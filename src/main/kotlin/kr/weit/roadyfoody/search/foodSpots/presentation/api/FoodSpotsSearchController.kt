@@ -2,6 +2,7 @@ package kr.weit.roadyfoody.search.foodSpots.presentation.api
 
 import kr.weit.roadyfoody.search.foodSpots.application.service.FoodSpotsSearchService
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
+import kr.weit.roadyfoody.search.foodSpots.dto.RequiredCoinRequest
 import kr.weit.roadyfoody.search.foodSpots.presentation.spec.FoodSpotsSearchControllerSpec
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.web.bind.annotation.GetMapping
@@ -18,4 +19,10 @@ class FoodSpotsSearchController(
         user: User,
         foodSpotsSearchCondition: FoodSpotsSearchCondition,
     ) = foodSpotsSearchService.searchFoodSpots(user, foodSpotsSearchCondition)
+
+    @GetMapping("/search/coin-required")
+    override fun getRequiredCoin(
+        user: User,
+        requiredCoinRequest: RequiredCoinRequest,
+    ) = foodSpotsSearchService.getRequiredCoin(user, requiredCoinRequest)
 }
