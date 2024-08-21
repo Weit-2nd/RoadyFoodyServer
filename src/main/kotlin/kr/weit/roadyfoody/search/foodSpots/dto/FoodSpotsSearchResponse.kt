@@ -39,8 +39,8 @@ enum class OperationStatus {
     TEMPORARILY_CLOSED,
 }
 
-@Schema(description = "코인 소모량 계산 응답 데이터")
-data class CalculateCoinResponse(
-    @Schema(description = "코인 소모량 계산 결과")
+@Schema(description = "코인 소모량 응답 데이터")
+data class RequiredCoinResponse(
+    @Schema(description = "코인 소모량")
     val requiredCoin: Int,
 )

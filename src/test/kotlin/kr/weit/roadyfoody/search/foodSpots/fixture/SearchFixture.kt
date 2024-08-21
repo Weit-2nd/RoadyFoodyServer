@@ -1,7 +1,8 @@
 package kr.weit.roadyfoody.search.foodSpots.fixture
 
-import kr.weit.roadyfoody.search.foodSpots.dto.CalculateCoinResponse
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
+import kr.weit.roadyfoody.search.foodSpots.dto.RequiredCoinRequest
+import kr.weit.roadyfoody.search.foodSpots.dto.RequiredCoinResponse
 
 fun createFoodSpotsSearchCondition(
     centerLongitude: Double,
@@ -18,4 +19,15 @@ fun createFoodSpotsSearchCondition(
         categoryIds = categoryIds,
     )
 
-fun createCalculateCoinResponse(coin: Int): CalculateCoinResponse = CalculateCoinResponse(coin)
+fun createRequiredCoinRequest(
+    centerLongitude: Double,
+    centerLatitude: Double,
+    radius: Int,
+): RequiredCoinRequest =
+    RequiredCoinRequest(
+        centerLongitude = centerLongitude,
+        centerLatitude = centerLatitude,
+        radius = radius,
+    )
+
+fun createRequiredCoinResponse(coin: Int): RequiredCoinResponse = RequiredCoinResponse(coin)

@@ -8,9 +8,10 @@ import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.global.swagger.ApiErrorCodeExamples
 import kr.weit.roadyfoody.global.swagger.v1.SwaggerTag
-import kr.weit.roadyfoody.search.foodSpots.dto.CalculateCoinResponse
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponses
+import kr.weit.roadyfoody.search.foodSpots.dto.RequiredCoinRequest
+import kr.weit.roadyfoody.search.foodSpots.dto.RequiredCoinResponse
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.web.bind.annotation.ModelAttribute
 
@@ -57,8 +58,8 @@ interface FoodSpotsSearchControllerSpec {
             ErrorCode.LONGITUDE_TOO_HIGH,
         ],
     )
-    fun calculateRequiredCoin(
+    fun getRequiredCoin(
         @LoginUser user: User,
-        @ModelAttribute @Valid foodSpotsSearchCondition: FoodSpotsSearchCondition,
-    ): CalculateCoinResponse
+        @ModelAttribute @Valid requiredCoinRequest: RequiredCoinRequest,
+    ): RequiredCoinResponse
 }

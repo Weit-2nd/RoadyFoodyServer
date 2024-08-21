@@ -16,8 +16,9 @@ import kr.weit.roadyfoody.foodSpots.fixture.createMockSearchCoinCaches
 import kr.weit.roadyfoody.rewards.application.service.RewardsCommandService
 import kr.weit.roadyfoody.rewards.fixture.createTestRewards
 import kr.weit.roadyfoody.search.foodSpots.application.service.FoodSpotsSearchService
-import kr.weit.roadyfoody.search.foodSpots.fixture.createCalculateCoinResponse
 import kr.weit.roadyfoody.search.foodSpots.fixture.createFoodSpotsSearchCondition
+import kr.weit.roadyfoody.search.foodSpots.fixture.createRequiredCoinRequest
+import kr.weit.roadyfoody.search.foodSpots.fixture.createRequiredCoinResponse
 import kr.weit.roadyfoody.search.foodSpots.repository.SearchCoinCacheRepository
 import kr.weit.roadyfoody.user.application.service.UserCommandService
 import kr.weit.roadyfoody.user.fixture.createTestUser
@@ -39,9 +40,9 @@ class FoodSpotsSearchServiceTest :
 
         afterEach { clearAllMocks() }
 
-        given("calculateRequiredCoin 테스트") {
+        given("getRequiredCoin 테스트") {
             val query1000m =
-                createFoodSpotsSearchCondition(
+                createRequiredCoinRequest(
                     0.0,
                     0.0,
                     1000,
@@ -52,12 +53,12 @@ class FoodSpotsSearchServiceTest :
                 every { searchCoinCacheRepository.findByUserId(user.id) } returns emptyList()
 
                 then("소모될 예정인 코인을 리턴한다") {
-                    val result = foodSpotsSearchService.calculateRequiredCoin(user, query1000m)
-                    result shouldBe createCalculateCoinResponse(200)
+                    val result = foodSpotsSearchService.getRequiredCoin(user, query1000m)
+                    result shouldBe createRequiredCoinResponse(200)
                 }
             }
             val query1000mWithCache =
-                createFoodSpotsSearchCondition(
+                createRequiredCoinRequest(
                     TEST_FOOD_SPOT_LONGITUDE,
                     TEST_FOOD_SPOT_LATITUDE,
                     1000,
@@ -68,13 +69,13 @@ class FoodSpotsSearchServiceTest :
                 every { searchCoinCacheRepository.findByUserId(user.id) } returns createMockSearchCoinCaches(user.id)
 
                 then("소모될 코인이 없기 때문에 0을 리턴한다") {
-                    val result = foodSpotsSearchService.calculateRequiredCoin(user, query1000mWithCache)
-                    result shouldBe createCalculateCoinResponse(0)
+                    val result = foodSpotsSearchService.getRequiredCoin(user, query1000mWithCache)
+                    result shouldBe createRequiredCoinResponse(0)
                 }
             }
 
             val query500m =
-                createFoodSpotsSearchCondition(
+                createRequiredCoinRequest(
                     0.0,
                     0.0,
                     500,
@@ -84,8 +85,8 @@ class FoodSpotsSearchServiceTest :
                 val user = createTestUser()
 
                 then("소모될 코인이 없기 때문에 0을 리턴한다") {
-                    val result = foodSpotsSearchService.calculateRequiredCoin(user, query500m)
-                    result shouldBe createCalculateCoinResponse(0)
+                    val result = foodSpotsSearchService.getRequiredCoin(user, query500m)
+                    result shouldBe createRequiredCoinResponse(0)
                 }
             }
         }

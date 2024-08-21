@@ -7,9 +7,10 @@ import kr.weit.roadyfoody.rewards.application.service.RewardsCommandService
 import kr.weit.roadyfoody.rewards.domain.RewardType
 import kr.weit.roadyfoody.rewards.domain.Rewards
 import kr.weit.roadyfoody.search.foodSpots.domain.SearchCoinCache
-import kr.weit.roadyfoody.search.foodSpots.dto.CalculateCoinResponse
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponses
+import kr.weit.roadyfoody.search.foodSpots.dto.RequiredCoinRequest
+import kr.weit.roadyfoody.search.foodSpots.dto.RequiredCoinResponse
 import kr.weit.roadyfoody.search.foodSpots.repository.SearchCoinCacheRepository
 import kr.weit.roadyfoody.user.application.service.UserCommandService
 import kr.weit.roadyfoody.user.domain.User
@@ -42,8 +43,8 @@ class FoodSpotsSearchService(
             return foodSpotsQueryService.searchFoodSpots(foodSpotsSearchQuery)
         }
 
-        val coinRequired = calculateRequiredCoins(searchRadius)
-        val existingCache = isCacheValidate(user, foodSpotsSearchQuery, searchRadius)
+        val coinRequired = calculateRequiredCoin(searchRadius)
+        val existingCache = isCacheValidate(user, foodSpotsSearchQuery.centerLongitude, foodSpotsSearchQuery.centerLatitude, searchRadius)
 
         if (existingCache != null) {
             return foodSpotsQueryService.searchFoodSpots(foodSpotsSearchQuery)
@@ -77,24 +78,24 @@ class FoodSpotsSearchService(
     }
 
     @Transactional(readOnly = true)
-    fun calculateRequiredCoin(
+    fun getRequiredCoin(
         user: User,
-        foodSpotsSearchQuery: FoodSpotsSearchCondition,
-    ): CalculateCoinResponse {
-        val searchRadius = foodSpotsSearchQuery.radius
+        requiredCoinRequest: RequiredCoinRequest,
+    ): RequiredCoinResponse {
+        val searchRadius = requiredCoinRequest.radius
 
         if (BASE_RADIUS == searchRadius) {
-            return CalculateCoinResponse(0)
+            return RequiredCoinResponse(0)
         }
 
-        val coinRequired = calculateRequiredCoins(searchRadius)
-        val existingCache = isCacheValidate(user, foodSpotsSearchQuery, coinRequired)
+        val coinRequired = calculateRequiredCoin(searchRadius)
+        val existingCache = isCacheValidate(user, requiredCoinRequest.centerLongitude, requiredCoinRequest.centerLatitude, searchRadius)
 
         if (existingCache != null) {
-            return CalculateCoinResponse(0)
+            return RequiredCoinResponse(0)
         }
 
-        return CalculateCoinResponse(coinRequired)
+        return RequiredCoinResponse(coinRequired)
     }
 
     private fun calculateDistance(
@@ -119,7 +120,7 @@ class FoodSpotsSearchService(
 
     fun haversine(value: Double): Double = sin(value / 2).pow(2.0)
 
-    private fun calculateRequiredCoins(searchRadius: Int): Int {
+    private fun calculateRequiredCoin(searchRadius: Int): Int {
         val additionalRadius = (searchRadius - BASE_RADIUS) / BASE_RADIUS
         val coinRequired = (2.0.pow(additionalRadius.toDouble()) * 100).toInt()
         return coinRequired
@@ -127,7 +128,8 @@ class FoodSpotsSearchService(
 
     private fun isCacheValidate(
         user: User,
-        foodSpotsSearchQuery: FoodSpotsSearchCondition,
+        centerLongitude: Double,
+        centerLatitude: Double,
         searchRadius: Int,
     ): SearchCoinCache? {
         val recentSearches = searchCoinCacheRepository.findByUserId(user.id)
@@ -135,8 +137,8 @@ class FoodSpotsSearchService(
         val existingCache =
             recentSearches.find { cache ->
                 calculateDistance(
-                    foodSpotsSearchQuery.centerLatitude,
-                    foodSpotsSearchQuery.centerLongitude,
+                    centerLatitude,
+                    centerLongitude,
                     cache.latitude,
                     cache.longitude,
                 ) <= 0.1 &&
