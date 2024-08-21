@@ -6,7 +6,6 @@ import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.global.validator.MaxFileSize
 import kr.weit.roadyfoody.global.validator.WebPImage
-import kr.weit.roadyfoody.user.application.dto.UserCoinBalance
 import kr.weit.roadyfoody.user.application.dto.UserInfoResponse
 import kr.weit.roadyfoody.user.application.dto.UserNicknameRequest
 import kr.weit.roadyfoody.user.application.dto.UserReportHistoriesResponse
@@ -98,9 +97,4 @@ class UserController(
     ) {
         userCommandService.deleteProfileImage(user)
     }
-
-    @GetMapping("/me/coin-balance")
-    override fun getCoinBalance(
-        @LoginUser user: User,
-    ): UserCoinBalance = userQueryService.getCoinBalance(user)
 }

@@ -186,14 +186,4 @@ class UserQueryServiceTest :
                 }
             }
         }
-
-        given("getCoinBalance") {
-            val user = createTestUser()
-            every { userRepository.findById(any<Long>()) } returns Optional.of(user)
-            `when`("정상적인 데이터가 들어온 경우") {
-                then("회원의 보유 코인을 조회한다.") {
-                    userQueryService.getCoinBalance(user)
-                }
-            }
-        }
     })

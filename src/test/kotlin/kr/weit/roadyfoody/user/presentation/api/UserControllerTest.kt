@@ -29,7 +29,6 @@ import kr.weit.roadyfoody.user.fixture.TEST_MAX_LENGTH_NICKNAME
 import kr.weit.roadyfoody.user.fixture.TEST_MIN_LENGTH_NICKNAME
 import kr.weit.roadyfoody.user.fixture.TEST_USER_ID
 import kr.weit.roadyfoody.user.fixture.createTestSliceResponseUserReview
-import kr.weit.roadyfoody.user.fixture.createTestUserCoinBalance
 import kr.weit.roadyfoody.user.fixture.createTestUserInfoResponse
 import kr.weit.roadyfoody.user.fixture.createTestUserNicknameRequest
 import kr.weit.roadyfoody.user.fixture.createTestUserReportHistoriesResponse
@@ -345,18 +344,6 @@ class UserControllerTest(
                             deleteWithAuth("$requestPath/profile"),
                         ).andExpect(status().isNoContent)
                     verify(exactly = 1) { userCommandService.deleteProfileImage(any<User>()) }
-                }
-            }
-        }
-
-        given("GET $requestPath/me/coin-balance TEST") {
-            `when`("정상적인 요청이 들어올 경우") {
-                every { userQueryService.getCoinBalance(any()) } returns createTestUserCoinBalance()
-                then("회원의 보유 코인을 조회한다.") {
-                    mockMvc
-                        .perform(
-                            getWithAuth("$requestPath/me/coin-balance"),
-                        ).andExpect(status().isOk)
                 }
             }
         }
