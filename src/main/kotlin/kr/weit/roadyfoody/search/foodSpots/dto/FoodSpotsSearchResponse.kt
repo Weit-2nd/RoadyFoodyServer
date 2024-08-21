@@ -38,3 +38,9 @@ enum class OperationStatus {
     @Schema(description = "임시 휴무")
     TEMPORARILY_CLOSED,
 }
+
+@Schema(description = "코인 소모량 응답 데이터")
+data class RequiredCoinResponse(
+    @Schema(description = "코인 소모량")
+    val requiredCoin: Int,
+)
