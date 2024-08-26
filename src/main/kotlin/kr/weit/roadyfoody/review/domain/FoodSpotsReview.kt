@@ -30,4 +30,8 @@ class FoodSpotsReview(
     val rate: Int,
     @Column(nullable = false, updatable = false, length = 1200)
     val contents: String,
-) : BaseTimeEntity()
+    @Column(nullable = false)
+    val likeTotal: Int,
+) : BaseTimeEntity() {
+    constructor() : this(0L, FoodSpots(), User.of("", "defaultNickname"), 0, "", 0)
+}
