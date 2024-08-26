@@ -10,6 +10,7 @@ import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsReviewResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoryDetailResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
+import kr.weit.roadyfoody.foodSpots.application.dto.UserReportCount
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsCommandService
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsQueryService
 import kr.weit.roadyfoody.foodSpots.presentation.spec.FoodSportsControllerSpec
@@ -107,4 +108,11 @@ class FoodSpotsController(
         @Positive(message = "음식점 ID는 양수여야 합니다.")
         foodSpotsId: Long,
     ): FoodSpotsDetailResponse = foodSpotsQueryService.getFoodSpotsDetail(foodSpotsId)
+
+    @GetMapping("/ranking")
+    fun getRanking(
+        @Positive
+        @RequestParam(required = true, defaultValue = "10")
+        limit: Long,
+    ): List<UserReportCount> = foodSpotsQueryService.getUserReports(limit)
 }

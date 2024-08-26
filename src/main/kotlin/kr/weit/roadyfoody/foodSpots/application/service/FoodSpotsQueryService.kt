@@ -7,6 +7,7 @@ import kr.weit.roadyfoody.foodSpots.application.dto.ReportCategoryResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoryDetailResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportOperationHoursResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportPhotoResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.UserReportCount
 import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
@@ -17,6 +18,7 @@ import kr.weit.roadyfoody.foodSpots.repository.ReportOperationHoursRepository
 import kr.weit.roadyfoody.foodSpots.repository.getByFoodSpots
 import kr.weit.roadyfoody.foodSpots.repository.getByFoodSpotsId
 import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
+import kr.weit.roadyfoody.foodSpots.repository.getUserReports
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.review.application.dto.ReviewPhotoResponse
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewPhotoRepository
@@ -30,6 +32,8 @@ import kr.weit.roadyfoody.search.foodSpots.dto.OperationStatus
 import kr.weit.roadyfoody.user.application.dto.ReviewerInfoResponse
 import kr.weit.roadyfoody.user.repository.UserRepository
 import kr.weit.roadyfoody.user.repository.getByUserId
+import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -51,7 +55,12 @@ class FoodSpotsQueryService(
     private val userRepository: UserRepository,
     private val reviewPhotoRepository: FoodSpotsReviewPhotoRepository,
     private val executor: ExecutorService,
+    private val redisTemplate: RedisTemplate<String, String>,
 ) {
+    companion object {
+        private val reportRankingKey = "rofo:user-report-counts"
+    }
+
     @Transactional(readOnly = true)
     fun searchFoodSpots(foodSpotsSearchQuery: FoodSpotsSearchCondition): FoodSpotsSearchResponses {
         val result: List<FoodSpots> =
@@ -191,6 +200,31 @@ class FoodSpotsQueryService(
                 } ?: OperationStatus.CLOSED
         } else {
             OperationStatus.TEMPORARILY_CLOSED
+        }
+    }
+
+    fun getUserReports(limit: Long): List<UserReportCount> {
+        val typedTuple = redisTemplate.opsForZSet().reverseRangeWithScores(reportRankingKey, 0, limit - 1) ?: emptySet()
+        return typedTuple.map { tuple ->
+            val userNickname = tuple.value ?: ""
+            val score = tuple.score ?: 0.0
+
+            UserReportCount(
+                userNickname = userNickname,
+                reportCount = score.toLong(),
+            )
+        }
+    }
+
+    @Scheduled(cron = "0 0 5 * * *")
+    fun updateRanking() {
+        redisTemplate.delete(reportRankingKey)
+
+        val reportUserCounts = foodSpotsHistoryRepository.getUserReports()
+
+        val zSetOps = redisTemplate.opsForZSet()
+        reportUserCounts.forEach {
+            zSetOps.add(reportRankingKey, it.userNickname, it.reportCount.toDouble())
         }
     }
 }

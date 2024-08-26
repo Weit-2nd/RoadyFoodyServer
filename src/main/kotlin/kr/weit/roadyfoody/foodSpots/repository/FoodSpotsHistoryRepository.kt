@@ -1,10 +1,12 @@
 package kr.weit.roadyfoody.foodSpots.repository
 
 import com.linecorp.kotlinjdsl.support.spring.data.jpa.repository.KotlinJdslJpqlExecutor
+import kr.weit.roadyfoody.foodSpots.application.dto.UserReportCount
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
 import kr.weit.roadyfoody.foodSpots.exception.FoodSpotsHistoryNotFoundException
 import kr.weit.roadyfoody.global.utils.getSlice
+import kr.weit.roadyfoody.user.domain.Profile
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
@@ -21,6 +23,8 @@ fun FoodSpotsHistoryRepository.getByHistoryId(historyId: Long): FoodSpotsHistory
 
 fun FoodSpotsHistoryRepository.getByFoodSpots(foodSpots: FoodSpots): List<FoodSpotsHistory> = findByFoodSpots(foodSpots)
 
+fun FoodSpotsHistoryRepository.getUserReports(): List<UserReportCount> = findAllUserReportCounts()
+
 interface FoodSpotsHistoryRepository :
     JpaRepository<FoodSpotsHistory, Long>,
     CustomFoodSpotsHistoryRepository {
@@ -35,6 +39,8 @@ interface CustomFoodSpotsHistoryRepository {
         size: Int,
         lastId: Long?,
     ): Slice<FoodSpotsHistory>
+
+    fun findAllUserReportCounts(): List<UserReportCount>
 }
 
 class CustomFoodSpotsHistoryRepositoryImpl(
@@ -59,4 +65,23 @@ class CustomFoodSpotsHistoryRepositoryImpl(
                 ).orderBy(path(FoodSpotsHistory::id).desc())
         }
     }
+
+    override fun findAllUserReportCounts(): List<UserReportCount> =
+        kotlinJdslJpqlExecutor
+            .findAll {
+                val userIdPath = path(FoodSpotsHistory::user).path(User::id)
+                val userNicknamePath = path(FoodSpotsHistory::user).path(User::profile).path(Profile::nickname)
+                val historyIdPath = path(FoodSpotsHistory::id)
+                val createdAtPath = path(FoodSpotsHistory::createdDateTime)
+
+                selectNew<UserReportCount>(
+                    userNicknamePath,
+                    count(historyIdPath),
+                ).from(entity(FoodSpotsHistory::class))
+                    .groupBy(userIdPath)
+                    .orderBy(
+                        count(historyIdPath).desc(),
+                        max(createdAtPath).asc(),
+                    )
+            }.filterNotNull()
 }
