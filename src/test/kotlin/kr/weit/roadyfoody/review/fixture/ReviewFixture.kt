@@ -38,6 +38,35 @@ fun createTestFoodSpotsReview(
     rate: Int = TEST_REVIEW_RATING,
 ) = FoodSpotsReview(0L, foodSpots, user, rate, TEST_REVIEW_CONTENT)
 
+fun createTestFoodSpotsReviews(
+    user: User = createTestUser(),
+    foodSpots: FoodSpots = createTestFoodSpots(),
+    rate: Int = TEST_REVIEW_RATING,
+    size: Int = 3,
+) = List(size) {
+    createTestFoodSpotsReview(user, foodSpots, rate)
+}
+
+fun createTestFoodSpotsReviews(
+    user: User = createTestUser(),
+    foodSpots: FoodSpots = createTestFoodSpots(),
+    otherRate: Int = 5,
+    sizeOfAllReviews: Int = 3,
+    sizeOfRateOver6Reviews: Int = 1,
+) = createTestFoodSpotsReviews(
+    user = user,
+    foodSpots = foodSpots,
+    rate = otherRate,
+    size =
+        sizeOfAllReviews - sizeOfRateOver6Reviews,
+) +
+    createTestFoodSpotsReviews(
+        user = user,
+        foodSpots = foodSpots,
+        rate = 6,
+        size = sizeOfRateOver6Reviews,
+    )
+
 fun createMockTestReview(
     user: User = createTestUser(),
     foodSpots: FoodSpots = createTestFoodSpots(),
