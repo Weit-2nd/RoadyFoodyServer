@@ -1,5 +1,6 @@
 package kr.weit.roadyfoody.user.application.service
 
+import kr.weit.roadyfoody.badge.domain.Badge
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
 import kr.weit.roadyfoody.global.annotation.DistributedLock
@@ -8,6 +9,7 @@ import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.repository.UserRepository
 import kr.weit.roadyfoody.user.repository.getByUserId
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 
@@ -74,4 +76,10 @@ class UserCommandService(
             imageService.remove(imageName)
         } ?: throw RoadyFoodyBadRequestException(ErrorCode.PROFILE_IMAGE_NOT_EXISTS)
     }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    fun changeBadgeNewTx(
+        userId: Long,
+        badge: Badge,
+    ): User = userRepository.getByUserId(userId).apply { changeBadge(badge) }
 }
