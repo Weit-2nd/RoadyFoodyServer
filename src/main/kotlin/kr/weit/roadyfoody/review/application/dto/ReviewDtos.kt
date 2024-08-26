@@ -26,7 +26,7 @@ data class ReviewRequest(
     fun toEntity(
         user: User,
         foodSpot: FoodSpots,
-    ): FoodSpotsReview = FoodSpotsReview(id = 0L, foodSpot, user, rating, contents)
+    ): FoodSpotsReview = FoodSpotsReview(id = 0L, foodSpot, user, rating, contents, 0)
 }
 
 data class ReviewPhotoResponse(
