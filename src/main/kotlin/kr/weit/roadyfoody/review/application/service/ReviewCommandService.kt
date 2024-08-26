@@ -1,5 +1,6 @@
 package kr.weit.roadyfoody.review.application.service
 
+import kr.weit.roadyfoody.badge.service.BadgeCommandService
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
 import kr.weit.roadyfoody.foodSpots.repository.getByFoodSpotsId
 import kr.weit.roadyfoody.global.service.ImageService
@@ -24,6 +25,7 @@ class ReviewCommandService(
     private val foodSpotsRepository: FoodSpotsRepository,
     private val imageService: ImageService,
     private val executor: ExecutorService,
+    private val badgeCommandService: BadgeCommandService,
 ) {
     @Transactional
     fun createReview(
@@ -49,6 +51,7 @@ class ReviewCommandService(
                     }, executor)
                 }.forEach { it.join() }
         }
+        badgeCommandService.tryChangeBadgeAndIfPromotedGiveBonus(user)
     }
 
     @Transactional
@@ -72,6 +75,7 @@ class ReviewCommandService(
         }
         deleteReviewPhoto(listOf(review))
         reviewRepository.delete(review)
+        badgeCommandService.tryChangeBadgeAndIfPromotedGiveBonus(user)
     }
 
     private fun deleteReviewPhoto(reviews: List<FoodSpotsReview>) {

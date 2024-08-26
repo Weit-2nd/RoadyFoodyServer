@@ -8,9 +8,12 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.clearAllMocks
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
 import io.mockk.spyk
 import io.mockk.verify
+import kr.weit.roadyfoody.badge.service.BadgeCommandService
 import kr.weit.roadyfoody.foodSpots.fixture.createMockPhotoList
 import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodSpot
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
@@ -36,6 +39,7 @@ class ReviewCommandServiceTest :
             val foodSpotsRepository = mockk<FoodSpotsRepository>()
             val imageService = spyk(ImageService(mockk()))
             val executor = mockk<ExecutorService>()
+            val badgeCommandService = mockk<BadgeCommandService>()
             val reportService =
                 ReviewCommandService(
                     reviewRepository,
@@ -43,6 +47,7 @@ class ReviewCommandServiceTest :
                     foodSpotsRepository,
                     imageService,
                     executor,
+                    badgeCommandService,
                 )
             afterEach { clearAllMocks() }
 
@@ -57,6 +62,7 @@ class ReviewCommandServiceTest :
                 every { executor.execute(any()) } answers {
                     firstArg<Runnable>().run()
                 }
+                every { badgeCommandService.tryChangeBadgeAndIfPromotedGiveBonus(any()) } just runs
                 `when`("정상적인 데이터와 이미지가 들어올 경우") {
                     then("정상적으로 저장되어야 한다.") {
                         reportService.createReview(
@@ -119,6 +125,7 @@ class ReviewCommandServiceTest :
                     every { imageService.remove(any()) } returns Unit
                     every { reviewPhotoRepository.deleteAll(any()) } returns Unit
                     every { reviewRepository.delete(any()) } returns Unit
+                    every { badgeCommandService.tryChangeBadgeAndIfPromotedGiveBonus(any()) } just runs
                     then("정상적으로 삭제되어야 한다.") {
                         reportService.deleteReview(user, TEST_REVIEW_ID)
                         verify(exactly = 1) {
