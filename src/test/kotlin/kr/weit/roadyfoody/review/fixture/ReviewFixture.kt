@@ -25,6 +25,7 @@ const val TEST_REVIEW_REQUEST_PHOTO = "reviewPhotos"
 const val TEST_REVIEW_ID = 1L
 const val TEST_REVIEW_PHOTO_URL = "reviewPhotoUrl"
 const val TEST_REVIEW_PHOTO_ID = 1L
+const val TEST_REVIEW_LIKE = 0
 
 fun createTestReviewRequest(
     foodSpotsId: Long = TEST_FOOD_SPOT_ID,
@@ -36,7 +37,8 @@ fun createTestFoodSpotsReview(
     user: User = createTestUser(),
     foodSpots: FoodSpots = createTestFoodSpots(),
     rate: Int = TEST_REVIEW_RATING,
-) = FoodSpotsReview(0L, foodSpots, user, rate, TEST_REVIEW_CONTENT)
+    likeTotal: Int = TEST_REVIEW_LIKE,
+) = FoodSpotsReview(0L, foodSpots, user, rate, TEST_REVIEW_CONTENT, likeTotal)
 
 fun createMockTestReview(
     user: User = createTestUser(),
@@ -61,6 +63,7 @@ class MockTestReview(
     user: User = createTestUser(),
     contents: String = TEST_REVIEW_CONTENT,
     rating: Int = TEST_REVIEW_RATING,
-) : FoodSpotsReview(id, foodSpots, user, rating, contents) {
+    likeTotal: Int = TEST_REVIEW_LIKE,
+) : FoodSpotsReview(id, foodSpots, user, rating, contents, likeTotal) {
     override var createdDateTime: LocalDateTime = LocalDateTime.now()
 }
