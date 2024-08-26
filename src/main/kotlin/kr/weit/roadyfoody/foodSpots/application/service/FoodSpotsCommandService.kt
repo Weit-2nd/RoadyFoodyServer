@@ -19,9 +19,9 @@ import kr.weit.roadyfoody.foodSpots.exception.NotFoodSpotsHistoriesOwnerExceptio
 import kr.weit.roadyfoody.foodSpots.exception.TooManyReportRequestException
 import kr.weit.roadyfoody.foodSpots.exception.UnauthorizedPhotoRemoveException
 import kr.weit.roadyfoody.foodSpots.repository.FoodCategoryRepository
-import kr.weit.roadyfoody.foodSpots.repository.FoodSportsOperationHoursRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsFoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
+import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsOperationHoursRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsPhotoRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
@@ -58,7 +58,7 @@ class FoodSpotsCommandService(
     private val foodSpotsHistoryRepository: FoodSpotsHistoryRepository,
     private val foodSpotsPhotoRepository: FoodSpotsPhotoRepository,
     private val reportOperationHoursRepository: ReportOperationHoursRepository,
-    private val foodSportsOperationHoursRepository: FoodSportsOperationHoursRepository,
+    private val foodSpotsOperationHoursRepository: FoodSpotsOperationHoursRepository,
     private val foodCategoryRepository: FoodCategoryRepository,
     private val reportFoodCategoryRepository: ReportFoodCategoryRepository,
     private val foodSpotsCategoryRepository: FoodSpotsFoodCategoryRepository,
@@ -148,7 +148,7 @@ class FoodSpotsCommandService(
             foodCategories.map { FoodSpotsFoodCategory(foodSpots, it) },
         )
 
-        foodSportsOperationHoursRepository.saveAll(operationHoursList)
+        foodSpotsOperationHoursRepository.saveAll(operationHoursList)
         return foodSpots
     }
 
@@ -341,10 +341,10 @@ class FoodSpotsCommandService(
         val newFoodSpotsOperationHours = request.toOperationHoursEntity(foodSpots) ?: return false
 
         val foodSpotsOperationHoursToRemove = currentFoodSpotsOperationHours subtract newFoodSpotsOperationHours
-        foodSportsOperationHoursRepository.deleteAll(foodSpotsOperationHoursToRemove)
+        foodSpotsOperationHoursRepository.deleteAll(foodSpotsOperationHoursToRemove)
 
         val foodSpotsOperationHoursToAdd = newFoodSpotsOperationHours subtract currentFoodSpotsOperationHours
-        foodSportsOperationHoursRepository.saveAll(foodSpotsOperationHoursToAdd)
+        foodSpotsOperationHoursRepository.saveAll(foodSpotsOperationHoursToAdd)
 
         val changed = foodSpotsOperationHoursToRemove.isNotEmpty() || foodSpotsOperationHoursToAdd.isNotEmpty()
         return changed

@@ -4,4 +4,4 @@ import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsOperationHours
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsOperationHoursId
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface FoodSportsOperationHoursRepository : JpaRepository<FoodSpotsOperationHours, FoodSpotsOperationHoursId>
+interface FoodSpotsOperationHoursRepository : JpaRepository<FoodSpotsOperationHours, FoodSpotsOperationHoursId>
