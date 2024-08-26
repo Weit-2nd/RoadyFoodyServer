@@ -1,5 +1,6 @@
 package kr.weit.roadyfoody.user.fixture
 
+import kr.weit.roadyfoody.badge.domain.Badge
 import kr.weit.roadyfoody.user.application.dto.UserNicknameRequest
 import kr.weit.roadyfoody.user.domain.Profile
 import kr.weit.roadyfoody.user.domain.SocialLoginType
@@ -26,6 +27,7 @@ fun createTestUser(
     socialId: String = TEST_USER_SOCIAL_ID,
     profileImageName: String? = "${TEST_USER_PROFILE_IMAGE_NAME}_$id",
     coin: Int = TEST_USER_COIN,
+    badge: Badge = Badge.BEGINNER,
 ) = User(
     id,
     socialId,
@@ -34,6 +36,7 @@ fun createTestUser(
         profileImageName,
     ),
     coin,
+    badge,
 )
 
 fun createTestUsers(size: Int = 5) = List(size) { createTestUser(it.toLong() + 1) }
