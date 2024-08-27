@@ -9,8 +9,6 @@ import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
 import kr.weit.roadyfoody.badge.domain.Badge
-import kr.weit.roadyfoody.badge.domain.Badge.Companion.BEGINNER_RATE_OVER_6_REVIEWS_THRESHOLD
-import kr.weit.roadyfoody.badge.domain.Badge.Companion.BEGINNER_REVIEWS_THRESHOLD
 import kr.weit.roadyfoody.badge.fixture.createTestUserPromotionRewardHistory
 import kr.weit.roadyfoody.badge.repository.UserPromotionRewardHistoryRepository
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
@@ -45,9 +43,9 @@ class BadgeCommandServiceTest :
                 val user = createTestUser(badge = Badge.BEGINNER)
                 val reviews =
                     createTestFoodSpotsReviews(
-                        otherRate = 5,
-                        sizeOfAllReviews = BEGINNER_REVIEWS_THRESHOLD + 1,
-                        sizeOfRateOver6Reviews = BEGINNER_RATE_OVER_6_REVIEWS_THRESHOLD + 1,
+                        otherRate = Badge.HIGH_RATING_CONDITION,
+                        sizeOfAllReviews = Badge.PRO.totalReviewsRequired,
+                        sizeOfHighRatedReviews = Badge.PRO.highRatedReviewsRequired,
                     )
                 every { userPromotionRewardHistoryRepository.existsByUserIdAndBadge(any(), any()) } returns false
                 every { foodSpotsReviewRepository.findByUser(any()) } returns reviews
@@ -69,9 +67,9 @@ class BadgeCommandServiceTest :
                 val user = createTestUser(badge = Badge.BEGINNER)
                 val reviews =
                     createTestFoodSpotsReviews(
-                        otherRate = 5,
-                        sizeOfAllReviews = BEGINNER_REVIEWS_THRESHOLD + 1,
-                        sizeOfRateOver6Reviews = BEGINNER_RATE_OVER_6_REVIEWS_THRESHOLD + 1,
+                        otherRate = Badge.HIGH_RATING_CONDITION,
+                        sizeOfAllReviews = Badge.PRO.totalReviewsRequired,
+                        sizeOfHighRatedReviews = Badge.PRO.highRatedReviewsRequired,
                     )
                 every { foodSpotsReviewRepository.findByUser(any()) } returns reviews
                 every { userCommandService.changeBadgeNewTx(any(), any()) } returns createTestUser(badge = Badge.PRO)
@@ -83,7 +81,7 @@ class BadgeCommandServiceTest :
                     verify(exactly = 0) {
                         userPromotionRewardHistoryRepository.save(any())
                         rewardsRepository.save(any())
-                        userCommandService.increaseCoin(user.id, Badge.PRO_BONUS)
+                        userCommandService.increaseCoin(any(), any())
                     }
                 }
             }
@@ -92,9 +90,9 @@ class BadgeCommandServiceTest :
                 val user = createTestUser(badge = Badge.BEGINNER)
                 val reviews =
                     createTestFoodSpotsReviews(
-                        otherRate = 5,
-                        sizeOfAllReviews = BEGINNER_REVIEWS_THRESHOLD,
-                        sizeOfRateOver6Reviews = BEGINNER_RATE_OVER_6_REVIEWS_THRESHOLD,
+                        otherRate = Badge.HIGH_RATING_CONDITION - 1,
+                        sizeOfAllReviews = Badge.BEGINNER.totalReviewsRequired,
+                        sizeOfHighRatedReviews = Badge.BEGINNER.highRatedReviewsRequired,
                     )
                 every { foodSpotsReviewRepository.findByUser(any()) } returns reviews
                 every { userCommandService.changeBadgeNewTx(any(), any()) } returns createTestUser(badge = Badge.BEGINNER)
@@ -115,9 +113,9 @@ class BadgeCommandServiceTest :
                 val user = createTestUser(badge = Badge.PRO)
                 val reviewsForDemotion =
                     createTestFoodSpotsReviews(
-                        otherRate = 5,
-                        sizeOfAllReviews = BEGINNER_REVIEWS_THRESHOLD,
-                        sizeOfRateOver6Reviews = BEGINNER_RATE_OVER_6_REVIEWS_THRESHOLD,
+                        otherRate = Badge.HIGH_RATING_CONDITION - 1,
+                        sizeOfAllReviews = Badge.PRO.totalReviewsRequired,
+                        sizeOfHighRatedReviews = Badge.PRO.highRatedReviewsRequired - 1,
                     )
                 every { foodSpotsReviewRepository.findByUser(any()) } returns reviewsForDemotion
                 every { userCommandService.changeBadgeNewTx(any(), any()) } returns createTestUser(badge = Badge.BEGINNER)

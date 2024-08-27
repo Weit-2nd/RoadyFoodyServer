@@ -1,3 +1,4 @@
+import kr.weit.roadyfoody.badge.domain.Badge
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_PHOTO_NAME
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpots
@@ -52,19 +53,19 @@ fun createTestFoodSpotsReviews(
     foodSpots: FoodSpots = createTestFoodSpots(),
     otherRate: Int = 5,
     sizeOfAllReviews: Int = 3,
-    sizeOfRateOver6Reviews: Int = 1,
+    sizeOfHighRatedReviews: Int = 1,
 ) = createTestFoodSpotsReviews(
     user = user,
     foodSpots = foodSpots,
     rate = otherRate,
     size =
-        sizeOfAllReviews - sizeOfRateOver6Reviews,
+        sizeOfAllReviews - sizeOfHighRatedReviews,
 ) +
     createTestFoodSpotsReviews(
         user = user,
         foodSpots = foodSpots,
-        rate = 6,
-        size = sizeOfRateOver6Reviews,
+        rate = Badge.HIGH_RATING_CONDITION,
+        size = sizeOfHighRatedReviews,
     )
 
 fun createMockTestReview(

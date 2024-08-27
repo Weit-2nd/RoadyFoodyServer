@@ -24,8 +24,8 @@ class BadgeCommandService(
 
         val reviews = foodSpotsReviewRepository.findByUser(user)
         val numOfReviews = reviews.size
-        val numOfReviewsRateOver6 = reviews.count { it.rate >= 6 }
-        val newBadge = Badge.getBadge(numOfReviews, numOfReviewsRateOver6)
+        val numOfHighRatedReviews = reviews.count { it.rate >= Badge.HIGH_RATING_CONDITION }
+        val newBadge = Badge.getBadge(numOfReviews, numOfHighRatedReviews)
 
         if (prevBadge == newBadge) {
             return
@@ -43,16 +43,14 @@ class BadgeCommandService(
 
         userPromotionRewardHistoryRepository.save(UserPromotionRewardHistory.from(changedUser))
 
-        val bonusAmount = Badge.calculateBonusAmount(changedUser.badge)
-
         Rewards(
             user = changedUser,
             foodSpotsHistory = null,
-            rewardPoint = bonusAmount,
+            rewardPoint = changedUser.badge.bonusAmount,
             coinReceived = true,
-            rewardType = Badge.convertToReportType(changedUser.badge),
+            rewardType = changedUser.badge.rewardType,
         ).also { rewardsRepository.save(it) }
 
-        userCommandService.increaseCoin(changedUser.id, bonusAmount)
+        userCommandService.increaseCoin(changedUser.id, changedUser.badge.bonusAmount)
     }
 }
