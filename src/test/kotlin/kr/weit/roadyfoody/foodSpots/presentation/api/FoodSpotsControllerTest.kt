@@ -29,6 +29,7 @@ import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsDetailResponse
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportRequest
 import kr.weit.roadyfoody.foodSpots.fixture.createTestSliceFoodSpotsReviewResponse
+import kr.weit.roadyfoody.foodSpots.fixture.createUserRankingResponse
 import kr.weit.roadyfoody.global.TEST_LAST_ID
 import kr.weit.roadyfoody.global.TEST_NON_POSITIVE_ID
 import kr.weit.roadyfoody.global.TEST_NON_POSITIVE_SIZE
@@ -662,6 +663,32 @@ class FoodSpotsControllerTest(
                         mockMvc
                             .perform(
                                 getWithAuth("$requestPath/$TEST_INVALID_FOOD_SPOT_ID"),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+            }
+
+            given("GET $requestPath/report/ranking") {
+                val response = createUserRankingResponse()
+                every {
+                    foodSpotsCommandService.getReportRanking(any())
+                } returns response
+                `when`("정상적인 데이터가 들어올 경우") {
+                    then("리포트 랭킹 리스트가 조회된다.") {
+                        mockMvc
+                            .perform(
+                                getWithAuth("$requestPath/report/ranking")
+                                    .param("size", "$TEST_PAGE_SIZE"),
+                            ).andExpect(status().isOk)
+                    }
+                }
+
+                `when`("size가 음수가 들어올 경우") {
+                    then("400을 반환한다") {
+                        mockMvc
+                            .perform(
+                                getWithAuth("$requestPath/report/ranking")
+                                    .param("size", "-1"),
                             ).andExpect(status().isBadRequest)
                     }
                 }

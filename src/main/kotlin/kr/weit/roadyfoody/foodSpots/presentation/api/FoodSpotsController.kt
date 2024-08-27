@@ -114,5 +114,5 @@ class FoodSpotsController(
         @Positive(message = "size는 양수여야 합니다.")
         @RequestParam(defaultValue = "10")
         size: Long,
-    ): List<UserReportCount> = foodSpotsQueryService.getReportRanking(size)
+    ): List<UserReportCount> = foodSpotsCommandService.getReportRanking(size)
 }

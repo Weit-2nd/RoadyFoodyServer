@@ -111,4 +111,13 @@ class FoodSpotsHistoryRepositoryTest(
                 }
             }
         }
+
+        describe("getAllUserReportCount 메소드는") {
+            it("전체 회원의 닉네임과 리포트 개수를 리스트로 반환한다") {
+                val userReportCounts = foodSpotsHistoryRepository.getAllUserReportCount()
+                userReportCounts.size shouldBe 1
+                userReportCounts[0].userNickname shouldBe "existentNick"
+                userReportCounts[0].reportCount shouldBe 2
+            }
+        }
     })
