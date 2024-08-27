@@ -46,9 +46,9 @@ import kr.weit.roadyfoody.foodSpots.fixture.createTestReportFoodCategory
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportOperationHours
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportRequest
 import kr.weit.roadyfoody.foodSpots.repository.FoodCategoryRepository
-import kr.weit.roadyfoody.foodSpots.repository.FoodSportsOperationHoursRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsFoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
+import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsOperationHoursRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsPhotoRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
@@ -76,7 +76,7 @@ class FoodSpotsCommandServiceTest :
             val foodSpotsPhotoRepository = mockk<FoodSpotsPhotoRepository>()
             val userRepository = mockk<UserRepository>()
             val reportOperationHoursRepository = mockk<ReportOperationHoursRepository>()
-            val foodSportsOperationHoursRepository = mockk<FoodSportsOperationHoursRepository>()
+            val foodSpotsOperationHoursRepository = mockk<FoodSpotsOperationHoursRepository>()
             val foodCategoryRepository = mockk<FoodCategoryRepository>()
             val reportFoodCategoryRepository = mockk<ReportFoodCategoryRepository>()
             val foodSpotsCategoryRepository = mockk<FoodSpotsFoodCategoryRepository>()
@@ -93,7 +93,7 @@ class FoodSpotsCommandServiceTest :
                     foodSpotsHistoryRepository,
                     foodSpotsPhotoRepository,
                     reportOperationHoursRepository,
-                    foodSportsOperationHoursRepository,
+                    foodSpotsOperationHoursRepository,
                     foodCategoryRepository,
                     reportFoodCategoryRepository,
                     foodSpotsCategoryRepository,
@@ -120,7 +120,7 @@ class FoodSpotsCommandServiceTest :
                     )
                 every { reportOperationHoursRepository.saveAll(any<List<ReportOperationHours>>()) } returns
                     listOf(createTestReportOperationHours())
-                every { foodSportsOperationHoursRepository.saveAll(any<List<FoodSpotsOperationHours>>()) } returns
+                every { foodSpotsOperationHoursRepository.saveAll(any<List<FoodSpotsOperationHours>>()) } returns
                     listOf(createTestFoodOperationHours())
                 every { reportFoodCategoryRepository.saveAll(any<List<ReportFoodCategory>>()) } returns
                     listOf(createTestReportFoodCategory())
@@ -177,8 +177,8 @@ class FoodSpotsCommandServiceTest :
                 every { foodCategoryRepository.findFoodCategoryByIdIn(any()) } returns createTestFoodCategories()
                 every { foodSpotsCategoryRepository.saveAll(any<List<FoodSpotsFoodCategory>>()) } returns
                     createTestFoodSpotsFoodCategories()
-                every { foodSportsOperationHoursRepository.deleteAll(any<List<FoodSpotsOperationHours>>()) } just runs
-                every { foodSportsOperationHoursRepository.saveAll(any<List<FoodSpotsOperationHours>>()) } returns
+                every { foodSpotsOperationHoursRepository.deleteAll(any<List<FoodSpotsOperationHours>>()) } just runs
+                every { foodSpotsOperationHoursRepository.saveAll(any<List<FoodSpotsOperationHours>>()) } returns
                     listOf(createTestFoodOperationHours())
                 every { foodSpotsHistoryRepository.save(any()) } returns createMockTestFoodHistory()
                 every { reportFoodCategoryRepository.saveAll(any<List<ReportFoodCategory>>()) } returns

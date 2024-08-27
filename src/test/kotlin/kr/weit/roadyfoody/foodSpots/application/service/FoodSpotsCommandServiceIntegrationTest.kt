@@ -16,9 +16,9 @@ import kr.weit.roadyfoody.foodSpots.exception.TooManyReportRequestException
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodCategories
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportRequest
 import kr.weit.roadyfoody.foodSpots.repository.FoodCategoryRepository
-import kr.weit.roadyfoody.foodSpots.repository.FoodSportsOperationHoursRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsFoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
+import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsOperationHoursRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportOperationHoursRepository
@@ -33,7 +33,7 @@ import org.springframework.data.redis.core.RedisTemplate
 class FoodSpotsCommandServiceIntegrationTest(
     @SpykBean private val foodSpotsRepository: FoodSpotsRepository,
     private val foodSpotsCategoryRepository: FoodSpotsFoodCategoryRepository,
-    private val foodSportsOperationHoursRepository: FoodSportsOperationHoursRepository,
+    private val foodSpotsOperationHoursRepository: FoodSpotsOperationHoursRepository,
     private val foodSpotsCommandService: FoodSpotsCommandService,
     private val userRepository: UserRepository,
     private val categoryRepository: FoodCategoryRepository,
@@ -76,7 +76,7 @@ class FoodSpotsCommandServiceIntegrationTest(
                     reportOperationHoursRepository.deleteAll()
                     foodSpotsHistoryRepository.deleteAll()
                     foodSpotsCategoryRepository.deleteAll()
-                    foodSportsOperationHoursRepository.deleteAll()
+                    foodSpotsOperationHoursRepository.deleteAll()
                     rewardsCommandService.deleteAllUserRewards(user)
                     foodSpotsRepository.deleteAll()
                     userRepository.delete(user)
