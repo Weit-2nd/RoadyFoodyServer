@@ -23,7 +23,7 @@ fun FoodSpotsHistoryRepository.getByHistoryId(historyId: Long): FoodSpotsHistory
 
 fun FoodSpotsHistoryRepository.getByFoodSpots(foodSpots: FoodSpots): List<FoodSpotsHistory> = findByFoodSpots(foodSpots)
 
-fun FoodSpotsHistoryRepository.getUserReports(): List<UserReportCount> = findAllUserReportCounts()
+fun FoodSpotsHistoryRepository.getAllUserReportCount(): List<UserReportCount> = findAllUserReportCount()
 
 interface FoodSpotsHistoryRepository :
     JpaRepository<FoodSpotsHistory, Long>,
@@ -40,7 +40,7 @@ interface CustomFoodSpotsHistoryRepository {
         lastId: Long?,
     ): Slice<FoodSpotsHistory>
 
-    fun findAllUserReportCounts(): List<UserReportCount>
+    fun findAllUserReportCount(): List<UserReportCount>
 }
 
 class CustomFoodSpotsHistoryRepositoryImpl(
@@ -66,7 +66,7 @@ class CustomFoodSpotsHistoryRepositoryImpl(
         }
     }
 
-    override fun findAllUserReportCounts(): List<UserReportCount> =
+    override fun findAllUserReportCount(): List<UserReportCount> =
         kotlinJdslJpqlExecutor
             .findAll {
                 val userIdPath = path(FoodSpotsHistory::user).path(User::id)
@@ -78,7 +78,7 @@ class CustomFoodSpotsHistoryRepositoryImpl(
                     userNicknamePath,
                     count(historyIdPath),
                 ).from(entity(FoodSpotsHistory::class))
-                    .groupBy(userIdPath)
+                    .groupBy(userIdPath, userNicknamePath)
                     .orderBy(
                         count(historyIdPath).desc(),
                         max(createdAtPath).asc(),

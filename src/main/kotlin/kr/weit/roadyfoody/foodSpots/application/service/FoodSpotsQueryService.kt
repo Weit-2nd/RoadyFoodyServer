@@ -15,10 +15,10 @@ import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsPhotoRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportOperationHoursRepository
+import kr.weit.roadyfoody.foodSpots.repository.getAllUserReportCount
 import kr.weit.roadyfoody.foodSpots.repository.getByFoodSpots
 import kr.weit.roadyfoody.foodSpots.repository.getByFoodSpotsId
 import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
-import kr.weit.roadyfoody.foodSpots.repository.getUserReports
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.review.application.dto.ReviewPhotoResponse
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewPhotoRepository
@@ -32,6 +32,8 @@ import kr.weit.roadyfoody.search.foodSpots.dto.OperationStatus
 import kr.weit.roadyfoody.user.application.dto.ReviewerInfoResponse
 import kr.weit.roadyfoody.user.repository.UserRepository
 import kr.weit.roadyfoody.user.repository.getByUserId
+import org.redisson.api.RLock
+import org.redisson.api.RedissonClient
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
@@ -42,6 +44,7 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoField
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.TimeUnit
 
 @Service
 class FoodSpotsQueryService(
@@ -56,9 +59,11 @@ class FoodSpotsQueryService(
     private val reviewPhotoRepository: FoodSpotsReviewPhotoRepository,
     private val executor: ExecutorService,
     private val redisTemplate: RedisTemplate<String, String>,
+    private val redissonClient: RedissonClient,
 ) {
     companion object {
-        private val reportRankingKey = "rofo:user-report-counts"
+        private const val REPORT_RANKING_KEY = "rofo:user-report-ranking"
+        private const val REPORT_RANKING_UPDATE_LOCK = "updateReportRankingLock"
     }
 
     @Transactional(readOnly = true)
@@ -203,8 +208,9 @@ class FoodSpotsQueryService(
         }
     }
 
-    fun getUserReports(limit: Long): List<UserReportCount> {
-        val typedTuple = redisTemplate.opsForZSet().reverseRangeWithScores(reportRankingKey, 0, limit - 1) ?: emptySet()
+    fun getReportRanking(size: Long): List<UserReportCount> {
+        val typedTuple = redisTemplate.opsForZSet().reverseRangeWithScores(REPORT_RANKING_KEY, 0, size - 1) ?: emptySet()
+
         return typedTuple.map { tuple ->
             val userNickname = tuple.value ?: ""
             val score = tuple.score ?: 0.0
@@ -217,14 +223,17 @@ class FoodSpotsQueryService(
     }
 
     @Scheduled(cron = "0 0 5 * * *")
-    fun updateRanking() {
-        redisTemplate.delete(reportRankingKey)
+    fun updateReportRanking() {
+        val lock: RLock = redissonClient.getLock(REPORT_RANKING_UPDATE_LOCK)
+        if (lock.tryLock(0, 10, TimeUnit.MINUTES)) {
+            redisTemplate.delete(REPORT_RANKING_KEY)
 
-        val reportUserCounts = foodSpotsHistoryRepository.getUserReports()
+            val userReports = foodSpotsHistoryRepository.getAllUserReportCount()
 
-        val zSetOps = redisTemplate.opsForZSet()
-        reportUserCounts.forEach {
-            zSetOps.add(reportRankingKey, it.userNickname, it.reportCount.toDouble())
+            val zSetOps = redisTemplate.opsForZSet()
+            userReports.forEach {
+                zSetOps.add(REPORT_RANKING_KEY, it.userNickname, it.reportCount.toDouble())
+            }
         }
     }
 }

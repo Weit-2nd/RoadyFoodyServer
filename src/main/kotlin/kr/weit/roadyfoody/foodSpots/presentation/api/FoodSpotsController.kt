@@ -109,10 +109,10 @@ class FoodSpotsController(
         foodSpotsId: Long,
     ): FoodSpotsDetailResponse = foodSpotsQueryService.getFoodSpotsDetail(foodSpotsId)
 
-    @GetMapping("/ranking")
-    fun getRanking(
-        @Positive
-        @RequestParam(required = true, defaultValue = "10")
-        limit: Long,
-    ): List<UserReportCount> = foodSpotsQueryService.getUserReports(limit)
+    @GetMapping("/report/ranking")
+    override fun getReportRanking(
+        @Positive(message = "size는 양수여야 합니다.")
+        @RequestParam(defaultValue = "10")
+        size: Long,
+    ): List<UserReportCount> = foodSpotsQueryService.getReportRanking(size)
 }

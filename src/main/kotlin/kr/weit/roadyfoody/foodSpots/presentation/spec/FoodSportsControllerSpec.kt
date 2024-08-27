@@ -17,6 +17,7 @@ import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsReviewResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoryDetailResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
+import kr.weit.roadyfoody.foodSpots.application.dto.UserReportCount
 import kr.weit.roadyfoody.foodSpots.utils.SliceFoodSpotsReview
 import kr.weit.roadyfoody.foodSpots.validator.WebPImageList
 import kr.weit.roadyfoody.global.swagger.ApiErrorCodeExamples
@@ -234,4 +235,29 @@ interface FoodSportsControllerSpec {
         @Positive(message = "음식점 ID는 양수여야 합니다.")
         foodSpotsId: Long,
     ): FoodSpotsDetailResponse
+
+    @Operation(
+        description = "리포트 랭킹 조회 API",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "리포트 랭킹 조회 성공",
+                content = [
+                    Content(
+                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                        schema =
+                            Schema(
+                                implementation = UserReportCount::class,
+                            ),
+                    ),
+                ],
+            ),
+
+        ],
+    )
+    fun getReportRanking(
+        @Positive(message = "size는 양수여야 합니다.")
+        @RequestParam(defaultValue = "10")
+        size: Long,
+    ): List<UserReportCount>
 }
