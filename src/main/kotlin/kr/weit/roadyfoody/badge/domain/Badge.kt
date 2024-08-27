@@ -4,59 +4,32 @@ import kr.weit.roadyfoody.rewards.domain.RewardType
 
 enum class Badge(
     val description: String,
+    val totalReviewsRequired: Int,
+    val highRatedReviewsRequired: Int,
+    val bonusAmount: Int,
+    val rewardType: RewardType,
 ) {
-    BEGINNER("초심자"),
-    PRO("중수"),
-    SUPER("고수"),
-    EXPERT("초고수"),
+    BEGINNER("초심자", 0, 0, 50, RewardType.BEGINNER_GIFT),
+    PRO("중수", 5, 3, 150, RewardType.PRO_GIFT),
+    SUPER("고수", 10, 5, 250, RewardType.SUPER_GIFT),
+    EXPERT("초고수", 20, 10, 500, RewardType.EXPERT_GIFT),
     ;
 
     companion object {
-        const val BEGINNER_REVIEWS_THRESHOLD = 4
-        const val BEGINNER_RATE_OVER_6_REVIEWS_THRESHOLD = 2
-        const val PRO_REVIEWS_THRESHOLD = 9
-        const val PRO_RATE_OVER_6_REVIEWS_THRESHOLD = 4
-        const val SUPER_REVIEWS_THRESHOLD = 19
-        const val SUPER_RATE_OVER_6_REVIEWS_THRESHOLD = 9
-
-        const val BEGINNER_BONUS = 50
-        const val PRO_BONUS = 150
-        const val SUPER_BONUS = 250
-        const val EXPERT_BONUS = 500
+        const val HIGH_RATING_CONDITION = 6
 
         fun getBadge(
-            numOfReviews: Int,
-            numOfReviewsRateOver6: Int,
+            totalReviews: Int,
+            highRatedReviews: Int,
         ): Badge =
-            when {
-                (numOfReviews <= BEGINNER_REVIEWS_THRESHOLD) or
-                    (numOfReviewsRateOver6 <= BEGINNER_RATE_OVER_6_REVIEWS_THRESHOLD) -> BEGINNER
-                (numOfReviews <= PRO_REVIEWS_THRESHOLD) or
-                    (numOfReviewsRateOver6 <= PRO_RATE_OVER_6_REVIEWS_THRESHOLD) -> PRO
-                (numOfReviews <= SUPER_REVIEWS_THRESHOLD) or
-                    (numOfReviewsRateOver6 <= SUPER_RATE_OVER_6_REVIEWS_THRESHOLD) -> SUPER
-                else -> EXPERT
-            }
+            entries.toTypedArray().lastOrNull { badge ->
+                totalReviews >= badge.totalReviewsRequired &&
+                    highRatedReviews >= badge.highRatedReviewsRequired
+            } ?: BEGINNER
 
         fun isDemoted(
             prevBadge: Badge,
             newBadge: Badge,
         ): Boolean = prevBadge > newBadge
-
-        fun calculateBonusAmount(badge: Badge): Int =
-            when (badge) {
-                BEGINNER -> BEGINNER_BONUS
-                PRO -> PRO_BONUS
-                SUPER -> SUPER_BONUS
-                EXPERT -> EXPERT_BONUS
-            }
-
-        fun convertToReportType(badge: Badge): RewardType =
-            when (badge) {
-                BEGINNER -> RewardType.BEGINNER_GIFT
-                PRO -> RewardType.PRO_GIFT
-                SUPER -> RewardType.SUPER_GIFT
-                EXPERT -> RewardType.EXPERT_GIFT
-            }
     }
 }
