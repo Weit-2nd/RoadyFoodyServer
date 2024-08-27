@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.multipart.MultipartFile
 
 @Tag(name = SwaggerTag.FOOD_SPOTS)
-interface FoodSportsControllerSpec {
+interface FoodSpotsControllerSpec {
     @Operation(
         description = "음식점 정보 리포트 API",
         responses = [

@@ -13,7 +13,7 @@ import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.UserReportCount
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsCommandService
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsQueryService
-import kr.weit.roadyfoody.foodSpots.presentation.spec.FoodSportsControllerSpec
+import kr.weit.roadyfoody.foodSpots.presentation.spec.FoodSpotsControllerSpec
 import kr.weit.roadyfoody.foodSpots.validator.WebPImageList
 import kr.weit.roadyfoody.review.repository.ReviewSortType
 import kr.weit.roadyfoody.user.domain.User
@@ -37,7 +37,7 @@ import org.springframework.web.multipart.MultipartFile
 class FoodSpotsController(
     private val foodSpotsCommandService: FoodSpotsCommandService,
     private val foodSpotsQueryService: FoodSpotsQueryService,
-) : FoodSportsControllerSpec {
+) : FoodSpotsControllerSpec {
     @ResponseStatus(CREATED)
     @PostMapping(consumes = [MULTIPART_FORM_DATA_VALUE])
     override fun createReport(
