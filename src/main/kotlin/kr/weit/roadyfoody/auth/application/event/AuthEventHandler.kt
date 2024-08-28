@@ -1,6 +1,7 @@
 package kr.weit.roadyfoody.auth.application.event
 
 import kr.weit.roadyfoody.auth.security.jwt.JwtUtil
+import kr.weit.roadyfoody.badge.repository.UserPromotionRewardHistoryRepository
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsCommandService
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.review.application.service.ReviewCommandService
@@ -20,6 +21,7 @@ class AuthEventHandler(
     private val reviewCommandService: ReviewCommandService,
     private val jwtUtil: JwtUtil,
     private val rewardsCommandService: RewardsCommandService,
+    private val userPromotionRewardHistoryRepository: UserPromotionRewardHistoryRepository,
 ) {
     // TODO : 각 도메인 개발 상황에 따라 기능을 추가해주세요.
     @EventListener(AuthLeaveEvent::class)
@@ -29,6 +31,7 @@ class AuthEventHandler(
         foodSpotsCommandService.deleteWithdrawUserReport(user)
         reviewCommandService.deleteWithdrewUserReview(user)
         rewardsCommandService.deleteAllUserRewards(user)
+        userPromotionRewardHistoryRepository.deleteAllByUser(user)
         userRepository.delete(user)
         val profileImageName = user.profile.profileImageName
         profileImageName?.let {

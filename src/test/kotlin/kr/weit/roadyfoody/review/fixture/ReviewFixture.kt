@@ -1,3 +1,4 @@
+import kr.weit.roadyfoody.badge.domain.Badge
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_PHOTO_NAME
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpots
@@ -39,6 +40,35 @@ fun createTestFoodSpotsReview(
     rate: Int = TEST_REVIEW_RATING,
     likeTotal: Int = TEST_REVIEW_LIKE,
 ) = FoodSpotsReview(0L, foodSpots, user, rate, TEST_REVIEW_CONTENT, likeTotal)
+
+fun createTestFoodSpotsReviews(
+    user: User = createTestUser(),
+    foodSpots: FoodSpots = createTestFoodSpots(),
+    rate: Int = TEST_REVIEW_RATING,
+    size: Int = 3,
+) = List(size) {
+    createTestFoodSpotsReview(user, foodSpots, rate)
+}
+
+fun createTestFoodSpotsReviews(
+    user: User = createTestUser(),
+    foodSpots: FoodSpots = createTestFoodSpots(),
+    otherRate: Int = 5,
+    sizeOfAllReviews: Int = 3,
+    sizeOfHighRatedReviews: Int = 1,
+) = createTestFoodSpotsReviews(
+    user = user,
+    foodSpots = foodSpots,
+    rate = otherRate,
+    size =
+        sizeOfAllReviews - sizeOfHighRatedReviews,
+) +
+    createTestFoodSpotsReviews(
+        user = user,
+        foodSpots = foodSpots,
+        rate = Badge.HIGH_RATING_CONDITION,
+        size = sizeOfHighRatedReviews,
+    )
 
 fun createMockTestReview(
     user: User = createTestUser(),

@@ -1,7 +1,10 @@
 package kr.weit.roadyfoody.review.application.service
 
+import USER_ENTITY_LOCK_KEY
+import kr.weit.roadyfoody.badge.service.BadgeCommandService
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
 import kr.weit.roadyfoody.foodSpots.repository.getByFoodSpotsId
+import kr.weit.roadyfoody.global.annotation.DistributedLock
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.review.application.dto.ReviewRequest
 import kr.weit.roadyfoody.review.domain.FoodSpotsReview
@@ -24,7 +27,9 @@ class ReviewCommandService(
     private val foodSpotsRepository: FoodSpotsRepository,
     private val imageService: ImageService,
     private val executor: ExecutorService,
+    private val badgeCommandService: BadgeCommandService,
 ) {
+    @DistributedLock(lockName = USER_ENTITY_LOCK_KEY, identifier = "user")
     @Transactional
     fun createReview(
         user: User,
@@ -49,6 +54,7 @@ class ReviewCommandService(
                     }, executor)
                 }.forEach { it.join() }
         }
+        badgeCommandService.tryChangeBadgeAndIfPromotedGiveBonus(user.id)
     }
 
     @Transactional
@@ -61,6 +67,7 @@ class ReviewCommandService(
         }
     }
 
+    @DistributedLock(lockName = USER_ENTITY_LOCK_KEY, identifier = "user")
     @Transactional
     fun deleteReview(
         user: User,
@@ -72,6 +79,7 @@ class ReviewCommandService(
         }
         deleteReviewPhoto(listOf(review))
         reviewRepository.delete(review)
+        badgeCommandService.tryChangeBadgeAndIfPromotedGiveBonus(user.id)
     }
 
     private fun deleteReviewPhoto(reviews: List<FoodSpotsReview>) {

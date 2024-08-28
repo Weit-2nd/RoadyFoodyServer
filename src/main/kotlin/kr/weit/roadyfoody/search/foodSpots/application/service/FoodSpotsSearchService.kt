@@ -1,8 +1,10 @@
 package kr.weit.roadyfoody.search.foodSpots.application.service
 
+import USER_ENTITY_LOCK_KEY
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsQueryService
+import kr.weit.roadyfoody.global.annotation.DistributedLock
 import kr.weit.roadyfoody.rewards.application.service.RewardsCommandService
 import kr.weit.roadyfoody.rewards.domain.RewardType
 import kr.weit.roadyfoody.rewards.domain.Rewards
@@ -32,6 +34,7 @@ class FoodSpotsSearchService(
     private val searchCoinCacheRepository: SearchCoinCacheRepository,
     private val rewardsCommandService: RewardsCommandService,
 ) {
+    @DistributedLock(lockName = USER_ENTITY_LOCK_KEY, identifier = "user")
     @Transactional
     fun searchFoodSpots(
         user: User,
