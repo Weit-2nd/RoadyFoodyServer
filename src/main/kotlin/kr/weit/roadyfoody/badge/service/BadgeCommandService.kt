@@ -7,7 +7,8 @@ import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
 import kr.weit.roadyfoody.rewards.domain.Rewards
 import kr.weit.roadyfoody.rewards.repository.RewardsRepository
 import kr.weit.roadyfoody.user.application.service.UserCommandService
-import kr.weit.roadyfoody.user.domain.User
+import kr.weit.roadyfoody.user.repository.UserRepository
+import kr.weit.roadyfoody.user.repository.getByUserId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -18,8 +19,10 @@ class BadgeCommandService(
     private val foodSpotsReviewRepository: FoodSpotsReviewRepository,
     private val userPromotionRewardHistoryRepository: UserPromotionRewardHistoryRepository,
     private val rewardsRepository: RewardsRepository,
+    private val userRepository: UserRepository,
 ) {
-    fun tryChangeBadgeAndIfPromotedGiveBonus(user: User) {
+    fun tryChangeBadgeAndIfPromotedGiveBonus(userId: Long) {
+        val user = userRepository.getByUserId(userId)
         val prevBadge = user.badge
 
         val reviews = foodSpotsReviewRepository.findByUser(user)
@@ -31,26 +34,24 @@ class BadgeCommandService(
             return
         }
 
-        // 최하단 increaseCoin 에서 user 의 coin 을 변경하는 새로운 트랜잭션을 만듭니다.
-        // user 내부 badge 를 현재 트랜잭션에서 변경하게되면 데드락이 발생합니다. 따라서 새로운 트랜잭션을 만들어야합니다.
-        val changedUser = userCommandService.changeBadgeNewTx(user.id, newBadge)
+        user.changeBadge(newBadge)
 
-        if (Badge.isDemoted(prevBadge, changedUser.badge) ||
-            userPromotionRewardHistoryRepository.existsByUserIdAndBadge(changedUser.id, changedUser.badge)
+        if (Badge.isDemoted(prevBadge, user.badge) ||
+            userPromotionRewardHistoryRepository.existsByUserIdAndBadge(user.id, user.badge)
         ) {
             return
         }
 
-        userPromotionRewardHistoryRepository.save(UserPromotionRewardHistory.from(changedUser))
+        userPromotionRewardHistoryRepository.save(UserPromotionRewardHistory.from(user))
 
         Rewards(
-            user = changedUser,
+            user = user,
             foodSpotsHistory = null,
-            rewardPoint = changedUser.badge.bonusAmount,
+            rewardPoint = user.badge.bonusAmount,
             coinReceived = true,
-            rewardType = changedUser.badge.rewardType,
+            rewardType = user.badge.rewardType,
         ).also { rewardsRepository.save(it) }
 
-        userCommandService.increaseCoin(changedUser.id, changedUser.badge.bonusAmount)
+        userCommandService.increaseCoin(user.id, user.badge.bonusAmount)
     }
 }
