@@ -6,4 +6,8 @@ enum class RewardType {
     REPORT_CLOSE,
     SEARCH_SPOT,
     REPORT_DELETE,
+    BEGINNER_GIFT,
+    PRO_GIFT,
+    SUPER_GIFT,
+    EXPERT_GIFT,
 }

@@ -11,7 +11,6 @@ import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.spyk
 import io.mockk.verify
-import jakarta.persistence.EntityManager
 import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
 import kr.weit.roadyfoody.foodSpots.application.dto.OperationHoursRequest
 import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
@@ -88,7 +87,6 @@ class FoodSpotsCommandServiceTest :
             val executor = mockk<ExecutorService>()
             val userCommandService = mockk<UserCommandService>()
             val rewardsCommandService = mockk<RewardsCommandService>()
-            val entityManager = mockk<EntityManager>()
             val redissonClient = mockk<RedissonClient>()
             val redisTemplate = mockk<RedisTemplate<String, String>>()
             val foodSpotsCommandService =
@@ -104,7 +102,6 @@ class FoodSpotsCommandServiceTest :
                     imageService,
                     executor,
                     userCommandService,
-                    entityManager,
                     redissonClient,
                     redisTemplate,
                     rewardsCommandService,
@@ -136,7 +133,6 @@ class FoodSpotsCommandServiceTest :
                     firstArg<Runnable>().run()
                 }
                 every { userCommandService.increaseCoin(any(), any()) } just runs
-                every { entityManager.flush() } just runs
                 every { rewardsCommandService.createRewards(any()) } just runs
                 `when`("정상적인 데이터와 이미지가 들어올 경우") {
                     then("정상적으로 저장되어야 한다.") {
@@ -193,7 +189,6 @@ class FoodSpotsCommandServiceTest :
                     listOf(createTestFoodSpotsPhoto())
                 every { foodSpotsPhotoRepository.findAllById(any()) } returns emptyList()
                 every { foodSpotsPhotoRepository.deleteAll(any()) } just runs
-                every { entityManager.flush() } just runs
                 every { userCommandService.increaseCoin(any(), any()) } just runs
                 every { executor.execute(any()) } answers {
                     firstArg<Runnable>().run()
@@ -681,7 +676,6 @@ class FoodSpotsCommandServiceTest :
                             createTestFoodSpotsPhoto(),
                         )
                     every { foodSpotsPhotoRepository.deleteAll(any()) } returns Unit
-                    every { entityManager.flush() } returns Unit
                     every { userCommandService.decreaseCoin(any(), any()) } returns Unit
                     every { imageService.remove(any()) } returns Unit
                     then("정상적으로 삭제되어야 한다.") {
