@@ -65,7 +65,13 @@ class DistributedLockAop(
     ): String {
         for (i in methodParameterNames.indices) {
             if (methodParameterNames[i] == paramName) {
-                return args[i].toString()
+                val arg = args[i]
+                return try {
+                    val getIdMethod = arg::class.java.getMethod("getId")
+                    getIdMethod.invoke(arg).toString()
+                } catch (e: NoSuchMethodException) {
+                    arg.toString()
+                }
             }
         }
         throw RedisLockFailedException(ErrorCode.BAD_REDISSON_IDENTIFIER.errorMessage)

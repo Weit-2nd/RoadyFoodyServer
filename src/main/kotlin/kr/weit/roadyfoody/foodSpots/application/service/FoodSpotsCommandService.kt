@@ -1,6 +1,5 @@
 package kr.weit.roadyfoody.foodSpots.application.service
 
-import jakarta.persistence.EntityManager
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsUpdateRequest
@@ -29,6 +28,7 @@ import kr.weit.roadyfoody.foodSpots.repository.ReportOperationHoursRepository
 import kr.weit.roadyfoody.foodSpots.repository.getByFoodSpotsId
 import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
 import kr.weit.roadyfoody.foodSpots.repository.getFoodCategories
+import kr.weit.roadyfoody.global.annotation.DistributedLock
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.global.utils.CoordinateUtils.Companion.createCoordinate
 import kr.weit.roadyfoody.rewards.application.service.RewardsCommandService
@@ -65,7 +65,6 @@ class FoodSpotsCommandService(
     private val imageService: ImageService,
     private val executor: ExecutorService,
     private val userCommandService: UserCommandService,
-    private val entityManager: EntityManager,
     private val redissonClient: RedissonClient,
     private val redisTemplate: RedisTemplate<String, String>,
     private val rewardsCommandService: RewardsCommandService,
@@ -81,6 +80,7 @@ class FoodSpotsCommandService(
         fun getFoodSpotsReportCountKey(userId: Long) = "$FOOD_SPOTS_REPORT_LIMIT_PREFIX$userId"
     }
 
+    @DistributedLock(lockName = "USER-ENTITY-LOCK", identifier = "user")
     @Transactional
     fun createReport(
         user: User,
@@ -114,8 +114,6 @@ class FoodSpotsCommandService(
             .map {
                 FoodSpotsPhoto.of(foodSpotsHistory, it.key)
             }.also { foodSpotsPhotoRepository.saveAll(it) }
-
-        entityManager.flush()
 
         rewardsCommandService.createRewards(
             Rewards(
@@ -152,6 +150,7 @@ class FoodSpotsCommandService(
         return foodSpots
     }
 
+    @DistributedLock(lockName = "USER-ENTITY-LOCK", identifier = "user")
     @Transactional
     fun doUpdateReport(
         user: User,
@@ -218,8 +217,6 @@ class FoodSpotsCommandService(
         }
 
         foodSpotsPhotoRepository.deleteAll(photosToRemove)
-
-        entityManager.flush()
 
         val rewardType =
             when (foodSpotsHistory.reportType) {
@@ -399,6 +396,7 @@ class FoodSpotsCommandService(
         }
     }
 
+    @DistributedLock(lockName = "USER-ENTITY-LOCK", identifier = "user")
     @Transactional
     fun deleteFoodSpotsHistories(
         user: User,
@@ -419,8 +417,6 @@ class FoodSpotsCommandService(
         foodSpotsPhotoRepository.deleteAll(photos)
 
         foodSpotsHistoryRepository.deleteById(historyId)
-
-        entityManager.flush()
 
         rewardsCommandService.createRewards(
             Rewards(
