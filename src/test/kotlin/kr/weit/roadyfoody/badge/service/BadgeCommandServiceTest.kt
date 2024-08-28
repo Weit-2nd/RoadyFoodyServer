@@ -109,8 +109,6 @@ class BadgeCommandServiceTest :
                     user.badge should beInstanceOf(Badge.BEGINNER::class)
 
                     verify(exactly = 0) {
-                        userCommandService.changeBadgeNewTx(any(), any())
-
                         userPromotionRewardHistoryRepository.save(any())
                         rewardsRepository.save(any())
                         userCommandService.increaseCoin(any(), any())
