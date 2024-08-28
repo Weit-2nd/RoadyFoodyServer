@@ -1,5 +1,6 @@
 package kr.weit.roadyfoody.review.application.service
 
+import USER_ENTITY_LOCK_KEY
 import kr.weit.roadyfoody.badge.service.BadgeCommandService
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
 import kr.weit.roadyfoody.foodSpots.repository.getByFoodSpotsId
@@ -28,7 +29,7 @@ class ReviewCommandService(
     private val executor: ExecutorService,
     private val badgeCommandService: BadgeCommandService,
 ) {
-    @DistributedLock(lockName = "USER-ENTITY-LOCK", identifier = "user")
+    @DistributedLock(lockName = USER_ENTITY_LOCK_KEY, identifier = "user")
     @Transactional
     fun createReview(
         user: User,
@@ -66,7 +67,7 @@ class ReviewCommandService(
         }
     }
 
-    @DistributedLock(lockName = "USER-ENTITY-LOCK", identifier = "user")
+    @DistributedLock(lockName = USER_ENTITY_LOCK_KEY, identifier = "user")
     @Transactional
     fun deleteReview(
         user: User,

@@ -7,7 +7,6 @@ import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
 import kr.weit.roadyfoody.auth.fixture.PROFILE_IMAGE_FILE_NAME
-import kr.weit.roadyfoody.badge.domain.Badge
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
 import kr.weit.roadyfoody.global.service.ImageService
@@ -137,18 +136,6 @@ class UserCommandServiceTest :
                             userCommandService.deleteProfileImage(user)
                         }
                     ex.message shouldBe ErrorCode.PROFILE_IMAGE_NOT_EXISTS.errorMessage
-                }
-            }
-        }
-
-        given("changeBadgeNewTx 테스트") {
-            `when`("뱃지를 변경하면") {
-                val user = createTestUser(badge = Badge.BEGINNER)
-                val newBadge = Badge.PRO
-                every { userRepository.findById(any()) } returns Optional.of(user)
-                userCommandService.changeBadgeNewTx(user.id, newBadge)
-                then("새로운 뱃지로 변경된다.") {
-                    user.badge shouldBe newBadge
                 }
             }
         }

@@ -22,7 +22,7 @@ enum class Badge(
             totalReviews: Int,
             highRatedReviews: Int,
         ): Badge =
-            entries.toTypedArray().lastOrNull { badge ->
+            entries.lastOrNull { badge ->
                 totalReviews >= badge.totalReviewsRequired &&
                     highRatedReviews >= badge.highRatedReviewsRequired
             } ?: BEGINNER

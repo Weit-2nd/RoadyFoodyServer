@@ -1,5 +1,6 @@
 package kr.weit.roadyfoody.foodSpots.application.service
 
+import USER_ENTITY_LOCK_KEY
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsUpdateRequest
@@ -80,7 +81,7 @@ class FoodSpotsCommandService(
         fun getFoodSpotsReportCountKey(userId: Long) = "$FOOD_SPOTS_REPORT_LIMIT_PREFIX$userId"
     }
 
-    @DistributedLock(lockName = "USER-ENTITY-LOCK", identifier = "user")
+    @DistributedLock(lockName = USER_ENTITY_LOCK_KEY, identifier = "user")
     @Transactional
     fun createReport(
         user: User,
@@ -150,7 +151,7 @@ class FoodSpotsCommandService(
         return foodSpots
     }
 
-    @DistributedLock(lockName = "USER-ENTITY-LOCK", identifier = "user")
+    @DistributedLock(lockName = USER_ENTITY_LOCK_KEY, identifier = "user")
     @Transactional
     fun doUpdateReport(
         user: User,
@@ -396,7 +397,7 @@ class FoodSpotsCommandService(
         }
     }
 
-    @DistributedLock(lockName = "USER-ENTITY-LOCK", identifier = "user")
+    @DistributedLock(lockName = USER_ENTITY_LOCK_KEY, identifier = "user")
     @Transactional
     fun deleteFoodSpotsHistories(
         user: User,
