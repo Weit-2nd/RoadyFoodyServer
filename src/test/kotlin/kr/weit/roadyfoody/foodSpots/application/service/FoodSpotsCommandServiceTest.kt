@@ -54,7 +54,6 @@ import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsPhotoRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportOperationHoursRepository
-import kr.weit.roadyfoody.foodSpots.repository.getAllUserReportCount
 import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.rewards.application.service.RewardsCommandService
@@ -715,14 +714,14 @@ class FoodSpotsCommandServiceTest :
                     every { mockLock.tryLock(0, 10, TimeUnit.MINUTES) } returns true
 
                     every { redisTemplate.delete("rofo:user-report-ranking") } returns true
-                    every { foodSpotsHistoryRepository.getAllUserReportCount() } returns createUserRankingResponse()
+                    every { foodSpotsHistoryRepository.findAllUserReportCount() } returns createUserRankingResponse()
                     every { redisTemplate.opsForZSet() } returns zSetOperations
                     every { zSetOperations.reverseRangeWithScores(any(), any(), any()) } returns mockTypedTuple
                     every { zSetOperations.add("rofo:user-report-ranking", "existentNick", 10.0) } returns true
 
                     then("레디스의 데이터가 정상적으로 업데이트된다.") {
                         foodSpotsCommandService.updateReportRanking()
-                        verify(exactly = 1) { foodSpotsHistoryRepository.getAllUserReportCount() }
+                        verify(exactly = 1) { foodSpotsHistoryRepository.findAllUserReportCount() }
                     }
                 }
 
@@ -731,7 +730,7 @@ class FoodSpotsCommandServiceTest :
 
                     then("레디스의 데이터가 업데이트되지 않는다.") {
                         foodSpotsCommandService.updateReportRanking()
-                        verify(exactly = 1) { foodSpotsHistoryRepository.getAllUserReportCount() }
+                        verify(exactly = 1) { foodSpotsHistoryRepository.findAllUserReportCount() }
                     }
                 }
             }

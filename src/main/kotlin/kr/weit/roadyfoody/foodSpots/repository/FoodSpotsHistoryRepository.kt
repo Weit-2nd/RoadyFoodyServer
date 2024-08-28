@@ -5,6 +5,7 @@ import kr.weit.roadyfoody.foodSpots.application.dto.UserReportCount
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
 import kr.weit.roadyfoody.foodSpots.exception.FoodSpotsHistoryNotFoundException
+import kr.weit.roadyfoody.global.utils.findList
 import kr.weit.roadyfoody.global.utils.getSlice
 import kr.weit.roadyfoody.user.domain.Profile
 import kr.weit.roadyfoody.user.domain.User
@@ -22,8 +23,6 @@ fun FoodSpotsHistoryRepository.getByHistoryId(historyId: Long): FoodSpotsHistory
     findById(historyId).orElseThrow { FoodSpotsHistoryNotFoundException() }
 
 fun FoodSpotsHistoryRepository.getByFoodSpots(foodSpots: FoodSpots): List<FoodSpotsHistory> = findByFoodSpots(foodSpots)
-
-fun FoodSpotsHistoryRepository.getAllUserReportCount(): List<UserReportCount> = findAllUserReportCount()
 
 interface FoodSpotsHistoryRepository :
     JpaRepository<FoodSpotsHistory, Long>,
@@ -68,7 +67,7 @@ class CustomFoodSpotsHistoryRepositoryImpl(
 
     override fun findAllUserReportCount(): List<UserReportCount> =
         kotlinJdslJpqlExecutor
-            .findAll {
+            .findList {
                 val userIdPath = path(FoodSpotsHistory::user).path(User::id)
                 val userNicknamePath = path(FoodSpotsHistory::user).path(User::profile).path(Profile::nickname)
                 val historyIdPath = path(FoodSpotsHistory::id)
@@ -83,5 +82,5 @@ class CustomFoodSpotsHistoryRepositoryImpl(
                         count(historyIdPath).desc(),
                         max(createdAtPath).asc(),
                     )
-            }.filterNotNull()
+            }
 }

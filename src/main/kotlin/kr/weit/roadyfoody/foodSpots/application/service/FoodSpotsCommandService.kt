@@ -27,7 +27,6 @@ import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsPhotoRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportOperationHoursRepository
-import kr.weit.roadyfoody.foodSpots.repository.getAllUserReportCount
 import kr.weit.roadyfoody.foodSpots.repository.getByFoodSpotsId
 import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
 import kr.weit.roadyfoody.foodSpots.repository.getFoodCategories
@@ -473,7 +472,7 @@ class FoodSpotsCommandService(
         if (lock.tryLock(0, 10, TimeUnit.MINUTES)) {
             redisTemplate.delete(REPORT_RANKING_KEY)
 
-            val userReports = foodSpotsHistoryRepository.getAllUserReportCount()
+            val userReports = foodSpotsHistoryRepository.findAllUserReportCount()
 
             userReports.forEach {
                 redisTemplate
