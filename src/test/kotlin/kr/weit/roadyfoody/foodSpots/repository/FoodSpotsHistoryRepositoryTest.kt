@@ -22,21 +22,35 @@ class FoodSpotsHistoryRepositoryTest(
 ) : DescribeSpec({
         lateinit var user: User
         lateinit var otherUser: User
+        lateinit var user2: User
+        lateinit var user3: User
+        lateinit var user4: User
         lateinit var foodSpots: FoodSpots
         lateinit var otherFoodSpots: FoodSpots
         lateinit var notExistFoodSpots: FoodSpots
+        lateinit var foodSpotForRanking: FoodSpots
         lateinit var foodSpotsHistories: List<FoodSpotsHistory>
         beforeEach {
             user = userRepository.save(createTestUser(0L))
             otherUser = userRepository.save(createTestUser(0L, nickname = "otherUser"))
+            user2 = userRepository.save(createTestUser(2L, "existentNick2"))
+            user3 = userRepository.save(createTestUser(3L, "existentNick3"))
+            user4 = userRepository.save(createTestUser(4L, "existentNick4"))
             foodSpots = foodSpotsRepository.save(createTestFoodSpots())
             otherFoodSpots = foodSpotsRepository.save(createTestFoodSpots())
             notExistFoodSpots = foodSpotsRepository.save(createTestFoodSpots())
+            foodSpotForRanking = foodSpotsRepository.save(createTestFoodSpots())
             foodSpotsHistories =
                 foodSpotsHistoryRepository.saveAll(
                     listOf(
                         createTestFoodHistory(user = user, foodSpots = foodSpots),
                         createTestFoodHistory(user = user, foodSpots = otherFoodSpots),
+                        createTestFoodHistory(user = user2, foodSpots = foodSpotForRanking),
+                        createTestFoodHistory(user = user2, foodSpots = foodSpotForRanking),
+                        createTestFoodHistory(user = user2, foodSpots = foodSpotForRanking),
+                        createTestFoodHistory(user = user3, foodSpots = foodSpotForRanking),
+                        createTestFoodHistory(user = user3, foodSpots = foodSpotForRanking),
+                        createTestFoodHistory(user = user4, foodSpots = foodSpotForRanking),
                     ),
                 )
         }
@@ -109,6 +123,24 @@ class FoodSpotsHistoryRepositoryTest(
                     val histories = foodSpotsHistoryRepository.getByFoodSpots(notExistFoodSpots)
                     histories shouldBe emptyList()
                 }
+            }
+        }
+
+        describe("findAllUserReportCount 메소드는") {
+            it("전체 회원의 닉네임과 리포트 개수를 정렬하여 리스트로 반환한다") {
+                val userReportCounts = foodSpotsHistoryRepository.findAllUserReportCount()
+                userReportCounts.size shouldBe 4
+                userReportCounts[0].userNickname shouldBe "existentNick2"
+                userReportCounts[0].reportCount shouldBe 3
+
+                userReportCounts[1].userNickname shouldBe "existentNick"
+                userReportCounts[1].reportCount shouldBe 2
+
+                userReportCounts[2].userNickname shouldBe "existentNick3"
+                userReportCounts[2].reportCount shouldBe 2
+
+                userReportCounts[3].userNickname shouldBe "existentNick4"
+                userReportCounts[3].reportCount shouldBe 1
             }
         }
     })
