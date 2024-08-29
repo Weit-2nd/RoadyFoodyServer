@@ -5,6 +5,7 @@ import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
+import kr.weit.roadyfoody.foodSpots.application.dto.UserReportCount
 import kr.weit.roadyfoody.foodSpots.application.service.event.ReportErrorCompensatingTxSync
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsFoodCategory
@@ -37,6 +38,7 @@ import kr.weit.roadyfoody.rewards.domain.RewardType
 import kr.weit.roadyfoody.rewards.domain.Rewards
 import kr.weit.roadyfoody.user.application.service.UserCommandService
 import kr.weit.roadyfoody.user.domain.User
+import org.redisson.api.RLock
 import org.redisson.api.RedissonClient
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.scheduling.annotation.Scheduled
@@ -52,6 +54,7 @@ import java.time.ZoneId
 import java.util.Date
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.TimeUnit
 
 @Service
 class FoodSpotsCommandService(
@@ -79,6 +82,9 @@ class FoodSpotsCommandService(
         const val FOOD_SPOTS_REPORT_LIMIT_COUNT = 5
 
         fun getFoodSpotsReportCountKey(userId: Long) = "$FOOD_SPOTS_REPORT_LIMIT_PREFIX$userId"
+
+        private const val REPORT_RANKING_KEY = "rofo:user-report-ranking"
+        private const val REPORT_RANKING_UPDATE_LOCK = "updateReportRankingLock"
     }
 
     @DistributedLock(lockName = USER_ENTITY_LOCK_KEY, identifier = "user")
@@ -436,5 +442,44 @@ class FoodSpotsCommandService(
                     imageService.remove(it.fileName)
                 }, executor)
             }.forEach { it.join() }
+    }
+
+    fun getReportRanking(size: Long): List<UserReportCount> {
+        val typedTuple =
+            redisTemplate.opsForZSet().reverseRangeWithScores(
+                REPORT_RANKING_KEY,
+                0,
+                size - 1,
+            ) ?: emptySet()
+
+        return typedTuple.map { tuple ->
+            val userNickname = tuple.value ?: ""
+            val score = tuple.score ?: 0.0
+
+            UserReportCount(
+                userNickname = userNickname,
+                reportCount = score.toLong(),
+            )
+        }
+    }
+
+    @Scheduled(cron = "0 0 5 * * *")
+    fun updateReportRanking() {
+        val lock: RLock = redissonClient.getLock(REPORT_RANKING_UPDATE_LOCK)
+        if (lock.tryLock(0, 10, TimeUnit.MINUTES)) {
+            redisTemplate.delete(REPORT_RANKING_KEY)
+
+            val userReports = foodSpotsHistoryRepository.findAllUserReportCount()
+
+            userReports.forEach {
+                redisTemplate
+                    .opsForZSet()
+                    .add(
+                        REPORT_RANKING_KEY,
+                        it.userNickname,
+                        it.reportCount.toDouble(),
+                    )
+            }
+        }
     }
 }

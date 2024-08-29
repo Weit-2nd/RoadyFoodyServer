@@ -44,6 +44,7 @@ import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsUpdateRequestFrom
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportFoodCategory
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportOperationHours
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportRequest
+import kr.weit.roadyfoody.foodSpots.fixture.createUserRankingResponse
 import kr.weit.roadyfoody.foodSpots.repository.FoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsFoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
@@ -61,11 +62,14 @@ import kr.weit.roadyfoody.user.fixture.TEST_OTHER_USER_ID
 import kr.weit.roadyfoody.user.fixture.TEST_USER_ID
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import kr.weit.roadyfoody.user.repository.UserRepository
+import org.redisson.api.RLock
 import org.redisson.api.RedissonClient
 import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.data.redis.core.ZSetOperations
 import org.springframework.transaction.support.TransactionSynchronizationManager
 import java.util.Optional
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.TimeUnit
 
 class FoodSpotsCommandServiceTest :
     BehaviorSpec(
@@ -679,6 +683,73 @@ class FoodSpotsCommandServiceTest :
                         verify(exactly = 1) {
                             foodSpotsHistoryRepository.deleteById(any())
                         }
+                    }
+                }
+            }
+
+            given("updateReportRanking 테스트") {
+                val mockLock = mockk<RLock>()
+                val zSetOperations = mockk<ZSetOperations<String, String>>()
+                val mockTypedTuple: Set<ZSetOperations.TypedTuple<String>> =
+                    setOf(
+                        mockk<ZSetOperations.TypedTuple<String>>().apply {
+                            every { value } returns "user1"
+                            every { score } returns 10.0
+                        },
+                        mockk<ZSetOperations.TypedTuple<String>>().apply {
+                            every { value } returns "user2"
+                            every { score } returns 5.0
+                        },
+                    )
+
+                every { redissonClient.getLock(any<String>()) } returns mockLock
+
+                `when`("Lock을 획득한 경우") {
+                    every { mockLock.tryLock(0, 10, TimeUnit.MINUTES) } returns true
+
+                    every { redisTemplate.delete("rofo:user-report-ranking") } returns true
+                    every { foodSpotsHistoryRepository.findAllUserReportCount() } returns createUserRankingResponse()
+                    every { redisTemplate.opsForZSet() } returns zSetOperations
+                    every { zSetOperations.reverseRangeWithScores(any(), any(), any()) } returns mockTypedTuple
+                    every { zSetOperations.add("rofo:user-report-ranking", "existentNick", 10.0) } returns true
+
+                    then("레디스의 데이터가 정상적으로 업데이트된다.") {
+                        foodSpotsCommandService.updateReportRanking()
+                        verify(exactly = 1) { foodSpotsHistoryRepository.findAllUserReportCount() }
+                    }
+                }
+
+                `when`("Lock을 획득하지 못한 경우") {
+                    every { mockLock.tryLock(0, 10, TimeUnit.MINUTES) } returns false
+
+                    then("레디스의 데이터가 업데이트되지 않는다.") {
+                        foodSpotsCommandService.updateReportRanking()
+                        verify(exactly = 1) { foodSpotsHistoryRepository.findAllUserReportCount() }
+                    }
+                }
+            }
+
+            given("getReportRanking 테스트") {
+                val zSetOperations = mockk<ZSetOperations<String, String>>()
+                val typedTupleSet =
+                    setOf(
+                        mockk<ZSetOperations.TypedTuple<String>> {
+                            every { value } returns "user1"
+                            every { score } returns 10.0
+                        },
+                        mockk<ZSetOperations.TypedTuple<String>> {
+                            every { value } returns "user2"
+                            every { score } returns 20.0
+                        },
+                    )
+
+                `when`("레디스의 데이터를 조회한 경우") {
+                    every { redisTemplate.opsForZSet() } returns zSetOperations
+                    every { zSetOperations.reverseRangeWithScores(any(), any(), any()) } returns typedTupleSet
+
+                    then("리포트 랭킹이 조회된다.") {
+                        foodSpotsCommandService.getReportRanking(10)
+                        verify(exactly = 1) { zSetOperations.reverseRangeWithScores(any(), any(), any()) }
                     }
                 }
             }
