@@ -3,9 +3,9 @@ package kr.weit.roadyfoody.ranking.presentation.api
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
-import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsCommandService
 import kr.weit.roadyfoody.foodSpots.fixture.createUserRankingResponse
 import kr.weit.roadyfoody.global.TEST_PAGE_SIZE
+import kr.weit.roadyfoody.ranking.application.service.RankingQueryService
 import kr.weit.roadyfoody.support.annotation.ControllerTest
 import kr.weit.roadyfoody.support.utils.getWithAuth
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -15,7 +15,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @WebMvcTest(RankingController::class)
 @ControllerTest
 class RankingControllerTest(
-    @MockkBean private val foodSpotsCommandService: FoodSpotsCommandService,
+    @MockkBean private val rankingQueryService: RankingQueryService,
     private val mockMvc: MockMvc,
 ) : BehaviorSpec(
         {
@@ -24,7 +24,7 @@ class RankingControllerTest(
             given("GET $requestPath/report") {
                 val response = createUserRankingResponse()
                 every {
-                    foodSpotsCommandService.getReportRanking(any())
+                    rankingQueryService.getReportRanking(any())
                 } returns response
                 `when`("정상적인 데이터가 들어올 경우") {
                     then("리포트 랭킹 리스트가 조회된다.") {
