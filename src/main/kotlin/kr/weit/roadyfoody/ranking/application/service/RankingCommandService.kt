@@ -10,78 +10,63 @@ import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
 import org.redisson.api.RLock
 import org.redisson.api.RedissonClient
 import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.Scheduled
+import org.springframework.stereotype.Service
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.TimeUnit
 
+@Service
 class RankingCommandService(
     private val redisTemplate: RedisTemplate<String, String>,
     private val redissonClient: RedissonClient,
     private val foodSpotsHistoryRepository: FoodSpotsHistoryRepository,
     private val reviewRepository: FoodSpotsReviewRepository,
+    private val executor: ExecutorService,
 ) {
     @Scheduled(cron = "0 0 5 * * *")
     fun updateReportRanking() {
-        val lock: RLock = redissonClient.getLock(REPORT_RANKING_UPDATE_LOCK)
-
-        if (lock.tryLock(0, 10, TimeUnit.MINUTES)) {
-            redisTemplate.delete(REPORT_RANKING_KEY)
-
-            val userReports = foodSpotsHistoryRepository.findAllUserReportCount()
-
-            userReports.forEach {
-                redisTemplate
-                    .opsForZSet()
-                    .add(
-                        REPORT_RANKING_KEY,
-                        it.userNickname,
-                        it.score.toDouble(),
-                    )
-            }
-        }
+        updateRanking(
+            lockName = REPORT_RANKING_UPDATE_LOCK,
+            key = REPORT_RANKING_KEY,
+            dataProvider = { foodSpotsHistoryRepository.findAllUserReportCount() },
+        )
     }
 
+    @Async
     @Scheduled(cron = "0 0 5 * * *")
     fun updateReviewRanking() {
-        val lock: RLock = redissonClient.getLock(REVIEW_RANKING_UPDATE_LOCK)
-
-        if (lock.tryLock(0, 10, TimeUnit.MINUTES)) {
-            redisTemplate.delete(REVIEW_RANKING_KEY)
-
-            val userReviews = reviewRepository.findAllUserReviewCount()
-
-            userReviews.forEach {
-                redisTemplate
-                    .opsForZSet()
-                    .add(
-                        REVIEW_RANKING_KEY,
-                        it.userNickname,
-                        it.score.toDouble(),
-                    )
-            }
-        }
+        updateRanking(
+            lockName = REVIEW_RANKING_UPDATE_LOCK,
+            key = REVIEW_RANKING_KEY,
+            dataProvider = { reviewRepository.findAllUserReviewCount() },
+        )
     }
 
-    private fun userRanking(
+    private fun updateRanking(
         lockName: String,
         key: String,
         dataProvider: () -> List<UserRanking>,
     ) {
-        val lock: RLock = redissonClient.getLock(lockName)
+        CompletableFuture.runAsync({
+            val lock: RLock = redissonClient.getLock(lockName)
 
-        if (lock.tryLock(0, 10, TimeUnit.MINUTES)) {
-            redisTemplate.delete(key)
+            if (lock.tryLock(0, 10, TimeUnit.MINUTES)) {
+                redisTemplate.delete(key)
 
-            val userReviews = dataProvider()
+                val userRanking = dataProvider()
 
-            userReviews.forEach {
-                redisTemplate
-                    .opsForZSet()
-                    .add(
-                        key,
-                        it.userNickname,
-                        it.score.toDouble(),
-                    )
+                userRanking.forEach {
+                    redisTemplate
+                        .opsForZSet()
+                        .add(
+                            key,
+                            it.userNickname,
+                            it.score.toDouble(),
+                        )
+                }
             }
-        }
+        }, executor)
     }
 }

@@ -6,7 +6,6 @@ import com.linecorp.kotlinjdsl.querymodel.jpql.sort.Sortable
 import com.linecorp.kotlinjdsl.support.spring.data.jpa.repository.KotlinJdslJpqlExecutor
 import kr.weit.roadyfoody.foodSpots.application.dto.ReviewAggregatedInfoResponse
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
-import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
 import kr.weit.roadyfoody.global.utils.findList
 import kr.weit.roadyfoody.global.utils.getSlice
 import kr.weit.roadyfoody.ranking.dto.UserRanking
@@ -106,7 +105,7 @@ class CustomFoodSpotsReviewRepositoryImpl(
                 val userIdPath = path(FoodSpotsReview::user).path(User::id)
                 val userNicknamePath = path(FoodSpotsReview::user).path(User::profile).path(Profile::nickname)
                 val reviewIdPath = path(FoodSpotsReview::id)
-                val createdAtPath = path(FoodSpotsHistory::createdDateTime)
+                val createdAtPath = path(FoodSpotsReview::createdDateTime)
 
                 selectNew<UserRanking>(
                     userNicknamePath,
@@ -115,7 +114,7 @@ class CustomFoodSpotsReviewRepositoryImpl(
                     .groupBy(userIdPath, userNicknamePath)
                     .orderBy(
                         count(reviewIdPath).desc(),
-                        createdAtPath.asc(),
+                        max(createdAtPath).asc(),
                     )
             }
 

@@ -37,4 +37,29 @@ class RankingQueryServiceTest :
                 }
             }
         }
+
+        given("getReviewRanking 테스트") {
+            val zSetOperations = mockk<ZSetOperations<String, String>>()
+            val typedTupleSet =
+                setOf(
+                    mockk<ZSetOperations.TypedTuple<String>> {
+                        every { value } returns "user1"
+                        every { score } returns 10.0
+                    },
+                    mockk<ZSetOperations.TypedTuple<String>> {
+                        every { value } returns "user2"
+                        every { score } returns 20.0
+                    },
+                )
+
+            `when`("레디스의 데이터를 조회한 경우") {
+                every { redisTemplate.opsForZSet() } returns zSetOperations
+                every { zSetOperations.reverseRangeWithScores(any(), any(), any()) } returns typedTupleSet
+
+                then("리뷰 랭킹이 조회된다.") {
+                    rankingQueryService.getReviewRanking(10)
+                    verify(exactly = 1) { zSetOperations.reverseRangeWithScores(any(), any(), any()) }
+                }
+            }
+        }
     })

@@ -460,7 +460,7 @@ fun createTestAggregatedInfoResponse(): ReviewAggregatedInfoResponse =
         TEST_REVIEW_COUNT,
     )
 
-fun createUserReportCountResponse(
+fun createCountResponse(
     user: User = createTestUser(),
     score: Long = 10,
 ): UserRanking =
@@ -469,4 +469,4 @@ fun createUserReportCountResponse(
         score = score,
     )
 
-fun createUserRankingResponse(): List<UserRanking> = listOf(createUserReportCountResponse())
+fun createUserRankingResponse(): List<UserRanking> = listOf(createCountResponse())
