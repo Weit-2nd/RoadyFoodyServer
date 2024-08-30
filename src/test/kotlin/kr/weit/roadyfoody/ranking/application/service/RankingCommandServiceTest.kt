@@ -6,6 +6,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import kr.weit.roadyfoody.foodSpots.fixture.createUserRankingResponse
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
+import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
 import org.redisson.api.RLock
 import org.redisson.api.RedissonClient
 import org.springframework.data.redis.core.RedisTemplate
@@ -18,11 +19,13 @@ class RankingCommandServiceTest :
             val redisTemplate = mockk<RedisTemplate<String, String>>()
             val redissonClient = mockk<RedissonClient>()
             val foodSpotsHistoryRepository = mockk<FoodSpotsHistoryRepository>()
+            val reviewRepository = mockk<FoodSpotsReviewRepository>()
             val rankingCommandService =
                 RankingCommandService(
                     redisTemplate,
                     redissonClient,
                     foodSpotsHistoryRepository,
+                    reviewRepository,
                 )
 
             given("updateReportRanking 테스트") {

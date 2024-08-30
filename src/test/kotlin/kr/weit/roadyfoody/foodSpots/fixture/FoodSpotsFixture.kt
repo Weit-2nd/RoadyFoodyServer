@@ -14,7 +14,6 @@ import kr.weit.roadyfoody.foodSpots.application.dto.ReportOperationHoursResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportPhotoResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.ReviewAggregatedInfoResponse
-import kr.weit.roadyfoody.foodSpots.application.dto.UserReportCount
 import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
@@ -28,6 +27,7 @@ import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHours
 import kr.weit.roadyfoody.foodSpots.domain.ReportType
 import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_MAX_LENGTH
 import kr.weit.roadyfoody.global.utils.CoordinateUtils
+import kr.weit.roadyfoody.ranking.dto.UserRanking
 import kr.weit.roadyfoody.search.foodSpots.domain.SearchCoinCache
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponse
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponses
@@ -462,11 +462,11 @@ fun createTestAggregatedInfoResponse(): ReviewAggregatedInfoResponse =
 
 fun createUserReportCountResponse(
     user: User = createTestUser(),
-    reportCount: Long = 10,
-): UserReportCount =
-    UserReportCount(
+    score: Long = 10,
+): UserRanking =
+    UserRanking(
         userNickname = user.profile.nickname,
-        reportCount = reportCount,
+        score = score,
     )
 
-fun createUserRankingResponse(): List<UserReportCount> = listOf(createUserReportCountResponse())
+fun createUserRankingResponse(): List<UserRanking> = listOf(createUserReportCountResponse())

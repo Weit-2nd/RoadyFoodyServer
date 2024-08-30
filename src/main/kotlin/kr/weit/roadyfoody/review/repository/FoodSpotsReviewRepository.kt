@@ -6,9 +6,13 @@ import com.linecorp.kotlinjdsl.querymodel.jpql.sort.Sortable
 import com.linecorp.kotlinjdsl.support.spring.data.jpa.repository.KotlinJdslJpqlExecutor
 import kr.weit.roadyfoody.foodSpots.application.dto.ReviewAggregatedInfoResponse
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
+import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
+import kr.weit.roadyfoody.global.utils.findList
 import kr.weit.roadyfoody.global.utils.getSlice
+import kr.weit.roadyfoody.ranking.dto.UserRanking
 import kr.weit.roadyfoody.review.domain.FoodSpotsReview
 import kr.weit.roadyfoody.review.exception.FoodSpotsReviewNotFoundException
+import kr.weit.roadyfoody.user.domain.Profile
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
@@ -40,6 +44,8 @@ interface CustomFoodSpotsReviewRepository {
     ): Slice<FoodSpotsReview>
 
     fun getReviewAggregatedInfo(foodSpots: FoodSpots): ReviewAggregatedInfoResponse
+
+    fun findAllUserReviewCount(): List<UserRanking>
 }
 
 class CustomFoodSpotsReviewRepositoryImpl(
@@ -93,6 +99,25 @@ class CustomFoodSpotsReviewRepositoryImpl(
                 ).from(entity(FoodSpotsReview::class))
                     .where(path(FoodSpotsReview::foodSpots).equal(foodSpots))
             }.first()!!
+
+    override fun findAllUserReviewCount(): List<UserRanking> =
+        kotlinJdslJpqlExecutor
+            .findList {
+                val userIdPath = path(FoodSpotsReview::user).path(User::id)
+                val userNicknamePath = path(FoodSpotsReview::user).path(User::profile).path(Profile::nickname)
+                val reviewIdPath = path(FoodSpotsReview::id)
+                val createdAtPath = path(FoodSpotsHistory::createdDateTime)
+
+                selectNew<UserRanking>(
+                    userNicknamePath,
+                    count(reviewIdPath),
+                ).from(entity(FoodSpotsReview::class))
+                    .groupBy(userIdPath, userNicknamePath)
+                    .orderBy(
+                        count(reviewIdPath).desc(),
+                        createdAtPath.asc(),
+                    )
+            }
 
     private fun Jpql.dynamicOrder(sortType: ReviewSortType): Array<Sortable> =
         when (sortType) {
