@@ -10,7 +10,6 @@ import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
 import org.redisson.api.RLock
 import org.redisson.api.RedissonClient
 import org.springframework.data.redis.core.RedisTemplate
-import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.util.concurrent.CompletableFuture
@@ -34,7 +33,6 @@ class RankingCommandService(
         )
     }
 
-    @Async
     @Scheduled(cron = "0 0 5 * * *")
     fun updateReviewRanking() {
         updateRanking(
