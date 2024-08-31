@@ -61,7 +61,7 @@ class RankingCommandService(
                         .add(
                             key,
                             it.userNickname,
-                            it.score.toDouble(),
+                            it.total.toDouble(),
                         )
                 }
             }

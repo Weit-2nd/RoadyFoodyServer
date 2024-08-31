@@ -462,11 +462,11 @@ fun createTestAggregatedInfoResponse(): ReviewAggregatedInfoResponse =
 
 fun createCountResponse(
     user: User = createTestUser(),
-    score: Long = 10,
+    total: Long = 10,
 ): UserRanking =
     UserRanking(
         userNickname = user.profile.nickname,
-        score = score,
+        total = total,
     )
 
 fun createUserRankingResponse(): List<UserRanking> = listOf(createCountResponse())

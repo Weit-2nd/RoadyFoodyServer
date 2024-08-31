@@ -27,11 +27,11 @@ class RankingQueryService(
 
         return typedTuple.map { tuple ->
             val userNickname = tuple.value ?: ""
-            val score = tuple.score ?: 0.0
+            val total = tuple.score ?: 0.0
 
             UserRanking(
                 userNickname = userNickname,
-                score = score.toLong(),
+                total = total.toLong(),
             )
         }
     }

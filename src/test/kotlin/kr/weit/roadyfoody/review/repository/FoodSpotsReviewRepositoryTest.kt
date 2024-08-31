@@ -183,10 +183,10 @@ class FoodSpotsReviewRepositoryTest(
                     val userReportCounts = reviewRepository.findAllUserReviewCount()
                     userReportCounts.size shouldBe 2
                     userReportCounts[0].userNickname shouldBe "existentNick"
-                    userReportCounts[0].score shouldBe 3
+                    userReportCounts[0].total shouldBe 3
 
                     userReportCounts[1].userNickname shouldBe "otherUser"
-                    userReportCounts[1].score shouldBe 1
+                    userReportCounts[1].total shouldBe 1
                 }
             }
         },
