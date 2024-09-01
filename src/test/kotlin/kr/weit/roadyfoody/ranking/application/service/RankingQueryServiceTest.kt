@@ -17,14 +17,8 @@ class RankingQueryServiceTest :
             val zSetOperations = mockk<ZSetOperations<String, String>>()
             val typedTupleSet =
                 setOf(
-                    mockk<ZSetOperations.TypedTuple<String>> {
-                        every { value } returns "user1"
-                        every { score } returns 10.0
-                    },
-                    mockk<ZSetOperations.TypedTuple<String>> {
-                        every { value } returns "user2"
-                        every { score } returns 20.0
-                    },
+                    ZSetOperations.TypedTuple.of("user1", 10.0),
+                    ZSetOperations.TypedTuple.of("user2", 20.0),
                 )
 
             `when`("레디스의 데이터를 조회한 경우") {
@@ -42,14 +36,8 @@ class RankingQueryServiceTest :
             val zSetOperations = mockk<ZSetOperations<String, String>>()
             val typedTupleSet =
                 setOf(
-                    mockk<ZSetOperations.TypedTuple<String>> {
-                        every { value } returns "user1"
-                        every { score } returns 10.0
-                    },
-                    mockk<ZSetOperations.TypedTuple<String>> {
-                        every { value } returns "user2"
-                        every { score } returns 20.0
-                    },
+                    ZSetOperations.TypedTuple.of("user1", 10.0),
+                    ZSetOperations.TypedTuple.of("user2", 20.0),
                 )
 
             `when`("레디스의 데이터를 조회한 경우") {

@@ -40,14 +40,8 @@ class RankingCommandServiceTest :
                 val zSetOperations = mockk<ZSetOperations<String, String>>()
                 val mockTypedTuple: Set<ZSetOperations.TypedTuple<String>> =
                     setOf(
-                        mockk<ZSetOperations.TypedTuple<String>>().apply {
-                            every { value } returns "user1"
-                            every { score } returns 10.0
-                        },
-                        mockk<ZSetOperations.TypedTuple<String>>().apply {
-                            every { value } returns "user2"
-                            every { score } returns 5.0
-                        },
+                        ZSetOperations.TypedTuple.of("user1", 10.0),
+                        ZSetOperations.TypedTuple.of("user2", 20.0),
                     )
 
                 every { redissonClient.getLock(any<String>()) } returns mockLock
@@ -82,14 +76,8 @@ class RankingCommandServiceTest :
                 val zSetOperations = mockk<ZSetOperations<String, String>>()
                 val mockTypedTuple: Set<ZSetOperations.TypedTuple<String>> =
                     setOf(
-                        mockk<ZSetOperations.TypedTuple<String>>().apply {
-                            every { value } returns "user1"
-                            every { score } returns 10.0
-                        },
-                        mockk<ZSetOperations.TypedTuple<String>>().apply {
-                            every { value } returns "user2"
-                            every { score } returns 5.0
-                        },
+                        ZSetOperations.TypedTuple.of("user1", 10.0),
+                        ZSetOperations.TypedTuple.of("user2", 20.0),
                     )
 
                 every { redissonClient.getLock(any<String>()) } returns mockLock
