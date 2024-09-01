@@ -4,6 +4,7 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.Positive
 import jakarta.validation.constraints.Size
 import kr.weit.roadyfoody.auth.security.LoginUser
+import kr.weit.roadyfoody.badge.domain.Badge
 import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsDetailResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsReviewResponse
@@ -99,7 +100,9 @@ class FoodSpotsController(
         lastId: Long?,
         @RequestParam(required = false, defaultValue = "LATEST")
         sortType: ReviewSortType,
-    ): SliceResponse<FoodSpotsReviewResponse> = foodSpotsQueryService.getFoodSpotsReview(foodSpotsId, size, lastId, sortType)
+        @RequestParam(required = false)
+        badge: Badge?,
+    ): SliceResponse<FoodSpotsReviewResponse> = foodSpotsQueryService.getFoodSpotsReview(foodSpotsId, size, lastId, sortType, badge)
 
     @GetMapping("/{foodSpotsId}")
     override fun getFoodSpotsDetail(
