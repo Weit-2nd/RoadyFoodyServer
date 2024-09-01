@@ -1,6 +1,7 @@
 package kr.weit.roadyfoody.user.application.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
+import kr.weit.roadyfoody.badge.domain.Badge
 import kr.weit.roadyfoody.review.application.dto.ReviewPhotoResponse
 import kr.weit.roadyfoody.review.domain.FoodSpotsReview
 import kr.weit.roadyfoody.user.domain.User
@@ -11,6 +12,8 @@ data class ReviewerInfoResponse(
     val id: Long,
     @Schema(description = "유저 닉네임", example = "TestNickname")
     val nickname: String,
+    @Schema(description = "유저 뱃지", example = "BEGINNER")
+    val badge: Badge,
     @Schema(description = "프로필 URL")
     val url: String?,
 ) {
@@ -18,7 +21,7 @@ data class ReviewerInfoResponse(
         fun of(
             user: User,
             url: String?,
-        ) = ReviewerInfoResponse(user.id, user.profile.nickname, url)
+        ) = ReviewerInfoResponse(user.id, user.profile.nickname, user.badge, url)
     }
 }
 

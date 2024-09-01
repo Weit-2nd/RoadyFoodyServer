@@ -10,6 +10,7 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.Positive
 import jakarta.validation.constraints.Size
 import kr.weit.roadyfoody.auth.security.LoginUser
+import kr.weit.roadyfoody.badge.domain.Badge
 import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsDetailResponse
@@ -202,6 +203,8 @@ interface FoodSpotsControllerSpec {
         lastId: Long?,
         @RequestParam(defaultValue = "LATEST", required = false)
         sortType: ReviewSortType,
+        @RequestParam(required = false)
+        badge: Badge?,
     ): SliceResponse<FoodSpotsReviewResponse>
 
     @Operation(
