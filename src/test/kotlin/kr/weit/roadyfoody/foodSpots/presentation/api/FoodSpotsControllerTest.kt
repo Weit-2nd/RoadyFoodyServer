@@ -591,7 +591,7 @@ class FoodSpotsControllerTest(
             given("GET $requestPath/{foodSpotsId}/reviews Test") {
                 val response = createTestSliceFoodSpotsReviewResponse()
                 every {
-                    foodSpotsQueryService.getFoodSpotsReview(any(), any(), any(), any())
+                    foodSpotsQueryService.getFoodSpotsReview(any(), any(), any(), any(), any())
                 } returns response
                 `when`("정상적인 데이터가 들어올 경우") {
                     then("음식점의 리뷰 리스트가 조회된다.") {

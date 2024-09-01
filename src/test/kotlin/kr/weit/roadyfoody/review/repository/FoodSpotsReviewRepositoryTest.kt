@@ -4,6 +4,7 @@ import createTestFoodSpotsReview
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
+import kr.weit.roadyfoody.badge.domain.Badge
 import kr.weit.roadyfoody.foodSpots.application.dto.ReviewAggregatedInfoResponse
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpots
@@ -157,6 +158,21 @@ class FoodSpotsReviewRepositoryTest(
                                     ReviewSortType.HIGHEST,
                                 )
                         contents.content shouldBe listOf(reviewList[2])
+                    }
+                }
+
+                context("음식점 ID, 사이즈, 마지막 ID, 정렬 타입, 뱃지를 받는 경우") {
+                    it("해당 음식점의 리뷰 리스트를 반환한다.") {
+                        val contents =
+                            reviewRepository
+                                .sliceByFoodSpots(
+                                    foodSpots.id,
+                                    TEST_PAGE_SIZE,
+                                    reviewList.last().id,
+                                    ReviewSortType.LATEST,
+                                    Badge.BEGINNER,
+                                )
+                        contents.content shouldBe listOf(reviewList[2], reviewList[0])
                     }
                 }
             }
