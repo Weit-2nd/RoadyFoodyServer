@@ -2,6 +2,7 @@ package kr.weit.roadyfoody.user.fixture
 
 import createMockSliceReview
 import createTestReviewPhotoResponse
+import kr.weit.roadyfoody.badge.domain.Badge
 import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_PHOTO_URL
@@ -17,11 +18,13 @@ import kr.weit.roadyfoody.user.application.dto.UserReviewResponse
 fun createTestUserInfoResponse(
     nickname: String = TEST_USER_NICKNAME,
     profileImageUrl: String = TEST_USER_PROFILE_IMAGE_URL,
+    badge: Badge = Badge.BEGINNER,
     coin: Int = TEST_USER_COIN,
     restDailyReportCreationCount: Int = TEST_REST_DAILY_REPORT_CREATION_COUNT,
 ) = UserInfoResponse(
     nickname = nickname,
     profileImageUrl = profileImageUrl,
+    badge = badge,
     coin = coin,
     restDailyReportCreationCount = restDailyReportCreationCount,
 )

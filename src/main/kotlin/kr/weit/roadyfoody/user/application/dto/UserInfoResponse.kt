@@ -1,12 +1,15 @@
 package kr.weit.roadyfoody.user.application.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
+import kr.weit.roadyfoody.badge.domain.Badge
 
 data class UserInfoResponse(
     @Schema(description = "유저 닉네임", example = "TestNickname")
     val nickname: String,
     @Schema(description = "프로필 URL")
     val profileImageUrl: String?,
+    @Schema(description = "뱃지 정보", example = "BEGINNER")
+    val badge: Badge,
     @Schema(description = "보유 중인 코인", example = "100")
     val coin: Int,
     @Schema(description = "잔여 당일 리포트 생성 횟수", example = "3")
@@ -16,12 +19,14 @@ data class UserInfoResponse(
         fun of(
             nickname: String,
             profileImageUrl: String?,
+            badge: Badge,
             coin: Int,
             restDailyReportCreationCount: Int,
         ): UserInfoResponse =
             UserInfoResponse(
                 nickname = nickname,
                 profileImageUrl = profileImageUrl,
+                badge = badge,
                 coin = coin,
                 restDailyReportCreationCount = restDailyReportCreationCount,
             )
