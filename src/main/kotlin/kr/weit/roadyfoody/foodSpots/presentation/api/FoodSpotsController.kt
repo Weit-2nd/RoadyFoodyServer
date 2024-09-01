@@ -101,8 +101,9 @@ class FoodSpotsController(
         @RequestParam(required = false, defaultValue = "LATEST")
         sortType: ReviewSortType,
         @RequestParam(required = false)
-        badge: Badge?,
-    ): SliceResponse<FoodSpotsReviewResponse> = foodSpotsQueryService.getFoodSpotsReview(foodSpotsId, size, lastId, sortType, badge)
+        badge: String?,
+    ): SliceResponse<FoodSpotsReviewResponse> =
+        foodSpotsQueryService.getFoodSpotsReview(foodSpotsId, size, lastId, sortType, badge?.let { Badge.fromDescriptionOrNull(it) })
 
     @GetMapping("/{foodSpotsId}")
     override fun getFoodSpotsDetail(
