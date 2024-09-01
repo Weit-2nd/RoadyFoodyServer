@@ -24,7 +24,7 @@ fun createTestUserInfoResponse(
 ) = UserInfoResponse(
     nickname = nickname,
     profileImageUrl = profileImageUrl,
-    badge = badge,
+    badge = badge.description,
     coin = coin,
     restDailyReportCreationCount = restDailyReportCreationCount,
 )
