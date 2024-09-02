@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.constraints.Positive
+import kr.weit.roadyfoody.common.exception.ErrorCode
+import kr.weit.roadyfoody.global.swagger.ApiErrorCodeExamples
 import kr.weit.roadyfoody.global.swagger.v1.SwaggerTag
 import kr.weit.roadyfoody.ranking.dto.UserRanking
 import org.springframework.http.MediaType
@@ -13,6 +15,11 @@ import org.springframework.web.bind.annotation.RequestParam
 
 @Tag(name = SwaggerTag.RANKING)
 interface RankingControllerSpec {
+    @ApiErrorCodeExamples(
+        [
+            ErrorCode.SIZE_NON_POSITIVE,
+        ],
+    )
     @Operation(
         description = "리포트 랭킹 조회 API",
         responses = [
@@ -38,6 +45,11 @@ interface RankingControllerSpec {
         size: Long,
     ): List<UserRanking>
 
+    @ApiErrorCodeExamples(
+        [
+            ErrorCode.SIZE_NON_POSITIVE,
+        ],
+    )
     @Operation(
         description = "리뷰 랭킹 조회 API",
         responses = [

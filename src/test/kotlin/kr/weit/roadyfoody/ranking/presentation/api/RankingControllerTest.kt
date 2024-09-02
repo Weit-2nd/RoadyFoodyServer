@@ -3,9 +3,9 @@ package kr.weit.roadyfoody.ranking.presentation.api
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
-import kr.weit.roadyfoody.foodSpots.fixture.createUserRankingResponse
 import kr.weit.roadyfoody.global.TEST_PAGE_SIZE
 import kr.weit.roadyfoody.ranking.application.service.RankingQueryService
+import kr.weit.roadyfoody.ranking.fixture.createUserRankingResponse
 import kr.weit.roadyfoody.support.annotation.ControllerTest
 import kr.weit.roadyfoody.support.utils.getWithAuth
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest

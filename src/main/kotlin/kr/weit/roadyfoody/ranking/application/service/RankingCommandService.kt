@@ -12,8 +12,6 @@ import org.redisson.api.RedissonClient
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.ExecutorService
 import java.util.concurrent.TimeUnit
 
 @Service
@@ -22,14 +20,13 @@ class RankingCommandService(
     private val redissonClient: RedissonClient,
     private val foodSpotsHistoryRepository: FoodSpotsHistoryRepository,
     private val reviewRepository: FoodSpotsReviewRepository,
-    private val executor: ExecutorService,
 ) {
     @Scheduled(cron = "0 0 5 * * *")
     fun updateReportRanking() {
         updateRanking(
             lockName = REPORT_RANKING_UPDATE_LOCK,
             key = REPORT_RANKING_KEY,
-            dataProvider = { foodSpotsHistoryRepository.findAllUserReportCount() },
+            dataProvider = foodSpotsHistoryRepository::findAllUserReportCount,
         )
     }
 
@@ -38,7 +35,7 @@ class RankingCommandService(
         updateRanking(
             lockName = REVIEW_RANKING_UPDATE_LOCK,
             key = REVIEW_RANKING_KEY,
-            dataProvider = { reviewRepository.findAllUserReviewCount() },
+            dataProvider = reviewRepository::findAllUserReviewCount,
         )
     }
 
@@ -47,24 +44,22 @@ class RankingCommandService(
         key: String,
         dataProvider: () -> List<UserRanking>,
     ) {
-        CompletableFuture.runAsync({
-            val lock: RLock = redissonClient.getLock(lockName)
+        val lock: RLock = redissonClient.getLock(lockName)
 
-            if (lock.tryLock(0, 10, TimeUnit.MINUTES)) {
-                redisTemplate.delete(key)
+        if (lock.tryLock(0, 10, TimeUnit.MINUTES)) {
+            redisTemplate.delete(key)
 
-                val userRanking = dataProvider()
+            val userRanking = dataProvider()
 
-                userRanking.forEach {
-                    redisTemplate
-                        .opsForZSet()
-                        .add(
-                            key,
-                            it.userNickname,
-                            it.total.toDouble(),
-                        )
-                }
+            userRanking.forEach {
+                redisTemplate
+                    .opsForZSet()
+                    .add(
+                        key,
+                        it.userNickname,
+                        it.total.toDouble(),
+                    )
             }
-        }, executor)
+        }
     }
 }

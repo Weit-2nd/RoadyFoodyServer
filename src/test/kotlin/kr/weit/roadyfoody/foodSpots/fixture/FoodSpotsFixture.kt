@@ -27,7 +27,6 @@ import kr.weit.roadyfoody.foodSpots.domain.ReportOperationHours
 import kr.weit.roadyfoody.foodSpots.domain.ReportType
 import kr.weit.roadyfoody.foodSpots.utils.FOOD_SPOTS_NAME_MAX_LENGTH
 import kr.weit.roadyfoody.global.utils.CoordinateUtils
-import kr.weit.roadyfoody.ranking.dto.UserRanking
 import kr.weit.roadyfoody.search.foodSpots.domain.SearchCoinCache
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponse
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponses
@@ -459,14 +458,3 @@ fun createTestAggregatedInfoResponse(): ReviewAggregatedInfoResponse =
         TEST_AVERAGE_RATE,
         TEST_REVIEW_COUNT,
     )
-
-fun createCountResponse(
-    user: User = createTestUser(),
-    total: Long = 10,
-): UserRanking =
-    UserRanking(
-        userNickname = user.profile.nickname,
-        total = total,
-    )
-
-fun createUserRankingResponse(): List<UserRanking> = listOf(createCountResponse())
