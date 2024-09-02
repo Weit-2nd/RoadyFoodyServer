@@ -32,7 +32,7 @@ class ReviewLikeControllerTest(
                             .perform(
                                 postWithAuth(requestPath),
                             ).andExpect(status().isCreated)
-                        verify { reviewLikeCommandService.likeReview(any(), any()) }
+                        verify(exactly = 1) { reviewLikeCommandService.likeReview(any(), any()) }
                     }
                 }
 
@@ -54,7 +54,7 @@ class ReviewLikeControllerTest(
                             .perform(
                                 deleteWithAuth(requestPath),
                             ).andExpect(status().isNoContent)
-                        verify { reviewLikeCommandService.unlikeReview(any(), any()) }
+                        verify(exactly = 1) { reviewLikeCommandService.unlikeReview(any(), any()) }
                     }
                 }
 
