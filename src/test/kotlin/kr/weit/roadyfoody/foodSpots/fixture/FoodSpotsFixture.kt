@@ -14,7 +14,6 @@ import kr.weit.roadyfoody.foodSpots.application.dto.ReportOperationHoursResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportPhotoResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.ReviewAggregatedInfoResponse
-import kr.weit.roadyfoody.foodSpots.application.dto.UserReportCount
 import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.domain.FoodCategory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
@@ -459,14 +458,3 @@ fun createTestAggregatedInfoResponse(): ReviewAggregatedInfoResponse =
         TEST_AVERAGE_RATE,
         TEST_REVIEW_COUNT,
     )
-
-fun createUserReportCountResponse(
-    user: User = createTestUser(),
-    reportCount: Long = 10,
-): UserReportCount =
-    UserReportCount(
-        userNickname = user.profile.nickname,
-        reportCount = reportCount,
-    )
-
-fun createUserRankingResponse(): List<UserReportCount> = listOf(createUserReportCountResponse())
