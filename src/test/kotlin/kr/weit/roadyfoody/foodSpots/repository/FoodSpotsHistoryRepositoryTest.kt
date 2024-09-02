@@ -131,16 +131,16 @@ class FoodSpotsHistoryRepositoryTest(
                 val userReportCounts = foodSpotsHistoryRepository.findAllUserReportCount()
                 userReportCounts.size shouldBe 4
                 userReportCounts[0].userNickname shouldBe "existentNick2"
-                userReportCounts[0].reportCount shouldBe 3
+                userReportCounts[0].total shouldBe 3
 
                 userReportCounts[1].userNickname shouldBe "existentNick"
-                userReportCounts[1].reportCount shouldBe 2
+                userReportCounts[1].total shouldBe 2
 
                 userReportCounts[2].userNickname shouldBe "existentNick3"
-                userReportCounts[2].reportCount shouldBe 2
+                userReportCounts[2].total shouldBe 2
 
                 userReportCounts[3].userNickname shouldBe "existentNick4"
-                userReportCounts[3].reportCount shouldBe 1
+                userReportCounts[3].total shouldBe 1
             }
         }
     })
