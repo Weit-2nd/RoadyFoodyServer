@@ -10,6 +10,8 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
 import kr.weit.roadyfoody.common.domain.BaseTimeEntity
+import kr.weit.roadyfoody.common.exception.ErrorCode
+import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.user.domain.User
 
@@ -31,7 +33,16 @@ class FoodSpotsReview(
     @Column(nullable = false, updatable = false, length = 1200)
     val contents: String,
     @Column(nullable = false)
-    val likeTotal: Int,
+    var likeTotal: Int,
 ) : BaseTimeEntity() {
     constructor() : this(0L, FoodSpots(), User.of("", "defaultNickname"), 0, "", 0)
+
+    fun increaseLike() {
+        this.likeTotal++
+    }
+
+    fun decreaseLike() {
+        require(this.likeTotal > 0) { throw RoadyFoodyBadRequestException(ErrorCode.NEGATIVE_NUMBER_OF_LIKED) }
+        this.likeTotal--
+    }
 }

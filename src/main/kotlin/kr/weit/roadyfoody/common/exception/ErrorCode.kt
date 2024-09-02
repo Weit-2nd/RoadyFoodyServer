@@ -99,9 +99,12 @@ enum class ErrorCode(
     REVIEW_RATING_NEGATIVE(HttpStatus.BAD_REQUEST, -14000, "별점은 0점 이상으로 입력해주세요."),
     REVIEW_RATING_TOO_HIGH(HttpStatus.BAD_REQUEST, -14000, "별점은 10점 이하로 입력해주세요."),
     REVIEW_ID_NON_POSITIVE(HttpStatus.BAD_REQUEST, -14000, "리뷰 ID는 양수여야 합니다."),
+    NEGATIVE_NUMBER_OF_LIKED(HttpStatus.BAD_REQUEST, -14000, "리뷰 좋아요 수는 음수가 될 수 없습니다."),
     NOT_FOUND_FOOD_SPOTS(HttpStatus.NOT_FOUND, -14001, "해당 음식점이 존재하지 않습니다."),
     NOT_FOUND_FOOD_SPOTS_REVIEW(HttpStatus.NOT_FOUND, -14002, "해당 리뷰가 존재하지 않습니다."),
     NOT_FOOD_SPOTS_REVIEW_OWNER(HttpStatus.FORBIDDEN, -14003, "해당 리뷰의 소유자가 아닙니다."),
+    ALREADY_LIKED(HttpStatus.CONFLICT, -14004, "이미 좋아요를 누른 리뷰입니다."),
+    NOT_LIKED(HttpStatus.NOT_FOUND, -14005, "좋아요를 누르지 않은 리뷰입니다."),
 
     // User API error 15000대
     USER_ID_NON_POSITIVE(HttpStatus.BAD_REQUEST, -15000, "유저 ID는 양수여야 합니다."),

@@ -7,6 +7,7 @@ import kr.weit.roadyfoody.review.application.dto.ReviewPhotoResponse
 import kr.weit.roadyfoody.review.application.dto.ReviewRequest
 import kr.weit.roadyfoody.review.domain.FoodSpotsReview
 import kr.weit.roadyfoody.review.domain.FoodSpotsReviewPhoto
+import kr.weit.roadyfoody.review.domain.ReviewLike
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import org.springframework.data.domain.Pageable
@@ -26,7 +27,7 @@ const val TEST_REVIEW_REQUEST_PHOTO = "reviewPhotos"
 const val TEST_REVIEW_ID = 1L
 const val TEST_REVIEW_PHOTO_URL = "reviewPhotoUrl"
 const val TEST_REVIEW_PHOTO_ID = 1L
-const val TEST_REVIEW_LIKE = 0
+const val TEST_REVIEW_LIKE = 1
 
 fun createTestReviewRequest(
     foodSpotsId: Long = TEST_FOOD_SPOT_ID,
@@ -73,7 +74,8 @@ fun createTestFoodSpotsReviews(
 fun createMockTestReview(
     user: User = createTestUser(),
     foodSpots: FoodSpots = createTestFoodSpots(),
-) = MockTestReview(user = user, foodSpots = foodSpots)
+    likeTotal: Int = TEST_REVIEW_LIKE,
+) = MockTestReview(user = user, foodSpots = foodSpots, likeTotal = likeTotal)
 
 fun createTestReviewPhoto(foodSpotsReview: FoodSpotsReview = createMockTestReview()) =
     FoodSpotsReviewPhoto(0L, foodSpotsReview, TEST_PHOTO_NAME)
@@ -87,6 +89,11 @@ fun createMockSliceReview(): Slice<FoodSpotsReview> =
 
 fun createTestReviewPhotoResponse(): ReviewPhotoResponse = ReviewPhotoResponse(TEST_REVIEW_PHOTO_ID, TEST_REVIEW_PHOTO_URL)
 
+fun createMockReviewLike(
+    review: FoodSpotsReview = createMockTestReview(),
+    user: User = createTestUser(),
+): ReviewLike = MockTestReviewLike(review, user)
+
 class MockTestReview(
     id: Long = 0L,
     foodSpots: FoodSpots = createTestFoodSpots(),
@@ -95,5 +102,12 @@ class MockTestReview(
     rating: Int = TEST_REVIEW_RATING,
     likeTotal: Int = TEST_REVIEW_LIKE,
 ) : FoodSpotsReview(id, foodSpots, user, rating, contents, likeTotal) {
+    override var createdDateTime: LocalDateTime = LocalDateTime.now()
+}
+
+class MockTestReviewLike(
+    review: FoodSpotsReview = createMockTestReview(),
+    user: User = createTestUser(),
+) : ReviewLike(review, user) {
     override var createdDateTime: LocalDateTime = LocalDateTime.now()
 }
