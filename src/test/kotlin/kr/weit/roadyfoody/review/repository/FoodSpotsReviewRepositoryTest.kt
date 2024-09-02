@@ -177,5 +177,17 @@ class FoodSpotsReviewRepositoryTest(
                     }
                 }
             }
+
+            describe("findAllUserReviewCount 메소드는") {
+                it("전체 회원의 닉네임과 리뷰 개수를 정렬하여 리스트로 반환한다") {
+                    val userReportCounts = reviewRepository.findAllUserReviewCount()
+                    userReportCounts.size shouldBe 2
+                    userReportCounts[0].userNickname shouldBe "existentNick"
+                    userReportCounts[0].total shouldBe 3
+
+                    userReportCounts[1].userNickname shouldBe "otherUser"
+                    userReportCounts[1].total shouldBe 1
+                }
+            }
         },
     )
