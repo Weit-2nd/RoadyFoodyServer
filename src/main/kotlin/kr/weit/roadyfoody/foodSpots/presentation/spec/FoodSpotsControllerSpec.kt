@@ -167,6 +167,16 @@ interface FoodSpotsControllerSpec {
 
     @Operation(
         description = "음식점의 리뷰 리스트 조회 API",
+        parameters = [
+            Parameter(name = "size", description = "조회할 개수", example = "10"),
+            Parameter(name = "lastId", description = "마지막 ID", example = "1"),
+            Parameter(
+                name = "sortType",
+                description = "정렬 방식",
+                example = "LATEST",
+                schema = Schema(implementation = ReviewSortType::class),
+            ),
+        ],
         responses = [
             ApiResponse(
                 responseCode = "200",

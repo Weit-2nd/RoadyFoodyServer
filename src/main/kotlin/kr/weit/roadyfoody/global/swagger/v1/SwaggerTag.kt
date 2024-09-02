@@ -11,5 +11,6 @@ object SwaggerTag {
     const val USER: String = "G. 유저 API"
     const val REWARDS: String = "H. 리워드 API"
     const val RANKING: String = "I. 랭킹 API"
+    const val LIKE: String = "J. 좋아요 API"
     const val ADMIN: String = "Z. 관리자 API"
 }
