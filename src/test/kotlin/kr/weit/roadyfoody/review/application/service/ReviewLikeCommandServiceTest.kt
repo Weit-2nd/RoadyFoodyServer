@@ -118,7 +118,7 @@ class ReviewLikeCommandServiceTest :
                             likeTotal = 0,
                         )
                     every { reviewLikeRepository.existsById(any()) } returns true
-                    then("리뷰 좋아요 수는 음수가 될 수 없는 예외가 발생한다.") {
+                    then("리뷰 좋아요 수는 음수가 될 수 없다는 예외가 발생한다.") {
                         shouldThrow<RoadyFoodyBadRequestException> {
                             reviewLikeService.unlikeReview(TEST_REVIEW_ID, createTestUser())
                         }.message shouldBe ErrorCode.NEGATIVE_NUMBER_OF_LIKED.errorMessage
