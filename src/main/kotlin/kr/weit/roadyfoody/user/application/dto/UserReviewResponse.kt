@@ -11,6 +11,8 @@ data class ReviewerInfoResponse(
     val id: Long,
     @Schema(description = "유저 닉네임", example = "TestNickname")
     val nickname: String,
+    @Schema(description = "유저 뱃지", example = "초심자")
+    val badge: String,
     @Schema(description = "프로필 URL")
     val url: String?,
 ) {
@@ -18,7 +20,7 @@ data class ReviewerInfoResponse(
         fun of(
             user: User,
             url: String?,
-        ) = ReviewerInfoResponse(user.id, user.profile.nickname, url)
+        ) = ReviewerInfoResponse(user.id, user.profile.nickname, user.badge.description, url)
     }
 }
 

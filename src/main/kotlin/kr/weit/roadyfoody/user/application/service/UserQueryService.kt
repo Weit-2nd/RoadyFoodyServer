@@ -50,6 +50,7 @@ class UserQueryService(
         return UserInfoResponse.of(
             user.profile.nickname,
             profileImageUrl,
+            user.badge.description,
             user.coin,
             restDailyReportCreationCount,
         )

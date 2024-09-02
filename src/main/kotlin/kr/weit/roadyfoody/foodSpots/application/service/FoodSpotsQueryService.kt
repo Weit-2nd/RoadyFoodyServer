@@ -1,5 +1,6 @@
 package kr.weit.roadyfoody.foodSpots.application.service
 
+import kr.weit.roadyfoody.badge.domain.Badge
 import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsDetailResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsReviewResponse
@@ -116,9 +117,10 @@ class FoodSpotsQueryService(
         size: Int,
         lastId: Long?,
         sortType: ReviewSortType,
+        badge: Badge? = null,
     ): SliceResponse<FoodSpotsReviewResponse> {
         val response =
-            reviewRepository.sliceByFoodSpots(foodSpotsId, size, lastId, sortType).map {
+            reviewRepository.sliceByFoodSpots(foodSpotsId, size, lastId, sortType, badge).map {
                 val user = userRepository.getByUserId(it.user.id)
                 val url =
                     user.profile.profileImageName?.let { fileName ->
