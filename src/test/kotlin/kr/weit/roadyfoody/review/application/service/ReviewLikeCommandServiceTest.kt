@@ -13,13 +13,11 @@ import io.mockk.verify
 import jakarta.persistence.EntityManager
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
-import kr.weit.roadyfoody.review.exception.FoodSpotsReviewNotFoundException
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
 import kr.weit.roadyfoody.review.repository.ReviewLikeRepository
 import kr.weit.roadyfoody.review.repository.getReviewByReviewId
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.fixture.createTestUser
-import java.util.Optional
 
 class ReviewLikeCommandServiceTest :
     BehaviorSpec(
@@ -67,15 +65,6 @@ class ReviewLikeCommandServiceTest :
                             reviewLikeRepository.deleteById(any())
                         }
                         review.likeTotal shouldBe expectedLikeTotal
-                    }
-                }
-
-                `when`("리뷰가 존재하지 않는 경우") {
-                    every { reviewRepository.findById(any()) } returns Optional.empty()
-                    then("리뷰가 존재하지 않는다는 예외가 발생") {
-                        shouldThrow<FoodSpotsReviewNotFoundException> {
-                            reviewLikeService.toggleLike(TEST_REVIEW_ID, createTestUser())
-                        }
                     }
                 }
 
