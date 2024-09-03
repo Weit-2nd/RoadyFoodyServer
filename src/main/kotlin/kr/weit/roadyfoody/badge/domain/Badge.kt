@@ -31,5 +31,7 @@ enum class Badge(
             prevBadge: Badge,
             newBadge: Badge,
         ): Boolean = prevBadge > newBadge
+
+        fun fromDescriptionOrNull(description: String): Badge? = entries.find { it.description == description }
     }
 }
