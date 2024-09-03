@@ -2,6 +2,7 @@ package kr.weit.roadyfoody.ranking.application.service
 
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
 import kr.weit.roadyfoody.ranking.dto.UserRanking
+import kr.weit.roadyfoody.ranking.utils.LIKE_RANKING_KEY
 import kr.weit.roadyfoody.ranking.utils.REPORT_RANKING_KEY
 import kr.weit.roadyfoody.ranking.utils.REVIEW_RANKING_KEY
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
@@ -26,6 +27,13 @@ class RankingQueryService(
             size = size,
             key = REVIEW_RANKING_KEY,
             dataProvider = reviewRepository::findAllUserReviewCount,
+        )
+
+    fun getLikeRanking(size: Long): List<UserRanking> =
+        getRanking(
+            size = size,
+            key = LIKE_RANKING_KEY,
+            dataProvider = reviewRepository::findAllUserLikeCount,
         )
 
     private fun getRanking(

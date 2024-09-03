@@ -27,4 +27,11 @@ class RankingController(
         @RequestParam(defaultValue = "10")
         size: Long,
     ): List<UserRanking> = rankingQueryService.getReviewRanking(size)
+
+    @GetMapping("/like")
+    override fun getLikeRanking(
+        @Positive(message = "size는 양수여야 합니다.")
+        @RequestParam(defaultValue = "10")
+        size: Long,
+    ): List<UserRanking> = rankingQueryService.getLikeRanking(size)
 }

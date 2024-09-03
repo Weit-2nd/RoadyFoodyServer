@@ -45,6 +45,8 @@ interface CustomFoodSpotsReviewRepository {
     fun getReviewAggregatedInfo(foodSpots: FoodSpots): ReviewAggregatedInfoResponse
 
     fun findAllUserReviewCount(): List<UserRanking>
+
+    fun findAllUserLikeCount(): List<UserRanking>
 }
 
 class CustomFoodSpotsReviewRepositoryImpl(
@@ -115,6 +117,23 @@ class CustomFoodSpotsReviewRepositoryImpl(
                     .orderBy(
                         count(reviewIdPath).desc(),
                         max(createdAtPath).asc(),
+                    )
+            }
+
+    override fun findAllUserLikeCount(): List<UserRanking> =
+        kotlinJdslJpqlExecutor
+            .findList {
+                val userIdPath = path(FoodSpotsReview::user).path(User::id)
+                val userNicknamePath = path(User::profile).path(Profile::nickname)
+                val likeTotalPath = path(FoodSpotsReview::likeTotal)
+
+                selectNew<UserRanking>(
+                    userNicknamePath,
+                    sum(likeTotalPath),
+                ).from(entity(FoodSpotsReview::class))
+                    .groupBy(userIdPath, userNicknamePath)
+                    .orderBy(
+                        sum(likeTotalPath).desc(),
                     )
             }
 
