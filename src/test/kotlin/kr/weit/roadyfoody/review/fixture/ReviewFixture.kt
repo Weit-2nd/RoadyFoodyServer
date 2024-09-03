@@ -5,6 +5,7 @@ import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpots
 import kr.weit.roadyfoody.global.TEST_PAGE_SIZE
 import kr.weit.roadyfoody.review.application.dto.ReviewPhotoResponse
 import kr.weit.roadyfoody.review.application.dto.ReviewRequest
+import kr.weit.roadyfoody.review.application.dto.ToggleLikeResponse
 import kr.weit.roadyfoody.review.domain.FoodSpotsReview
 import kr.weit.roadyfoody.review.domain.FoodSpotsReviewPhoto
 import kr.weit.roadyfoody.review.domain.ReviewLike
@@ -93,6 +94,8 @@ fun createMockReviewLike(
     review: FoodSpotsReview = createMockTestReview(),
     user: User = createTestUser(),
 ): ReviewLike = MockTestReviewLike(review, user)
+
+fun createTestToggleLikeResponse(): ToggleLikeResponse = ToggleLikeResponse(TEST_REVIEW_ID, TEST_REVIEW_LIKE, true)
 
 class MockTestReview(
     id: Long = 0L,
