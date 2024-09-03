@@ -40,7 +40,7 @@ class ReviewCommandServiceTest :
             val imageService = spyk(ImageService(mockk()))
             val executor = mockk<ExecutorService>()
             val badgeCommandService = mockk<BadgeCommandService>()
-            val reportService =
+            val reviewService =
                 ReviewCommandService(
                     reviewRepository,
                     reviewPhotoRepository,
@@ -65,7 +65,7 @@ class ReviewCommandServiceTest :
                 every { badgeCommandService.tryChangeBadgeAndIfPromotedGiveBonus(any()) } just runs
                 `when`("정상적인 데이터와 이미지가 들어올 경우") {
                     then("정상적으로 저장되어야 한다.") {
-                        reportService.createReview(
+                        reviewService.createReview(
                             createTestUser(),
                             createTestReviewRequest(),
                             createMockPhotoList(ImageFormat.WEBP),
@@ -77,7 +77,7 @@ class ReviewCommandServiceTest :
                     every { foodSpotsRepository.findById(any()) } returns Optional.empty()
                     then("FoodSpotsNotFoundException 이 발생해야 한다.") {
                         shouldThrow<FoodSpotsNotFoundException> {
-                            reportService.createReview(
+                            reviewService.createReview(
                                 createTestUser(),
                                 createTestReviewRequest(),
                                 createMockPhotoList(ImageFormat.WEBP),
@@ -98,7 +98,7 @@ class ReviewCommandServiceTest :
                 every { reviewPhotoRepository.deleteAll(any()) } returns Unit
                 `when`("정상적인 삭제 요청이 들어올 경우") {
                     then("정상적으로 삭제되어야 한다.") {
-                        reportService.deleteWithdrewUserReview(createTestUser())
+                        reviewService.deleteWithdrewUserReview(createTestUser())
                     }
                 }
             }
@@ -109,7 +109,7 @@ class ReviewCommandServiceTest :
                         createMockTestReview(createTestUser(TEST_OTHER_USER_ID))
                     then("예외가 발생한다.") {
                         shouldThrow<NotFoodSpotsReviewOwnerException> {
-                            reportService.deleteReview(createTestUser(), TEST_REVIEW_ID)
+                            reviewService.deleteReview(createTestUser(), TEST_REVIEW_ID)
                         }
                     }
                 }
@@ -127,7 +127,7 @@ class ReviewCommandServiceTest :
                     every { reviewRepository.delete(any()) } returns Unit
                     every { badgeCommandService.tryChangeBadgeAndIfPromotedGiveBonus(any()) } just runs
                     then("정상적으로 삭제되어야 한다.") {
-                        reportService.deleteReview(user, TEST_REVIEW_ID)
+                        reviewService.deleteReview(user, TEST_REVIEW_ID)
                         verify(exactly = 1) {
                             imageService.remove(any())
                             reviewPhotoRepository.deleteAll(any())
