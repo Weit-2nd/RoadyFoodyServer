@@ -46,20 +46,19 @@ class RankingQueryService(
                 key,
                 0,
                 size - 1,
-            ) ?: return fallback(
-                key = key,
-                dataProvider = dataProvider,
             )
 
-        return typedTuple.map { tuple ->
-            val userNickname = tuple.value ?: ""
-            val total = tuple.score ?: 0.0
+        return typedTuple?.takeIf { it.isNotEmpty() }?.let {
+            it.map { tuple ->
+                val userNickname = tuple.value ?: ""
+                val total = tuple.score ?: 0.0
 
-            UserRanking(
-                userNickname = userNickname,
-                total = total.toLong(),
-            )
-        }
+                UserRanking(
+                    userNickname = userNickname,
+                    total = total.toLong(),
+                )
+            }
+        } ?: fallback(key, dataProvider)
     }
 
     private fun fallback(

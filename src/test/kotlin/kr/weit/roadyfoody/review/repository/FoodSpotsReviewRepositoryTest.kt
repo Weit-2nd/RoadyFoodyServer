@@ -189,5 +189,12 @@ class FoodSpotsReviewRepositoryTest(
                     userReportCounts[1].total shouldBe 1
                 }
             }
+
+            describe("findAllUserLikeCount 메소드는") {
+                it("전체 회원의 닉네임과 좋아요 개수를 정렬하여 리스트로 반환한다") {
+                    val userLikeCounts = reviewRepository.findAllUserLikeCount()
+                    userLikeCounts.size shouldBe 2
+                }
+            }
         },
     )

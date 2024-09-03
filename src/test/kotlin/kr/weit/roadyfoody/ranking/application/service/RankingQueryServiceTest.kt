@@ -18,16 +18,16 @@ class RankingQueryServiceTest :
         val foodSpotsHistoryRepository = mockk<FoodSpotsHistoryRepository>()
         val reviewRepository = mockk<FoodSpotsReviewRepository>()
         val rankingQueryService = RankingQueryService(redisTemplate, foodSpotsHistoryRepository, reviewRepository)
+        val zSetOperations = mockk<ZSetOperations<String, String>>()
+        val typedTupleSet =
+            setOf(
+                ZSetOperations.TypedTuple.of("user1", 10.0),
+                ZSetOperations.TypedTuple.of("user2", 20.0),
+            )
+        afterEach { clearMocks(zSetOperations) }
+        afterEach { clearMocks(reviewRepository) }
 
         given("getReportRanking 테스트") {
-            val zSetOperations = mockk<ZSetOperations<String, String>>()
-            val typedTupleSet =
-                setOf(
-                    ZSetOperations.TypedTuple.of("user1", 10.0),
-                    ZSetOperations.TypedTuple.of("user2", 20.0),
-                )
-            afterEach { clearMocks(zSetOperations) }
-
             `when`("레디스의 데이터를 조회한 경우") {
                 every { redisTemplate.opsForZSet() } returns zSetOperations
                 every { zSetOperations.reverseRangeWithScores(any(), any(), any()) } returns typedTupleSet
@@ -53,15 +53,6 @@ class RankingQueryServiceTest :
         }
 
         given("getReviewRanking 테스트") {
-            val zSetOperations = mockk<ZSetOperations<String, String>>()
-            val typedTupleSet =
-                setOf(
-                    ZSetOperations.TypedTuple.of("user1", 10.0),
-                    ZSetOperations.TypedTuple.of("user2", 20.0),
-                )
-
-            afterEach { clearMocks(zSetOperations) }
-
             `when`("레디스의 데이터를 조회한 경우") {
                 every { redisTemplate.opsForZSet() } returns zSetOperations
                 every { zSetOperations.reverseRangeWithScores(any(), any(), any()) } returns typedTupleSet
@@ -82,6 +73,44 @@ class RankingQueryServiceTest :
                     rankingQueryService.getReviewRanking(10)
                     verify(exactly = 1) { zSetOperations.reverseRangeWithScores(any(), any(), any()) }
                     verify(exactly = 1) { reviewRepository.findAllUserReviewCount() }
+                }
+            }
+        }
+
+        given("getLikeRanking 테스트") {
+            `when`("레디스의 데이터를 조회한 경우") {
+                every { redisTemplate.opsForZSet() } returns zSetOperations
+                every { zSetOperations.reverseRangeWithScores(any(), any(), any()) } returns typedTupleSet
+
+                then("리뷰 랭킹이 조회된다.") {
+                    rankingQueryService.getLikeRanking(10)
+                    verify(exactly = 1) { zSetOperations.reverseRangeWithScores(any(), any(), any()) }
+                }
+            }
+
+            `when`("레디스의 데이터가 null인 경우") {
+                every { redisTemplate.opsForZSet() } returns zSetOperations
+                every { zSetOperations.reverseRangeWithScores(any(), any(), any()) } returns null
+                every { zSetOperations.add("rofo:user-like-ranking", "existentNick", 10.0) } returns true
+                every { reviewRepository.findAllUserLikeCount() } returns createUserRankingResponse()
+
+                then("리뷰 랭킹이 조회된다.") {
+                    rankingQueryService.getLikeRanking(10)
+                    verify(exactly = 1) { zSetOperations.reverseRangeWithScores(any(), any(), any()) }
+                    verify(exactly = 1) { reviewRepository.findAllUserLikeCount() }
+                }
+            }
+
+            `when`("레디스의 데이터가 빈값인 경우") {
+                every { redisTemplate.opsForZSet() } returns zSetOperations
+                every { zSetOperations.reverseRangeWithScores(any(), any(), any()) } returns setOf()
+                every { zSetOperations.add("rofo:user-like-ranking", "existentNick", 10.0) } returns true
+                every { reviewRepository.findAllUserLikeCount() } returns createUserRankingResponse()
+
+                then("리뷰 랭킹이 조회된다.") {
+                    rankingQueryService.getLikeRanking(10)
+                    verify(exactly = 1) { zSetOperations.reverseRangeWithScores(any(), any(), any()) }
+                    verify(exactly = 1) { reviewRepository.findAllUserLikeCount() }
                 }
             }
         }

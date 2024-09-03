@@ -29,15 +29,15 @@ class RankingCommandServiceTest :
                     reviewRepository,
                 )
 
-            given("updateReportRanking 테스트") {
-                val mockLock = mockk<RLock>()
-                val zSetOperations = mockk<ZSetOperations<String, String>>()
-                val typedTupleSet =
-                    setOf(
-                        ZSetOperations.TypedTuple.of("user1", 10.0),
-                        ZSetOperations.TypedTuple.of("user2", 20.0),
-                    )
+            val mockLock = mockk<RLock>()
+            val zSetOperations = mockk<ZSetOperations<String, String>>()
+            val typedTupleSet =
+                setOf(
+                    ZSetOperations.TypedTuple.of("user1", 10.0),
+                    ZSetOperations.TypedTuple.of("user2", 20.0),
+                )
 
+            given("updateReportRanking 테스트") {
                 every { redissonClient.getLock(any<String>()) } returns mockLock
                 afterEach { clearMocks(foodSpotsHistoryRepository) }
 
@@ -67,14 +67,6 @@ class RankingCommandServiceTest :
             }
 
             given("updateReviewRanking 테스트") {
-                val mockLock = mockk<RLock>()
-                val zSetOperations = mockk<ZSetOperations<String, String>>()
-                val typedTupleSet =
-                    setOf(
-                        ZSetOperations.TypedTuple.of("user1", 10.0),
-                        ZSetOperations.TypedTuple.of("user2", 20.0),
-                    )
-
                 every { redissonClient.getLock(any<String>()) } returns mockLock
                 afterEach { clearMocks(reviewRepository) }
 
@@ -99,6 +91,35 @@ class RankingCommandServiceTest :
                     then("레디스의 데이터가 업데이트되지 않는다.") {
                         rankingCommandService.updateReviewRanking()
                         verify(exactly = 0) { reviewRepository.findAllUserReviewCount() }
+                    }
+                }
+            }
+
+            given("updateLikeRanking 테스트") {
+                every { redissonClient.getLock(any<String>()) } returns mockLock
+                afterEach { clearMocks(reviewRepository) }
+
+                `when`("Lock을 획득한 경우") {
+                    every { mockLock.tryLock(0, 10, TimeUnit.MINUTES) } returns true
+
+                    every { redisTemplate.delete("rofo:user-like-ranking") } returns true
+                    every { reviewRepository.findAllUserLikeCount() } returns createUserRankingResponse()
+                    every { redisTemplate.opsForZSet() } returns zSetOperations
+                    every { zSetOperations.reverseRangeWithScores(any(), any(), any()) } returns typedTupleSet
+                    every { zSetOperations.add("rofo:user-like-ranking", "existentNick", 10.0) } returns true
+
+                    then("레디스의 데이터가 정상적으로 업데이트된다.") {
+                        rankingCommandService.updateLikeRanking()
+                        verify(exactly = 1) { reviewRepository.findAllUserLikeCount() }
+                    }
+                }
+
+                `when`("Lock을 획득하지 못한 경우") {
+                    every { mockLock.tryLock(0, 10, TimeUnit.MINUTES) } returns false
+
+                    then("레디스의 데이터가 업데이트되지 않는다.") {
+                        rankingCommandService.updateLikeRanking()
+                        verify(exactly = 0) { reviewRepository.findAllUserLikeCount() }
                     }
                 }
             }
