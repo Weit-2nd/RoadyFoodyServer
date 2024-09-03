@@ -408,10 +408,3 @@ data class ReviewAggregatedInfoResponse(
         reviewCount ?: 0,
     )
 }
-
-data class UserReportCount(
-    @Schema(description = "유저 닉네임", example = "로디푸디유저")
-    val userNickname: String,
-    @Schema(description = "유저가 작성한 Report 개수", example = "1")
-    val reportCount: Long,
-)

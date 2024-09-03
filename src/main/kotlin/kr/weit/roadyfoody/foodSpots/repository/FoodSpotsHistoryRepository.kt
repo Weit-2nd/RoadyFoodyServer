@@ -1,12 +1,12 @@
 package kr.weit.roadyfoody.foodSpots.repository
 
 import com.linecorp.kotlinjdsl.support.spring.data.jpa.repository.KotlinJdslJpqlExecutor
-import kr.weit.roadyfoody.foodSpots.application.dto.UserReportCount
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
 import kr.weit.roadyfoody.foodSpots.exception.FoodSpotsHistoryNotFoundException
 import kr.weit.roadyfoody.global.utils.findList
 import kr.weit.roadyfoody.global.utils.getSlice
+import kr.weit.roadyfoody.ranking.dto.UserRanking
 import kr.weit.roadyfoody.user.domain.Profile
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.data.domain.Pageable
@@ -39,7 +39,7 @@ interface CustomFoodSpotsHistoryRepository {
         lastId: Long?,
     ): Slice<FoodSpotsHistory>
 
-    fun findAllUserReportCount(): List<UserReportCount>
+    fun findAllUserReportCount(): List<UserRanking>
 }
 
 class CustomFoodSpotsHistoryRepositoryImpl(
@@ -65,7 +65,7 @@ class CustomFoodSpotsHistoryRepositoryImpl(
         }
     }
 
-    override fun findAllUserReportCount(): List<UserReportCount> =
+    override fun findAllUserReportCount(): List<UserRanking> =
         kotlinJdslJpqlExecutor
             .findList {
                 val userIdPath = path(FoodSpotsHistory::user).path(User::id)
@@ -73,7 +73,7 @@ class CustomFoodSpotsHistoryRepositoryImpl(
                 val historyIdPath = path(FoodSpotsHistory::id)
                 val createdAtPath = path(FoodSpotsHistory::createdDateTime)
 
-                selectNew<UserReportCount>(
+                selectNew<UserRanking>(
                     userNicknamePath,
                     count(historyIdPath),
                 ).from(entity(FoodSpotsHistory::class))
