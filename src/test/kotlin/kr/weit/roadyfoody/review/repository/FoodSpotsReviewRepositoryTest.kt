@@ -4,6 +4,7 @@ import createTestFoodSpotsReview
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
+import kr.weit.roadyfoody.badge.domain.Badge
 import kr.weit.roadyfoody.foodSpots.application.dto.ReviewAggregatedInfoResponse
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpots
@@ -159,6 +160,21 @@ class FoodSpotsReviewRepositoryTest(
                         contents.content shouldBe listOf(reviewList[2])
                     }
                 }
+
+                context("음식점 ID, 사이즈, 마지막 ID, 정렬 타입, 뱃지를 받는 경우") {
+                    it("해당 음식점의 리뷰 리스트를 반환한다.") {
+                        val contents =
+                            reviewRepository
+                                .sliceByFoodSpots(
+                                    foodSpots.id,
+                                    TEST_PAGE_SIZE,
+                                    reviewList.last().id,
+                                    ReviewSortType.LATEST,
+                                    Badge.BEGINNER,
+                                )
+                        contents.content shouldBe listOf(reviewList[2], reviewList[0])
+                    }
+                }
             }
             describe("getReviewAggregatedInfo 메소드는") {
                 context("리뷰가 있는 음식점을 받는 경우") {
@@ -175,6 +191,18 @@ class FoodSpotsReviewRepositoryTest(
                             reviewRepository.getReviewAggregatedInfo(noReviewsFoodSpots)
                         reviewAggregatedInfoResponse shouldBe ReviewAggregatedInfoResponse(0.0, 0)
                     }
+                }
+            }
+
+            describe("findAllUserReviewCount 메소드는") {
+                it("전체 회원의 닉네임과 리뷰 개수를 정렬하여 리스트로 반환한다") {
+                    val userReportCounts = reviewRepository.findAllUserReviewCount()
+                    userReportCounts.size shouldBe 2
+                    userReportCounts[0].userNickname shouldBe "existentNick"
+                    userReportCounts[0].total shouldBe 3
+
+                    userReportCounts[1].userNickname shouldBe "otherUser"
+                    userReportCounts[1].total shouldBe 1
                 }
             }
         },
