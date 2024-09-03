@@ -2,6 +2,7 @@ package kr.weit.roadyfoody.foodSpots.presentation.spec
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -176,6 +177,12 @@ interface FoodSpotsControllerSpec {
                 example = "LATEST",
                 schema = Schema(implementation = ReviewSortType::class),
             ),
+            Parameter(
+                name = "badge",
+                description = "사용자 배지 필터",
+                `in` = ParameterIn.QUERY,
+                schema = Schema(type = "string", allowableValues = ["초심자", "중수", "고수", "초고수"]),
+            ),
         ],
         responses = [
             ApiResponse(
@@ -212,6 +219,8 @@ interface FoodSpotsControllerSpec {
         lastId: Long?,
         @RequestParam(defaultValue = "LATEST", required = false)
         sortType: ReviewSortType,
+        @RequestParam(required = false)
+        badge: String?,
     ): SliceResponse<FoodSpotsReviewResponse>
 
     @Operation(
