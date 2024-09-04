@@ -51,6 +51,9 @@ dependencies {
     implementation("com.linecorp.kotlin-jdsl:spring-data-jpa-support:3.4.1")
     implementation("com.linecorp.kotlin-jdsl:hibernate-kotlin-jdsl-jakarta:2.2.1.RELEASE")
     implementation("org.hibernate.orm:hibernate-spatial:6.5.2.Final")
+    implementation("org.opensearch.client:spring-data-opensearch-starter:1.5.1") {
+        exclude("org.opensearch.client", "opensearch-rest-client-sniffer")
+    }
 
     // Secret & Config
     implementation(platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.1.1"))
@@ -81,6 +84,7 @@ dependencies {
     testImplementation("org.testcontainers:oracle-xe:1.19.8")
     testImplementation("com.redis:testcontainers-redis:2.2.2")
     testImplementation("org.testcontainers:localstack:1.19.8")
+    testImplementation("org.opensearch:opensearch-testcontainers:2.1.0")
 
     // Monitoring
     implementation("io.sentry:sentry-spring-boot-starter-jakarta:7.9.0")
