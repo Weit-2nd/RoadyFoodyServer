@@ -205,5 +205,13 @@ class FoodSpotsReviewRepositoryTest(
                     userReportCounts[1].total shouldBe 1
                 }
             }
+
+            describe("findByFoodSpots 메소드는") {
+                context("음식점을 받는 경우") {
+                    it("해당 음식점의 리뷰 리스트를 반환한다.") {
+                        reviewRepository.findByFoodSpots(foodSpots).size shouldBe 2
+                    }
+                }
+            }
         },
     )
