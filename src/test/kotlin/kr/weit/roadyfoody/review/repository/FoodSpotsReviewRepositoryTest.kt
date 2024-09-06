@@ -3,6 +3,7 @@ package kr.weit.roadyfoody.review.repository
 import createTestFoodSpotsReview
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import kr.weit.roadyfoody.badge.domain.Badge
 import kr.weit.roadyfoody.foodSpots.application.dto.ReviewAggregatedInfoResponse
@@ -209,7 +210,7 @@ class FoodSpotsReviewRepositoryTest(
             describe("findByFoodSpots 메소드는") {
                 context("음식점을 받는 경우") {
                     it("해당 음식점의 리뷰 리스트를 반환한다.") {
-                        reviewRepository.findByFoodSpots(foodSpots).size shouldBe 2
+                        reviewRepository.findByFoodSpots(foodSpots).shouldHaveSize(2)
                     }
                 }
             }
