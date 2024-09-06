@@ -331,9 +331,6 @@ class FoodSpotsQueryServiceTest :
                             emptyList(),
                         )
                     } returns emptyList()
-                    every { foodSpotsPhotoRepository.findOneByFoodSpots(any()) } returns createTestFoodSpotsPhoto()
-                    every { reviewRepository.findByFoodSpots(any()) } returns createTestFoodSpotsReviews()
-                    every { imageService.getDownloadUrl(any()) } returns TEST_FOOD_SPOTS_PHOTO_URL
                     then("빈 리스트를 반환한다.") {
                         val foodSpotsSearchResponses =
                             foodSPotsQueryService.searchFoodSpots(query500m)
