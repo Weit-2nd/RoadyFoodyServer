@@ -1,6 +1,8 @@
 package kr.weit.roadyfoody.foodSpots.repository
 
 import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
@@ -93,6 +95,22 @@ class FoodSpotsPhotoRepositoryTest(
                     foodSpotsPhotoRepository.findAll().size shouldBe 2
                     foodSpotsPhotoRepository.deleteAll(listOf(foodSpotsPhoto, otherFoodSpotsPhoto))
                     foodSpotsPhotoRepository.findAll().size shouldBe 0
+                }
+            }
+        }
+
+        describe("findOneByFoodSpots 메소드는") {
+            context("존재하는 foodSpotsId 를 받는 경우") {
+                it("해당 FoodSpotsPhoto 를 반환한다.") {
+                    val result = foodSpotsPhotoRepository.findOneByFoodSpots(foodSpots.id)
+                    result.shouldNotBeNull()
+                }
+            }
+
+            context("존재하지 않는 foodSpotsId 를 받는 경우") {
+                it("null 을 반환한다.") {
+                    val result = foodSpotsPhotoRepository.findOneByFoodSpots(0L)
+                    result.shouldBeNull()
                 }
             }
         }

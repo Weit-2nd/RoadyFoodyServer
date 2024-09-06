@@ -3,6 +3,7 @@ package kr.weit.roadyfoody.foodSpots.application.service
 import kr.weit.roadyfoody.badge.domain.Badge
 import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsDetailResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsOperationHoursResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsReviewResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportCategoryResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoryDetailResponse
@@ -54,7 +55,10 @@ class FoodSpotsQueryService(
     private val executor: ExecutorService,
 ) {
     @Transactional(readOnly = true)
-    fun searchFoodSpots(foodSpotsSearchQuery: FoodSpotsSearchCondition): FoodSpotsSearchResponses {
+    fun searchFoodSpots(
+        foodSpotsSearchQuery: FoodSpotsSearchCondition,
+        today: LocalDate = LocalDate.now(),
+    ): FoodSpotsSearchResponses {
         val result: List<FoodSpots> =
             foodSpotsRepository.findFoodSpotsByPointWithinRadius(
                 foodSpotsSearchQuery.centerLongitude,
@@ -67,13 +71,28 @@ class FoodSpotsQueryService(
         val foodSpotsSearchResponses =
             result.map { foodSpots ->
                 val openValue: OperationStatus = determineOpenStatus(foodSpots)
+                val foodSpotsPhoto = foodSpotsPhotoRepository.findOneByFoodSpots(foodSpots.id)
+                val reviews = reviewRepository.findByFoodSpots(foodSpots)
+                val averageRating =
+                    if (reviews.isNotEmpty()) {
+                        val sum = reviews.sumOf { it.rate }.toDouble()
+                        ((sum / reviews.size) * 10).toInt() / 10.0
+                    } else {
+                        0.0
+                    }
+
                 FoodSpotsSearchResponse(
                     id = foodSpots.id,
                     name = foodSpots.name,
                     longitude = foodSpots.point.x,
                     latitude = foodSpots.point.y,
                     open = openValue,
+                    operationHours = getTodayOperationHoursResponse(foodSpots, today),
                     foodCategories = foodSpots.foodCategoryList.map { it.foodCategory.name },
+                    foodTruck = foodSpots.foodTruck,
+                    imageUrl = foodSpotsPhoto?.let { imageService.getDownloadUrl(it.fileName) },
+                    averageRating = averageRating,
+                    reviewCount = reviews.size,
                     createdDateTime = foodSpots.createdDateTime,
                 )
             }
@@ -194,5 +213,26 @@ class FoodSpotsQueryService(
         } else {
             OperationStatus.TEMPORARILY_CLOSED
         }
+    }
+
+    private fun getTodayOperationHoursResponse(
+        foodSpot: FoodSpots,
+        today: LocalDate = LocalDate.now(),
+    ): FoodSpotsOperationHoursResponse {
+        val dayOfWeekValue = today.get(ChronoField.DAY_OF_WEEK) - 1
+        val dayOfWeek = DayOfWeek.of(dayOfWeekValue)
+
+        return foodSpot.operationHoursList
+            .firstOrNull { it.dayOfWeek == dayOfWeek }
+            ?.let { operationHours ->
+                return FoodSpotsOperationHoursResponse(
+                    operationHours,
+                )
+            } ?: FoodSpotsOperationHoursResponse(
+            foodSpotsId = foodSpot.id,
+            dayOfWeek = dayOfWeek,
+            openingHours = "00:00",
+            closingHours = "00:00",
+        )
     }
 }
