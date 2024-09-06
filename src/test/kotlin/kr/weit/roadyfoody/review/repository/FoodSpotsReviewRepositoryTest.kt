@@ -51,6 +51,8 @@ class FoodSpotsReviewRepositoryTest(
                             createTestFoodSpotsReview(otherUser, foodSpots, 4),
                             createTestFoodSpotsReview(user, otherFoodSpots, 10),
                             createTestFoodSpotsReview(testUser, testFoodSpots, 4),
+                            createTestFoodSpotsReview(user, foodSpots, 0, 0),
+                            createTestFoodSpotsReview(user, foodSpots, 3, 0),
                         ),
                     )
 
@@ -65,7 +67,7 @@ class FoodSpotsReviewRepositoryTest(
             describe("findByUser 메소드는") {
                 context("리뷰를 작성한 사용자를 받는 경우") {
                     it("해당 사용자의 리뷰 리스트를 반환한다.") {
-                        reviewRepository.findByUser(user).size shouldBe 3
+                        reviewRepository.findByUser(user).size shouldBe 5
                     }
                 }
             }
@@ -114,7 +116,7 @@ class FoodSpotsReviewRepositoryTest(
                                 user,
                                 TEST_PAGE_SIZE,
                                 null,
-                            ).content.size shouldBe 3
+                            ).content.size shouldBe 5
                     }
                 }
             }
@@ -214,7 +216,7 @@ class FoodSpotsReviewRepositoryTest(
                     val userReportCounts = reviewRepository.findAllUserReviewCount()
                     userReportCounts.size shouldBe 3
                     userReportCounts[0].userNickname shouldBe "existentNick"
-                    userReportCounts[0].total shouldBe 3
+                    userReportCounts[0].total shouldBe 5
 
                     userReportCounts[1].userNickname shouldBe "otherUser"
                     userReportCounts[1].total shouldBe 2
@@ -237,6 +239,19 @@ class FoodSpotsReviewRepositoryTest(
 
                     userLikeCounts[2].userNickname shouldBe "testUser"
                     userLikeCounts[2].total shouldBe 2
+                }
+            }
+
+            describe("getRatingCount 메소드는") {
+                context("음식점 ID를 받는 경우") {
+                    it("해당 음식점의 별점 개수를 반환한다.") {
+                        val ratingCountResponses = reviewRepository.getRatingCount(foodSpots.id)
+                        ratingCountResponses.size shouldBe 2
+                        ratingCountResponses[0].rating shouldBe 10
+                        ratingCountResponses[0].count shouldBe 1
+                        ratingCountResponses[1].rating shouldBe 4
+                        ratingCountResponses[1].count shouldBe 1
+                    }
                 }
             }
         },

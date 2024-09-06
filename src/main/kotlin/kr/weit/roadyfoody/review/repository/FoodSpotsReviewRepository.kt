@@ -5,9 +5,11 @@ import com.linecorp.kotlinjdsl.querymodel.jpql.predicate.Predicate
 import com.linecorp.kotlinjdsl.querymodel.jpql.sort.Sortable
 import com.linecorp.kotlinjdsl.support.spring.data.jpa.repository.KotlinJdslJpqlExecutor
 import kr.weit.roadyfoody.badge.domain.Badge
+import kr.weit.roadyfoody.foodSpots.application.dto.RatingCountResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReviewAggregatedInfoResponse
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.global.utils.findList
+import kr.weit.roadyfoody.global.utils.findMutableList
 import kr.weit.roadyfoody.global.utils.getSlice
 import kr.weit.roadyfoody.ranking.dto.UserRanking
 import kr.weit.roadyfoody.review.domain.FoodSpotsReview
@@ -51,6 +53,8 @@ interface CustomFoodSpotsReviewRepository {
     fun findAllUserReviewCount(): List<UserRanking>
 
     fun findAllUserLikeCount(): List<UserRanking>
+
+    fun getRatingCount(foodSpotsId: Long): MutableList<RatingCountResponse>
 }
 
 class CustomFoodSpotsReviewRepositoryImpl(
@@ -90,6 +94,7 @@ class CustomFoodSpotsReviewRepositoryImpl(
                 .whereAnd(
                     dynamicLastId(sortType, lastId),
                     path(FoodSpotsReview::foodSpots)(FoodSpots::id).equal(foodSpotsId),
+                    path(FoodSpotsReview::rate).`in`(2, 4, 6, 8, 10),
                     badge?.let { path(FoodSpotsReview::user)(User::badge).equal(badge) },
                 ).orderBy(
                     *dynamicOrder(sortType),
@@ -104,8 +109,26 @@ class CustomFoodSpotsReviewRepositoryImpl(
                     avg(path(FoodSpotsReview::rate)),
                     count(path(FoodSpotsReview::id)),
                 ).from(entity(FoodSpotsReview::class))
-                    .where(path(FoodSpotsReview::foodSpots).equal(foodSpots))
+                    .whereAnd(
+                        path(FoodSpotsReview::foodSpots).equal(foodSpots),
+                        path(FoodSpotsReview::rate).`in`(2, 4, 6, 8, 10),
+                    )
             }.first()!!
+
+    override fun getRatingCount(foodSpotsId: Long): MutableList<RatingCountResponse> =
+        kotlinJdslJpqlExecutor
+            .findMutableList {
+                val ratePath = path(FoodSpotsReview::rate)
+                selectNew<RatingCountResponse>(
+                    ratePath,
+                    count(ratePath),
+                ).from(entity(FoodSpotsReview::class))
+                    .whereAnd(
+                        path(FoodSpotsReview::foodSpots)(FoodSpots::id).equal(foodSpotsId),
+                        path(FoodSpotsReview::rate).`in`(2, 4, 6, 8, 10),
+                    ).groupBy(ratePath)
+                    .orderBy(ratePath.desc())
+            }
 
     override fun findAllUserReviewCount(): List<UserRanking> =
         kotlinJdslJpqlExecutor
