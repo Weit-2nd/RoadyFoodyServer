@@ -208,8 +208,20 @@ class FoodSpotsReviewRepositoryTest(
 
             describe("findAllUserLikeCount 메소드는") {
                 it("전체 회원의 닉네임과 좋아요 개수를 정렬하여 리스트로 반환한다") {
+                    val testUser = userRepository.save(createTestUser(0L, "testUser"))
+                    reviewRepository.save(createTestFoodSpotsReview(testUser, foodSpots, 10))
+
                     val userLikeCounts = reviewRepository.findAllUserLikeCount()
-                    userLikeCounts.size shouldBe 2
+                    userLikeCounts.size shouldBe 3
+
+                    userLikeCounts[0].userNickname shouldBe "existentNick"
+                    userLikeCounts[0].total shouldBe 3
+
+                    userLikeCounts[1].userNickname shouldBe "otherUser"
+                    userLikeCounts[1].total shouldBe 1
+
+                    userLikeCounts[2].userNickname shouldBe "testUser"
+                    userLikeCounts[2].total shouldBe 1
                 }
             }
         },

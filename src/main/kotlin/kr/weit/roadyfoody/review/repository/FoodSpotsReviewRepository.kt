@@ -11,12 +11,14 @@ import kr.weit.roadyfoody.global.utils.findList
 import kr.weit.roadyfoody.global.utils.getSlice
 import kr.weit.roadyfoody.ranking.dto.UserRanking
 import kr.weit.roadyfoody.review.domain.FoodSpotsReview
+import kr.weit.roadyfoody.review.domain.ReviewLike
 import kr.weit.roadyfoody.review.exception.FoodSpotsReviewNotFoundException
 import kr.weit.roadyfoody.user.domain.Profile
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.jpa.repository.JpaRepository
+import java.time.LocalDateTime
 
 fun FoodSpotsReviewRepository.getReviewByReviewId(reviewId: Long): FoodSpotsReview =
     findById(reviewId).orElseThrow {
@@ -127,17 +129,30 @@ class CustomFoodSpotsReviewRepositoryImpl(
     override fun findAllUserLikeCount(): List<UserRanking> =
         kotlinJdslJpqlExecutor
             .findList {
-                val userIdPath = path(FoodSpotsReview::user).path(User::id)
-                val userNicknamePath = path(User::profile).path(Profile::nickname)
-                val likeTotalPath = path(FoodSpotsReview::likeTotal)
+                val foodSpotsReview = entity(FoodSpotsReview::class, "foodSpotsReview")
+                val userIdPath = foodSpotsReview(FoodSpotsReview::user).path(User::id)
+                val userNicknamePath = foodSpotsReview(FoodSpotsReview::user).path(User::profile).path(Profile::nickname)
+                val likeTotalPath = foodSpotsReview(FoodSpotsReview::likeTotal)
+                val createdAtPath = path(ReviewLike::createdDateTime)
+
+                val subQuery =
+                    select<LocalDateTime>(
+                        max(createdAtPath),
+                    ).from(
+                        entity(ReviewLike::class),
+                    ).where(
+                        path(ReviewLike::review).path(FoodSpotsReview::user).path(User::id).eq(userIdPath),
+                    ).asSubquery()
 
                 selectNew<UserRanking>(
                     userNicknamePath,
                     sum(likeTotalPath),
-                ).from(entity(FoodSpotsReview::class))
-                    .groupBy(userIdPath, userNicknamePath)
+                ).from(
+                    entity(FoodSpotsReview::class),
+                ).groupBy(userIdPath, userNicknamePath)
                     .orderBy(
                         sum(likeTotalPath).desc(),
+                        subQuery.asc(),
                     )
             }
 
