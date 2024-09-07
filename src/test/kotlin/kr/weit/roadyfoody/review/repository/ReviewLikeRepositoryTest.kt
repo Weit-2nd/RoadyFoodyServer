@@ -58,10 +58,28 @@ class ReviewLikeRepositoryTest(
 
             describe("deleteById 메소드는") {
                 context("존재하는 리뷰 좋아요 ID를 받는 경우") {
-                    it("리뷰 좋아요가 삭제된다.") {
+                    it("리뷰 좋아요 이력이 삭제된다.") {
                         reviewLikeRepository.existsById(reviewLikeId) shouldBe true
                         reviewLikeRepository.deleteById(reviewLikeId)
                         reviewLikeRepository.existsById(reviewLikeId) shouldBe false
+                    }
+                }
+            }
+
+            describe("getByUser 메소드는") {
+                context("유저를 받는 경우") {
+                    it("유저가 좋아요한 리뷰를 반환한다.") {
+                        reviewLikeRepository.getByUser(user) shouldBe listOf(review)
+                    }
+                }
+            }
+
+            describe("deleteByUser 메소드는") {
+                context("유저를 받는 경우") {
+                    it("유저가 좋아요한 리뷰를 삭제한다.") {
+                        reviewLikeRepository.findByUser(user) shouldBe listOf(reviewLike)
+                        reviewLikeRepository.deleteByUser(user)
+                        reviewLikeRepository.findByUser(user) shouldBe emptyList()
                     }
                 }
             }
