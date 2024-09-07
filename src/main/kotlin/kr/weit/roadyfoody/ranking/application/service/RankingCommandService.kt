@@ -68,12 +68,8 @@ class RankingCommandService(
 
             userRanking.forEach {
                 redisTemplate
-                    .opsForZSet()
-                    .add(
-                        key,
-                        it.userNickname,
-                        it.total.toDouble(),
-                    )
+                    .opsForList()
+                    .rightPush(key, "${it.userNickname}:${it.total}")
             }
         }
     }

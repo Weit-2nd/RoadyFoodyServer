@@ -129,10 +129,9 @@ class CustomFoodSpotsReviewRepositoryImpl(
     override fun findAllUserLikeCount(): List<UserRanking> =
         kotlinJdslJpqlExecutor
             .findList {
-                val foodSpotsReview = entity(FoodSpotsReview::class, "foodSpotsReview")
-                val userIdPath = foodSpotsReview(FoodSpotsReview::user).path(User::id)
-                val userNicknamePath = foodSpotsReview(FoodSpotsReview::user).path(User::profile).path(Profile::nickname)
-                val likeTotalPath = foodSpotsReview(FoodSpotsReview::likeTotal)
+                val userIdPath = path(FoodSpotsReview::user).path(User::id)
+                val userNicknamePath = path(FoodSpotsReview::user).path(User::profile).path(Profile::nickname)
+                val likeTotalPath = path(FoodSpotsReview::likeTotal)
                 val createdAtPath = path(ReviewLike::createdDateTime)
 
                 val subQuery =

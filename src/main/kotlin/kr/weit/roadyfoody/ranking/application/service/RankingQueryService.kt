@@ -41,23 +41,20 @@ class RankingQueryService(
         key: String,
         dataProvider: () -> List<UserRanking>,
     ): List<UserRanking> {
-        val typedTuple =
-            redisTemplate.opsForZSet().reverseRangeWithScores(
-                key,
-                0,
-                size - 1,
+        val ranking =
+            redisTemplate
+                .opsForList()
+                .range(key, 0, size - 1)
+
+        return ranking?.takeIf { it.isNotEmpty() }?.map { score ->
+            val data = score.split(":")
+            val userNickname = data.getOrNull(0) ?: ""
+            val total = data.getOrNull(1)?.toDoubleOrNull() ?: 0.0
+
+            UserRanking(
+                userNickname = userNickname,
+                total = total.toLong(),
             )
-
-        return typedTuple?.takeIf { it.isNotEmpty() }?.let {
-            it.map { tuple ->
-                val userNickname = tuple.value ?: ""
-                val total = tuple.score ?: 0.0
-
-                UserRanking(
-                    userNickname = userNickname,
-                    total = total.toLong(),
-                )
-            }
         } ?: fallback(key, dataProvider)
     }
 
@@ -69,13 +66,10 @@ class RankingQueryService(
 
         userRanking.forEach {
             redisTemplate
-                .opsForZSet()
-                .add(
-                    key,
-                    it.userNickname,
-                    it.total.toDouble(),
-                )
+                .opsForList()
+                .rightPush(key, "${it.userNickname}:${it.total}")
         }
+
         return userRanking
     }
 }
