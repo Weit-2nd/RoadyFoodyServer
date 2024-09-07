@@ -25,9 +25,9 @@ data class FoodSpotsSearchResponse(
     @Schema(description = "푸드트럭 여부")
     val foodTruck: Boolean,
     @Schema(description = "리뷰 평균 별점")
-    val averageRating: Double,
+    val averageRating: Float,
     @Schema(description = "리뷰 개수")
-    val reviewCount: Int,
+    val reviewCount: Long,
     @Schema(description = "음식점 생성 일자")
     val createdDateTime: LocalDateTime,
 )

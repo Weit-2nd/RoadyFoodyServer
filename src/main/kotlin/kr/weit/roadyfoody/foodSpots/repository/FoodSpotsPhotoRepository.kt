@@ -4,7 +4,7 @@ import com.linecorp.kotlinjdsl.support.spring.data.jpa.repository.KotlinJdslJpql
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
-import org.springframework.data.domain.Pageable
+import kr.weit.roadyfoody.global.utils.findOne
 import org.springframework.data.jpa.repository.JpaRepository
 
 fun FoodSpotsPhotoRepository.getByHistoryId(historyId: Long): List<FoodSpotsPhoto> = findByHistoryId(historyId)
@@ -26,7 +26,7 @@ class CustomFoodSpotsPhotoRepositoryImpl(
 ) : CustomFoodSpotsPhotoRepository {
     override fun findOneByFoodSpots(foodSpotsId: Long): FoodSpotsPhoto? =
         kotlinJdslJpqlExecutor
-            .findAll(Pageable.ofSize(1)) {
+            .findOne {
                 select(entity(FoodSpotsPhoto::class))
                     .from(entity(FoodSpotsPhoto::class))
                     .where(
@@ -35,5 +35,5 @@ class CustomFoodSpotsPhotoRepositoryImpl(
                             .path(FoodSpots::id)
                             .eq(foodSpotsId),
                     ).orderBy(path(FoodSpotsPhoto::id).desc())
-            }.firstOrNull()
+            }
 }
