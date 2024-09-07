@@ -39,7 +39,7 @@ class RankingQueryServiceTest :
 
                 `when`("레디스의 데이터가 조회가 안되는 경우") {
                     every { listOperation.range(any(), any(), any()) } returns listOf()
-                    every { listOperation.rightPush(any(), any()) } returns 1L
+                    every { listOperation.rightPushAll(any(), *anyVararg()) } returns 1L
                     every { foodSpotsHistoryRepository.findAllUserReportCount() } returns createUserRankingResponse()
 
                     then("리포트 랭킹이 조회된다.") {
@@ -64,7 +64,7 @@ class RankingQueryServiceTest :
                 `when`("레디스의 데이터가 조회가 안되는 경우") {
                     every { redisTemplate.opsForList() } returns listOperation
                     every { listOperation.range(any(), any(), any()) } returns listOf()
-                    every { listOperation.rightPush(any(), any()) } returns 1L
+                    every { listOperation.rightPushAll(any(), *anyVararg()) } returns 1L
                     every { reviewRepository.findAllUserReviewCount() } returns createUserRankingResponse()
 
                     then("리뷰 랭킹이 조회된다.") {
@@ -89,7 +89,7 @@ class RankingQueryServiceTest :
                 `when`("레디스의 데이터가 null인 경우") {
                     every { redisTemplate.opsForList() } returns listOperation
                     every { listOperation.range(any(), any(), any()) } returns null
-                    every { listOperation.rightPush(any(), any()) } returns 1L
+                    every { listOperation.rightPushAll(any(), *anyVararg()) } returns 1L
                     every { reviewRepository.findAllUserLikeCount() } returns createUserRankingResponse()
 
                     then("리뷰 랭킹이 조회된다.") {
@@ -102,7 +102,7 @@ class RankingQueryServiceTest :
                 `when`("레디스의 데이터가 빈값인 경우") {
                     every { redisTemplate.opsForList() } returns listOperation
                     every { listOperation.range(any(), any(), any()) } returns listOf()
-                    every { listOperation.rightPush(any(), any()) } returns 1L
+                    every { listOperation.rightPushAll(any(), *anyVararg()) } returns 1L
                     every { reviewRepository.findAllUserLikeCount() } returns createUserRankingResponse()
 
                     then("리뷰 랭킹이 조회된다.") {

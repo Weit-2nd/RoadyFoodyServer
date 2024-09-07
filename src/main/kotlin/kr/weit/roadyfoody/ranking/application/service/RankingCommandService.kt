@@ -65,12 +65,11 @@ class RankingCommandService(
             redisTemplate.delete(key)
 
             val userRanking = dataProvider()
+            val rankingData = userRanking.map { "${it.userNickname}:${it.total}" }
 
-            userRanking.forEach {
-                redisTemplate
-                    .opsForList()
-                    .rightPush(key, "${it.userNickname}:${it.total}")
-            }
+            redisTemplate
+                .opsForList()
+                .rightPushAll(key, *rankingData.toTypedArray())
         }
     }
 }

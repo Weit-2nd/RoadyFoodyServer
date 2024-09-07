@@ -42,7 +42,7 @@ class RankingCommandServiceTest :
                     every { redisTemplate.delete("rofo:user-report-ranking") } returns true
                     every { foodSpotsHistoryRepository.findAllUserReportCount() } returns createUserRankingResponse()
                     every { redisTemplate.opsForList() } returns list
-                    every { list.rightPush(any(), any()) } returns 1L
+                    every { list.rightPushAll(any(), *anyVararg()) } returns 1L
 
                     then("레디스의 데이터가 정상적으로 업데이트된다.") {
                         rankingCommandService.updateReportRanking()
@@ -70,7 +70,7 @@ class RankingCommandServiceTest :
                     every { redisTemplate.delete("rofo:user-review-ranking") } returns true
                     every { reviewRepository.findAllUserReviewCount() } returns createUserRankingResponse()
                     every { redisTemplate.opsForList() } returns list
-                    every { list.rightPush(any(), any()) } returns 1L
+                    every { list.rightPushAll(any(), *anyVararg()) } returns 1L
 
                     then("레디스의 데이터가 정상적으로 업데이트된다.") {
                         rankingCommandService.updateReviewRanking()
@@ -98,7 +98,7 @@ class RankingCommandServiceTest :
                     every { redisTemplate.delete("rofo:user-like-ranking") } returns true
                     every { reviewRepository.findAllUserLikeCount() } returns createUserRankingResponse()
                     every { redisTemplate.opsForList() } returns list
-                    every { list.rightPush(any(), any()) } returns 1L
+                    every { list.rightPushAll(any(), *anyVararg()) } returns 1L
 
                     then("레디스의 데이터가 정상적으로 업데이트된다.") {
                         rankingCommandService.updateLikeRanking()
