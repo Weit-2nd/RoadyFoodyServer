@@ -27,8 +27,6 @@ interface FoodSpotsReviewRepository :
     JpaRepository<FoodSpotsReview, Long>,
     CustomFoodSpotsReviewRepository {
     fun findByUser(user: User): List<FoodSpotsReview>
-
-    fun findByFoodSpots(foodSpots: FoodSpots): List<FoodSpotsReview>
 }
 
 interface CustomFoodSpotsReviewRepository {
