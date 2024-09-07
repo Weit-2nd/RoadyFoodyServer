@@ -4,6 +4,7 @@ import REVIEW_LIKE_LOCK_KEY
 import jakarta.persistence.EntityManager
 import kr.weit.roadyfoody.global.annotation.DistributedLock
 import kr.weit.roadyfoody.review.application.dto.ToggleLikeResponse
+import kr.weit.roadyfoody.review.domain.FoodSpotsReview
 import kr.weit.roadyfoody.review.domain.ReviewLike
 import kr.weit.roadyfoody.review.domain.ReviewLikeId
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
@@ -37,5 +38,14 @@ class ReviewLikeCommandService(
         }
 
         return ToggleLikeResponse(reviewId, review.likeTotal, liked)
+    }
+
+    @Transactional
+    @DistributedLock(lockName = REVIEW_LIKE_LOCK_KEY, identifier = "reviewId")
+    fun decreaseLikeRock(
+        review: FoodSpotsReview,
+        reviewId: Long,
+    ) {
+        review.decreaseLike()
     }
 }
