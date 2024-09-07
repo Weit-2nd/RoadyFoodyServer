@@ -48,8 +48,8 @@ class RankingQueryService(
 
         return ranking?.takeIf { it.isNotEmpty() }?.map { score ->
             val data = score.split(":")
-            val userNickname = data.getOrNull(0) ?: ""
-            val total = data.getOrNull(1)?.toDoubleOrNull() ?: 0.0
+            val userNickname = data[0]
+            val total = data[1]
 
             UserRanking(
                 userNickname = userNickname,
