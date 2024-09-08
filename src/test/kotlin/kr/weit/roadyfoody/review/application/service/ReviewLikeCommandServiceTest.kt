@@ -31,7 +31,7 @@ class ReviewLikeCommandServiceTest :
                     reviewLikeRepository,
                     entityManager,
                 )
-            val review = createMockTestReview()
+            var review = createMockTestReview()
             afterEach { clearAllMocks() }
 
             given("toggleLike 테스트") {
@@ -83,7 +83,7 @@ class ReviewLikeCommandServiceTest :
             }
 
             given("decreaseLikeRock 테스트") {
-                var review = createMockTestReview(likeTotal = 0)
+                review = createMockTestReview(likeTotal = 0)
                 `when`("리뷰 좋아요 수가 0인 경우") {
                     then("리뷰 좋아요 수는 음수가 될 수 없다는 예외가 발생한다.") {
                         shouldThrow<RoadyFoodyBadRequestException> {
