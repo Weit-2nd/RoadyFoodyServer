@@ -111,4 +111,7 @@ enum class ErrorCode(
 
     // Admin API error 16000대
     DAILY_REPORT_COUNT_NEGATIVE(HttpStatus.BAD_REQUEST, -16000, "일일 리포트 생성 횟수는 양수 또는 0이여야 합니다."),
+
+    // RANKING API error 17000대
+    NOT_FOUND_FOOD_SPOTS_RANKING(HttpStatus.NOT_FOUND, -17001, "해당 랭킹이 존재하지 않습니다."),
 }
