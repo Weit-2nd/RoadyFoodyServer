@@ -5,6 +5,7 @@ import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsDetailResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsOperationHoursResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsReviewResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.RatingCountResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportCategoryResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoryDetailResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportOperationHoursResponse
@@ -159,6 +160,7 @@ class FoodSpotsQueryService(
     fun getFoodSpotsDetail(foodSpotsId: Long): FoodSpotsDetailResponse =
         foodSpotsRepository.getByFoodSpotsId(foodSpotsId).let { foodSpots ->
             val reviewAggregatedInfoResponse = reviewRepository.getReviewAggregatedInfo(foodSpots)
+            val ratingCountResponse = getRatingCount(reviewRepository.getRatingCount(foodSpotsId))
             val photosFutures =
                 foodSpotsHistoryRepository.getByFoodSpots(foodSpots).let {
                     foodSpotsPhotoRepository.findByHistoryIn(it).map { photo ->
@@ -177,6 +179,7 @@ class FoodSpotsQueryService(
                 determineOpenStatus(foodSpots),
                 foodSpotsPhotos,
                 reviewAggregatedInfoResponse,
+                ratingCountResponse,
             )
         }
 
@@ -222,5 +225,27 @@ class FoodSpotsQueryService(
             openingHours = "00:00",
             closingHours = "00:00",
         )
+    }
+
+    private fun getRatingCount(ratingCountResponses: MutableList<RatingCountResponse>): List<RatingCountResponse> {
+        var index = 0
+        if (ratingCountResponses.isEmpty()) {
+            for (i in 10 downTo 2 step 2) {
+                ratingCountResponses.add(RatingCountResponse(i, 0))
+            }
+        } else {
+            for (i in 10 downTo 2 step 2) {
+                if (index < ratingCountResponses.size) {
+                    val rating = ratingCountResponses[index].rating
+                    if (rating == i) {
+                        index++
+                        continue
+                    }
+                }
+                ratingCountResponses.add(index, RatingCountResponse(i, 0))
+                index++
+            }
+        }
+        return ratingCountResponses
     }
 }

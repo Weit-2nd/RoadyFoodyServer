@@ -10,6 +10,7 @@ import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsOperationHoursRespo
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsReviewResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.OperationHoursRequest
+import kr.weit.roadyfoody.foodSpots.application.dto.RatingCountResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportCategoryResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoryDetailResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportOperationHoursResponse
@@ -82,8 +83,8 @@ const val TEST_INVALID_FOOD_SPOTS_HISTORY_ID = -1L
 const val TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME = "request"
 const val TEST_FOOD_SPOTS_UPDATE_REQUEST_PHOTO = "reportPhotos"
 const val TEST_REST_DAILY_REPORT_CREATION_COUNT = 5
-const val TEST_AVERAGE_RATE = 4.5
-const val TEST_REVIEW_COUNT = 2L
+const val TEST_AVERAGE_RATE = 0.0
+const val TEST_REVIEW_COUNT = 0L
 
 fun createMockTestFoodSpot(
     id: Long = 0L,
@@ -459,10 +460,30 @@ fun createTestFoodSpotsDetailResponse(): FoodSpotsDetailResponse =
         OperationStatus.OPEN,
         listOf(createTestReportPhotoResponse()),
         createTestAggregatedInfoResponse(),
+        createTestRatingCountResponseList(),
     )
 
-fun createTestAggregatedInfoResponse(): ReviewAggregatedInfoResponse =
-    ReviewAggregatedInfoResponse(
-        TEST_AVERAGE_RATE,
-        TEST_REVIEW_COUNT,
+fun createTestAggregatedInfoResponse(
+    reviewAverage: Double = TEST_AVERAGE_RATE,
+    reviewCount: Long = TEST_REVIEW_COUNT,
+): ReviewAggregatedInfoResponse = ReviewAggregatedInfoResponse(reviewAverage, reviewCount)
+
+fun createTestRatingCountResponseList(
+    ratingTen: Int = 0,
+    ratingEight: Int = 0,
+    ratingSix: Int = 0,
+    ratingFour: Int = 0,
+    ratingTwo: Int = 0,
+): MutableList<RatingCountResponse> =
+    mutableListOf(
+        createTestRatingCountResponse(10, ratingTen),
+        createTestRatingCountResponse(8, ratingEight),
+        createTestRatingCountResponse(6, ratingSix),
+        createTestRatingCountResponse(4, ratingFour),
+        createTestRatingCountResponse(2, ratingTwo),
     )
+
+fun createTestRatingCountResponse(
+    rating: Int = 10,
+    count: Int = 0,
+): RatingCountResponse = RatingCountResponse(rating, count)

@@ -30,6 +30,7 @@ import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodHistory
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodOperationHours
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsForDistance
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsPhoto
+import kr.weit.roadyfoody.foodSpots.fixture.createTestRatingCountResponse
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportFoodCategory
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportOperationHours
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
@@ -388,20 +389,59 @@ class FoodSpotsQueryServiceTest :
                 every { foodSpotsPhotoRepository.findByHistoryIn(any()) } returns
                     listOf(createTestFoodSpotsPhoto())
                 every { imageService.getDownloadUrl(any()) } returns TEST_FOOD_SPOTS_PHOTO_URL
-                every { reviewRepository.getReviewAggregatedInfo(any()) } returns createTestAggregatedInfoResponse()
                 every { executor.execute(any()) } answers {
                     firstArg<Runnable>().run()
                 }
                 `when`("정상적인 데이터가 들어올 경우") {
+                    every { reviewRepository.getReviewAggregatedInfo(any()) } returns
+                        createTestAggregatedInfoResponse(
+                            7.3,
+                            3,
+                        )
+                    every { reviewRepository.getRatingCount(any()) } returns
+                        mutableListOf(
+                            createTestRatingCountResponse(10, 1),
+                            createTestRatingCountResponse(6, 2),
+                        )
                     then("정상적으로 음식점 상세가 조회되어야 한다.") {
-                        foodSPotsQueryService.getFoodSpotsDetail(TEST_FOOD_SPOT_ID)
+                        val response = foodSPotsQueryService.getFoodSpotsDetail(TEST_FOOD_SPOT_ID)
+                        response.ratingCount[0].count shouldBe 1
+                        response.ratingCount[1].count shouldBe 0
+                        response.ratingCount[2].count shouldBe 2
+                        response.ratingCount[3].count shouldBe 0
                         verify(exactly = 1) {
                             foodSpotsRepository.getByFoodSpotsId(any())
                             foodSpotsHistoryRepository.findByFoodSpots(any())
                             foodSpotsPhotoRepository.findByHistoryIn(any())
                             imageService.getDownloadUrl(any())
                             executor.execute(any())
+                            reviewRepository.getReviewAggregatedInfo(any())
+                            reviewRepository.getRatingCount(any())
                         }
+                    }
+                }
+
+                every { foodSpotsRepository.getByFoodSpotsId(any()) } returns MockTestFoodSpot()
+                every { foodSpotsHistoryRepository.findByFoodSpots(any()) } returns
+                    listOf(
+                        createTestFoodHistory(),
+                    )
+                every { foodSpotsPhotoRepository.findByHistoryIn(any()) } returns
+                    listOf(createTestFoodSpotsPhoto())
+                every { imageService.getDownloadUrl(any()) } returns TEST_FOOD_SPOTS_PHOTO_URL
+                every { executor.execute(any()) } answers {
+                    firstArg<Runnable>().run()
+                }
+                `when`("리뷰가 없는 경우") {
+                    every { reviewRepository.getReviewAggregatedInfo(any()) } returns createTestAggregatedInfoResponse()
+                    every { reviewRepository.getRatingCount(any()) } returns mutableListOf()
+                    then("별점 개수가 전부 0으로 조회되어야 한다.") {
+                        val response = foodSPotsQueryService.getFoodSpotsDetail(TEST_FOOD_SPOT_ID)
+                        response.ratingCount[0].count shouldBe 0
+                        response.ratingCount[1].count shouldBe 0
+                        response.ratingCount[2].count shouldBe 0
+                        response.ratingCount[3].count shouldBe 0
+                        response.ratingCount[4].count shouldBe 0
                     }
                 }
 

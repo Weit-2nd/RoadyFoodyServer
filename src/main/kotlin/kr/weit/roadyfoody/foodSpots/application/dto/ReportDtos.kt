@@ -339,12 +339,15 @@ data class FoodSpotsDetailResponse(
     val createdDateTime: LocalDateTime,
     @Schema(description = "가게 리뷰 정보")
     val reviewInfo: ReviewAggregatedInfoResponse,
+    @Schema(description = "별점 개수")
+    val ratingCount: List<RatingCountResponse>,
 ) {
     constructor(
         foodSpots: FoodSpots,
         openStatus: OperationStatus,
         foodSpotsPhotos: List<ReportPhotoResponse>,
         reviewInfo: ReviewAggregatedInfoResponse,
+        ratingCount: List<RatingCountResponse>,
     ) :
         this(
             id = foodSpots.id,
@@ -364,6 +367,7 @@ data class FoodSpotsDetailResponse(
             foodSpotsPhotos = foodSpotsPhotos,
             createdDateTime = foodSpots.createdDateTime,
             reviewInfo = reviewInfo,
+            ratingCount = ratingCount,
         )
 }
 
@@ -407,4 +411,13 @@ data class ReviewAggregatedInfoResponse(
         ((avgRating ?: 0.0) * 10).toInt() / 10.0f,
         reviewCount ?: 0,
     )
+}
+
+data class RatingCountResponse(
+    @Schema(description = "별점")
+    val rating: Int,
+    @Schema(description = "개수")
+    val count: Int,
+) {
+    constructor(rating: Int, count: Long) : this(rating, count.toInt())
 }
