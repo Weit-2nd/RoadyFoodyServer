@@ -36,7 +36,7 @@ class AuthEventHandler(
         foodSpotsCommandService.deleteWithdrawUserReport(user)
         reviewLikeRepository
             .getByUser(user)
-            .forEach { reviewLikeCommandService.decreaseLikeRock(it, it.id) }
+            .forEach { reviewLikeCommandService.decreaseLikeLock(it, it.id) }
         reviewLikeRepository.deleteByUser(user)
         reviewCommandService.deleteWithdrewUserReview(user)
         rewardsCommandService.deleteAllUserRewards(user)
