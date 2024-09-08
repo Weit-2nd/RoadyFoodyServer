@@ -73,4 +73,33 @@ interface RankingControllerSpec {
         @RequestParam(defaultValue = "10")
         size: Long,
     ): List<UserRanking>
+
+    @ApiErrorCodeExamples(
+        [
+            ErrorCode.SIZE_NON_POSITIVE,
+        ],
+    )
+    @Operation(
+        description = "리뷰 좋아요 랭킹 조회 API",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "리뷰 좋아요 랭킹 조회 성공",
+                content = [
+                    Content(
+                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                        schema =
+                            Schema(
+                                implementation = UserRanking::class,
+                            ),
+                    ),
+                ],
+            ),
+        ],
+    )
+    fun getLikeRanking(
+        @Positive(message = "size는 양수여야 합니다")
+        @RequestParam(defaultValue = "10")
+        size: Long,
+    ): List<UserRanking>
 }

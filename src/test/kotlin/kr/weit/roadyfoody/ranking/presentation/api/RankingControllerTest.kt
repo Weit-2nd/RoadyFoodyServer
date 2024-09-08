@@ -72,5 +72,31 @@ class RankingControllerTest(
                     }
                 }
             }
+
+            given("GET $requestPath/like") {
+                val response = createUserRankingResponse()
+                every {
+                    rankingQueryService.getLikeRanking(any())
+                } returns response
+                `when`("정상적인 데이터가 들어올 경우") {
+                    then("좋아요 랭킹 리스트가 조회된다.") {
+                        mockMvc
+                            .perform(
+                                getWithAuth("$requestPath/like")
+                                    .param("size", "$TEST_PAGE_SIZE"),
+                            ).andExpect(status().isOk)
+                    }
+                }
+
+                `when`("size가 음수가 들어올 경우") {
+                    then("400을 반환한다") {
+                        mockMvc
+                            .perform(
+                                getWithAuth("$requestPath/like")
+                                    .param("size", "-1"),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+            }
         },
     )

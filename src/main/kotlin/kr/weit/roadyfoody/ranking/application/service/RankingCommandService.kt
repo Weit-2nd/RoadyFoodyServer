@@ -2,6 +2,8 @@ package kr.weit.roadyfoody.ranking.application.service
 
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
 import kr.weit.roadyfoody.ranking.dto.UserRanking
+import kr.weit.roadyfoody.ranking.utils.LIKE_RANKING_KEY
+import kr.weit.roadyfoody.ranking.utils.LIKE_RANKING_UPDATE_LOCK
 import kr.weit.roadyfoody.ranking.utils.REPORT_RANKING_KEY
 import kr.weit.roadyfoody.ranking.utils.REPORT_RANKING_UPDATE_LOCK
 import kr.weit.roadyfoody.ranking.utils.REVIEW_RANKING_KEY
@@ -42,7 +44,17 @@ class RankingCommandService(
         )
     }
 
-    private fun updateRanking(
+    @Async("asyncTask")
+    @Scheduled(cron = "0 0 5 * * *")
+    fun updateLikeRanking() {
+        updateRanking(
+            lockName = LIKE_RANKING_UPDATE_LOCK,
+            key = LIKE_RANKING_KEY,
+            dataProvider = reviewRepository::findAllUserLikeCount,
+        )
+    }
+
+    fun updateRanking(
         lockName: String,
         key: String,
         dataProvider: () -> List<UserRanking>,
@@ -53,16 +65,11 @@ class RankingCommandService(
             redisTemplate.delete(key)
 
             val userRanking = dataProvider()
+            val rankingData = userRanking.map { "${it.userNickname}:${it.total}" }
 
-            userRanking.forEach {
-                redisTemplate
-                    .opsForZSet()
-                    .add(
-                        key,
-                        it.userNickname,
-                        it.total.toDouble(),
-                    )
-            }
+            redisTemplate
+                .opsForList()
+                .rightPushAll(key, rankingData)
         }
     }
 }
