@@ -129,11 +129,13 @@ class CustomFoodSpotsReviewRepositoryImpl(
     override fun findAllUserLikeCount(): List<UserRanking> =
         kotlinJdslJpqlExecutor
             .findList {
-                val userPath = path(FoodSpotsReview::user)
-                val userIdPath = path(FoodSpotsReview::user)(User::id)
-                val userNicknamePath = path(FoodSpotsReview::user)(User::profile)(Profile::nickname)
-                val likeTotalPath = path(FoodSpotsReview::likeTotal)
+                val foodSpotsReview = entity(FoodSpotsReview::class, "foodSpotsReview")
+                val userPath = foodSpotsReview(FoodSpotsReview::user)
+                val userNicknamePath = userPath(User::profile)(Profile::nickname)
+                val likeTotalPath = foodSpotsReview(FoodSpotsReview::likeTotal)
+                val userIdPath = foodSpotsReview(FoodSpotsReview::user)(User::id)
                 val createdAtPath = path(ReviewLike::createdDateTime)
+                val reviewUserPath = path(ReviewLike::review)(FoodSpotsReview::user)
 
                 val subQuery =
                     select<LocalDateTime>(
@@ -141,19 +143,21 @@ class CustomFoodSpotsReviewRepositoryImpl(
                     ).from(
                         entity(ReviewLike::class),
                     ).where(
-                        userPath.eq(path(ReviewLike::review)(FoodSpotsReview::user)),
+                        reviewUserPath.eq(userPath),
                     ).asSubquery()
 
                 selectNew<UserRanking>(
                     userNicknamePath,
                     sum(likeTotalPath),
                 ).from(
-                    entity(FoodSpotsReview::class),
-                ).groupBy(userIdPath, userNicknamePath)
-                    .orderBy(
-                        sum(likeTotalPath).desc(),
-                        subQuery.asc(),
-                    )
+                    foodSpotsReview,
+                ).groupBy(
+                    userIdPath,
+                    userNicknamePath,
+                ).orderBy(
+                    sum(likeTotalPath).desc(),
+                    subQuery.asc(),
+                )
             }
 
     private fun Jpql.dynamicOrder(sortType: ReviewSortType): Array<Sortable> =
