@@ -42,7 +42,7 @@ class ReviewLikeCommandService(
 
     @Transactional
     @DistributedLock(lockName = REVIEW_LIKE_LOCK_KEY, identifier = "reviewId")
-    fun decreaseLikeRock(
+    fun decreaseLikeLock(
         review: FoodSpotsReview,
         reviewId: Long,
     ) {
