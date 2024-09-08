@@ -359,8 +359,8 @@ fun createFoodSpotsSearchResponse(): FoodSpotsSearchResponse =
         foodCategories = createTestFoodSpotsFoodCategories().map { it.foodCategory.name },
         createdDateTime = LocalDateTime.of(2024, 1, 1, 1, 1),
         imageUrl = TEST_FOOD_SPOTS_PHOTO_URL,
-        reviewCount = TEST_REVIEW_COUNT.toInt(),
-        averageRating = TEST_AVERAGE_RATE,
+        reviewCount = TEST_REVIEW_COUNT,
+        averageRating = TEST_AVERAGE_RATE.toFloat(),
     )
 
 fun createFoodSpotsSearchResponses(size: Int = 2): FoodSpotsSearchResponses =
