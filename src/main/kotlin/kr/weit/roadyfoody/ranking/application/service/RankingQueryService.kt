@@ -64,10 +64,11 @@ class RankingQueryService(
     ): List<UserRanking> {
         val userRanking = dataProvider()
 
-        val rankingData = userRanking.map { "${it.userNickname}:${it.total}" }
+        val rankingData = userRanking.map { "${it.userNickname}:${it.total}" }.toList()
+
         redisTemplate
             .opsForList()
-            .rightPushAll(key, *rankingData.toTypedArray())
+            .rightPushAll(key, rankingData)
 
         return userRanking
     }
