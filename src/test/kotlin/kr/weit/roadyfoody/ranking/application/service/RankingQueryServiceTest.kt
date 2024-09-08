@@ -1,11 +1,13 @@
 package kr.weit.roadyfoody.ranking.application.service
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
+import kr.weit.roadyfoody.ranking.exception.RankingNotFoundException
 import kr.weit.roadyfoody.ranking.fixture.createUserRankingResponse
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
 import org.springframework.data.redis.core.ListOperations
@@ -18,7 +20,9 @@ class RankingQueryServiceTest :
             val redisTemplate = mockk<RedisTemplate<String, String>>()
             val foodSpotsHistoryRepository = mockk<FoodSpotsHistoryRepository>()
             val reviewRepository = mockk<FoodSpotsReviewRepository>()
-            val rankingQueryService = RankingQueryService(redisTemplate, foodSpotsHistoryRepository, reviewRepository)
+            val rankingCommandService = mockk<RankingCommandService>()
+            val rankingQueryService =
+                RankingQueryService(redisTemplate, foodSpotsHistoryRepository, reviewRepository, rankingCommandService)
 
             val listOperation = mockk<ListOperations<String, String>>()
             val list = listOf("user1:10", "user2:20", "user3:15")
@@ -42,10 +46,8 @@ class RankingQueryServiceTest :
                     every { listOperation.rightPushAll(any(), any<List<String>>()) } returns 1L
                     every { foodSpotsHistoryRepository.findAllUserReportCount() } returns createUserRankingResponse()
 
-                    then("리포트 랭킹이 조회된다.") {
-                        rankingQueryService.getReportRanking(10)
-                        verify(exactly = 1) { listOperation.range(any(), any(), any()) }
-                        verify(exactly = 1) { foodSpotsHistoryRepository.findAllUserReportCount() }
+                    then("예외가 발생한다.") {
+                        shouldThrow<RankingNotFoundException> { rankingQueryService.getReportRanking(10) }
                     }
                 }
             }
@@ -67,10 +69,8 @@ class RankingQueryServiceTest :
                     every { listOperation.rightPushAll(any(), any<List<String>>()) } returns 1L
                     every { reviewRepository.findAllUserReviewCount() } returns createUserRankingResponse()
 
-                    then("리뷰 랭킹이 조회된다.") {
-                        rankingQueryService.getReviewRanking(10)
-                        verify(exactly = 1) { listOperation.range(any(), any(), any()) }
-                        verify(exactly = 1) { reviewRepository.findAllUserReviewCount() }
+                    then("예외가 발생한다.") {
+                        shouldThrow<RankingNotFoundException> { rankingQueryService.getReviewRanking(10) }
                     }
                 }
             }
@@ -92,10 +92,8 @@ class RankingQueryServiceTest :
                     every { listOperation.rightPushAll(any(), any<List<String>>()) } returns 1L
                     every { reviewRepository.findAllUserLikeCount() } returns createUserRankingResponse()
 
-                    then("리뷰 랭킹이 조회된다.") {
-                        rankingQueryService.getLikeRanking(10)
-                        verify(exactly = 1) { listOperation.range(any(), any(), any()) }
-                        verify(exactly = 1) { reviewRepository.findAllUserLikeCount() }
+                    then("예외가 발생한다.") {
+                        shouldThrow<RankingNotFoundException> { rankingQueryService.getLikeRanking(10) }
                     }
                 }
 
@@ -105,10 +103,8 @@ class RankingQueryServiceTest :
                     every { listOperation.rightPushAll(any(), any<List<String>>()) } returns 1L
                     every { reviewRepository.findAllUserLikeCount() } returns createUserRankingResponse()
 
-                    then("리뷰 랭킹이 조회된다.") {
-                        rankingQueryService.getLikeRanking(10)
-                        verify(exactly = 1) { listOperation.range(any(), any(), any()) }
-                        verify(exactly = 1) { reviewRepository.findAllUserLikeCount() }
+                    then("예외가 발생한다.") {
+                        shouldThrow<RankingNotFoundException> { rankingQueryService.getLikeRanking(10) }
                     }
                 }
             }

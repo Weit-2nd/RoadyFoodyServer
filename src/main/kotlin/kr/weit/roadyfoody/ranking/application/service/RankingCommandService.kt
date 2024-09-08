@@ -54,7 +54,7 @@ class RankingCommandService(
         )
     }
 
-    private fun updateRanking(
+    fun updateRanking(
         lockName: String,
         key: String,
         dataProvider: () -> List<UserRanking>,
