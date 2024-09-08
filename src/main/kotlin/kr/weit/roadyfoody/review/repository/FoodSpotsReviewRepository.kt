@@ -11,12 +11,14 @@ import kr.weit.roadyfoody.global.utils.findList
 import kr.weit.roadyfoody.global.utils.getSlice
 import kr.weit.roadyfoody.ranking.dto.UserRanking
 import kr.weit.roadyfoody.review.domain.FoodSpotsReview
+import kr.weit.roadyfoody.review.domain.ReviewLike
 import kr.weit.roadyfoody.review.exception.FoodSpotsReviewNotFoundException
 import kr.weit.roadyfoody.user.domain.Profile
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.jpa.repository.JpaRepository
+import java.time.LocalDateTime
 
 fun FoodSpotsReviewRepository.getReviewByReviewId(reviewId: Long): FoodSpotsReview =
     findById(reviewId).orElseThrow {
@@ -47,6 +49,8 @@ interface CustomFoodSpotsReviewRepository {
     fun getReviewAggregatedInfo(foodSpots: FoodSpots): ReviewAggregatedInfoResponse
 
     fun findAllUserReviewCount(): List<UserRanking>
+
+    fun findAllUserLikeCount(): List<UserRanking>
 }
 
 class CustomFoodSpotsReviewRepositoryImpl(
@@ -120,6 +124,40 @@ class CustomFoodSpotsReviewRepositoryImpl(
                         count(reviewIdPath).desc(),
                         max(createdAtPath).asc(),
                     )
+            }
+
+    override fun findAllUserLikeCount(): List<UserRanking> =
+        kotlinJdslJpqlExecutor
+            .findList {
+                val foodSpotsReview = entity(FoodSpotsReview::class, "foodSpotsReview")
+                val userPath = foodSpotsReview(FoodSpotsReview::user)
+                val userNicknamePath = userPath(User::profile)(Profile::nickname)
+                val likeTotalPath = foodSpotsReview(FoodSpotsReview::likeTotal)
+                val userIdPath = foodSpotsReview(FoodSpotsReview::user)(User::id)
+                val createdAtPath = path(ReviewLike::createdDateTime)
+                val reviewUserPath = path(ReviewLike::review)(FoodSpotsReview::user)
+
+                val subQuery =
+                    select<LocalDateTime>(
+                        max(createdAtPath),
+                    ).from(
+                        entity(ReviewLike::class),
+                    ).where(
+                        reviewUserPath.eq(userPath),
+                    ).asSubquery()
+
+                selectNew<UserRanking>(
+                    userNicknamePath,
+                    sum(likeTotalPath),
+                ).from(
+                    foodSpotsReview,
+                ).groupBy(
+                    userIdPath,
+                    userNicknamePath,
+                ).orderBy(
+                    sum(likeTotalPath).desc(),
+                    subQuery.asc(),
+                )
             }
 
     private fun Jpql.dynamicOrder(sortType: ReviewSortType): Array<Sortable> =

@@ -11,6 +11,7 @@ import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpots
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
 import kr.weit.roadyfoody.global.TEST_PAGE_SIZE
 import kr.weit.roadyfoody.review.domain.FoodSpotsReview
+import kr.weit.roadyfoody.review.domain.ReviewLike
 import kr.weit.roadyfoody.review.exception.FoodSpotsReviewNotFoundException
 import kr.weit.roadyfoody.support.annotation.RepositoryTest
 import kr.weit.roadyfoody.user.domain.User
@@ -22,20 +23,26 @@ class FoodSpotsReviewRepositoryTest(
     private val userRepository: UserRepository,
     private val foodSpotsRepository: FoodSpotsRepository,
     private val reviewRepository: FoodSpotsReviewRepository,
+    private val reviewLikeRepository: ReviewLikeRepository,
 ) : DescribeSpec(
         {
             lateinit var user: User
             lateinit var otherUser: User
+            lateinit var testUser: User
             lateinit var foodSpots: FoodSpots
             lateinit var otherFoodSpots: FoodSpots
+            lateinit var testFoodSpots: FoodSpots
             lateinit var noReviewsFoodSpots: FoodSpots
             lateinit var reviewList: List<FoodSpotsReview>
             beforeEach {
                 user = userRepository.save(createTestUser(0L))
                 otherUser = userRepository.save(createTestUser(0L, "otherUser"))
+                testUser = userRepository.save(createTestUser(0L, "testUser"))
                 foodSpots = foodSpotsRepository.save(createTestFoodSpots())
                 otherFoodSpots = foodSpotsRepository.save(createTestFoodSpots())
+                testFoodSpots = foodSpotsRepository.save(createTestFoodSpots())
                 noReviewsFoodSpots = foodSpotsRepository.save(createTestFoodSpots())
+
                 reviewList =
                     reviewRepository.saveAll(
                         listOf(
@@ -43,8 +50,16 @@ class FoodSpotsReviewRepositoryTest(
                             createTestFoodSpotsReview(user, otherFoodSpots, 10),
                             createTestFoodSpotsReview(otherUser, foodSpots, 4),
                             createTestFoodSpotsReview(user, otherFoodSpots, 10),
+                            createTestFoodSpotsReview(testUser, testFoodSpots, 4),
                         ),
                     )
+
+                reviewLikeRepository.saveAll(
+                    listOf(
+                        ReviewLike(reviewRepository.save(createTestFoodSpotsReview(otherUser, testFoodSpots, 4)), user),
+                        ReviewLike(reviewRepository.save(createTestFoodSpotsReview(testUser, testFoodSpots, 4)), otherUser),
+                    ),
+                )
             }
 
             describe("findByUser 메소드는") {
@@ -60,7 +75,7 @@ class FoodSpotsReviewRepositoryTest(
                     it("해당 리스트 모두 삭제한다.") {
                         val reviews = reviewRepository.findByUser(user)
                         reviewRepository.deleteAll(reviews)
-                        reviewRepository.findAll().size shouldBe 1
+                        reviewRepository.findAll().size shouldBe 4
                     }
                 }
             }
@@ -197,12 +212,31 @@ class FoodSpotsReviewRepositoryTest(
             describe("findAllUserReviewCount 메소드는") {
                 it("전체 회원의 닉네임과 리뷰 개수를 정렬하여 리스트로 반환한다") {
                     val userReportCounts = reviewRepository.findAllUserReviewCount()
-                    userReportCounts.size shouldBe 2
+                    userReportCounts.size shouldBe 3
                     userReportCounts[0].userNickname shouldBe "existentNick"
                     userReportCounts[0].total shouldBe 3
 
                     userReportCounts[1].userNickname shouldBe "otherUser"
-                    userReportCounts[1].total shouldBe 1
+                    userReportCounts[1].total shouldBe 2
+
+                    userReportCounts[2].userNickname shouldBe "testUser"
+                    userReportCounts[2].total shouldBe 2
+                }
+            }
+
+            describe("findAllUserLikeCount 메소드는") {
+                it("전체 회원의 닉네임과 좋아요 개수를 정렬하여 리스트로 반환한다") {
+                    val userLikeCounts = reviewRepository.findAllUserLikeCount()
+                    userLikeCounts.size shouldBe 3
+
+                    userLikeCounts[0].userNickname shouldBe "existentNick"
+                    userLikeCounts[0].total shouldBe 3
+
+                    userLikeCounts[1].userNickname shouldBe "otherUser"
+                    userLikeCounts[1].total shouldBe 2
+
+                    userLikeCounts[2].userNickname shouldBe "testUser"
+                    userLikeCounts[2].total shouldBe 2
                 }
             }
         },
