@@ -81,5 +81,23 @@ class ReviewLikeCommandServiceTest :
                     }
                 }
             }
+
+            given("decreaseLikeRock 테스트") {
+                var review = createMockTestReview(likeTotal = 0)
+                `when`("리뷰 좋아요 수가 0인 경우") {
+                    then("리뷰 좋아요 수는 음수가 될 수 없다는 예외가 발생한다.") {
+                        shouldThrow<RoadyFoodyBadRequestException> {
+                            reviewLikeService.decreaseLikeRock(review, review.id)
+                        }.message shouldBe ErrorCode.NEGATIVE_NUMBER_OF_LIKED.errorMessage
+                    }
+                }
+                `when`("리뷰 좋아요 수가 2인 경우") {
+                    review = createMockTestReview(likeTotal = 2)
+                    then("리뷰 좋아요 수는 1이 된다.") {
+                        reviewLikeService.decreaseLikeRock(review, review.id)
+                        review.likeTotal shouldBe 1
+                    }
+                }
+            }
         },
     )
