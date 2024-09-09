@@ -8,19 +8,26 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import io.mockk.spyk
 import io.mockk.verify
+import kr.weit.roadyfoody.foodSpots.domain.DayOfWeek
 import kr.weit.roadyfoody.foodSpots.exception.FoodSpotsHistoryNotFoundException
 import kr.weit.roadyfoody.foodSpots.fixture.MockTestFoodSpot
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_HISTORY_ID
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_PHOTO_URL
+import kr.weit.roadyfoody.foodSpots.fixture.TEST_OPERATION_HOURS_CLOSE
+import kr.weit.roadyfoody.foodSpots.fixture.TEST_OPERATION_HOURS_OPEN
 import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodHistory
+import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodSpot
 import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodSpotList
 import kr.weit.roadyfoody.foodSpots.fixture.createTestAggregatedInfoResponse
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodHistory
+import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodOperationHours
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsForDistance
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsPhoto
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportFoodCategory
@@ -43,6 +50,8 @@ import kr.weit.roadyfoody.review.repository.getByReview
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import kr.weit.roadyfoody.user.repository.UserRepository
+import java.time.LocalDate
+import java.time.temporal.ChronoField
 import java.util.Optional
 import java.util.concurrent.ExecutorService
 
@@ -72,6 +81,7 @@ class FoodSpotsQueryServiceTest :
                     reviewPhotoRepository,
                     executor,
                 )
+
             afterEach { clearAllMocks() }
 
             given("searchFoodSpots 테스트") {
@@ -93,6 +103,8 @@ class FoodSpotsQueryServiceTest :
                             emptyList(),
                         )
                     } returns createMockTestFoodSpotList()
+                    every { foodSpotsPhotoRepository.findOneByFoodSpots(any()) } returns null
+                    every { reviewRepository.getReviewAggregatedInfo(any()) } returns createTestAggregatedInfoResponse()
                     then("500m 거리 이내 음식점을 반환한다.") {
 
                         val foodSpotsSearchResponses =
@@ -127,10 +139,8 @@ class FoodSpotsQueryServiceTest :
                             emptyList(),
                         )
                     } returns createTestFoodSpotsForDistance()
-                    every {
-                        userRepository.save(any())
-                    } returns createTestUser(coin = 800)
-
+                    every { foodSpotsPhotoRepository.findOneByFoodSpots(any()) } returns null
+                    every { reviewRepository.getReviewAggregatedInfo(any()) } returns createTestAggregatedInfoResponse()
                     then("1000m 거리 이내 음식점을 반환한다.") {
                         val foodSpotsSearchResponses =
                             foodSPotsQueryService.searchFoodSpots(query1000m)
@@ -165,7 +175,8 @@ class FoodSpotsQueryServiceTest :
                             listOf(1L, 2L),
                         )
                     } returns listOf(MockTestFoodSpot())
-
+                    every { foodSpotsPhotoRepository.findOneByFoodSpots(any()) } returns null
+                    every { reviewRepository.getReviewAggregatedInfo(any()) } returns createTestAggregatedInfoResponse()
                     then("카테고리 별 500m 거리 이내 음식점을 반환한다.") {
                         val foodSpotsSearchResponses =
                             foodSPotsQueryService.searchFoodSpots(categoryQuery)
@@ -181,6 +192,86 @@ class FoodSpotsQueryServiceTest :
                         }
                     }
                 }
+
+                `when`("금일 영업중인 음식점이 존재할 경우") {
+                    mockkStatic(LocalDate::class)
+                    every { LocalDate.now() } returns LocalDate.of(2021, 1, 1) // 금요일
+
+                    val day = DayOfWeek.of(LocalDate.now().get(ChronoField.DAY_OF_WEEK) - 1)
+                    every {
+                        foodSpotsRepository.findFoodSpotsByPointWithinRadius(
+                            0.0,
+                            0.0,
+                            500,
+                            null,
+                            emptyList(),
+                        )
+                    } returns
+                        listOf(
+                            createMockTestFoodSpot(
+                                operationHours =
+                                    mutableListOf(
+                                        createTestFoodOperationHours(
+                                            dayOfWeek = day,
+                                            openingHours = TEST_OPERATION_HOURS_OPEN,
+                                            closingHours = TEST_OPERATION_HOURS_CLOSE,
+                                        ),
+                                    ),
+                            ),
+                        )
+                    every { foodSpotsPhotoRepository.findOneByFoodSpots(any()) } returns null
+                    every { reviewRepository.getReviewAggregatedInfo(any()) } returns createTestAggregatedInfoResponse()
+                    then("금일 영업시간을 반환한다.") {
+                        val foodSpotsSearchResponses =
+                            foodSPotsQueryService.searchFoodSpots(query500m)
+                        foodSpotsSearchResponses.items.first().operationHours.run {
+                            dayOfWeek shouldBe day
+                            openingHours shouldBe TEST_OPERATION_HOURS_OPEN
+                            closingHours shouldBe TEST_OPERATION_HOURS_CLOSE
+                        }
+                    }
+                }
+
+                `when`("금일 영업중인 음식점이 존재하지 않을 경우") {
+                    mockkStatic(LocalDate::class)
+                    every { LocalDate.now() } returns LocalDate.of(2021, 1, 1) // 금요일
+
+                    val day = DayOfWeek.of(LocalDate.now().get(ChronoField.DAY_OF_WEEK) - 1)
+                    val otherDay = DayOfWeek.of(LocalDate.now().get(ChronoField.DAY_OF_WEEK))
+                    every {
+                        foodSpotsRepository.findFoodSpotsByPointWithinRadius(
+                            0.0,
+                            0.0,
+                            500,
+                            null,
+                            emptyList(),
+                        )
+                    } returns
+                        listOf(
+                            createMockTestFoodSpot(
+                                operationHours =
+                                    mutableListOf(
+                                        createTestFoodOperationHours(
+                                            dayOfWeek = otherDay,
+                                            openingHours = TEST_OPERATION_HOURS_CLOSE,
+                                            closingHours = TEST_OPERATION_HOURS_OPEN,
+                                        ),
+                                    ),
+                            ),
+                        )
+                    every { foodSpotsPhotoRepository.findOneByFoodSpots(any()) } returns null
+                    every { reviewRepository.getReviewAggregatedInfo(any()) } returns createTestAggregatedInfoResponse()
+                    then("시작, 종료 시간이 00:00 인 응답을 반환한다.") {
+                        val foodSpotsSearchResponses =
+                            foodSPotsQueryService.searchFoodSpots(query500m)
+                        foodSpotsSearchResponses.items.first().operationHours.run {
+                            dayOfWeek shouldBe day
+                            openingHours shouldBe "00:00"
+                            closingHours shouldBe "00:00"
+                        }
+                    }
+                }
+
                 `when`("반환할 가게가 없는 경우") {
                     every {
                         foodSpotsRepository.findFoodSpotsByPointWithinRadius(

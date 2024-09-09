@@ -3,6 +3,7 @@ package kr.weit.roadyfoody.foodSpots.application.service
 import kr.weit.roadyfoody.badge.domain.Badge
 import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsDetailResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsOperationHoursResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsReviewResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportCategoryResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoryDetailResponse
@@ -67,13 +68,21 @@ class FoodSpotsQueryService(
         val foodSpotsSearchResponses =
             result.map { foodSpots ->
                 val openValue: OperationStatus = determineOpenStatus(foodSpots)
+                val foodSpotsPhoto = foodSpotsPhotoRepository.findOneByFoodSpots(foodSpots.id)
+                val (averageRating, reviewCount) = reviewRepository.getReviewAggregatedInfo(foodSpots)
+
                 FoodSpotsSearchResponse(
                     id = foodSpots.id,
                     name = foodSpots.name,
                     longitude = foodSpots.point.x,
                     latitude = foodSpots.point.y,
                     open = openValue,
+                    operationHours = getTodayOperationHoursResponse(foodSpots),
                     foodCategories = foodSpots.foodCategoryList.map { it.foodCategory.name },
+                    foodTruck = foodSpots.foodTruck,
+                    imageUrl = foodSpotsPhoto?.let { imageService.getDownloadUrl(it.fileName) },
+                    averageRating = averageRating,
+                    reviewCount = reviewCount,
                     createdDateTime = foodSpots.createdDateTime,
                 )
             }
@@ -194,5 +203,24 @@ class FoodSpotsQueryService(
         } else {
             OperationStatus.TEMPORARILY_CLOSED
         }
+    }
+
+    private fun getTodayOperationHoursResponse(foodSpot: FoodSpots): FoodSpotsOperationHoursResponse {
+        val today = LocalDate.now()
+        val dayOfWeekValue = today.get(ChronoField.DAY_OF_WEEK) - 1
+        val dayOfWeek = DayOfWeek.of(dayOfWeekValue)
+
+        return foodSpot.operationHoursList
+            .firstOrNull { it.dayOfWeek == dayOfWeek }
+            ?.let { operationHours ->
+                return FoodSpotsOperationHoursResponse(
+                    operationHours,
+                )
+            } ?: FoodSpotsOperationHoursResponse(
+            foodSpotsId = foodSpot.id,
+            dayOfWeek = dayOfWeek,
+            openingHours = "00:00",
+            closingHours = "00:00",
+        )
     }
 }
