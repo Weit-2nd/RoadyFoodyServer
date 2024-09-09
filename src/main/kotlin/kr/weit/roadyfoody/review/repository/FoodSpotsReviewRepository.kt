@@ -125,7 +125,7 @@ class CustomFoodSpotsReviewRepositoryImpl(
                 ).from(entity(FoodSpotsReview::class))
                     .whereAnd(
                         path(FoodSpotsReview::foodSpots)(FoodSpots::id).equal(foodSpotsId),
-                        path(FoodSpotsReview::rate).`in`(2, 4, 6, 8, 10),
+                        ratePath.`in`(2, 4, 6, 8, 10),
                     ).groupBy(ratePath)
                     .orderBy(ratePath.desc())
             }
