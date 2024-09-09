@@ -34,4 +34,4 @@ fun <T : Any> KotlinJdslJpqlExecutor.getPage(
 fun <T : Any> KotlinJdslJpqlExecutor.findList(init: Jpql.() -> JpqlQueryable<SelectQuery<T>>): List<T> = findAll(init) as List<T>
 
 fun <T : Any> KotlinJdslJpqlExecutor.findMutableList(init: Jpql.() -> JpqlQueryable<SelectQuery<T>>): MutableList<T> =
-    findAll(init) as MutableList<T>
+    findAll(init).filterNotNull().toMutableList()

@@ -83,6 +83,7 @@ const val TEST_FOOD_SPOTS_UPDATE_REQUEST_PHOTO = "reportPhotos"
 const val TEST_REST_DAILY_REPORT_CREATION_COUNT = 5
 const val TEST_AVERAGE_RATE = 0.0
 const val TEST_REVIEW_COUNT = 0L
+const val TEST_RATING = 5
 
 fun createMockTestFoodSpot(
     id: Long = 0L,
@@ -461,21 +462,21 @@ fun createTestAggregatedInfoResponse(
 ): ReviewAggregatedInfoResponse = ReviewAggregatedInfoResponse(reviewAverage, reviewCount)
 
 fun createTestRatingCountResponseList(
-    ratingTen: Int = 0,
-    ratingEight: Int = 0,
-    ratingSix: Int = 0,
+    ratingFIve: Int = 0,
     ratingFour: Int = 0,
+    ratingThree: Int = 0,
     ratingTwo: Int = 0,
+    ratingOne: Int = 0,
 ): MutableList<RatingCountResponse> =
     mutableListOf(
-        createTestRatingCountResponse(10, ratingTen),
-        createTestRatingCountResponse(8, ratingEight),
-        createTestRatingCountResponse(6, ratingSix),
+        createTestRatingCountResponse(5, ratingFIve),
         createTestRatingCountResponse(4, ratingFour),
+        createTestRatingCountResponse(3, ratingThree),
         createTestRatingCountResponse(2, ratingTwo),
+        createTestRatingCountResponse(1, ratingOne),
     )
 
 fun createTestRatingCountResponse(
-    rating: Int = 10,
+    rating: Int = TEST_RATING,
     count: Int = 0,
 ): RatingCountResponse = RatingCountResponse(rating, count)
