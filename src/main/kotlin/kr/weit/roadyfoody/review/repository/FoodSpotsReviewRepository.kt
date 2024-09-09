@@ -54,7 +54,7 @@ interface CustomFoodSpotsReviewRepository {
 
     fun findAllUserLikeCount(): List<UserRanking>
 
-    fun getRatingCount(foodSpotsId: Long): MutableList<RatingCountResponse>
+    fun getRatingCount(foodSpotsId: Long): List<RatingCountResponse>
 }
 
 class CustomFoodSpotsReviewRepositoryImpl(
@@ -94,7 +94,6 @@ class CustomFoodSpotsReviewRepositoryImpl(
                 .whereAnd(
                     dynamicLastId(sortType, lastId),
                     path(FoodSpotsReview::foodSpots)(FoodSpots::id).equal(foodSpotsId),
-                    path(FoodSpotsReview::rate).`in`(2, 4, 6, 8, 10),
                     badge?.let { path(FoodSpotsReview::user)(User::badge).equal(badge) },
                 ).orderBy(
                     *dynamicOrder(sortType),
@@ -111,24 +110,26 @@ class CustomFoodSpotsReviewRepositoryImpl(
                 ).from(entity(FoodSpotsReview::class))
                     .whereAnd(
                         path(FoodSpotsReview::foodSpots).equal(foodSpots),
-                        path(FoodSpotsReview::rate).`in`(2, 4, 6, 8, 10),
                     )
             }.first()!!
 
-    override fun getRatingCount(foodSpotsId: Long): MutableList<RatingCountResponse> =
-        kotlinJdslJpqlExecutor
-            .findMutableList {
-                val ratePath = path(FoodSpotsReview::rate)
-                selectNew<RatingCountResponse>(
-                    ratePath,
-                    count(ratePath),
-                ).from(entity(FoodSpotsReview::class))
-                    .whereAnd(
-                        path(FoodSpotsReview::foodSpots)(FoodSpots::id).equal(foodSpotsId),
-                        path(FoodSpotsReview::rate).`in`(2, 4, 6, 8, 10),
-                    ).groupBy(ratePath)
-                    .orderBy(ratePath.desc())
-            }
+    override fun getRatingCount(foodSpotsId: Long): List<RatingCountResponse> {
+        val ratingCountResponses =
+            kotlinJdslJpqlExecutor
+                .findMutableList {
+                    val ratePath = path(FoodSpotsReview::rate)
+                    selectNew<RatingCountResponse>(
+                        ratePath,
+                        count(ratePath),
+                    ).from(entity(FoodSpotsReview::class))
+                        .whereAnd(
+                            path(FoodSpotsReview::foodSpots)(FoodSpots::id).equal(foodSpotsId),
+                        ).groupBy(ratePath)
+                        .orderBy(ratePath.desc())
+                }
+
+        return fillMissingRatings(ratingCountResponses)
+    }
 
     override fun findAllUserReviewCount(): List<UserRanking> =
         kotlinJdslJpqlExecutor
@@ -222,6 +223,28 @@ class CustomFoodSpotsReviewRepositoryImpl(
                     .from(entity(FoodSpotsReview::class))
                     .where(path(FoodSpotsReview::id).equal(lastId))
             }.firstNotNullOf { it }
+
+    private fun fillMissingRatings(ratingCountResponses: MutableList<RatingCountResponse>): List<RatingCountResponse> {
+        var index = 0
+        if (ratingCountResponses.isEmpty()) {
+            for (i in 5 downTo 1) {
+                ratingCountResponses.add(RatingCountResponse(i, 0))
+            }
+        } else {
+            for (i in 5 downTo 1) {
+                if (index < ratingCountResponses.size) {
+                    val rating = ratingCountResponses[index].rating
+                    if (rating == i) {
+                        index++
+                        continue
+                    }
+                }
+                ratingCountResponses.add(index, RatingCountResponse(i, 0))
+                index++
+            }
+        }
+        return ratingCountResponses
+    }
 }
 
 enum class ReviewSortType {

@@ -46,13 +46,11 @@ class FoodSpotsReviewRepositoryTest(
                 reviewList =
                     reviewRepository.saveAll(
                         listOf(
-                            createTestFoodSpotsReview(user, foodSpots, 10),
-                            createTestFoodSpotsReview(user, otherFoodSpots, 10),
-                            createTestFoodSpotsReview(otherUser, foodSpots, 4),
-                            createTestFoodSpotsReview(user, otherFoodSpots, 10),
-                            createTestFoodSpotsReview(testUser, testFoodSpots, 4),
-                            createTestFoodSpotsReview(user, foodSpots, 0, 0),
-                            createTestFoodSpotsReview(user, foodSpots, 3, 0),
+                            createTestFoodSpotsReview(user, foodSpots, 5),
+                            createTestFoodSpotsReview(user, otherFoodSpots, 5),
+                            createTestFoodSpotsReview(otherUser, foodSpots, 2),
+                            createTestFoodSpotsReview(user, otherFoodSpots, 5),
+                            createTestFoodSpotsReview(testUser, testFoodSpots, 2),
                         ),
                     )
 
@@ -67,7 +65,7 @@ class FoodSpotsReviewRepositoryTest(
             describe("findByUser 메소드는") {
                 context("리뷰를 작성한 사용자를 받는 경우") {
                     it("해당 사용자의 리뷰 리스트를 반환한다.") {
-                        reviewRepository.findByUser(user).size shouldBe 5
+                        reviewRepository.findByUser(user).size shouldBe 3
                     }
                 }
             }
@@ -116,7 +114,7 @@ class FoodSpotsReviewRepositoryTest(
                                 user,
                                 TEST_PAGE_SIZE,
                                 null,
-                            ).content.size shouldBe 5
+                            ).content.size shouldBe 3
                     }
                 }
             }
@@ -198,7 +196,7 @@ class FoodSpotsReviewRepositoryTest(
                     it("해당 음식점의 리뷰 평균 별점과 리뷰 개수를 반환한다.") {
                         val reviewAggregatedInfoResponse =
                             reviewRepository.getReviewAggregatedInfo(foodSpots)
-                        reviewAggregatedInfoResponse shouldBe ReviewAggregatedInfoResponse(7.0, 2)
+                        reviewAggregatedInfoResponse shouldBe ReviewAggregatedInfoResponse(3.5, 2)
                     }
                 }
 
@@ -216,7 +214,7 @@ class FoodSpotsReviewRepositoryTest(
                     val userReportCounts = reviewRepository.findAllUserReviewCount()
                     userReportCounts.size shouldBe 3
                     userReportCounts[0].userNickname shouldBe "existentNick"
-                    userReportCounts[0].total shouldBe 5
+                    userReportCounts[0].total shouldBe 3
 
                     userReportCounts[1].userNickname shouldBe "otherUser"
                     userReportCounts[1].total shouldBe 2
@@ -246,11 +244,12 @@ class FoodSpotsReviewRepositoryTest(
                 context("음식점 ID를 받는 경우") {
                     it("해당 음식점의 별점 개수를 반환한다.") {
                         val ratingCountResponses = reviewRepository.getRatingCount(foodSpots.id)
-                        ratingCountResponses.size shouldBe 2
-                        ratingCountResponses[0].rating shouldBe 10
-                        ratingCountResponses[0].count shouldBe 1
-                        ratingCountResponses[1].rating shouldBe 4
-                        ratingCountResponses[1].count shouldBe 1
+                        ratingCountResponses.size shouldBe 5
+                        val countList = listOf(1, 0, 0, 1, 0)
+                        for (i in ratingCountResponses.indices) {
+                            ratingCountResponses[i].rating shouldBe 5 - i
+                            ratingCountResponses[i].count shouldBe countList[i]
+                        }
                     }
                 }
             }

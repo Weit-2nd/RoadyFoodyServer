@@ -30,7 +30,7 @@ import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodHistory
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodOperationHours
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsForDistance
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsPhoto
-import kr.weit.roadyfoody.foodSpots.fixture.createTestRatingCountResponse
+import kr.weit.roadyfoody.foodSpots.fixture.createTestRatingCountResponseList
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportFoodCategory
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportOperationHours
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
@@ -399,16 +399,18 @@ class FoodSpotsQueryServiceTest :
                             3,
                         )
                     every { reviewRepository.getRatingCount(any()) } returns
-                        mutableListOf(
-                            createTestRatingCountResponse(10, 1),
-                            createTestRatingCountResponse(6, 2),
+                        createTestRatingCountResponseList(
+                            1,
+                            0,
+                            2,
+                            0,
+                            0,
                         )
                     then("정상적으로 음식점 상세가 조회되어야 한다.") {
                         val response = foodSPotsQueryService.getFoodSpotsDetail(TEST_FOOD_SPOT_ID)
                         response.ratingCount[0].count shouldBe 1
-                        response.ratingCount[1].count shouldBe 0
                         response.ratingCount[2].count shouldBe 2
-                        response.ratingCount[3].count shouldBe 0
+                        response.ratingCount.shouldHaveSize(5)
                         verify(exactly = 1) {
                             foodSpotsRepository.getByFoodSpotsId(any())
                             foodSpotsHistoryRepository.findByFoodSpots(any())
@@ -434,14 +436,11 @@ class FoodSpotsQueryServiceTest :
                 }
                 `when`("리뷰가 없는 경우") {
                     every { reviewRepository.getReviewAggregatedInfo(any()) } returns createTestAggregatedInfoResponse()
-                    every { reviewRepository.getRatingCount(any()) } returns mutableListOf()
+                    every { reviewRepository.getRatingCount(any()) } returns createTestRatingCountResponseList()
                     then("별점 개수가 전부 0으로 조회되어야 한다.") {
                         val response = foodSPotsQueryService.getFoodSpotsDetail(TEST_FOOD_SPOT_ID)
-                        response.ratingCount[0].count shouldBe 0
-                        response.ratingCount[1].count shouldBe 0
-                        response.ratingCount[2].count shouldBe 0
-                        response.ratingCount[3].count shouldBe 0
-                        response.ratingCount[4].count shouldBe 0
+                        response.ratingCount.forEach { it.count shouldBe 0 }
+                        response.ratingCount.shouldHaveSize(5)
                     }
                 }
 

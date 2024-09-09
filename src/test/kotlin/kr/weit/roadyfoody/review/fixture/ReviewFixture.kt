@@ -18,12 +18,12 @@ import java.time.LocalDateTime
 
 const val TEST_FOOD_SPOT_ID = 1L
 const val TEST_REVIEW_CONTENT = "testReview"
-const val TEST_REVIEW_RATING = 10
+const val TEST_REVIEW_RATING = 5
 const val TEST_REVIEW_REQUEST_NAME = "reviewRequest"
 const val TEST_REVIEW_CONTENT_MAX_LENGTH = 1200
 const val TEST_INVALID_FOOD_SPOT_ID = -1L
-const val TEST_INVALID_RATING = -1
-const val TEST_INVALID_RATING_OVER = 11
+const val TEST_INVALID_RATING = 0
+const val TEST_INVALID_RATING_OVER = 6
 const val TEST_REVIEW_REQUEST_PHOTO = "reviewPhotos"
 const val TEST_REVIEW_ID = 1L
 const val TEST_REVIEW_PHOTO_URL = "reviewPhotoUrl"
