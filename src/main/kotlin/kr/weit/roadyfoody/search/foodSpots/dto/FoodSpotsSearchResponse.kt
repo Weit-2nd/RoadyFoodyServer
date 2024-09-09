@@ -1,6 +1,7 @@
 package kr.weit.roadyfoody.search.foodSpots.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
+import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsOperationHoursResponse
 import java.time.LocalDateTime
 
 @Schema(description = "음식점 검색 응답 데이터")
@@ -15,8 +16,18 @@ data class FoodSpotsSearchResponse(
     val latitude: Double,
     @Schema(description = "영업 상태")
     val open: OperationStatus,
+    @Schema(description = "금일 영업 시간")
+    val operationHours: FoodSpotsOperationHoursResponse,
     @Schema(description = "음식 카테고리 목록")
     val foodCategories: List<String>,
+    @Schema(description = "음식점 이미지 URL")
+    val imageUrl: String?,
+    @Schema(description = "푸드트럭 여부")
+    val foodTruck: Boolean,
+    @Schema(description = "리뷰 평균 별점")
+    val averageRating: Float,
+    @Schema(description = "리뷰 개수")
+    val reviewCount: Long,
     @Schema(description = "음식점 생성 일자")
     val createdDateTime: LocalDateTime,
 )
