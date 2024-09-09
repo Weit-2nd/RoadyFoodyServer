@@ -1,10 +1,12 @@
 package kr.weit.roadyfoody.foodSpots.fixture
 
+import TEST_FOOD_SPOT_ID
 import createMockSliceReview
 import createTestReviewPhotoResponse
 import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodCategoryResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsDetailResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsOperationHoursResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsReviewResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.OperationHoursRequest
@@ -340,28 +342,34 @@ class MockTestFoodSpotsHistory(
     override var createdDateTime: LocalDateTime = LocalDateTime.now()
 }
 
-fun createFoodSpotsSearchResponses(): FoodSpotsSearchResponses =
+fun createTestFoodSpotsOperationHoursResponse(
+    foodSpots: FoodSpots = createTestFoodSpots(),
+    dayOfWeek: DayOfWeek = DayOfWeek.MON,
+    openingHours: String = TEST_OPERATION_HOURS_OPEN,
+    closingHours: String = TEST_OPERATION_HOURS_CLOSE,
+) = FoodSpotsOperationHoursResponse(createTestFoodOperationHours(foodSpots, dayOfWeek, openingHours, closingHours))
+
+fun createFoodSpotsSearchResponse(): FoodSpotsSearchResponse =
+    FoodSpotsSearchResponse(
+        id = TEST_FOOD_SPOT_ID,
+        name = TEST_FOOD_SPOT_NAME,
+        longitude = TEST_FOOD_SPOT_LONGITUDE,
+        latitude = TEST_FOOD_SPOT_LATITUDE,
+        foodTruck = true,
+        open = OperationStatus.OPEN,
+        operationHours = createTestFoodSpotsOperationHoursResponse(),
+        foodCategories = createTestFoodSpotsFoodCategories().map { it.foodCategory.name },
+        createdDateTime = LocalDateTime.of(2024, 1, 1, 1, 1),
+        imageUrl = TEST_FOOD_SPOTS_PHOTO_URL,
+        reviewCount = TEST_REVIEW_COUNT,
+        averageRating = TEST_AVERAGE_RATE.toFloat(),
+    )
+
+fun createFoodSpotsSearchResponses(size: Int = 2): FoodSpotsSearchResponses =
     FoodSpotsSearchResponses(
-        listOf(
-            FoodSpotsSearchResponse(
-                id = 1L,
-                name = "name",
-                longitude = 1.0,
-                latitude = 1.0,
-                open = OperationStatus.OPEN,
-                foodCategories = listOf("category1", "category2"),
-                createdDateTime = LocalDateTime.of(2024, 1, 1, 1, 1),
-            ),
-            FoodSpotsSearchResponse(
-                id = 2L,
-                name = "name",
-                longitude = 1.0,
-                latitude = 1.0,
-                open = OperationStatus.OPEN,
-                foodCategories = listOf("category1", "category2"),
-                createdDateTime = LocalDateTime.of(2024, 1, 1, 1, 1),
-            ),
-        ),
+        List(size) {
+            createFoodSpotsSearchResponse()
+        },
     )
 
 fun createFoodCategoryResponse(foodCategory: FoodCategory = createTestFoodCategory()): FoodCategoryResponse =

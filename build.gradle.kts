@@ -112,8 +112,6 @@ tasks.getByName<Jar>("jar") {
 
 // https://github.com/Ninja-Squad/springmockk/blob/master/README.md#gotchas
 tasks.test {
-    jvmArgs(
-        "--add-opens",
-        "java.base/java.lang.reflect=ALL-UNNAMED",
-    )
+    jvmArgs("--add-opens", "java.base/java.lang.reflect=ALL-UNNAMED")
+    jvmArgs("--add-opens", "java.base/java.time=ALL-UNNAMED")
 }

@@ -33,5 +33,12 @@ fun <T : Any> KotlinJdslJpqlExecutor.getPage(
 
 fun <T : Any> KotlinJdslJpqlExecutor.findList(init: Jpql.() -> JpqlQueryable<SelectQuery<T>>): List<T> = findAll(init) as List<T>
 
+private val SINGLE_RESULT_PAGEABLE = Pageable.ofSize(1)
+
+// 3.5.2 버전부턴 findAll 의 parameter 에 limit 이 추가됩니다.
+// 참고 : https://github.com/line/kotlin-jdsl/releases/tag/3.5.2
+fun <T : Any> KotlinJdslJpqlExecutor.findOne(init: Jpql.() -> JpqlQueryable<SelectQuery<T>>): T? =
+    findAll(pageable = SINGLE_RESULT_PAGEABLE, init).firstOrNull()
+
 fun <T : Any> KotlinJdslJpqlExecutor.findMutableList(init: Jpql.() -> JpqlQueryable<SelectQuery<T>>): MutableList<T> =
     findAll(init).filterNotNull().toMutableList()
