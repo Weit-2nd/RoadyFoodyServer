@@ -232,11 +232,11 @@ class CustomFoodSpotsReviewRepositoryImpl(
                     entity(User::class),
                     leftJoin(foodSpotsHistory).on(foodSpotsHistory(FoodSpotsHistory::user)(User::id).eq(path(User::id))),
                     leftJoin(
-                        reviewLike,
-                    ).on(reviewLike(ReviewLike::review)(FoodSpotsReview::id).eq(foodSpotsHistory(FoodSpotsHistory::id))),
-                    leftJoin(
                         foodSpotsReview,
                     ).on(foodSpotsReview(FoodSpotsReview::user)(User::id).eq(path(User::id))),
+                    leftJoin(
+                        reviewLike,
+                    ).on(reviewLike(ReviewLike::review)(FoodSpotsReview::id).eq(foodSpotsReview(FoodSpotsReview::id))),
                 ).groupBy(
                     path(User::id),
                     path(User::profile)(Profile::nickname),
