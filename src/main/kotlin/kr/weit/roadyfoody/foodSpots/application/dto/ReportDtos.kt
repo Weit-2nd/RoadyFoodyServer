@@ -413,11 +413,20 @@ data class ReviewAggregatedInfoResponse(
     )
 }
 
-data class RatingCountResponse(
+data class CountRate(
     @Schema(description = "별점")
     val rating: Int,
     @Schema(description = "개수")
     val count: Int,
 ) {
     constructor(rating: Int, count: Long) : this(rating, count.toInt())
+}
+
+data class RatingCountResponse(
+    @Schema(description = "별점")
+    val rating: Int,
+    @Schema(description = "개수")
+    val count: Int,
+) {
+    constructor(countRate: CountRate) : this(countRate.rating, countRate.count)
 }
