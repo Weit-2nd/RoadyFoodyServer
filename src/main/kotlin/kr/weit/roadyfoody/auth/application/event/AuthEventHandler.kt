@@ -5,6 +5,9 @@ import kr.weit.roadyfoody.badge.repository.UserPromotionRewardHistoryRepository
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsCommandService
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.review.application.service.ReviewCommandService
+import kr.weit.roadyfoody.review.application.service.ReviewLikeCommandService
+import kr.weit.roadyfoody.review.repository.ReviewLikeRepository
+import kr.weit.roadyfoody.review.repository.getLikedReviewByUser
 import kr.weit.roadyfoody.rewards.application.service.RewardsCommandService
 import kr.weit.roadyfoody.user.repository.UserRepository
 import kr.weit.roadyfoody.user.repository.getByUserId
@@ -22,6 +25,8 @@ class AuthEventHandler(
     private val jwtUtil: JwtUtil,
     private val rewardsCommandService: RewardsCommandService,
     private val userPromotionRewardHistoryRepository: UserPromotionRewardHistoryRepository,
+    private val reviewLikeCommandService: ReviewLikeCommandService,
+    private val reviewLikeRepository: ReviewLikeRepository,
 ) {
     // TODO : 각 도메인 개발 상황에 따라 기능을 추가해주세요.
     @EventListener(AuthLeaveEvent::class)
@@ -29,6 +34,10 @@ class AuthEventHandler(
         val user = userRepository.getByUserId(event.userId)
         userAgreedTermRepository.deleteAllByUser(user)
         foodSpotsCommandService.deleteWithdrawUserReport(user)
+        reviewLikeRepository
+            .getLikedReviewByUser(user)
+            .forEach { reviewLikeCommandService.decreaseLikeLock(it, it.id) }
+        reviewLikeRepository.deleteByUser(user)
         reviewCommandService.deleteWithdrewUserReview(user)
         rewardsCommandService.deleteAllUserRewards(user)
         userPromotionRewardHistoryRepository.deleteAllByUser(user)

@@ -5,10 +5,12 @@ import com.linecorp.kotlinjdsl.querymodel.jpql.predicate.Predicate
 import com.linecorp.kotlinjdsl.querymodel.jpql.sort.Sortable
 import com.linecorp.kotlinjdsl.support.spring.data.jpa.repository.KotlinJdslJpqlExecutor
 import kr.weit.roadyfoody.badge.domain.Badge
+import kr.weit.roadyfoody.foodSpots.application.dto.CountRate
 import kr.weit.roadyfoody.foodSpots.application.dto.ReviewAggregatedInfoResponse
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
 import kr.weit.roadyfoody.global.utils.findList
+import kr.weit.roadyfoody.global.utils.findMutableList
 import kr.weit.roadyfoody.global.utils.getSlice
 import kr.weit.roadyfoody.ranking.dto.UserRanking
 import kr.weit.roadyfoody.review.domain.FoodSpotsReview
@@ -52,6 +54,8 @@ interface CustomFoodSpotsReviewRepository {
     fun findAllUserReviewCount(): List<UserRanking>
 
     fun findAllUserLikeCount(): List<UserRanking>
+
+    fun getRatingCount(foodSpotsId: Long): List<CountRate>
 
     fun findAllUserTotalCount(): List<UserRanking>
 }
@@ -107,8 +111,28 @@ class CustomFoodSpotsReviewRepositoryImpl(
                     avg(path(FoodSpotsReview::rate)),
                     count(path(FoodSpotsReview::id)),
                 ).from(entity(FoodSpotsReview::class))
-                    .where(path(FoodSpotsReview::foodSpots).equal(foodSpots))
+                    .whereAnd(
+                        path(FoodSpotsReview::foodSpots).equal(foodSpots),
+                    )
             }.first()!!
+
+    override fun getRatingCount(foodSpotsId: Long): List<CountRate> {
+        val countRates =
+            kotlinJdslJpqlExecutor
+                .findMutableList {
+                    val ratePath = path(FoodSpotsReview::rate)
+                    selectNew<CountRate>(
+                        ratePath,
+                        count(ratePath),
+                    ).from(entity(FoodSpotsReview::class))
+                        .whereAnd(
+                            path(FoodSpotsReview::foodSpots)(FoodSpots::id).equal(foodSpotsId),
+                        ).groupBy(ratePath)
+                        .orderBy(ratePath.desc())
+                }
+
+        return fillMissingRatings(countRates)
+    }
 
     override fun findAllUserReviewCount(): List<UserRanking> =
         kotlinJdslJpqlExecutor
@@ -261,6 +285,28 @@ class CustomFoodSpotsReviewRepositoryImpl(
                     .from(entity(FoodSpotsReview::class))
                     .where(path(FoodSpotsReview::id).equal(lastId))
             }.firstNotNullOf { it }
+
+    private fun fillMissingRatings(countRates: MutableList<CountRate>): List<CountRate> {
+        var index = 0
+        if (countRates.isEmpty()) {
+            for (i in 5 downTo 1) {
+                countRates.add(CountRate(i, 0))
+            }
+        } else {
+            for (i in 5 downTo 1) {
+                if (index < countRates.size) {
+                    val rating = countRates[index].rating
+                    if (rating == i) {
+                        index++
+                        continue
+                    }
+                }
+                countRates.add(index, CountRate(i, 0))
+                index++
+            }
+        }
+        return countRates
+    }
 }
 
 enum class ReviewSortType {

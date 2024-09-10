@@ -39,3 +39,6 @@ private val SINGLE_RESULT_PAGEABLE = Pageable.ofSize(1)
 // 참고 : https://github.com/line/kotlin-jdsl/releases/tag/3.5.2
 fun <T : Any> KotlinJdslJpqlExecutor.findOne(init: Jpql.() -> JpqlQueryable<SelectQuery<T>>): T? =
     findAll(pageable = SINGLE_RESULT_PAGEABLE, init).firstOrNull()
+
+fun <T : Any> KotlinJdslJpqlExecutor.findMutableList(init: Jpql.() -> JpqlQueryable<SelectQuery<T>>): MutableList<T> =
+    findAll(init).filterNotNull().toMutableList()
