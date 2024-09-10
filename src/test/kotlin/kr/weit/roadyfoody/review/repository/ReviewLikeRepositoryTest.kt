@@ -66,10 +66,10 @@ class ReviewLikeRepositoryTest(
                 }
             }
 
-            describe("getByUser 메소드는") {
+            describe("getLikedReviewByUser 메소드는") {
                 context("유저를 받는 경우") {
                     it("유저가 좋아요한 리뷰를 반환한다.") {
-                        reviewLikeRepository.getByUser(user) shouldBe listOf(review)
+                        reviewLikeRepository.getLikedReviewByUser(user) shouldBe listOf(review)
                     }
                 }
             }
