@@ -108,5 +108,38 @@ class RankingQueryServiceTest :
                     }
                 }
             }
+            given("getTotalRanking 테스트") {
+                `when`("레디스의 데이터를 조회한 경우") {
+                    every { redisTemplate.opsForList() } returns listOperation
+                    every { listOperation.range(any(), any(), any()) } returns list
+
+                    then("종합 랭킹이 조회된다.") {
+                        rankingQueryService.getTotalRanking(10)
+                        verify(exactly = 1) { listOperation.range(any(), any(), any()) }
+                    }
+                }
+
+                `when`("레디스의 데이터가 null인 경우") {
+                    every { redisTemplate.opsForList() } returns listOperation
+                    every { listOperation.range(any(), any(), any()) } returns null
+                    every { listOperation.rightPushAll(any(), any<List<String>>()) } returns 1L
+                    every { reviewRepository.findAllUserTotalCount() } returns createUserRankingResponse()
+
+                    then("예외가 발생한다.") {
+                        shouldThrow<RankingNotFoundException> { rankingQueryService.getTotalRanking(10) }
+                    }
+                }
+
+                `when`("레디스의 데이터가 빈값인 경우") {
+                    every { redisTemplate.opsForList() } returns listOperation
+                    every { listOperation.range(any(), any(), any()) } returns listOf()
+                    every { listOperation.rightPushAll(any(), any<List<String>>()) } returns 1L
+                    every { reviewRepository.findAllUserTotalCount() } returns createUserRankingResponse()
+
+                    then("예외가 발생한다.") {
+                        shouldThrow<RankingNotFoundException> { rankingQueryService.getTotalRanking(10) }
+                    }
+                }
+            }
         },
     )

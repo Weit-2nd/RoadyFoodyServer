@@ -239,5 +239,21 @@ class FoodSpotsReviewRepositoryTest(
                     userLikeCounts[2].total shouldBe 2
                 }
             }
+
+            describe("findAllUserTotalCount 메소드는") {
+                it("전체 회원의 종합 랭킹을 리스트로 반환한다") {
+                    val userTotalCounts = reviewRepository.findAllUserTotalCount()
+                    userTotalCounts.size shouldBe 3
+
+                    userTotalCounts[0].userNickname shouldBe "existentNick"
+                    userTotalCounts[0].total shouldBe 6
+
+                    userTotalCounts[1].userNickname shouldBe "otherUser"
+                    userTotalCounts[1].total shouldBe 4
+
+                    userTotalCounts[2].userNickname shouldBe "testUser"
+                    userTotalCounts[2].total shouldBe 4
+                }
+            }
         },
     )

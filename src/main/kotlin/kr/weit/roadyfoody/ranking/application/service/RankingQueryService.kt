@@ -9,6 +9,8 @@ import kr.weit.roadyfoody.ranking.utils.REPORT_RANKING_KEY
 import kr.weit.roadyfoody.ranking.utils.REPORT_RANKING_UPDATE_LOCK
 import kr.weit.roadyfoody.ranking.utils.REVIEW_RANKING_KEY
 import kr.weit.roadyfoody.ranking.utils.REVIEW_RANKING_UPDATE_LOCK
+import kr.weit.roadyfoody.ranking.utils.TOTAL_RANKING_KEY
+import kr.weit.roadyfoody.ranking.utils.TOTAL_RANKING_UPDATE_LOCK
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
@@ -43,6 +45,14 @@ class RankingQueryService(
             size = size,
             key = LIKE_RANKING_KEY,
             dataProvider = reviewRepository::findAllUserLikeCount,
+        )
+
+    fun getTotalRanking(size: Long): List<UserRanking> =
+        getRanking(
+            lockName = TOTAL_RANKING_UPDATE_LOCK,
+            size = size,
+            key = TOTAL_RANKING_KEY,
+            dataProvider = reviewRepository::findAllUserTotalCount,
         )
 
     private fun getRanking(

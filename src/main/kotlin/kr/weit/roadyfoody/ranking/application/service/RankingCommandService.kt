@@ -8,6 +8,8 @@ import kr.weit.roadyfoody.ranking.utils.REPORT_RANKING_KEY
 import kr.weit.roadyfoody.ranking.utils.REPORT_RANKING_UPDATE_LOCK
 import kr.weit.roadyfoody.ranking.utils.REVIEW_RANKING_KEY
 import kr.weit.roadyfoody.ranking.utils.REVIEW_RANKING_UPDATE_LOCK
+import kr.weit.roadyfoody.ranking.utils.TOTAL_RANKING_KEY
+import kr.weit.roadyfoody.ranking.utils.TOTAL_RANKING_UPDATE_LOCK
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
 import org.redisson.api.RLock
 import org.redisson.api.RedissonClient
@@ -51,6 +53,16 @@ class RankingCommandService(
             lockName = LIKE_RANKING_UPDATE_LOCK,
             key = LIKE_RANKING_KEY,
             dataProvider = reviewRepository::findAllUserLikeCount,
+        )
+    }
+
+    @Async("asyncTask")
+    @Scheduled(cron = "0 0 5 * * *")
+    fun updateTotalRanking() {
+        updateRanking(
+            lockName = TOTAL_RANKING_UPDATE_LOCK,
+            key = TOTAL_RANKING_KEY,
+            dataProvider = reviewRepository::findAllUserTotalCount,
         )
     }
 

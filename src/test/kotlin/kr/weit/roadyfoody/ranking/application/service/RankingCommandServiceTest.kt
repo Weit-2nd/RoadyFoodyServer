@@ -115,5 +115,33 @@ class RankingCommandServiceTest :
                     }
                 }
             }
+
+            given("updateTotalRanking 테스트") {
+                every { redissonClient.getLock(any<String>()) } returns lock
+                afterEach { clearMocks(reviewRepository) }
+
+                `when`("Lock을 획득한 경우") {
+                    every { lock.tryLock(0, 10, TimeUnit.MINUTES) } returns true
+
+                    every { redisTemplate.delete("rofo:user-total-ranking") } returns true
+                    every { reviewRepository.findAllUserTotalCount() } returns createUserRankingResponse()
+                    every { redisTemplate.opsForList() } returns list
+                    every { list.rightPushAll(any(), any<List<String>>()) } returns 1L
+
+                    then("레디스의 데이터가 정상적으로 업데이트된다.") {
+                        rankingCommandService.updateTotalRanking()
+                        verify(exactly = 1) { reviewRepository.findAllUserTotalCount() }
+                    }
+                }
+
+                `when`("Lock을 획득하지 못한 경우") {
+                    every { lock.tryLock(0, 10, TimeUnit.MINUTES) } returns false
+
+                    then("레디스의 데이터가 업데이트되지 않는다.") {
+                        rankingCommandService.updateTotalRanking()
+                        verify(exactly = 0) { reviewRepository.findAllUserTotalCount() }
+                    }
+                }
+            }
         },
     )
