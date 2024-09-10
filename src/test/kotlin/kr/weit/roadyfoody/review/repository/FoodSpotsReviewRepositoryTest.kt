@@ -262,10 +262,10 @@ class FoodSpotsReviewRepositoryTest(
                     userTotalCounts[0].userNickname shouldBe "existentNick"
                     userTotalCounts[0].total shouldBe 6
 
-                    userTotalCounts[1].userNickname shouldBe "testUser"
+                    userTotalCounts[1].userNickname shouldBe "otherUser"
                     userTotalCounts[1].total shouldBe 4
 
-                    userTotalCounts[2].userNickname shouldBe "otherUser"
+                    userTotalCounts[2].userNickname shouldBe "testUser"
                     userTotalCounts[2].total shouldBe 4
                 }
             }

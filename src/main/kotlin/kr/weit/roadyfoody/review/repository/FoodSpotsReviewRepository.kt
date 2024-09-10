@@ -215,14 +215,14 @@ class CustomFoodSpotsReviewRepositoryImpl(
                     ).where(foodSpotsHistory(FoodSpotsHistory::user)(User::id).eq(entity(User::class)(User::id)))
                         .asSubquery()
 
-//                val latestDate =
-//                    customExpression(
-//                        LocalDateTime::class,
-//                        "GREATEST(" +
-//                            "COALESCE(MAX(foodSpotsReview.createdDateTime),TO_TIMESTAMP('1970-12-31 23:59:59'))," +
-//                            "COALESCE(MAX(foodSpotsHistory.createdDateTime),TO_TIMESTAMP('1970-12-31 23:59:59'))," +
-//                            "COALESCE(MAX(reviewLike.createdDateTime),TO_TIMESTAMP('1970-12-31 23:59:59')))",
-//                    )
+                val latestDate =
+                    customExpression(
+                        LocalDateTime::class,
+                        """GREATEST(
+                            COALESCE(MAX(foodSpotsReview.createdDateTime),TO_TIMESTAMP('1970-12-31 23:59:59')),
+                            COALESCE(MAX(foodSpotsHistory.createdDateTime),TO_TIMESTAMP('1970-12-31 23:59:59')),
+                            COALESCE(MAX(reviewLike.createdDateTime),TO_TIMESTAMP('1970-12-31 23:59:59')))""",
+                    )
 
                 val total = expression(Long::class, "total")
                 selectNew<UserRanking>(
@@ -242,7 +242,7 @@ class CustomFoodSpotsReviewRepositoryImpl(
                     path(User::profile)(Profile::nickname),
                 ).orderBy(
                     total.desc(),
-                    //   latestDate.asc(),
+                    latestDate.asc(),
                 )
             }
 
