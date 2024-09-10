@@ -227,7 +227,9 @@ class CustomFoodSpotsReviewRepositoryImpl(
                 val latestDate =
                     customExpression(
                         LocalDateTime::class,
-                        """MAX(foodSpotsReview.createdDateTime),MAX(foodSpotsHistory.createdDateTime),MAX(reviewLike.createdDateTime)""",
+                        """GREATEST(
+                            MAX(foodSpotsReview.createdDateTime),MAX(foodSpotsHistory.createdDateTime),MAX(reviewLike.createdDateTime)
+                            )""",
                     )
 
                 val total = expression(Long::class, "total")
