@@ -21,6 +21,7 @@ import kr.weit.roadyfoody.user.domain.User
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.jpa.repository.JpaRepository
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 fun FoodSpotsReviewRepository.getReviewByReviewId(reviewId: Long): FoodSpotsReview =
@@ -215,22 +216,23 @@ class CustomFoodSpotsReviewRepositoryImpl(
                     ).where(foodSpotsHistory(FoodSpotsHistory::user)(User::id).eq(entity(User::class)(User::id)))
                         .asSubquery()
 
+                val latestDate =
+                    customExpression(
+                        LocalDate::class,
+                        """GREATEST(
+                            COALESCE(MAX(foodSpotsReview.createdDateTime),TO_DATE('1970-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS')),
+                            COALESCE(MAX(foodSpotsHistory.createdDateTime),TO_DATE('1970-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS')),
+                            COALESCE(MAX(reviewLike.createdDateTime),TO_DATE('1970-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'))""",
+                    )
+
 //                val latestDate =
 //                    customExpression(
 //                        LocalDateTime::class,
 //                        """GREATEST(
-//                            COALESCE(MAX(foodSpotsReview.createdDateTime),TO_TIMESTAMP('1970-12-31 23:59:59')),
-//                            COALESCE(MAX(foodSpotsHistory.createdDateTime),TO_TIMESTAMP('1970-12-31 23:59:59')),
-//                            COALESCE(MAX(reviewLike.createdDateTime),TO_TIMESTAMP('1970-12-31 23:59:59')))""",
+//                            COALESCE(MAX(foodSpotsReview.createdDateTime),TO_TIMESTAMP('1970-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS')),
+//                            COALESCE(MAX(foodSpotsHistory.createdDateTime),TO_TIMESTAMP('1970-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS')),
+//                            COALESCE(MAX(reviewLike.createdDateTime),TO_TIMESTAMP('1970-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'))""",
 //                    )
-
-                val latestDate =
-                    customExpression(
-                        LocalDateTime::class,
-                        """GREATEST(
-                            MAX(foodSpotsReview.createdDateTime),MAX(foodSpotsHistory.createdDateTime),MAX(reviewLike.createdDateTime)
-                            )""",
-                    )
 
                 val total = expression(Long::class, "total")
                 selectNew<UserRanking>(

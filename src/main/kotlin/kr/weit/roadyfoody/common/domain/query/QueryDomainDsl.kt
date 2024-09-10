@@ -1,5 +1,3 @@
-@file:Suppress("ktlint:standard:filename")
-
 package kr.weit.roadyfoody.common.domain.query
 
 import com.linecorp.kotlinjdsl.dsl.jpql.Jpql
