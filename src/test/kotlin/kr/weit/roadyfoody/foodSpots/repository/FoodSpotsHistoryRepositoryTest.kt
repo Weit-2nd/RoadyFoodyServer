@@ -33,9 +33,9 @@ class FoodSpotsHistoryRepositoryTest(
         beforeEach {
             user = userRepository.save(createTestUser(0L))
             otherUser = userRepository.save(createTestUser(0L, nickname = "otherUser"))
-            user2 = userRepository.save(createTestUser(2L, "existentNick2"))
-            user3 = userRepository.save(createTestUser(3L, "existentNick3"))
-            user4 = userRepository.save(createTestUser(4L, "existentNick4"))
+            user2 = userRepository.save(createTestUser(0L, "existentNick2"))
+            user3 = userRepository.save(createTestUser(0L, "existentNick3"))
+            user4 = userRepository.save(createTestUser(0L, "existentNick4"))
             foodSpots = foodSpotsRepository.save(createTestFoodSpots())
             otherFoodSpots = foodSpotsRepository.save(createTestFoodSpots())
             notExistFoodSpots = foodSpotsRepository.save(createTestFoodSpots())
