@@ -194,7 +194,10 @@ class CustomFoodSpotsReviewRepositoryImpl(
                 val latestDate =
                     expression(
                         LocalDateTime::class,
-                        "GREATEST(COALESCE(MAX(foodSpotsReview2.createdDateTime),TO_TIMESTAMP('1970-12-31 23:59:59')), COALESCE(MAX(foodSpotsHistory1.createdDateTime),TO_TIMESTAMP('1970-12-31 23:59:59')), COALESCE(MAX(reviewLike2.createdDateTime),TO_TIMESTAMP('1970-12-31 23:59:59')))",
+                        "GREATEST(" +
+                            "COALESCE(MAX(foodSpotsReview.createdDateTime),TO_TIMESTAMP('1970-12-31 23:59:59'))," +
+                            "COALESCE(MAX(foodSpotsHistory.createdDateTime),TO_TIMESTAMP('1970-12-31 23:59:59'))," +
+                            "COALESCE(MAX(reviewLike.createdDateTime),TO_TIMESTAMP('1970-12-31 23:59:59')))",
                     )
 
                 val total = expression(Long::class, "total")
