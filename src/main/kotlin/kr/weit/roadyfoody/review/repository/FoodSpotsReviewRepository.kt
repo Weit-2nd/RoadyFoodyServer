@@ -224,6 +224,12 @@ class CustomFoodSpotsReviewRepositoryImpl(
 //                            COALESCE(MAX(reviewLike.createdDateTime),TO_TIMESTAMP('1970-12-31 23:59:59')))""",
 //                    )
 
+                val latestDate =
+                    customExpression(
+                        LocalDateTime::class,
+                        """MAX(foodSpotsReview.createdDateTime)""",
+                    )
+
                 val total = expression(Long::class, "total")
                 selectNew<UserRanking>(
                     path(User::profile)(Profile::nickname),
@@ -242,7 +248,7 @@ class CustomFoodSpotsReviewRepositoryImpl(
                     path(User::profile)(Profile::nickname),
                 ).orderBy(
                     total.desc(),
-                    // latestDate.asc(),
+                    latestDate.asc(),
                 )
             }
 
