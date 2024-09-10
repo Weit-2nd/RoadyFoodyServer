@@ -1,5 +1,6 @@
 package kr.weit.roadyfoody.review.repository
 
+import com.google.protobuf.Timestamp
 import com.linecorp.kotlinjdsl.dsl.jpql.Jpql
 import com.linecorp.kotlinjdsl.querymodel.jpql.predicate.Predicate
 import com.linecorp.kotlinjdsl.querymodel.jpql.sort.Sortable
@@ -216,12 +217,12 @@ class CustomFoodSpotsReviewRepositoryImpl(
                         .asSubquery()
 
                 val latestDate =
-                    expression(
-                        LocalDateTime::class,
+                    customExpression(
+                        Timestamp::class,
                         "GREATEST(" +
-                            "COALESCE(MAX(foodSpotsReview.createdDateTime),TO_TIMESTAMP('1970-12-31 23:59:59'))," +
-                            "COALESCE(MAX(foodSpotsHistory.createdDateTime),TO_TIMESTAMP('1970-12-31 23:59:59'))," +
-                            "COALESCE(MAX(reviewLike.createdDateTime),TO_TIMESTAMP('1970-12-31 23:59:59')))",
+                            "COALESCE(MAX(foodSpotsReview.createdDateTime),TO_TIMESTAMP('1970-12-31 00:00:00'))," +
+                            "COALESCE(MAX(foodSpotsHistory.createdDateTime),TO_TIMESTAMP('1970-12-31 00:00:00'))," +
+                            "COALESCE(MAX(reviewLike.createdDateTime),TO_TIMESTAMP('1970-12-31 00:00:00')))",
                     )
 
                 val total = expression(Long::class, "total")
