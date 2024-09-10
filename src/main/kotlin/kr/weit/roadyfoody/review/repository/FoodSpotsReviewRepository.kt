@@ -215,24 +215,24 @@ class CustomFoodSpotsReviewRepositoryImpl(
                     ).where(foodSpotsHistory(FoodSpotsHistory::user)(User::id).eq(entity(User::class)(User::id)))
                         .asSubquery()
 
+//                val latestDate =
+//                    customExpression(
+//                        LocalDate::class,
+//                        """GREATEST(
+//                            COALESCE(MAX(foodSpotsReview.createdDateTime),TO_DATE('1970-12-31 00:00:00')),
+//                            COALESCE(MAX(foodSpotsHistory.createdDateTime),TO_DATE('1970-12-31 00:00:00')),
+//                            COALESCE(MAX(reviewLike.createdDateTime),TO_DATE('1970-12-31 00:00:00'))""",
+//                    )
+
                 val latestDate =
                     customExpression(
                         LocalDateTime::class,
                         """GREATEST(
-                            COALESCE(MAX(foodSpotsReview.createdDateTime),TO_TIMESTAMP('1970-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS')),
-                            COALESCE(MAX(foodSpotsHistory.createdDateTime),TO_TIMESTAMP('1970-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS')),
-                            COALESCE(MAX(reviewLike.createdDateTime),TO_TIMESTAMP('1970-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'))""",
+                            CAST(COALESCE(MAX(foodSpotsReview.createdDateTime),TO_TIMESTAMP('1970-12-31 00:00:00')) AS TIMESTAMP),
+                            CAST(COALESCE(MAX(foodSpotsHistory.createdDateTime),TO_TIMESTAMP('1970-12-31 00:00:00')) AS TIMESTAMP),
+                            CAST(COALESCE(MAX(reviewLike.createdDateTime),TO_TIMESTAMP('1970-12-31 00:00:00')) AS TIMESTAMP)
+                            )""",
                     )
-
-//                val latestDate =
-//                    customExpression(
-//                        LocalDateTime::class,
-//                        """GREATEST(
-//                            COALESCE(MAX(foodSpotsReview.createdDateTime),TO_TIMESTAMP('1970-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS')),
-//                            COALESCE(MAX(foodSpotsHistory.createdDateTime),TO_TIMESTAMP('1970-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS')),
-//                            COALESCE(MAX(reviewLike.createdDateTime),TO_TIMESTAMP('1970-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'))""",
-//                    )
-
                 val total = expression(Long::class, "total")
                 selectNew<UserRanking>(
                     path(User::profile)(Profile::nickname),
