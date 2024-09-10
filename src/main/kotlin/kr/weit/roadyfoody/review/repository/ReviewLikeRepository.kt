@@ -7,7 +7,7 @@ import kr.weit.roadyfoody.user.domain.User
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
-fun ReviewLikeRepository.getByUser(user: User): List<FoodSpotsReview> = findByUser(user).map { it.review }
+fun ReviewLikeRepository.getLikedReviewByUser(user: User): List<FoodSpotsReview> = findByUser(user).map { it.review }
 
 @Repository
 interface ReviewLikeRepository : JpaRepository<ReviewLike, ReviewLikeId> {

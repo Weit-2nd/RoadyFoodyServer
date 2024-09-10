@@ -7,7 +7,7 @@ import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.review.application.service.ReviewCommandService
 import kr.weit.roadyfoody.review.application.service.ReviewLikeCommandService
 import kr.weit.roadyfoody.review.repository.ReviewLikeRepository
-import kr.weit.roadyfoody.review.repository.getByUser
+import kr.weit.roadyfoody.review.repository.getLikedReviewByUser
 import kr.weit.roadyfoody.rewards.application.service.RewardsCommandService
 import kr.weit.roadyfoody.user.repository.UserRepository
 import kr.weit.roadyfoody.user.repository.getByUserId
@@ -35,7 +35,7 @@ class AuthEventHandler(
         userAgreedTermRepository.deleteAllByUser(user)
         foodSpotsCommandService.deleteWithdrawUserReport(user)
         reviewLikeRepository
-            .getByUser(user)
+            .getLikedReviewByUser(user)
             .forEach { reviewLikeCommandService.decreaseLikeLock(it, it.id) }
         reviewLikeRepository.deleteByUser(user)
         reviewCommandService.deleteWithdrewUserReview(user)
