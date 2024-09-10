@@ -26,11 +26,11 @@ import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodHistory
 import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodSpot
 import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodSpotList
 import kr.weit.roadyfoody.foodSpots.fixture.createTestAggregatedInfoResponse
+import kr.weit.roadyfoody.foodSpots.fixture.createTestCountRateList
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodHistory
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodOperationHours
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsForDistance
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpotsPhoto
-import kr.weit.roadyfoody.foodSpots.fixture.createTestRatingCountResponseList
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportFoodCategory
 import kr.weit.roadyfoody.foodSpots.fixture.createTestReportOperationHours
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
@@ -399,7 +399,7 @@ class FoodSpotsQueryServiceTest :
                             3,
                         )
                     every { reviewRepository.getRatingCount(any()) } returns
-                        createTestRatingCountResponseList(
+                        createTestCountRateList(
                             1,
                             0,
                             2,
@@ -436,7 +436,7 @@ class FoodSpotsQueryServiceTest :
                 }
                 `when`("리뷰가 없는 경우") {
                     every { reviewRepository.getReviewAggregatedInfo(any()) } returns createTestAggregatedInfoResponse()
-                    every { reviewRepository.getRatingCount(any()) } returns createTestRatingCountResponseList()
+                    every { reviewRepository.getRatingCount(any()) } returns createTestCountRateList()
                     then("별점 개수가 전부 0으로 조회되어야 한다.") {
                         val response = foodSPotsQueryService.getFoodSpotsDetail(TEST_FOOD_SPOT_ID)
                         response.ratingCount.forEach { it.count shouldBe 0 }

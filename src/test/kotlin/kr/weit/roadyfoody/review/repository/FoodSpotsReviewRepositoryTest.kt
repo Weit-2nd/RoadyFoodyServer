@@ -243,12 +243,12 @@ class FoodSpotsReviewRepositoryTest(
             describe("getRatingCount 메소드는") {
                 context("음식점 ID를 받는 경우") {
                     it("해당 음식점의 별점 개수를 반환한다.") {
-                        val ratingCountResponses = reviewRepository.getRatingCount(foodSpots.id)
-                        ratingCountResponses.size shouldBe 5
+                        val countRates = reviewRepository.getRatingCount(foodSpots.id)
+                        countRates.size shouldBe 5
                         val countList = listOf(1, 0, 0, 1, 0)
-                        for (i in ratingCountResponses.indices) {
-                            ratingCountResponses[i].rating shouldBe 5 - i
-                            ratingCountResponses[i].count shouldBe countList[i]
+                        for (i in countRates.indices) {
+                            countRates[i].rating shouldBe 5 - i
+                            countRates[i].count shouldBe countList[i]
                         }
                     }
                 }

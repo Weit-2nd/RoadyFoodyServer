@@ -5,6 +5,7 @@ import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsDetailResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsOperationHoursResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsReviewResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.RatingCountResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportCategoryResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoryDetailResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportOperationHoursResponse
@@ -159,7 +160,8 @@ class FoodSpotsQueryService(
     fun getFoodSpotsDetail(foodSpotsId: Long): FoodSpotsDetailResponse =
         foodSpotsRepository.getByFoodSpotsId(foodSpotsId).let { foodSpots ->
             val reviewAggregatedInfoResponse = reviewRepository.getReviewAggregatedInfo(foodSpots)
-            val ratingCountResponse = reviewRepository.getRatingCount(foodSpotsId)
+            val ratingCountResponse =
+                reviewRepository.getRatingCount(foodSpotsId).map { RatingCountResponse(it) }
             val photosFutures =
                 foodSpotsHistoryRepository.getByFoodSpots(foodSpots).let {
                     foodSpotsPhotoRepository.findByHistoryIn(it).map { photo ->

@@ -4,6 +4,7 @@ import TEST_FOOD_SPOT_ID
 import createMockSliceReview
 import createTestReviewPhotoResponse
 import kr.weit.roadyfoody.common.dto.SliceResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.CountRate
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodCategoryResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsDetailResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsOperationHoursResponse
@@ -461,7 +462,7 @@ fun createTestFoodSpotsDetailResponse(): FoodSpotsDetailResponse =
         OperationStatus.OPEN,
         listOf(createTestReportPhotoResponse()),
         createTestAggregatedInfoResponse(),
-        createTestRatingCountResponseList(),
+        createTestRatingCountRateResponseList(),
     )
 
 fun createTestAggregatedInfoResponse(
@@ -469,22 +470,39 @@ fun createTestAggregatedInfoResponse(
     reviewCount: Long = TEST_REVIEW_COUNT,
 ): ReviewAggregatedInfoResponse = ReviewAggregatedInfoResponse(reviewAverage, reviewCount)
 
-fun createTestRatingCountResponseList(
+fun createTestCountRateList(
+    ratingFIve: Int = 0,
+    ratingFour: Int = 0,
+    ratingThree: Int = 0,
+    ratingTwo: Int = 0,
+    ratingOne: Int = 0,
+): MutableList<CountRate> =
+    mutableListOf(
+        createTestCountRateResponse(5, ratingFIve),
+        createTestCountRateResponse(4, ratingFour),
+        createTestCountRateResponse(3, ratingThree),
+        createTestCountRateResponse(2, ratingTwo),
+        createTestCountRateResponse(1, ratingOne),
+    )
+
+fun createTestCountRateResponse(
+    rating: Int = TEST_RATING,
+    count: Int = 0,
+): CountRate = CountRate(rating, count)
+
+fun createTestRatingCountRateResponse(
+    rating: Int = TEST_RATING,
+    count: Int = 0,
+): RatingCountResponse = RatingCountResponse(createTestCountRateResponse(rating, count))
+
+fun createTestRatingCountRateResponseList(
     ratingFIve: Int = 0,
     ratingFour: Int = 0,
     ratingThree: Int = 0,
     ratingTwo: Int = 0,
     ratingOne: Int = 0,
 ): MutableList<RatingCountResponse> =
-    mutableListOf(
-        createTestRatingCountResponse(5, ratingFIve),
-        createTestRatingCountResponse(4, ratingFour),
-        createTestRatingCountResponse(3, ratingThree),
-        createTestRatingCountResponse(2, ratingTwo),
-        createTestRatingCountResponse(1, ratingOne),
-    )
-
-fun createTestRatingCountResponse(
-    rating: Int = TEST_RATING,
-    count: Int = 0,
-): RatingCountResponse = RatingCountResponse(rating, count)
+    createTestCountRateList(ratingFIve, ratingFour, ratingThree, ratingTwo, ratingOne)
+        .map {
+            createTestRatingCountRateResponse(it.rating, it.count)
+        }.toMutableList()

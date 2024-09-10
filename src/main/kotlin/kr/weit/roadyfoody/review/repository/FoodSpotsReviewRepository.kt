@@ -5,7 +5,7 @@ import com.linecorp.kotlinjdsl.querymodel.jpql.predicate.Predicate
 import com.linecorp.kotlinjdsl.querymodel.jpql.sort.Sortable
 import com.linecorp.kotlinjdsl.support.spring.data.jpa.repository.KotlinJdslJpqlExecutor
 import kr.weit.roadyfoody.badge.domain.Badge
-import kr.weit.roadyfoody.foodSpots.application.dto.RatingCountResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.CountRate
 import kr.weit.roadyfoody.foodSpots.application.dto.ReviewAggregatedInfoResponse
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.global.utils.findList
@@ -54,7 +54,7 @@ interface CustomFoodSpotsReviewRepository {
 
     fun findAllUserLikeCount(): List<UserRanking>
 
-    fun getRatingCount(foodSpotsId: Long): List<RatingCountResponse>
+    fun getRatingCount(foodSpotsId: Long): List<CountRate>
 }
 
 class CustomFoodSpotsReviewRepositoryImpl(
@@ -113,12 +113,12 @@ class CustomFoodSpotsReviewRepositoryImpl(
                     )
             }.first()!!
 
-    override fun getRatingCount(foodSpotsId: Long): List<RatingCountResponse> {
-        val ratingCountResponses =
+    override fun getRatingCount(foodSpotsId: Long): List<CountRate> {
+        val countRates =
             kotlinJdslJpqlExecutor
                 .findMutableList {
                     val ratePath = path(FoodSpotsReview::rate)
-                    selectNew<RatingCountResponse>(
+                    selectNew<CountRate>(
                         ratePath,
                         count(ratePath),
                     ).from(entity(FoodSpotsReview::class))
@@ -128,7 +128,7 @@ class CustomFoodSpotsReviewRepositoryImpl(
                         .orderBy(ratePath.desc())
                 }
 
-        return fillMissingRatings(ratingCountResponses)
+        return fillMissingRatings(countRates)
     }
 
     override fun findAllUserReviewCount(): List<UserRanking> =
@@ -224,26 +224,26 @@ class CustomFoodSpotsReviewRepositoryImpl(
                     .where(path(FoodSpotsReview::id).equal(lastId))
             }.firstNotNullOf { it }
 
-    private fun fillMissingRatings(ratingCountResponses: MutableList<RatingCountResponse>): List<RatingCountResponse> {
+    private fun fillMissingRatings(countRates: MutableList<CountRate>): List<CountRate> {
         var index = 0
-        if (ratingCountResponses.isEmpty()) {
+        if (countRates.isEmpty()) {
             for (i in 5 downTo 1) {
-                ratingCountResponses.add(RatingCountResponse(i, 0))
+                countRates.add(CountRate(i, 0))
             }
         } else {
             for (i in 5 downTo 1) {
-                if (index < ratingCountResponses.size) {
-                    val rating = ratingCountResponses[index].rating
+                if (index < countRates.size) {
+                    val rating = countRates[index].rating
                     if (rating == i) {
                         index++
                         continue
                     }
                 }
-                ratingCountResponses.add(index, RatingCountResponse(i, 0))
+                countRates.add(index, CountRate(i, 0))
                 index++
             }
         }
-        return ratingCountResponses
+        return countRates
     }
 }
 
