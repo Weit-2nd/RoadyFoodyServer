@@ -19,8 +19,8 @@ data class ReviewRequest(
     @field:Length(max = 1200, message = "리뷰 최대 길이를 초과했습니다.")
     val contents: String,
     @Schema(description = "별점")
-    @field:Min(0, message = "별점은 0점 이상으로 입력해주세요.")
-    @field:Max(10, message = "별점은 10점 이하로 입력해주세요.")
+    @field:Min(1, message = "별점은 1점 이상으로 입력해주세요.")
+    @field:Max(5, message = "별점은 5점 이하로 입력해주세요.")
     val rating: Int,
 ) {
     fun toEntity(

@@ -46,11 +46,11 @@ class FoodSpotsReviewRepositoryTest(
                 reviewList =
                     reviewRepository.saveAll(
                         listOf(
-                            createTestFoodSpotsReview(user, foodSpots, 10),
-                            createTestFoodSpotsReview(user, otherFoodSpots, 10),
-                            createTestFoodSpotsReview(otherUser, foodSpots, 4),
-                            createTestFoodSpotsReview(user, otherFoodSpots, 10),
-                            createTestFoodSpotsReview(testUser, testFoodSpots, 4),
+                            createTestFoodSpotsReview(user, foodSpots, 5),
+                            createTestFoodSpotsReview(user, otherFoodSpots, 5),
+                            createTestFoodSpotsReview(otherUser, foodSpots, 2),
+                            createTestFoodSpotsReview(user, otherFoodSpots, 5),
+                            createTestFoodSpotsReview(testUser, testFoodSpots, 2),
                         ),
                     )
 
@@ -196,7 +196,7 @@ class FoodSpotsReviewRepositoryTest(
                     it("해당 음식점의 리뷰 평균 별점과 리뷰 개수를 반환한다.") {
                         val reviewAggregatedInfoResponse =
                             reviewRepository.getReviewAggregatedInfo(foodSpots)
-                        reviewAggregatedInfoResponse shouldBe ReviewAggregatedInfoResponse(7.0, 2)
+                        reviewAggregatedInfoResponse shouldBe ReviewAggregatedInfoResponse(3.5, 2)
                     }
                 }
 
@@ -237,6 +237,20 @@ class FoodSpotsReviewRepositoryTest(
 
                     userLikeCounts[2].userNickname shouldBe "testUser"
                     userLikeCounts[2].total shouldBe 2
+                }
+            }
+
+            describe("getRatingCount 메소드는") {
+                context("음식점 ID를 받는 경우") {
+                    it("해당 음식점의 별점 개수를 반환한다.") {
+                        val countRates = reviewRepository.getRatingCount(foodSpots.id)
+                        countRates.size shouldBe 5
+                        val countList = listOf(1, 0, 0, 1, 0)
+                        for (i in countRates.indices) {
+                            countRates[i].rating shouldBe 5 - i
+                            countRates[i].count shouldBe countList[i]
+                        }
+                    }
                 }
             }
         },

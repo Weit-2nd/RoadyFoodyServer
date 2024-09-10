@@ -4,12 +4,14 @@ import TEST_FOOD_SPOT_ID
 import createMockSliceReview
 import createTestReviewPhotoResponse
 import kr.weit.roadyfoody.common.dto.SliceResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.CountRate
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodCategoryResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsDetailResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsOperationHoursResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsReviewResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsUpdateRequest
 import kr.weit.roadyfoody.foodSpots.application.dto.OperationHoursRequest
+import kr.weit.roadyfoody.foodSpots.application.dto.RatingCountResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportCategoryResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoryDetailResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportOperationHoursResponse
@@ -82,8 +84,9 @@ const val TEST_INVALID_FOOD_SPOTS_HISTORY_ID = -1L
 const val TEST_FOOD_SPOTS_UPDATE_REQUEST_NAME = "request"
 const val TEST_FOOD_SPOTS_UPDATE_REQUEST_PHOTO = "reportPhotos"
 const val TEST_REST_DAILY_REPORT_CREATION_COUNT = 5
-const val TEST_AVERAGE_RATE = 4.5
-const val TEST_REVIEW_COUNT = 2L
+const val TEST_AVERAGE_RATE = 0.0
+const val TEST_REVIEW_COUNT = 0L
+const val TEST_RATING = 5
 
 fun createMockTestFoodSpot(
     id: Long = 0L,
@@ -459,10 +462,47 @@ fun createTestFoodSpotsDetailResponse(): FoodSpotsDetailResponse =
         OperationStatus.OPEN,
         listOf(createTestReportPhotoResponse()),
         createTestAggregatedInfoResponse(),
+        createTestRatingCountRateResponseList(),
     )
 
-fun createTestAggregatedInfoResponse(): ReviewAggregatedInfoResponse =
-    ReviewAggregatedInfoResponse(
-        TEST_AVERAGE_RATE,
-        TEST_REVIEW_COUNT,
+fun createTestAggregatedInfoResponse(
+    reviewAverage: Double = TEST_AVERAGE_RATE,
+    reviewCount: Long = TEST_REVIEW_COUNT,
+): ReviewAggregatedInfoResponse = ReviewAggregatedInfoResponse(reviewAverage, reviewCount)
+
+fun createTestCountRateList(
+    ratingFIve: Int = 0,
+    ratingFour: Int = 0,
+    ratingThree: Int = 0,
+    ratingTwo: Int = 0,
+    ratingOne: Int = 0,
+): MutableList<CountRate> =
+    mutableListOf(
+        createTestCountRateResponse(5, ratingFIve),
+        createTestCountRateResponse(4, ratingFour),
+        createTestCountRateResponse(3, ratingThree),
+        createTestCountRateResponse(2, ratingTwo),
+        createTestCountRateResponse(1, ratingOne),
     )
+
+fun createTestCountRateResponse(
+    rating: Int = TEST_RATING,
+    count: Int = 0,
+): CountRate = CountRate(rating, count)
+
+fun createTestRatingCountRateResponse(
+    rating: Int = TEST_RATING,
+    count: Int = 0,
+): RatingCountResponse = RatingCountResponse(createTestCountRateResponse(rating, count))
+
+fun createTestRatingCountRateResponseList(
+    ratingFIve: Int = 0,
+    ratingFour: Int = 0,
+    ratingThree: Int = 0,
+    ratingTwo: Int = 0,
+    ratingOne: Int = 0,
+): MutableList<RatingCountResponse> =
+    createTestCountRateList(ratingFIve, ratingFour, ratingThree, ratingTwo, ratingOne)
+        .map {
+            createTestRatingCountRateResponse(it.rating, it.count)
+        }.toMutableList()
