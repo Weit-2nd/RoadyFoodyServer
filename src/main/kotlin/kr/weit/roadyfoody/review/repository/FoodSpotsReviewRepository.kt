@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.jpa.repository.JpaRepository
 import java.time.LocalDateTime
+import java.util.Date
 
 fun FoodSpotsReviewRepository.getReviewByReviewId(reviewId: Long): FoodSpotsReview =
     findById(reviewId).orElseThrow {
@@ -217,7 +218,7 @@ class CustomFoodSpotsReviewRepositoryImpl(
 
                 val latestDate =
                     customExpression(
-                        LocalDateTime::class,
+                        Date::class,
                         """GREATEST(
                             COALESCE(MAX(foodSpotsReview.createdDateTime),TO_DATE('1970-12-31')),
                             COALESCE(MAX(foodSpotsHistory.createdDateTime),TO_DATE('1970-12-31')),
