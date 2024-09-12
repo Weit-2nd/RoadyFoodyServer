@@ -1,6 +1,7 @@
 package kr.weit.roadyfoody.review.repository
 
 import com.linecorp.kotlinjdsl.dsl.jpql.Jpql
+import com.linecorp.kotlinjdsl.querymodel.jpql.expression.Expressions
 import com.linecorp.kotlinjdsl.querymodel.jpql.predicate.Predicate
 import com.linecorp.kotlinjdsl.querymodel.jpql.sort.Sortable
 import com.linecorp.kotlinjdsl.support.spring.data.jpa.repository.KotlinJdslJpqlExecutor
@@ -22,7 +23,6 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.jpa.repository.JpaRepository
 import java.time.LocalDateTime
-import java.util.Date
 
 fun FoodSpotsReviewRepository.getReviewByReviewId(reviewId: Long): FoodSpotsReview =
     findById(reviewId).orElseThrow {
@@ -216,14 +216,21 @@ class CustomFoodSpotsReviewRepositoryImpl(
                     ).where(foodSpotsHistory(FoodSpotsHistory::user)(User::id).eq(entity(User::class)(User::id)))
                         .asSubquery()
 
-                val latestDate =
-                    customExpression(
-                        Date::class,
-                        """GREATEST(
-                            COALESCE(MAX(foodSpotsReview.createdDateTime),TO_DATE('1970-12-31')),
-                            COALESCE(MAX(foodSpotsHistory.createdDateTime),TO_DATE('1970-12-31')),
-                            COALESCE(MAX(reviewLike.createdDateTime),TO_DATE('1970-12-31'))
-                            )""",
+                val defaultDate = LocalDateTime.parse("1970-12-31T00:00:00")
+
+                val maxReviewDate = coalesce(max(foodSpotsReview(FoodSpotsReview::createdDateTime)), defaultDate)
+                val maxHistoryDate = coalesce(max(foodSpotsHistory(FoodSpotsHistory::createdDateTime)), defaultDate)
+                val maxLikeDate = coalesce(max(reviewLike(ReviewLike::createdDateTime)), defaultDate)
+
+                val greatestDateExpression =
+                    Expressions.customExpression(
+                        LocalDateTime::class,
+                        "GREATEST({0}, {1}, {2})",
+                        listOf(
+                            maxReviewDate,
+                            maxHistoryDate,
+                            maxLikeDate,
+                        ),
                     )
                 val total = expression(Long::class, "total")
                 selectNew<UserRanking>(
@@ -243,7 +250,7 @@ class CustomFoodSpotsReviewRepositoryImpl(
                     path(User::profile)(Profile::nickname),
                 ).orderBy(
                     total.desc(),
-                    latestDate.asc(),
+                    greatestDateExpression.asc(),
                 )
             }
 
