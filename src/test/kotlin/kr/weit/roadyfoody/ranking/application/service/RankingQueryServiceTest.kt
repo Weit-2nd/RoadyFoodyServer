@@ -14,6 +14,7 @@ import kr.weit.roadyfoody.ranking.fixture.createUserRankingResponse
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
 import org.springframework.data.redis.core.ListOperations
 import org.springframework.data.redis.core.RedisTemplate
+import java.util.concurrent.ExecutorService
 
 class RankingQueryServiceTest :
     BehaviorSpec(
@@ -22,8 +23,9 @@ class RankingQueryServiceTest :
             val foodSpotsHistoryRepository = mockk<FoodSpotsHistoryRepository>()
             val reviewRepository = mockk<FoodSpotsReviewRepository>()
             val rankingCommandService = mockk<RankingCommandService>()
+            val executor = mockk<ExecutorService>()
             val rankingQueryService =
-                RankingQueryService(redisTemplate, foodSpotsHistoryRepository, reviewRepository, rankingCommandService)
+                RankingQueryService(redisTemplate, foodSpotsHistoryRepository, reviewRepository, rankingCommandService, executor)
 
             val listOperation = mockk<ListOperations<String, String>>()
             val list = listOf("user1:10", "user2:20", "user3:15")
@@ -31,6 +33,9 @@ class RankingQueryServiceTest :
             afterEach { clearMocks(reviewRepository) }
             afterEach { clearMocks(listOperation) }
             afterEach { clearMocks(rankingCommandService) }
+            every { executor.execute(any()) } answers {
+                firstArg<Runnable>().run()
+            }
 
             given("getReportRanking 테스트") {
                 `when`("레디스의 데이터를 조회한 경우") {

@@ -15,6 +15,7 @@ import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutorService
 
 @Service
 class RankingQueryService(
@@ -22,6 +23,7 @@ class RankingQueryService(
     private val foodSpotsHistoryRepository: FoodSpotsHistoryRepository,
     private val reviewRepository: FoodSpotsReviewRepository,
     private val rankingCommandService: RankingCommandService,
+    private val executor: ExecutorService,
 ) {
     fun getReportRanking(size: Long): List<UserRanking> =
         getRanking(
@@ -67,13 +69,13 @@ class RankingQueryService(
                 .range(key, 0, size - 1)
 
         if (ranking.isNullOrEmpty()) {
-            CompletableFuture.runAsync {
+            CompletableFuture.runAsync({
                 rankingCommandService.updateRanking(
                     lockName = lockName,
                     key = key,
                     dataProvider = dataProvider,
                 )
-            }
+            }, executor)
             throw RankingNotFoundException()
         }
         return ranking.map { score ->
