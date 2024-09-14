@@ -2,8 +2,10 @@ package kr.weit.roadyfoody.ranking.application.service
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
+import io.mockk.Runs
 import io.mockk.clearMocks
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
@@ -16,7 +18,6 @@ import org.springframework.data.redis.core.RedisTemplate
 class RankingQueryServiceTest :
     BehaviorSpec(
         {
-
             val redisTemplate = mockk<RedisTemplate<String, String>>()
             val foodSpotsHistoryRepository = mockk<FoodSpotsHistoryRepository>()
             val reviewRepository = mockk<FoodSpotsReviewRepository>()
@@ -29,6 +30,7 @@ class RankingQueryServiceTest :
 
             afterEach { clearMocks(reviewRepository) }
             afterEach { clearMocks(listOperation) }
+            afterEach { clearMocks(rankingCommandService) }
 
             given("getReportRanking 테스트") {
                 `when`("레디스의 데이터를 조회한 경우") {
@@ -109,6 +111,7 @@ class RankingQueryServiceTest :
                 }
             }
             given("getTotalRanking 테스트") {
+
                 `when`("레디스의 데이터를 조회한 경우") {
                     every { redisTemplate.opsForList() } returns listOperation
                     every { listOperation.range(any(), any(), any()) } returns list
@@ -124,9 +127,24 @@ class RankingQueryServiceTest :
                     every { listOperation.range(any(), any(), any()) } returns null
                     every { listOperation.rightPushAll(any(), any<List<String>>()) } returns 1L
                     every { reviewRepository.findAllUserTotalCount() } returns createUserRankingResponse()
-
+                    every {
+                        rankingCommandService.updateRanking(
+                            any(),
+                            any(),
+                            any(),
+                        )
+                    } just Runs
                     then("예외가 발생한다.") {
+
                         shouldThrow<RankingNotFoundException> { rankingQueryService.getTotalRanking(10) }
+
+                        verify(exactly = 1) {
+                            rankingCommandService.updateRanking(
+                                any(),
+                                any(),
+                                any(),
+                            )
+                        }
                     }
                 }
 
@@ -135,9 +153,22 @@ class RankingQueryServiceTest :
                     every { listOperation.range(any(), any(), any()) } returns listOf()
                     every { listOperation.rightPushAll(any(), any<List<String>>()) } returns 1L
                     every { reviewRepository.findAllUserTotalCount() } returns createUserRankingResponse()
-
+                    every {
+                        rankingCommandService.updateRanking(
+                            any(),
+                            any(),
+                            any(),
+                        )
+                    } just Runs
                     then("예외가 발생한다.") {
                         shouldThrow<RankingNotFoundException> { rankingQueryService.getTotalRanking(10) }
+                        verify(exactly = 1) {
+                            rankingCommandService.updateRanking(
+                                any(),
+                                any(),
+                                any(),
+                            )
+                        }
                     }
                 }
             }

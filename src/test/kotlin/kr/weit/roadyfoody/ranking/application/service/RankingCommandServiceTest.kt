@@ -7,6 +7,10 @@ import io.mockk.mockk
 import io.mockk.verify
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
 import kr.weit.roadyfoody.ranking.fixture.createUserRankingResponse
+import kr.weit.roadyfoody.ranking.utils.LIKE_RANKING_KEY
+import kr.weit.roadyfoody.ranking.utils.REPORT_RANKING_KEY
+import kr.weit.roadyfoody.ranking.utils.REVIEW_RANKING_KEY
+import kr.weit.roadyfoody.ranking.utils.TOTAL_RANKING_KEY
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
 import org.redisson.api.RLock
 import org.redisson.api.RedissonClient
@@ -39,7 +43,7 @@ class RankingCommandServiceTest :
                 `when`("Lock을 획득한 경우") {
                     every { lock.tryLock(0, 10, TimeUnit.MINUTES) } returns true
 
-                    every { redisTemplate.delete("rofo:user-report-ranking") } returns true
+                    every { redisTemplate.delete(REPORT_RANKING_KEY) } returns true
                     every { foodSpotsHistoryRepository.findAllUserReportCount() } returns createUserRankingResponse()
                     every { redisTemplate.opsForList() } returns list
                     every { list.rightPushAll(any(), any<List<String>>()) } returns 1L
@@ -67,7 +71,7 @@ class RankingCommandServiceTest :
                 `when`("Lock을 획득한 경우") {
                     every { lock.tryLock(0, 10, TimeUnit.MINUTES) } returns true
 
-                    every { redisTemplate.delete("rofo:user-review-ranking") } returns true
+                    every { redisTemplate.delete(REVIEW_RANKING_KEY) } returns true
                     every { reviewRepository.findAllUserReviewCount() } returns createUserRankingResponse()
                     every { redisTemplate.opsForList() } returns list
                     every { list.rightPushAll(any(), any<List<String>>()) } returns 1L
@@ -95,7 +99,7 @@ class RankingCommandServiceTest :
                 `when`("Lock을 획득한 경우") {
                     every { lock.tryLock(0, 10, TimeUnit.MINUTES) } returns true
 
-                    every { redisTemplate.delete("rofo:user-like-ranking") } returns true
+                    every { redisTemplate.delete(LIKE_RANKING_KEY) } returns true
                     every { reviewRepository.findAllUserLikeCount() } returns createUserRankingResponse()
                     every { redisTemplate.opsForList() } returns list
                     every { list.rightPushAll(any(), any<List<String>>()) } returns 1L
@@ -123,7 +127,7 @@ class RankingCommandServiceTest :
                 `when`("Lock을 획득한 경우") {
                     every { lock.tryLock(0, 10, TimeUnit.MINUTES) } returns true
 
-                    every { redisTemplate.delete("rofo:user-total-ranking") } returns true
+                    every { redisTemplate.delete(TOTAL_RANKING_KEY) } returns true
                     every { reviewRepository.findAllUserTotalCount() } returns createUserRankingResponse()
                     every { redisTemplate.opsForList() } returns list
                     every { list.rightPushAll(any(), any<List<String>>()) } returns 1L
