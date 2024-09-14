@@ -98,5 +98,31 @@ class RankingControllerTest(
                     }
                 }
             }
+
+            given("GET $requestPath/total") {
+                val response = createUserRankingResponse()
+                every {
+                    rankingQueryService.getTotalRanking(any())
+                } returns response
+                `when`("정상적인 데이터가 들어올 경우") {
+                    then("좋아요 랭킹 리스트가 조회된다.") {
+                        mockMvc
+                            .perform(
+                                getWithAuth("$requestPath/total")
+                                    .param("size", "$TEST_PAGE_SIZE"),
+                            ).andExpect(status().isOk)
+                    }
+                }
+
+                `when`("size가 음수가 들어올 경우") {
+                    then("400을 반환한다") {
+                        mockMvc
+                            .perform(
+                                getWithAuth("$requestPath/total")
+                                    .param("size", "-1"),
+                            ).andExpect(status().isBadRequest)
+                    }
+                }
+            }
         },
     )

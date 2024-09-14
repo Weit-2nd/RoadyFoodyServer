@@ -9,10 +9,13 @@ import kr.weit.roadyfoody.ranking.utils.REPORT_RANKING_KEY
 import kr.weit.roadyfoody.ranking.utils.REPORT_RANKING_UPDATE_LOCK
 import kr.weit.roadyfoody.ranking.utils.REVIEW_RANKING_KEY
 import kr.weit.roadyfoody.ranking.utils.REVIEW_RANKING_UPDATE_LOCK
+import kr.weit.roadyfoody.ranking.utils.TOTAL_RANKING_KEY
+import kr.weit.roadyfoody.ranking.utils.TOTAL_RANKING_UPDATE_LOCK
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutorService
 
 @Service
 class RankingQueryService(
@@ -20,6 +23,7 @@ class RankingQueryService(
     private val foodSpotsHistoryRepository: FoodSpotsHistoryRepository,
     private val reviewRepository: FoodSpotsReviewRepository,
     private val rankingCommandService: RankingCommandService,
+    private val executor: ExecutorService,
 ) {
     fun getReportRanking(size: Long): List<UserRanking> =
         getRanking(
@@ -45,6 +49,14 @@ class RankingQueryService(
             dataProvider = reviewRepository::findAllUserLikeCount,
         )
 
+    fun getTotalRanking(size: Long): List<UserRanking> =
+        getRanking(
+            lockName = TOTAL_RANKING_UPDATE_LOCK,
+            size = size,
+            key = TOTAL_RANKING_KEY,
+            dataProvider = reviewRepository::findAllUserTotalCount,
+        )
+
     private fun getRanking(
         lockName: String,
         size: Long,
@@ -57,13 +69,13 @@ class RankingQueryService(
                 .range(key, 0, size - 1)
 
         if (ranking.isNullOrEmpty()) {
-            CompletableFuture.runAsync {
+            CompletableFuture.runAsync({
                 rankingCommandService.updateRanking(
                     lockName = lockName,
                     key = key,
                     dataProvider = dataProvider,
                 )
-            }
+            }, executor)
             throw RankingNotFoundException()
         }
         return ranking.map { score ->

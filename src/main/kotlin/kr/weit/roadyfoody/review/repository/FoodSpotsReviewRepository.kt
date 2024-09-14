@@ -1,6 +1,7 @@
 package kr.weit.roadyfoody.review.repository
 
 import com.linecorp.kotlinjdsl.dsl.jpql.Jpql
+import com.linecorp.kotlinjdsl.querymodel.jpql.expression.Expressions
 import com.linecorp.kotlinjdsl.querymodel.jpql.predicate.Predicate
 import com.linecorp.kotlinjdsl.querymodel.jpql.sort.Sortable
 import com.linecorp.kotlinjdsl.support.spring.data.jpa.repository.KotlinJdslJpqlExecutor
@@ -8,6 +9,7 @@ import kr.weit.roadyfoody.badge.domain.Badge
 import kr.weit.roadyfoody.foodSpots.application.dto.CountRate
 import kr.weit.roadyfoody.foodSpots.application.dto.ReviewAggregatedInfoResponse
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
+import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsHistory
 import kr.weit.roadyfoody.global.utils.findList
 import kr.weit.roadyfoody.global.utils.findMutableList
 import kr.weit.roadyfoody.global.utils.getSlice
@@ -55,6 +57,8 @@ interface CustomFoodSpotsReviewRepository {
     fun findAllUserLikeCount(): List<UserRanking>
 
     fun getRatingCount(foodSpotsId: Long): List<CountRate>
+
+    fun findAllUserTotalCount(): List<UserRanking>
 }
 
 class CustomFoodSpotsReviewRepositoryImpl(
@@ -181,6 +185,72 @@ class CustomFoodSpotsReviewRepositoryImpl(
                 ).orderBy(
                     sum(likeTotalPath).desc(),
                     subQuery.asc(),
+                )
+            }
+
+    override fun findAllUserTotalCount(): List<UserRanking> =
+        kotlinJdslJpqlExecutor
+            .findList {
+                val foodSpotsReview = entity(FoodSpotsReview::class, "foodSpotsReview")
+                val foodSpotsHistory = entity(FoodSpotsHistory::class, "foodSpotsHistory")
+                val reviewLike = entity(ReviewLike::class, "reviewLike")
+
+                val subquery =
+                    select<Long>(
+                        coalesce(
+                            count(
+                                foodSpotsReview(FoodSpotsReview::id),
+                            ).plus(sum(foodSpotsReview(FoodSpotsReview::likeTotal))),
+                            0,
+                        ),
+                    ).from(
+                        foodSpotsReview,
+                    ).where(foodSpotsReview(FoodSpotsReview::user)(User::id).eq(entity(User::class)(User::id)))
+                        .asSubquery()
+
+                val subquery2 =
+                    select<Long>(
+                        coalesce(count(foodSpotsHistory(FoodSpotsHistory::id)), 0),
+                    ).from(
+                        foodSpotsHistory,
+                    ).where(foodSpotsHistory(FoodSpotsHistory::user)(User::id).eq(entity(User::class)(User::id)))
+                        .asSubquery()
+
+                val defaultDate = LocalDateTime.parse("1970-12-31T00:00:00")
+
+                val maxReviewDate = coalesce(max(foodSpotsReview(FoodSpotsReview::createdDateTime)), defaultDate)
+                val maxHistoryDate = coalesce(max(foodSpotsHistory(FoodSpotsHistory::createdDateTime)), defaultDate)
+                val maxLikeDate = coalesce(max(reviewLike(ReviewLike::createdDateTime)), defaultDate)
+
+                val greatestDateExpression =
+                    Expressions.customExpression(
+                        LocalDateTime::class,
+                        "GREATEST({0}, {1}, {2})",
+                        listOf(
+                            maxReviewDate,
+                            maxHistoryDate,
+                            maxLikeDate,
+                        ),
+                    )
+                val total = expression(Long::class, "total")
+                selectNew<UserRanking>(
+                    path(User::profile)(Profile::nickname),
+                    subquery2.plus(subquery).`as`(total),
+                ).from(
+                    entity(User::class),
+                    leftJoin(foodSpotsHistory).on(foodSpotsHistory(FoodSpotsHistory::user)(User::id).eq(path(User::id))),
+                    leftJoin(
+                        foodSpotsReview,
+                    ).on(foodSpotsReview(FoodSpotsReview::user)(User::id).eq(path(User::id))),
+                    leftJoin(
+                        reviewLike,
+                    ).on(reviewLike(ReviewLike::review)(FoodSpotsReview::id).eq(foodSpotsReview(FoodSpotsReview::id))),
+                ).groupBy(
+                    path(User::id),
+                    path(User::profile)(Profile::nickname),
+                ).orderBy(
+                    total.desc(),
+                    greatestDateExpression.asc(),
                 )
             }
 
