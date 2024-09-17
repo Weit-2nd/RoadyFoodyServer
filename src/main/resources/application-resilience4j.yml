@@ -1,0 +1,28 @@
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      failure-rate-threshold: 50
+      slow-call-rate-threshold: 50
+      slow-call-duration-threshold:
+        seconds: 3
+      permitted-number-of-calls-in-half-open-state: 3
+      max-wait-duration-in-half-open-state:
+        seconds: 3
+      sliding-window-type: COUNT_BASED
+      sliding-window-size: 10
+      minimum-number-of-calls: 5
+      wait-duration-in-open-state:
+        seconds: 5
+      register-health-indicator: true
+      automatic-transition-from-open-to-half-open-enabled: true
+      event-consumer-buffer-size: 10
+  instances:
+    redisCircuitBreaker:
+      baseConfig: default
+      record-exceptions:
+        - org.springframework.data.redis.RedisSystemException
+        - org.springframework.data.redis.RedisConnectionFailureException
+        - org.springframework.data.redis.TooManyClusterRedirectionsException
+        - org.springframework.data.redis.ClusterRedirectException
+        - org.springframework.data.redis.ClusterStateFailureException
+        - org.redisson.client.RedisException
