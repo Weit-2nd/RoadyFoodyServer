@@ -1,5 +1,6 @@
 package kr.weit.roadyfoody.ranking.application.service
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
 import kr.weit.roadyfoody.ranking.dto.UserRanking
 import kr.weit.roadyfoody.ranking.exception.RankingNotFoundException
@@ -25,6 +26,7 @@ class RankingQueryService(
     private val rankingCommandService: RankingCommandService,
     private val executor: ExecutorService,
 ) {
+    @CircuitBreaker(name = "redisCircuitBreaker")
     fun getReportRanking(size: Long): List<UserRanking> =
         getRanking(
             lockName = REPORT_RANKING_UPDATE_LOCK,
@@ -33,6 +35,7 @@ class RankingQueryService(
             dataProvider = foodSpotsHistoryRepository::findAllUserReportCount,
         )
 
+    @CircuitBreaker(name = "redisCircuitBreaker")
     fun getReviewRanking(size: Long): List<UserRanking> =
         getRanking(
             lockName = REVIEW_RANKING_UPDATE_LOCK,
@@ -41,6 +44,7 @@ class RankingQueryService(
             dataProvider = reviewRepository::findAllUserReviewCount,
         )
 
+    @CircuitBreaker(name = "redisCircuitBreaker")
     fun getLikeRanking(size: Long): List<UserRanking> =
         getRanking(
             lockName = LIKE_RANKING_UPDATE_LOCK,
@@ -49,6 +53,7 @@ class RankingQueryService(
             dataProvider = reviewRepository::findAllUserLikeCount,
         )
 
+    @CircuitBreaker(name = "redisCircuitBreaker")
     fun getTotalRanking(size: Long): List<UserRanking> =
         getRanking(
             lockName = TOTAL_RANKING_UPDATE_LOCK,

@@ -1,6 +1,7 @@
 package kr.weit.roadyfoody.search.foodSpots.application.service
 
 import USER_ENTITY_LOCK_KEY
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsQueryService
@@ -80,6 +81,7 @@ class FoodSpotsSearchService(
         return foodSpotsSearchResponses
     }
 
+    @CircuitBreaker(name = "redisCircuitBreaker")
     @Transactional(readOnly = true)
     fun getRequiredCoin(
         user: User,
