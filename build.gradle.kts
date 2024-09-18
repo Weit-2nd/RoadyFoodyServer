@@ -54,7 +54,6 @@ dependencies {
     implementation("org.opensearch.client:spring-data-opensearch-starter:1.5.1") {
         exclude("org.opensearch.client", "opensearch-rest-client-sniffer")
     }
-    implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("com.github.ben-manes.caffeine:caffeine")
 
     // Secret & Config
