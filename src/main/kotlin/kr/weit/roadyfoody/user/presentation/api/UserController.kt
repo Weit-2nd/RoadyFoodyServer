@@ -1,6 +1,7 @@
 package kr.weit.roadyfoody.user.presentation.api
 
 import jakarta.validation.Valid
+import jakarta.validation.constraints.Past
 import jakarta.validation.constraints.Positive
 import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.common.dto.SliceResponse
@@ -67,9 +68,15 @@ class UserController(
     ): SliceResponse<UserReviewResponse> = userQueryService.getUserReviews(userId, size, lastId)
 
     @GetMapping("{userId}/likes/reviews")
-    override fun getUserLikes(
+    override fun getUserLikeReviews(
+        @PathVariable("userId")
+        @Positive(message = "유저 ID는 양수여야 합니다.")
         userId: Long,
+        @Positive(message = "조회할 개수는 양수여야 합니다.")
+        @RequestParam(defaultValue = "10", required = false)
         size: Int,
+        @Past(message = "마지막 시간은 과거여야 합니다.")
+        @RequestParam(required = false)
         lastTime: LocalDateTime?,
     ): SliceResponse<UserLikedReviewResponse> = userQueryService.getLikeReviews(userId, size, lastTime)
 

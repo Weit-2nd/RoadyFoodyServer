@@ -246,7 +246,7 @@ interface UserControllerSpec {
             ErrorCode.NOT_FOUND_USER,
         ],
     )
-    fun getUserLikes(
+    fun getUserLikeReviews(
         @PathVariable("userId")
         @Positive(message = "유저 ID는 양수여야 합니다.")
         userId: Long,
