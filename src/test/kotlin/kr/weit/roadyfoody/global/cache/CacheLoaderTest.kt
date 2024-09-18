@@ -13,11 +13,11 @@ import org.springframework.cache.CacheManager
 import org.springframework.data.redis.core.ListOperations
 import org.springframework.data.redis.core.RedisTemplate
 
-class CacheInitializerTest :
+class CacheLoaderTest :
     BehaviorSpec({
         val cacheManager: CacheManager = mockk()
         val redisTemplate: RedisTemplate<String, String> = mockk()
-        val cacheInitializer = CacheInitializer(cacheManager, redisTemplate)
+        val cacheLoader = CacheLoader(cacheManager, redisTemplate)
 
         given("CacheInitializer") {
             val keys = listOf(REPORT_RANKING_KEY, REVIEW_RANKING_KEY, LIKE_RANKING_KEY, TOTAL_RANKING_KEY)
@@ -34,7 +34,7 @@ class CacheInitializerTest :
                 }
 
                 then("비워있던 로컬 캐시가 저장된다.") {
-                    cacheInitializer.run(null)
+                    cacheLoader.run(null)
 
                     verify(exactly = 4) { redisTemplate.opsForList() }
                     keys.forEach { key ->

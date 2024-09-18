@@ -11,18 +11,18 @@ import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Component
 
 @Component
-class CacheInitializer(
+class CacheLoader(
     private val cacheManager: CacheManager,
     private val redisTemplate: RedisTemplate<String, String>,
 ) : ApplicationRunner {
     override fun run(args: ApplicationArguments?) {
-        rankingInitializer(REPORT_RANKING_KEY)
-        rankingInitializer(REVIEW_RANKING_KEY)
-        rankingInitializer(LIKE_RANKING_KEY)
-        rankingInitializer(TOTAL_RANKING_KEY)
+        rankingLoader(REPORT_RANKING_KEY)
+        rankingLoader(REVIEW_RANKING_KEY)
+        rankingLoader(LIKE_RANKING_KEY)
+        rankingLoader(TOTAL_RANKING_KEY)
     }
 
-    private fun rankingInitializer(key: String) {
+    private fun rankingLoader(key: String) {
         val value = redisTemplate.opsForList().range(key, 0, -1)
         cacheManager.getCache(key)?.put(key, value)
     }
