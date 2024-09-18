@@ -60,7 +60,7 @@ class RankingCommandService(
     }
 
     @Async("asyncTask")
-    @Scheduled(cron = "0 19 15 * * *")
+    @Scheduled(cron = "0 0 5 * * *")
     fun updateTotalRanking() {
         updateRanking(
             lockName = TOTAL_RANKING_UPDATE_LOCK,
