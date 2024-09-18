@@ -5,6 +5,7 @@ import kr.weit.roadyfoody.global.cache.CachePublisher
 import kr.weit.roadyfoody.ranking.dto.UserRanking
 import kr.weit.roadyfoody.ranking.utils.LIKE_RANKING_KEY
 import kr.weit.roadyfoody.ranking.utils.LIKE_RANKING_UPDATE_LOCK
+import kr.weit.roadyfoody.ranking.utils.RANKING_TOPIC
 import kr.weit.roadyfoody.ranking.utils.REPORT_RANKING_KEY
 import kr.weit.roadyfoody.ranking.utils.REPORT_RANKING_UPDATE_LOCK
 import kr.weit.roadyfoody.ranking.utils.REVIEW_RANKING_KEY
@@ -86,7 +87,7 @@ class RankingCommandService(
                 .opsForList()
                 .rightPushAll(key, rankingData)
 
-            cachePublisher.publishCacheUpdate(ChannelTopic.of("ranking-cache-update"), key)
+            cachePublisher.publishCacheUpdate(ChannelTopic.of(RANKING_TOPIC), key)
         }
     }
 }

@@ -1,6 +1,7 @@
 package kr.weit.roadyfoody.global.config
 
 import kr.weit.roadyfoody.global.cache.CacheSubscriber
+import kr.weit.roadyfoody.ranking.utils.RANKING_TOPIC
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.redis.connection.RedisConnectionFactory
@@ -19,7 +20,7 @@ class RedisConfig {
     ): RedisMessageListenerContainer {
         val container = RedisMessageListenerContainer()
         container.setConnectionFactory(connectionFactory)
-        container.addMessageListener(cacheSubscriber, PatternTopic("ranking-cache-update"))
+        container.addMessageListener(cacheSubscriber, PatternTopic(RANKING_TOPIC))
         return container
     }
 }
