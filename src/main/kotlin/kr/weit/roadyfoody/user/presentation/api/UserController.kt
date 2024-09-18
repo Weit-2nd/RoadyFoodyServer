@@ -75,7 +75,7 @@ class UserController(
         @Positive(message = "조회할 개수는 양수여야 합니다.")
         @RequestParam(defaultValue = "10", required = false)
         size: Int,
-        @Past(message = "마지막 시간은 과거여야 합니다.")
+        @Past(message = "마지막 시간은 현재 시간 이전이어야 합니다.")
         @RequestParam(required = false)
         lastTime: LocalDateTime?,
     ): SliceResponse<UserLikedReviewResponse> = userQueryService.getLikeReviews(userId, size, lastTime)
