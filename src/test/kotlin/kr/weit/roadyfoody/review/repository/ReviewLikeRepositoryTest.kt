@@ -26,20 +26,19 @@ class ReviewLikeRepositoryTest(
             lateinit var otherUser: User
             lateinit var foodSpots: FoodSpots
             lateinit var review: FoodSpotsReview
+            lateinit var otherReview: FoodSpotsReview
             lateinit var reviewLike: ReviewLike
+            lateinit var otherReviewLike: ReviewLike
             lateinit var reviewLikeId: ReviewLikeId
             beforeEach {
                 user = userRepository.save(createTestUser(0L))
                 otherUser = userRepository.save(createTestUser(0L, "otherUser"))
                 foodSpots = foodSpotsRepository.save(createTestFoodSpots())
                 review = reviewRepository.save(createTestFoodSpotsReview(user, foodSpots))
-                reviewLike = ReviewLike(review, user)
+                otherReview = reviewRepository.save(createTestFoodSpotsReview(otherUser, foodSpots))
+                reviewLike = reviewLikeRepository.save(ReviewLike(review, user))
+                otherReviewLike = reviewLikeRepository.save(ReviewLike(otherReview, user))
                 reviewLikeId = ReviewLikeId(reviewLike.review, reviewLike.user)
-                reviewLikeRepository.saveAll(
-                    listOf(
-                        reviewLike,
-                    ),
-                )
             }
 
             describe("existsById 메소드는") {
@@ -69,7 +68,11 @@ class ReviewLikeRepositoryTest(
             describe("getLikedReviewByUser 메소드는") {
                 context("유저를 받는 경우") {
                     it("유저가 좋아요한 리뷰를 반환한다.") {
-                        reviewLikeRepository.getLikedReviewByUser(user) shouldBe listOf(review)
+                        reviewLikeRepository.getLikedReviewByUser(user) shouldBe
+                            listOf(
+                                review,
+                                otherReview,
+                            )
                     }
                 }
             }
@@ -77,9 +80,37 @@ class ReviewLikeRepositoryTest(
             describe("deleteByUser 메소드는") {
                 context("유저를 받는 경우") {
                     it("유저가 좋아요한 리뷰를 삭제한다.") {
-                        reviewLikeRepository.findByUser(user) shouldBe listOf(reviewLike)
+                        reviewLikeRepository.findByUser(user) shouldBe
+                            listOf(
+                                reviewLike,
+                                otherReviewLike,
+                            )
                         reviewLikeRepository.deleteByUser(user)
                         reviewLikeRepository.findByUser(user) shouldBe emptyList()
+                    }
+                }
+            }
+
+            describe("sliceLikeReviews 메소드는") {
+                context("유저와 사이즈를 받는 경우") {
+                    it("유저가 좋아요한 리뷰를 페이징하여 반환한다.") {
+                        reviewLikeRepository
+                            .sliceLikeReviews(
+                                user,
+                                1,
+                                null,
+                            ).content shouldBe listOf(otherReviewLike)
+                    }
+                }
+
+                context("유저와 사이즈, 마지막 시간을 받는 경우") {
+                    it("유저가 좋아요한 리뷰를 페이징하여 반환한다.") {
+                        reviewLikeRepository
+                            .sliceLikeReviews(
+                                user,
+                                10,
+                                otherReviewLike.createdDateTime,
+                            ).content shouldBe listOf(reviewLike)
                     }
                 }
             }
