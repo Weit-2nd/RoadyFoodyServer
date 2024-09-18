@@ -93,7 +93,7 @@ class ReviewLikeRepositoryTest(
 
             describe("sliceLikeReviews 메소드는") {
                 context("유저와 사이즈를 받는 경우") {
-                    it("유저가 좋아요한 리뷰를 페이징하여 반환한다.") {
+                    it("유저가 좋아요한 리뷰를 slice하여 반환한다.") {
                         reviewLikeRepository
                             .sliceLikeReviews(
                                 user,
@@ -104,7 +104,7 @@ class ReviewLikeRepositoryTest(
                 }
 
                 context("유저와 사이즈, 마지막 시간을 받는 경우") {
-                    it("유저가 좋아요한 리뷰를 페이징하여 반환한다.") {
+                    it("유저가 좋아요한 리뷰를 slice하여 반환한다.") {
                         reviewLikeRepository
                             .sliceLikeReviews(
                                 user,
