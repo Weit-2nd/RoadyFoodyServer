@@ -7,6 +7,7 @@ import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.global.validator.MaxFileSize
 import kr.weit.roadyfoody.global.validator.WebPImage
 import kr.weit.roadyfoody.user.application.dto.UserInfoResponse
+import kr.weit.roadyfoody.user.application.dto.UserLikedReviewResponse
 import kr.weit.roadyfoody.user.application.dto.UserNicknameRequest
 import kr.weit.roadyfoody.user.application.dto.UserReportHistoriesResponse
 import kr.weit.roadyfoody.user.application.dto.UserReviewResponse
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
+import java.time.LocalDateTime
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -63,6 +65,13 @@ class UserController(
         @RequestParam(required = false)
         lastId: Long?,
     ): SliceResponse<UserReviewResponse> = userQueryService.getUserReviews(userId, size, lastId)
+
+    @GetMapping("{userId}/likes/reviews")
+    override fun getUserLikes(
+        userId: Long,
+        size: Int,
+        lastTime: LocalDateTime?,
+    ): SliceResponse<UserLikedReviewResponse> = userQueryService.getLikeReviews(userId, size, lastTime)
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PatchMapping("/nickname")

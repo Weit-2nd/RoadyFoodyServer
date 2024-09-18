@@ -1,6 +1,8 @@
 package kr.weit.roadyfoody.user.application.service
 
+import TEST_REVIEW_PHOTO_URL
 import createMockSliceReview
+import createMockSliceReviewLike
 import createTestReviewPhoto
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
@@ -23,10 +25,12 @@ import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
 import kr.weit.roadyfoody.foodSpots.repository.getHistoriesByUser
 import kr.weit.roadyfoody.global.TEST_LAST_ID
+import kr.weit.roadyfoody.global.TEST_LAST_TIME
 import kr.weit.roadyfoody.global.TEST_PAGE_SIZE
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewPhotoRepository
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
+import kr.weit.roadyfoody.review.repository.ReviewLikeRepository
 import kr.weit.roadyfoody.review.repository.getByReview
 import kr.weit.roadyfoody.user.exception.UserNotFoundException
 import kr.weit.roadyfoody.user.fixture.TEST_USER_ID
@@ -46,6 +50,7 @@ class UserQueryServiceTest :
         val reportFoodCategoryRepository = mockk<ReportFoodCategoryRepository>()
         val reviewRepository = mockk<FoodSpotsReviewRepository>()
         val reviewPhotoRepository = mockk<FoodSpotsReviewPhotoRepository>()
+        val reviewLikeRepository = mockk<ReviewLikeRepository>()
         val redisTemplate = mockk<RedisTemplate<String, String>>()
         val executor = mockk<ExecutorService>()
         val userQueryService =
@@ -57,6 +62,7 @@ class UserQueryServiceTest :
                 reportFoodCategoryRepository,
                 reviewRepository,
                 reviewPhotoRepository,
+                reviewLikeRepository,
                 redisTemplate,
                 executor,
             )
@@ -182,6 +188,45 @@ class UserQueryServiceTest :
                             TEST_PAGE_SIZE,
                             TEST_LAST_ID,
                         )
+                    }
+                }
+            }
+        }
+
+        given("getLikeReviews 테스트") {
+            `when`("정상적인 데이터가 들어올 경우") {
+                val sliceReviewLike = createMockSliceReviewLike()
+                val reviewPhoto = createTestReviewPhoto()
+                val userProfile =
+                    sliceReviewLike.content
+                        .first()
+                        .user.profile.profileImageName!!
+                every { userRepository.findById(any()) } returns Optional.of(createTestUser())
+                every {
+                    reviewLikeRepository.sliceLikeReviews(
+                        any(),
+                        any(),
+                        any(),
+                    )
+                } returns sliceReviewLike
+                every { reviewPhotoRepository.getByReview(any()) } returns listOf(reviewPhoto)
+                every { imageService.getDownloadUrl(reviewPhoto.fileName) } returns TEST_REVIEW_PHOTO_URL
+                every { executor.execute(any()) } answers { firstArg<Runnable>().run() }
+                every { imageService.getDownloadUrl(userProfile) } returns TEST_USER_PROFILE_IMAGE_URL
+                then("정상적으로 좋아요한 리뷰가 조회되어야 한다.") {
+                    userQueryService.getLikeReviews(
+                        TEST_USER_ID,
+                        TEST_PAGE_SIZE,
+                        TEST_LAST_TIME,
+                    )
+                    verify(exactly = 1) {
+                        userRepository.findById(any())
+                        reviewLikeRepository.sliceLikeReviews(any(), any(), any())
+                        reviewPhotoRepository.getByReview(any())
+                        executor.execute(any())
+                    }
+                    verify(exactly = 2) {
+                        imageService.getDownloadUrl(any())
                     }
                 }
             }
