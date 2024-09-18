@@ -242,7 +242,7 @@ interface UserControllerSpec {
         [
             ErrorCode.SIZE_NON_POSITIVE,
             ErrorCode.USER_ID_NON_POSITIVE,
-            ErrorCode.LAST_TIME_FUTURE_OR_PRESENT,
+            ErrorCode.LAST_TIME_NOT_PAST,
             ErrorCode.NOT_FOUND_USER,
         ],
     )

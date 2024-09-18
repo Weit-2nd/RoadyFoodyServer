@@ -115,7 +115,7 @@ class UserQueryService(
         return SliceResponse(response)
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     fun getLikeReviews(
         userId: Long,
         size: Int,
