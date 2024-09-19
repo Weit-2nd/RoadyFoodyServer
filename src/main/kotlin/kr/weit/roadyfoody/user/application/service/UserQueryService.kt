@@ -13,8 +13,10 @@ import kr.weit.roadyfoody.ranking.utils.TOTAL_RANKING_KEY
 import kr.weit.roadyfoody.review.application.dto.ReviewPhotoResponse
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewPhotoRepository
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
+import kr.weit.roadyfoody.review.repository.ReviewLikeRepository
 import kr.weit.roadyfoody.review.repository.getByReview
 import kr.weit.roadyfoody.user.application.dto.UserInfoResponse
+import kr.weit.roadyfoody.user.application.dto.UserLikedReviewResponse
 import kr.weit.roadyfoody.user.application.dto.UserReportCategoryResponse
 import kr.weit.roadyfoody.user.application.dto.UserReportHistoriesResponse
 import kr.weit.roadyfoody.user.application.dto.UserReportPhotoResponse
@@ -26,6 +28,7 @@ import org.springframework.cache.CacheManager
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutorService
 
@@ -38,12 +41,12 @@ class UserQueryService(
     private val reportFoodCategoryRepository: ReportFoodCategoryRepository,
     private val reviewRepository: FoodSpotsReviewRepository,
     private val reviewPhotoRepository: FoodSpotsReviewPhotoRepository,
+    private val reviewLikeRepository: ReviewLikeRepository,
     private val redisTemplate: RedisTemplate<String, String>,
     private val executor: ExecutorService,
     private val cacheManager: CacheManager,
 ) {
     fun getUserInfo(user: User): UserInfoResponse {
-        val user = userRepository.getByUserId(user.id)
         val profileImageUrl = user.profile.profileImageName?.let { imageService.getDownloadUrl(it) }
 
         val reportCountKey = getFoodSpotsReportCountKey(user.id)
@@ -114,6 +117,35 @@ class UserQueryService(
                     val reviewPhotos = photosFutures.map { it.join() }
                     UserReviewResponse(it, reviewPhotos)
                 }
+        return SliceResponse(response)
+    }
+
+    @Transactional(readOnly = true)
+    fun getLikeReviews(
+        userId: Long,
+        size: Int,
+        lastTime: LocalDateTime?,
+    ): SliceResponse<UserLikedReviewResponse> {
+        val user = userRepository.getByUserId(userId)
+        val response =
+            reviewLikeRepository.sliceLikeReviews(user, size, lastTime).map {
+                val photosFutures =
+                    reviewPhotoRepository.getByReview(it.review).map { photo ->
+                        CompletableFuture
+                            .supplyAsync({
+                                ReviewPhotoResponse(
+                                    photo.id,
+                                    imageService.getDownloadUrl(photo.fileName),
+                                )
+                            }, executor)
+                    }
+                val reviewPhotos = photosFutures.map { it.join() }
+                val profileUrl =
+                    it.user.profile.profileImageName?.let { fileName ->
+                        imageService.getDownloadUrl(fileName)
+                    }
+                UserLikedReviewResponse(it, reviewPhotos, profileUrl)
+            }
         return SliceResponse(response)
     }
 

@@ -2,6 +2,7 @@ package kr.weit.roadyfoody.user.presentation.api
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
+import createUserLikeReviewResponse
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
 import io.mockk.mockk
@@ -12,6 +13,7 @@ import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_HAS_NEXT
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_LAST_ID
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOTS_SIZE
 import kr.weit.roadyfoody.global.TEST_LAST_ID
+import kr.weit.roadyfoody.global.TEST_LAST_TIME
 import kr.weit.roadyfoody.global.TEST_NON_POSITIVE_ID
 import kr.weit.roadyfoody.global.TEST_NON_POSITIVE_SIZE
 import kr.weit.roadyfoody.global.TEST_PAGE_SIZE
@@ -39,6 +41,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.web.multipart.MultipartFile
+import java.time.LocalDateTime
 
 @ControllerTest
 @WebMvcTest(UserController::class)
@@ -344,6 +347,54 @@ class UserControllerTest(
                             deleteWithAuth("$requestPath/profile"),
                         ).andExpect(status().isNoContent)
                     verify(exactly = 1) { userCommandService.deleteProfileImage(any<User>()) }
+                }
+            }
+        }
+
+        given("GET $requestPath/{userId}/likes/reviews Test") {
+            val response = createUserLikeReviewResponse()
+            every {
+                userQueryService.getLikeReviews(any(), any(), any())
+            } returns response
+            `when`("정상적인 데이터가 들어올 경우") {
+                then("유저가 좋아요한 리뷰 리스트가 조회된다") {
+                    mockMvc
+                        .perform(
+                            getWithAuth("$requestPath/$TEST_USER_ID/likes/reviews")
+                                .param("size", "$TEST_PAGE_SIZE")
+                                .param("lastTime", "$TEST_LAST_TIME"),
+                        ).andExpect(status().isOk)
+                    verify(exactly = 1) { userQueryService.getLikeReviews(any(), any(), any()) }
+                }
+            }
+
+            `when`("userId가 양수가 아닌 경우") {
+                then("400 반환") {
+                    mockMvc
+                        .perform(
+                            getWithAuth("$requestPath/$TEST_NON_POSITIVE_ID/likes/reviews"),
+                        ).andExpect(status().isBadRequest)
+                }
+            }
+
+            `when`("조회할 개수가 양수가 아닌 경우") {
+                then("400 반환") {
+                    mockMvc
+                        .perform(
+                            getWithAuth("$requestPath/$TEST_USER_ID/likes/reviews")
+                                .param("size", "$TEST_NON_POSITIVE_SIZE"),
+                        ).andExpect(status().isBadRequest)
+                }
+            }
+
+            `when`("마지막 시간이 과거가 아닌 경우") {
+                then("400 반환") {
+                    mockMvc
+                        .perform(
+                            getWithAuth("$requestPath/$TEST_USER_ID/likes/reviews")
+                                .param("size", "$TEST_PAGE_SIZE")
+                                .param("lastTime", LocalDateTime.now().plusSeconds(1).toString()),
+                        ).andExpect(status().isBadRequest)
                 }
             }
         }

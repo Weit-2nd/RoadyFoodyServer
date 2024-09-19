@@ -1,10 +1,12 @@
 package kr.weit.roadyfoody.search.foodSpots.application.service
 
 import USER_ENTITY_LOCK_KEY
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsQueryService
 import kr.weit.roadyfoody.global.annotation.DistributedLock
+import kr.weit.roadyfoody.global.circuitbreaker.targetexception.REDIS_CIRCUIT_BREAKER_TARGET_EXCEPTIONS
 import kr.weit.roadyfoody.rewards.application.service.RewardsCommandService
 import kr.weit.roadyfoody.rewards.domain.RewardType
 import kr.weit.roadyfoody.rewards.domain.Rewards
@@ -18,6 +20,7 @@ import kr.weit.roadyfoody.user.application.service.UserCommandService
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.lang.Exception
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.pow
@@ -80,6 +83,7 @@ class FoodSpotsSearchService(
         return foodSpotsSearchResponses
     }
 
+    @CircuitBreaker(name = "redisCircuitBreaker", fallbackMethod = "fallbackRequiredCoin")
     @Transactional(readOnly = true)
     fun getRequiredCoin(
         user: User,
@@ -149,5 +153,16 @@ class FoodSpotsSearchService(
             }
 
         return existingCache
+    }
+
+    fun fallbackRequiredCoin(
+        user: User,
+        requiredCoinRequest: RequiredCoinRequest,
+        exception: Exception,
+    ): RequiredCoinResponse {
+        if (REDIS_CIRCUIT_BREAKER_TARGET_EXCEPTIONS.any { it.isInstance(exception) }) {
+            return RequiredCoinResponse(0)
+        }
+        throw exception
     }
 }
