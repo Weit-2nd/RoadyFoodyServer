@@ -2,9 +2,11 @@ package kr.weit.roadyfoody.ranking.application.service
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
+import kr.weit.roadyfoody.global.cache.CachePublisher
 import kr.weit.roadyfoody.ranking.dto.UserRanking
 import kr.weit.roadyfoody.ranking.utils.LIKE_RANKING_KEY
 import kr.weit.roadyfoody.ranking.utils.LIKE_RANKING_UPDATE_LOCK
+import kr.weit.roadyfoody.ranking.utils.RANKING_TOPIC
 import kr.weit.roadyfoody.ranking.utils.REPORT_RANKING_KEY
 import kr.weit.roadyfoody.ranking.utils.REPORT_RANKING_UPDATE_LOCK
 import kr.weit.roadyfoody.ranking.utils.REVIEW_RANKING_KEY
@@ -15,6 +17,7 @@ import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
 import org.redisson.api.RLock
 import org.redisson.api.RedissonClient
 import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.data.redis.listener.ChannelTopic
 import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
@@ -26,6 +29,7 @@ class RankingCommandService(
     private val redissonClient: RedissonClient,
     private val foodSpotsHistoryRepository: FoodSpotsHistoryRepository,
     private val reviewRepository: FoodSpotsReviewRepository,
+    private val cachePublisher: CachePublisher,
 ) {
     @Async("asyncTask")
     @Scheduled(cron = "0 0 5 * * *")
@@ -87,6 +91,8 @@ class RankingCommandService(
             redisTemplate
                 .opsForList()
                 .rightPushAll(key, rankingData)
+
+            cachePublisher.publishCacheUpdate(ChannelTopic.of(RANKING_TOPIC), key)
         }
     }
 }

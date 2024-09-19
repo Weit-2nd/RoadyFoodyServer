@@ -6,6 +6,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
+import kr.weit.roadyfoody.global.cache.CachePublisher
 import kr.weit.roadyfoody.ranking.fixture.createUserRankingResponse
 import kr.weit.roadyfoody.ranking.utils.LIKE_RANKING_KEY
 import kr.weit.roadyfoody.ranking.utils.REPORT_RANKING_KEY
@@ -25,12 +26,14 @@ class RankingCommandServiceTest :
             val redissonClient = mockk<RedissonClient>()
             val foodSpotsHistoryRepository = mockk<FoodSpotsHistoryRepository>()
             val reviewRepository = mockk<FoodSpotsReviewRepository>()
+            val cachePublisher = mockk<CachePublisher>()
             val rankingCommandService =
                 RankingCommandService(
                     redisTemplate,
                     redissonClient,
                     foodSpotsHistoryRepository,
                     reviewRepository,
+                    cachePublisher,
                 )
 
             val lock = mockk<RLock>()
@@ -39,6 +42,7 @@ class RankingCommandServiceTest :
             given("updateReportRanking 테스트") {
                 every { redissonClient.getLock(any<String>()) } returns lock
                 afterEach { clearMocks(foodSpotsHistoryRepository) }
+                afterEach { clearMocks(cachePublisher) }
 
                 `when`("Lock을 획득한 경우") {
                     every { lock.tryLock(0, 10, TimeUnit.MINUTES) } returns true
@@ -47,10 +51,12 @@ class RankingCommandServiceTest :
                     every { foodSpotsHistoryRepository.findAllUserReportCount() } returns createUserRankingResponse()
                     every { redisTemplate.opsForList() } returns list
                     every { list.rightPushAll(any(), any<List<String>>()) } returns 1L
+                    every { cachePublisher.publishCacheUpdate(any(), any()) } returns Unit
 
                     then("레디스의 데이터가 정상적으로 업데이트된다.") {
                         rankingCommandService.updateReportRanking()
                         verify(exactly = 1) { foodSpotsHistoryRepository.findAllUserReportCount() }
+                        verify(exactly = 1) { cachePublisher.publishCacheUpdate(any(), any()) }
                     }
                 }
 
@@ -60,6 +66,7 @@ class RankingCommandServiceTest :
                     then("레디스의 데이터가 업데이트되지 않는다.") {
                         rankingCommandService.updateReportRanking()
                         verify(exactly = 0) { foodSpotsHistoryRepository.findAllUserReportCount() }
+                        verify(exactly = 0) { cachePublisher.publishCacheUpdate(any(), any()) }
                     }
                 }
             }
@@ -67,6 +74,7 @@ class RankingCommandServiceTest :
             given("updateReviewRanking 테스트") {
                 every { redissonClient.getLock(any<String>()) } returns lock
                 afterEach { clearMocks(reviewRepository) }
+                afterEach { clearMocks(cachePublisher) }
 
                 `when`("Lock을 획득한 경우") {
                     every { lock.tryLock(0, 10, TimeUnit.MINUTES) } returns true
@@ -75,10 +83,12 @@ class RankingCommandServiceTest :
                     every { reviewRepository.findAllUserReviewCount() } returns createUserRankingResponse()
                     every { redisTemplate.opsForList() } returns list
                     every { list.rightPushAll(any(), any<List<String>>()) } returns 1L
+                    every { cachePublisher.publishCacheUpdate(any(), any()) } returns Unit
 
                     then("레디스의 데이터가 정상적으로 업데이트된다.") {
                         rankingCommandService.updateReviewRanking()
                         verify(exactly = 1) { reviewRepository.findAllUserReviewCount() }
+                        verify(exactly = 1) { cachePublisher.publishCacheUpdate(any(), any()) }
                     }
                 }
 
@@ -88,6 +98,7 @@ class RankingCommandServiceTest :
                     then("레디스의 데이터가 업데이트되지 않는다.") {
                         rankingCommandService.updateReviewRanking()
                         verify(exactly = 0) { reviewRepository.findAllUserReviewCount() }
+                        verify(exactly = 0) { cachePublisher.publishCacheUpdate(any(), any()) }
                     }
                 }
             }
@@ -95,6 +106,7 @@ class RankingCommandServiceTest :
             given("updateLikeRanking 테스트") {
                 every { redissonClient.getLock(any<String>()) } returns lock
                 afterEach { clearMocks(reviewRepository) }
+                afterEach { clearMocks(cachePublisher) }
 
                 `when`("Lock을 획득한 경우") {
                     every { lock.tryLock(0, 10, TimeUnit.MINUTES) } returns true
@@ -103,10 +115,12 @@ class RankingCommandServiceTest :
                     every { reviewRepository.findAllUserLikeCount() } returns createUserRankingResponse()
                     every { redisTemplate.opsForList() } returns list
                     every { list.rightPushAll(any(), any<List<String>>()) } returns 1L
+                    every { cachePublisher.publishCacheUpdate(any(), any()) } returns Unit
 
                     then("레디스의 데이터가 정상적으로 업데이트된다.") {
                         rankingCommandService.updateLikeRanking()
                         verify(exactly = 1) { reviewRepository.findAllUserLikeCount() }
+                        verify(exactly = 1) { cachePublisher.publishCacheUpdate(any(), any()) }
                     }
                 }
 
@@ -116,6 +130,7 @@ class RankingCommandServiceTest :
                     then("레디스의 데이터가 업데이트되지 않는다.") {
                         rankingCommandService.updateLikeRanking()
                         verify(exactly = 0) { reviewRepository.findAllUserLikeCount() }
+                        verify(exactly = 0) { cachePublisher.publishCacheUpdate(any(), any()) }
                     }
                 }
             }
@@ -123,6 +138,7 @@ class RankingCommandServiceTest :
             given("updateTotalRanking 테스트") {
                 every { redissonClient.getLock(any<String>()) } returns lock
                 afterEach { clearMocks(reviewRepository) }
+                afterEach { clearMocks(cachePublisher) }
 
                 `when`("Lock을 획득한 경우") {
                     every { lock.tryLock(0, 10, TimeUnit.MINUTES) } returns true
@@ -131,10 +147,12 @@ class RankingCommandServiceTest :
                     every { reviewRepository.findAllUserTotalCount() } returns createUserRankingResponse()
                     every { redisTemplate.opsForList() } returns list
                     every { list.rightPushAll(any(), any<List<String>>()) } returns 1L
+                    every { cachePublisher.publishCacheUpdate(any(), any()) } returns Unit
 
                     then("레디스의 데이터가 정상적으로 업데이트된다.") {
                         rankingCommandService.updateTotalRanking()
                         verify(exactly = 1) { reviewRepository.findAllUserTotalCount() }
+                        verify(exactly = 1) { cachePublisher.publishCacheUpdate(any(), any()) }
                     }
                 }
 
@@ -144,6 +162,7 @@ class RankingCommandServiceTest :
                     then("레디스의 데이터가 업데이트되지 않는다.") {
                         rankingCommandService.updateTotalRanking()
                         verify(exactly = 0) { reviewRepository.findAllUserTotalCount() }
+                        verify(exactly = 0) { cachePublisher.publishCacheUpdate(any(), any()) }
                     }
                 }
             }
