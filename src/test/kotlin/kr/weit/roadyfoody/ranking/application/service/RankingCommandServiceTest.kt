@@ -7,7 +7,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
 import kr.weit.roadyfoody.global.cache.CachePublisher
-import kr.weit.roadyfoody.ranking.fixture.createUserRankingResponse
+import kr.weit.roadyfoody.ranking.fixture.createUserRanking
 import kr.weit.roadyfoody.ranking.utils.LIKE_RANKING_KEY
 import kr.weit.roadyfoody.ranking.utils.REPORT_RANKING_KEY
 import kr.weit.roadyfoody.ranking.utils.REVIEW_RANKING_KEY
@@ -48,7 +48,7 @@ class RankingCommandServiceTest :
                     every { lock.tryLock(0, 10, TimeUnit.MINUTES) } returns true
 
                     every { redisTemplate.delete(REPORT_RANKING_KEY) } returns true
-                    every { foodSpotsHistoryRepository.findAllUserReportCount() } returns createUserRankingResponse()
+                    every { foodSpotsHistoryRepository.findAllUserReportCount() } returns createUserRanking()
                     every { redisTemplate.opsForList() } returns list
                     every { list.rightPushAll(any(), any<List<String>>()) } returns 1L
                     every { cachePublisher.publishCacheUpdate(any(), any()) } returns Unit
@@ -80,7 +80,7 @@ class RankingCommandServiceTest :
                     every { lock.tryLock(0, 10, TimeUnit.MINUTES) } returns true
 
                     every { redisTemplate.delete(REVIEW_RANKING_KEY) } returns true
-                    every { reviewRepository.findAllUserReviewCount() } returns createUserRankingResponse()
+                    every { reviewRepository.findAllUserReviewCount() } returns createUserRanking()
                     every { redisTemplate.opsForList() } returns list
                     every { list.rightPushAll(any(), any<List<String>>()) } returns 1L
                     every { cachePublisher.publishCacheUpdate(any(), any()) } returns Unit
@@ -112,7 +112,7 @@ class RankingCommandServiceTest :
                     every { lock.tryLock(0, 10, TimeUnit.MINUTES) } returns true
 
                     every { redisTemplate.delete(LIKE_RANKING_KEY) } returns true
-                    every { reviewRepository.findAllUserLikeCount() } returns createUserRankingResponse()
+                    every { reviewRepository.findAllUserLikeCount() } returns createUserRanking()
                     every { redisTemplate.opsForList() } returns list
                     every { list.rightPushAll(any(), any<List<String>>()) } returns 1L
                     every { cachePublisher.publishCacheUpdate(any(), any()) } returns Unit
@@ -144,7 +144,7 @@ class RankingCommandServiceTest :
                     every { lock.tryLock(0, 10, TimeUnit.MINUTES) } returns true
 
                     every { redisTemplate.delete(TOTAL_RANKING_KEY) } returns true
-                    every { reviewRepository.findAllUserTotalCount() } returns createUserRankingResponse()
+                    every { reviewRepository.findAllUserTotalCount() } returns createUserRanking()
                     every { redisTemplate.opsForList() } returns list
                     every { list.rightPushAll(any(), any<List<String>>()) } returns 1L
                     every { cachePublisher.publishCacheUpdate(any(), any()) } returns Unit

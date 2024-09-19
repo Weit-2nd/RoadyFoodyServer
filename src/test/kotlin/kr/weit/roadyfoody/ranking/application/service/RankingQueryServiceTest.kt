@@ -10,7 +10,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
 import kr.weit.roadyfoody.ranking.exception.RankingNotFoundException
-import kr.weit.roadyfoody.ranking.fixture.createUserRankingResponse
+import kr.weit.roadyfoody.ranking.fixture.createUserRanking
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
 import org.springframework.cache.Cache
 import org.springframework.cache.CacheManager
@@ -38,7 +38,7 @@ class RankingQueryServiceTest :
                 )
 
             val listOperation = mockk<ListOperations<String, String>>()
-            val list = listOf("user1:10", "user2:20", "user3:15")
+            val list = listOf("1:user2:20", "2:user3:15", "3:user1:10")
             val cache = mockk<Cache>()
 
             afterEach { clearMocks(reviewRepository) }
@@ -75,7 +75,7 @@ class RankingQueryServiceTest :
                     every { cache.get(any(), List::class.java) } returns null
                     every { listOperation.range(any(), any(), any()) } returns listOf()
                     every { listOperation.rightPushAll(any(), any<List<String>>()) } returns 1L
-                    every { foodSpotsHistoryRepository.findAllUserReportCount() } returns createUserRankingResponse()
+                    every { foodSpotsHistoryRepository.findAllUserReportCount() } returns createUserRanking()
 
                     then("예외가 발생한다.") {
                         shouldThrow<RankingNotFoundException> { rankingQueryService.getReportRanking(10) }
@@ -112,7 +112,7 @@ class RankingQueryServiceTest :
                     every { redisTemplate.opsForList() } returns listOperation
                     every { listOperation.range(any(), any(), any()) } returns listOf()
                     every { listOperation.rightPushAll(any(), any<List<String>>()) } returns 1L
-                    every { reviewRepository.findAllUserReviewCount() } returns createUserRankingResponse()
+                    every { reviewRepository.findAllUserReviewCount() } returns createUserRanking()
 
                     then("예외가 발생한다.") {
                         shouldThrow<RankingNotFoundException> { rankingQueryService.getReviewRanking(10) }
@@ -148,7 +148,7 @@ class RankingQueryServiceTest :
                     every { redisTemplate.opsForList() } returns listOperation
                     every { listOperation.range(any(), any(), any()) } returns null
                     every { listOperation.rightPushAll(any(), any<List<String>>()) } returns 1L
-                    every { reviewRepository.findAllUserLikeCount() } returns createUserRankingResponse()
+                    every { reviewRepository.findAllUserLikeCount() } returns createUserRanking()
 
                     then("예외가 발생한다.") {
                         shouldThrow<RankingNotFoundException> { rankingQueryService.getLikeRanking(10) }
@@ -161,7 +161,7 @@ class RankingQueryServiceTest :
                     every { redisTemplate.opsForList() } returns listOperation
                     every { listOperation.range(any(), any(), any()) } returns listOf()
                     every { listOperation.rightPushAll(any(), any<List<String>>()) } returns 1L
-                    every { reviewRepository.findAllUserLikeCount() } returns createUserRankingResponse()
+                    every { reviewRepository.findAllUserLikeCount() } returns createUserRanking()
 
                     then("예외가 발생한다.") {
                         shouldThrow<RankingNotFoundException> { rankingQueryService.getLikeRanking(10) }
@@ -197,7 +197,7 @@ class RankingQueryServiceTest :
                     every { redisTemplate.opsForList() } returns listOperation
                     every { listOperation.range(any(), any(), any()) } returns null
                     every { listOperation.rightPushAll(any(), any<List<String>>()) } returns 1L
-                    every { reviewRepository.findAllUserTotalCount() } returns createUserRankingResponse()
+                    every { reviewRepository.findAllUserTotalCount() } returns createUserRanking()
                     every {
                         rankingCommandService.updateRanking(
                             any(),
@@ -225,7 +225,7 @@ class RankingQueryServiceTest :
                     every { redisTemplate.opsForList() } returns listOperation
                     every { listOperation.range(any(), any(), any()) } returns listOf()
                     every { listOperation.rightPushAll(any(), any<List<String>>()) } returns 1L
-                    every { reviewRepository.findAllUserTotalCount() } returns createUserRankingResponse()
+                    every { reviewRepository.findAllUserTotalCount() } returns createUserRanking()
                     every {
                         rankingCommandService.updateRanking(
                             any(),

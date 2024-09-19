@@ -2,6 +2,7 @@ package kr.weit.roadyfoody.ranking.application.service
 
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
 import kr.weit.roadyfoody.ranking.dto.UserRanking
+import kr.weit.roadyfoody.ranking.dto.UserRankingResponse
 import kr.weit.roadyfoody.ranking.exception.RankingNotFoundException
 import kr.weit.roadyfoody.ranking.utils.LIKE_RANKING_KEY
 import kr.weit.roadyfoody.ranking.utils.LIKE_RANKING_UPDATE_LOCK
@@ -27,7 +28,7 @@ class RankingQueryService(
     private val executor: ExecutorService,
     private val cacheManager: CacheManager,
 ) {
-    fun getReportRanking(size: Long): List<UserRanking> =
+    fun getReportRanking(size: Long): List<UserRankingResponse> =
         getRanking(
             lockName = REPORT_RANKING_UPDATE_LOCK,
             size = size,
@@ -35,7 +36,7 @@ class RankingQueryService(
             dataProvider = foodSpotsHistoryRepository::findAllUserReportCount,
         )
 
-    fun getReviewRanking(size: Long): List<UserRanking> =
+    fun getReviewRanking(size: Long): List<UserRankingResponse> =
         getRanking(
             lockName = REVIEW_RANKING_UPDATE_LOCK,
             size = size,
@@ -43,7 +44,7 @@ class RankingQueryService(
             dataProvider = reviewRepository::findAllUserReviewCount,
         )
 
-    fun getLikeRanking(size: Long): List<UserRanking> =
+    fun getLikeRanking(size: Long): List<UserRankingResponse> =
         getRanking(
             lockName = LIKE_RANKING_UPDATE_LOCK,
             size = size,
@@ -51,7 +52,7 @@ class RankingQueryService(
             dataProvider = reviewRepository::findAllUserLikeCount,
         )
 
-    fun getTotalRanking(size: Long): List<UserRanking> =
+    fun getTotalRanking(size: Long): List<UserRankingResponse> =
         getRanking(
             lockName = TOTAL_RANKING_UPDATE_LOCK,
             size = size,
@@ -64,7 +65,7 @@ class RankingQueryService(
         size: Long,
         key: String,
         dataProvider: () -> List<UserRanking>,
-    ): List<UserRanking> {
+    ): List<UserRankingResponse> {
         val cache = cacheManager.getCache(key)
         val cachedData =
             cache?.get(key, List::class.java) as? List<String>
@@ -91,10 +92,11 @@ class RankingQueryService(
         return convertToUserRanking(ranking)
     }
 
-    private fun convertToUserRanking(ranking: List<String>): List<UserRanking> =
+    private fun convertToUserRanking(ranking: List<String>): List<UserRankingResponse> =
         ranking.map { score ->
-            val (userNickname, total) = score.split(":")
-            UserRanking(
+            val (ranking, userNickname, total) = score.split(":")
+            UserRankingResponse(
+                ranking = ranking.toLong(),
                 userNickname = userNickname,
                 total = total.toLong(),
             )

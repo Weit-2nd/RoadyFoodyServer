@@ -33,6 +33,8 @@ import kr.weit.roadyfoody.user.fixture.TEST_USER_ID
 import kr.weit.roadyfoody.user.fixture.TEST_USER_PROFILE_IMAGE_URL
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import kr.weit.roadyfoody.user.repository.UserRepository
+import org.springframework.cache.Cache
+import org.springframework.cache.CacheManager
 import org.springframework.data.redis.core.RedisTemplate
 import java.util.Optional
 import java.util.concurrent.ExecutorService
@@ -48,6 +50,7 @@ class UserQueryServiceTest :
         val reviewPhotoRepository = mockk<FoodSpotsReviewPhotoRepository>()
         val redisTemplate = mockk<RedisTemplate<String, String>>()
         val executor = mockk<ExecutorService>()
+        val cacheManager = mockk<CacheManager>()
         val userQueryService =
             UserQueryService(
                 userRepository,
@@ -59,16 +62,23 @@ class UserQueryServiceTest :
                 reviewPhotoRepository,
                 redisTemplate,
                 executor,
+                cacheManager,
             )
+        val list = listOf("1:user2:20", "2:user3:15", "3:user1:10")
+        val cache = mockk<Cache>()
 
         afterEach { clearAllMocks() }
 
         given("getUserInfo 테스트") {
             `when`("프로필사진이 존재하는 유저의 경우") {
                 val user = createTestUser()
+
                 every { userRepository.findById(any<Long>()) } returns Optional.of(user)
                 every { imageService.getDownloadUrl(any<String>()) } returns TEST_USER_PROFILE_IMAGE_URL
                 every { redisTemplate.opsForValue().get(any()) } returns TEST_REST_DAILY_REPORT_CREATION_COUNT.toString()
+                every { cacheManager.getCache(any()) } returns cache
+                every { cache.get(any(), List::class.java) } returns list
+
                 then("프로필사진 URL 이 존재하는 응답을 반환한다.") {
                     val userInfoResponse = userQueryService.getUserInfo(user)
                     userInfoResponse.profileImageUrl shouldBe TEST_USER_PROFILE_IMAGE_URL
@@ -81,6 +91,9 @@ class UserQueryServiceTest :
                 every { userRepository.findById(any<Long>()) } returns Optional.of(user)
                 every { imageService.getDownloadUrl(any<String>()) } returns TEST_USER_PROFILE_IMAGE_URL
                 every { redisTemplate.opsForValue().get(any()) } returns TEST_REST_DAILY_REPORT_CREATION_COUNT.toString()
+                every { cacheManager.getCache(any()) } returns cache
+                every { cache.get(any(), List::class.java) } returns list
+
                 then("프로필사진 URL 이 null 인 응답을 반환한다.") {
                     val userInfoResponse = userQueryService.getUserInfo(user)
                     userInfoResponse.profileImageUrl.shouldBeNull()
