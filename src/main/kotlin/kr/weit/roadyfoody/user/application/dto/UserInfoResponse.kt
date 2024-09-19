@@ -13,6 +13,8 @@ data class UserInfoResponse(
     val coin: Int,
     @Schema(description = "잔여 당일 리포트 생성 횟수", example = "3")
     val restDailyReportCreationCount: Int,
+    @Schema(description = "종합 랭킹 순위", example = "1")
+    val myRanking: Long,
 ) {
     companion object {
         fun of(
@@ -21,6 +23,7 @@ data class UserInfoResponse(
             badge: String,
             coin: Int,
             restDailyReportCreationCount: Int,
+            myRanking: Long,
         ): UserInfoResponse =
             UserInfoResponse(
                 nickname = nickname,
@@ -28,12 +31,7 @@ data class UserInfoResponse(
                 badge = badge,
                 coin = coin,
                 restDailyReportCreationCount = restDailyReportCreationCount,
+                myRanking = myRanking,
             )
     }
 }
-
-@Schema(description = "보유중인 코인 응답 데이터")
-data class UserCoinBalance(
-    @Schema(description = "보유중인 코인")
-    val userCoin: Int,
-)

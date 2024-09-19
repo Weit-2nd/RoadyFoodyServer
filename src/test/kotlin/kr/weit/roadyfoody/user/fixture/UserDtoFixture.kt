@@ -21,12 +21,14 @@ fun createTestUserInfoResponse(
     badge: Badge = Badge.BEGINNER,
     coin: Int = TEST_USER_COIN,
     restDailyReportCreationCount: Int = TEST_REST_DAILY_REPORT_CREATION_COUNT,
+    myRanking: Long = TEST_USER_RANKING,
 ) = UserInfoResponse(
     nickname = nickname,
     profileImageUrl = profileImageUrl,
     badge = badge.description,
     coin = coin,
     restDailyReportCreationCount = restDailyReportCreationCount,
+    myRanking = myRanking,
 )
 
 fun createTestUserReportPhotoResponse(

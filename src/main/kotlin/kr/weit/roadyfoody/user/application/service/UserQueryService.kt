@@ -9,6 +9,7 @@ import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
 import kr.weit.roadyfoody.foodSpots.repository.getHistoriesByUser
 import kr.weit.roadyfoody.global.service.ImageService
+import kr.weit.roadyfoody.ranking.utils.TOTAL_RANKING_KEY
 import kr.weit.roadyfoody.review.application.dto.ReviewPhotoResponse
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewPhotoRepository
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
@@ -23,6 +24,7 @@ import kr.weit.roadyfoody.user.application.dto.UserReviewResponse
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.repository.UserRepository
 import kr.weit.roadyfoody.user.repository.getByUserId
+import org.springframework.cache.CacheManager
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -42,6 +44,7 @@ class UserQueryService(
     private val reviewLikeRepository: ReviewLikeRepository,
     private val redisTemplate: RedisTemplate<String, String>,
     private val executor: ExecutorService,
+    private val cacheManager: CacheManager,
 ) {
     fun getUserInfo(user: User): UserInfoResponse {
         val profileImageUrl = user.profile.profileImageName?.let { imageService.getDownloadUrl(it) }
@@ -49,6 +52,7 @@ class UserQueryService(
         val reportCountKey = getFoodSpotsReportCountKey(user.id)
         val dailyReportCreationCount = redisTemplate.opsForValue().get(reportCountKey)?.toInt() ?: 0
         val restDailyReportCreationCount = FOOD_SPOTS_REPORT_LIMIT_COUNT - dailyReportCreationCount
+        val ranking = getRanking(user)
 
         return UserInfoResponse.of(
             user.profile.nickname,
@@ -56,6 +60,7 @@ class UserQueryService(
             user.badge.description,
             user.coin,
             restDailyReportCreationCount,
+            ranking,
         )
     }
 
@@ -113,6 +118,16 @@ class UserQueryService(
                     UserReviewResponse(it, reviewPhotos)
                 }
         return SliceResponse(response)
+    }
+
+    private fun getRanking(user: User): Long {
+        val cache = cacheManager.getCache(TOTAL_RANKING_KEY)
+        val cacheData = cache?.get(TOTAL_RANKING_KEY, List::class.java) as? List<String>
+
+        return cacheData?.firstNotNullOfOrNull { entry ->
+            val (ranking, nickname, _) = entry.split(":")
+            if (nickname == user.profile.nickname) ranking.toLong() else null
+        } ?: 0L
     }
 
     @Transactional(readOnly = true)
