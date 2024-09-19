@@ -25,6 +25,8 @@ data class UserReportHistoriesResponse(
     val reportPhotos: List<UserReportPhotoResponse>,
     @Schema(description = "음식 카테고리 리스트")
     val categories: List<UserReportCategoryResponse>,
+    @Schema(description = "푸드트럭 여부")
+    val foodTruck: Boolean,
 ) {
     constructor(
         foodSpotsHistory: FoodSpotsHistory,
@@ -40,6 +42,7 @@ data class UserReportHistoriesResponse(
         createdDateTime = foodSpotsHistory.createdDateTime,
         reportPhotos = reportPhotoResponse,
         categories = categories,
+        foodTruck = foodSpotsHistory.foodTruck,
     )
 }
 
