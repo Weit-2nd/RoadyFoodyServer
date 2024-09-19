@@ -1,6 +1,8 @@
 package kr.weit.roadyfoody.ranking.application.service
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
+import kr.weit.roadyfoody.global.circuitbreaker.targetexception.REDIS_CIRCUIT_BREAKER_TARGET_EXCEPTIONS
 import kr.weit.roadyfoody.ranking.dto.UserRanking
 import kr.weit.roadyfoody.ranking.exception.RankingNotFoundException
 import kr.weit.roadyfoody.ranking.utils.LIKE_RANKING_KEY
@@ -27,6 +29,7 @@ class RankingQueryService(
     private val executor: ExecutorService,
     private val cacheManager: CacheManager,
 ) {
+    @CircuitBreaker(name = "redisCircuitBreaker", fallbackMethod = "fallbackRankings")
     fun getReportRanking(size: Long): List<UserRanking> =
         getRanking(
             lockName = REPORT_RANKING_UPDATE_LOCK,
@@ -35,6 +38,7 @@ class RankingQueryService(
             dataProvider = foodSpotsHistoryRepository::findAllUserReportCount,
         )
 
+    @CircuitBreaker(name = "redisCircuitBreaker", fallbackMethod = "fallbackRankings")
     fun getReviewRanking(size: Long): List<UserRanking> =
         getRanking(
             lockName = REVIEW_RANKING_UPDATE_LOCK,
@@ -43,6 +47,7 @@ class RankingQueryService(
             dataProvider = reviewRepository::findAllUserReviewCount,
         )
 
+    @CircuitBreaker(name = "redisCircuitBreaker", fallbackMethod = "fallbackRankings")
     fun getLikeRanking(size: Long): List<UserRanking> =
         getRanking(
             lockName = LIKE_RANKING_UPDATE_LOCK,
@@ -51,6 +56,7 @@ class RankingQueryService(
             dataProvider = reviewRepository::findAllUserLikeCount,
         )
 
+    @CircuitBreaker(name = "redisCircuitBreaker", fallbackMethod = "fallbackRankings")
     fun getTotalRanking(size: Long): List<UserRanking> =
         getRanking(
             lockName = TOTAL_RANKING_UPDATE_LOCK,
@@ -99,4 +105,14 @@ class RankingQueryService(
                 total = total.toLong(),
             )
         }
+
+    fun fallbackRankings(
+        size: Long,
+        throwable: Throwable,
+    ): List<UserRanking> {
+        if (REDIS_CIRCUIT_BREAKER_TARGET_EXCEPTIONS.any { it.isInstance(throwable) }) {
+            return emptyList()
+        }
+        throw throwable
+    }
 }

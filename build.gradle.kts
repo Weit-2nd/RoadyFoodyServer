@@ -61,6 +61,9 @@ dependencies {
     implementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store:3.1.1")
     implementation("org.springframework.cloud:spring-cloud-starter-bootstrap:4.1.2")
 
+    // Toleration
+    implementation("io.github.resilience4j:resilience4j-spring-boot3:2.2.0")
+
     // Utils
     implementation("org.apache.tika:tika-core:2.9.1")
     implementation("com.sksamuel.scrimage:scrimage-webp:4.1.3")

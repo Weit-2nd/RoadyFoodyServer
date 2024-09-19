@@ -1,5 +1,6 @@
 package kr.weit.roadyfoody.global.annotation
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.RedisLockFailedException
 import org.aspectj.lang.ProceedingJoinPoint
@@ -20,6 +21,7 @@ class DistributedLockAop(
 ) {
     val log: Logger = LoggerFactory.getLogger(DistributedLockAop::class.java)
 
+    @CircuitBreaker(name = "redisCircuitBreaker")
     @Around("@annotation(kr.weit.roadyfoody.global.annotation.DistributedLock)")
     fun lock(joinPoint: ProceedingJoinPoint): Any? {
         val signature = joinPoint.signature as MethodSignature
