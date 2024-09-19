@@ -20,10 +20,11 @@ class CircuitBreakerStatusAlert(
             }
     }
 
+    private val managedStates = setOf(CircuitBreaker.State.CLOSED, CircuitBreaker.State.OPEN)
+
     fun handleStateTransition(event: CircuitBreakerOnStateTransitionEvent) {
         val state = event.stateTransition.toState
-
-        if (state != CircuitBreaker.State.CLOSED && state != CircuitBreaker.State.OPEN) {
+        if (state !in managedStates) {
             return
         }
 
