@@ -111,7 +111,7 @@ class RankingQueryService(
     fun fallbackRankings(
         size: Long,
         throwable: Throwable,
-    ): List<UserRanking> {
+    ): List<UserRankingResponse> {
         if (REDIS_CIRCUIT_BREAKER_TARGET_EXCEPTIONS.any { it.isInstance(throwable) }) {
             return emptyList()
         }
