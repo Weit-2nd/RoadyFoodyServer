@@ -296,6 +296,8 @@ data class FoodSpotsReviewResponse(
     val photos: List<ReviewPhotoResponse>,
     @Schema(description = "리뷰 작성일")
     val createdAt: LocalDateTime,
+    @Schema(description = "좋아요 수")
+    val likeTotal: Int,
 ) {
     companion object {
         fun of(
@@ -310,6 +312,7 @@ data class FoodSpotsReviewResponse(
             rate = review.rate,
             photos = photoList,
             createdAt = review.createdDateTime,
+            likeTotal = review.likeTotal,
         )
     }
 }

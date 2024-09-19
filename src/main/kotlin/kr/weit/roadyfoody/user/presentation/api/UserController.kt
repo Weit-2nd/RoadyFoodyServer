@@ -1,12 +1,14 @@
 package kr.weit.roadyfoody.user.presentation.api
 
 import jakarta.validation.Valid
+import jakarta.validation.constraints.Past
 import jakarta.validation.constraints.Positive
 import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.global.validator.MaxFileSize
 import kr.weit.roadyfoody.global.validator.WebPImage
 import kr.weit.roadyfoody.user.application.dto.UserInfoResponse
+import kr.weit.roadyfoody.user.application.dto.UserLikedReviewResponse
 import kr.weit.roadyfoody.user.application.dto.UserNicknameRequest
 import kr.weit.roadyfoody.user.application.dto.UserReportHistoriesResponse
 import kr.weit.roadyfoody.user.application.dto.UserReviewResponse
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
+import java.time.LocalDateTime
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -63,6 +66,19 @@ class UserController(
         @RequestParam(required = false)
         lastId: Long?,
     ): SliceResponse<UserReviewResponse> = userQueryService.getUserReviews(userId, size, lastId)
+
+    @GetMapping("{userId}/likes/reviews")
+    override fun getUserLikeReviews(
+        @PathVariable("userId")
+        @Positive(message = "유저 ID는 양수여야 합니다.")
+        userId: Long,
+        @Positive(message = "조회할 개수는 양수여야 합니다.")
+        @RequestParam(defaultValue = "10", required = false)
+        size: Int,
+        @Past(message = "마지막 시간은 현재 시간 이전이어야 합니다.")
+        @RequestParam(required = false)
+        lastTime: LocalDateTime?,
+    ): SliceResponse<UserLikedReviewResponse> = userQueryService.getLikeReviews(userId, size, lastTime)
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PatchMapping("/nickname")

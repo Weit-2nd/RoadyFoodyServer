@@ -1,4 +1,5 @@
 import kr.weit.roadyfoody.badge.domain.Badge
+import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_PHOTO_NAME
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpots
@@ -9,7 +10,9 @@ import kr.weit.roadyfoody.review.application.dto.ToggleLikeResponse
 import kr.weit.roadyfoody.review.domain.FoodSpotsReview
 import kr.weit.roadyfoody.review.domain.FoodSpotsReviewPhoto
 import kr.weit.roadyfoody.review.domain.ReviewLike
+import kr.weit.roadyfoody.user.application.dto.UserLikedReviewResponse
 import kr.weit.roadyfoody.user.domain.User
+import kr.weit.roadyfoody.user.fixture.TEST_USER_PROFILE_IMAGE_URL
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
@@ -96,6 +99,20 @@ fun createMockReviewLike(
 ): ReviewLike = MockTestReviewLike(review, user)
 
 fun createTestToggleLikeResponse(): ToggleLikeResponse = ToggleLikeResponse(TEST_REVIEW_ID, TEST_REVIEW_LIKE, true)
+
+fun createMockSliceReviewLike(): Slice<ReviewLike> = SliceImpl(listOf(createMockReviewLike()), Pageable.ofSize(TEST_PAGE_SIZE), false)
+
+fun createUserLikeReviewResponse(): SliceResponse<UserLikedReviewResponse> =
+    SliceResponse(
+        listOf(
+            UserLikedReviewResponse(
+                createMockReviewLike(),
+                listOf(createTestReviewPhotoResponse()),
+                TEST_USER_PROFILE_IMAGE_URL,
+            ),
+        ),
+        false,
+    )
 
 class MockTestReview(
     id: Long = 0L,

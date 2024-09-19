@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import jakarta.validation.constraints.Past
 import jakarta.validation.constraints.Positive
 import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.common.dto.SliceResponse
@@ -18,11 +19,13 @@ import kr.weit.roadyfoody.global.swagger.v1.SwaggerTag
 import kr.weit.roadyfoody.global.validator.MaxFileSize
 import kr.weit.roadyfoody.global.validator.WebPImage
 import kr.weit.roadyfoody.user.application.dto.UserInfoResponse
+import kr.weit.roadyfoody.user.application.dto.UserLikedReviewResponse
 import kr.weit.roadyfoody.user.application.dto.UserNicknameRequest
 import kr.weit.roadyfoody.user.application.dto.UserReportHistoriesResponse
 import kr.weit.roadyfoody.user.application.dto.UserReviewResponse
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.utils.SliceReportHistories
+import kr.weit.roadyfoody.user.utils.SliceUserLike
 import kr.weit.roadyfoody.user.utils.SliceUserReview
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PathVariable
@@ -30,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.multipart.MultipartFile
+import java.time.LocalDateTime
 
 @Tag(name = SwaggerTag.USER)
 interface UserControllerSpec {
@@ -215,4 +219,42 @@ interface UserControllerSpec {
     fun deleteProfile(
         @LoginUser user: User,
     )
+
+    @Operation(
+        description = "유저 좋아요 누른 게시물 조회 API",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "유저 좋아요 누른 게시물 조회 성공",
+                content = [
+                    Content(
+                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                        schema =
+                            Schema(
+                                implementation = SliceUserLike::class,
+                            ),
+                    ),
+                ],
+            ),
+        ],
+    )
+    @ApiErrorCodeExamples(
+        [
+            ErrorCode.SIZE_NON_POSITIVE,
+            ErrorCode.USER_ID_NON_POSITIVE,
+            ErrorCode.LAST_TIME_NOT_PAST,
+            ErrorCode.NOT_FOUND_USER,
+        ],
+    )
+    fun getUserLikeReviews(
+        @PathVariable("userId")
+        @Positive(message = "유저 ID는 양수여야 합니다.")
+        userId: Long,
+        @Positive(message = "조회할 개수는 양수여야 합니다.")
+        @RequestParam(defaultValue = "10", required = false)
+        size: Int,
+        @Past(message = "마지막 시간은 현재 시간 이전이어야 합니다.")
+        @RequestParam(required = false)
+        lastTime: LocalDateTime?,
+    ): SliceResponse<UserLikedReviewResponse>
 }
