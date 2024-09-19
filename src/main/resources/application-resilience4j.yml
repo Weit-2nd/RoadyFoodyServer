@@ -1,0 +1,30 @@
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      failure-rate-threshold: 50 # 실패율 임계값 (percent), 이 값이 초과되면 서킷 브레이커가 열립니다.
+      slow-call-rate-threshold: 50 # 느린 호출 비율 임계값 (percent), 이 값이 초과되면 서킷 브레이커가 열립니다.
+      slow-call-duration-threshold: # 느린 호출의 기간 임계값, 요청을 했을 때 소요시간이 이 임계값을 넘어가면 느린 호출 비율에 포함됩니다.
+        seconds: 3
+      permitted-number-of-calls-in-half-open-state: 3 # Half-Open 상태에서 허용되는 호출 수
+      max-wait-duration-in-half-open-state: # Half-Open 상태에서 서킷 브레이커가 다시 Open 상태로 전환되기까지 대기할 수 있는 최대 시간
+        seconds: 3
+      sliding-window-type: COUNT_BASED # 슬라이딩 윈도우의 유형 (COUNT_BASED 또는 TIME_BASED)
+      sliding-window-size: 10 # 슬라이딩 윈도우의 크기, COUNT_BASED 유형의 경우 호출 수를 기준으로 합니다.
+      minimum-number-of-calls: 5 # 서킷 브레이커가 작동하기 위해 필요한 최소 호출 수
+      wait-duration-in-open-state: # Open 상태에서의 대기 시간, 이 시간이 지나야 서킷 브레이커가 Half-Open 상태로 전환됩니다.
+        seconds: 5
+      register-health-indicator: true # Health Indicator 등록 여부
+      automatic-transition-from-open-to-half-open-enabled: true # Open 상태에서 Half-Open 상태로 자동 전환 기능
+      event-consumer-buffer-size: 10 # 이벤트 소비자 버퍼 크기
+  instances:
+    redisCircuitBreaker:
+      baseConfig: default  # 'default' 설정을 기반으로 합니다.
+
+      # 기록할 예외 목록, 이 예외들이 발생하면 서킷 브레이커가 작동합니다. 이 외의 예외들은 성공으로 간주합니다.
+      record-exceptions:
+        - org.springframework.data.redis.RedisSystemException
+        - org.springframework.data.redis.RedisConnectionFailureException
+        - org.springframework.data.redis.TooManyClusterRedirectionsException
+        - org.springframework.data.redis.ClusterRedirectException
+        - org.springframework.data.redis.ClusterStateFailureException
+        - org.redisson.client.RedisException
