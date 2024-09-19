@@ -1,6 +1,8 @@
 package kr.weit.roadyfoody.ranking.application.service
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
+import kr.weit.roadyfoody.global.circuitbreaker.targetexception.REDIS_CIRCUIT_BREAKER_TARGET_EXCEPTIONS
 import kr.weit.roadyfoody.ranking.dto.UserRanking
 import kr.weit.roadyfoody.ranking.exception.RankingNotFoundException
 import kr.weit.roadyfoody.ranking.utils.LIKE_RANKING_KEY
@@ -12,6 +14,7 @@ import kr.weit.roadyfoody.ranking.utils.REVIEW_RANKING_UPDATE_LOCK
 import kr.weit.roadyfoody.ranking.utils.TOTAL_RANKING_KEY
 import kr.weit.roadyfoody.ranking.utils.TOTAL_RANKING_UPDATE_LOCK
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
+import org.springframework.cache.CacheManager
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
 import java.util.concurrent.CompletableFuture
@@ -24,7 +27,9 @@ class RankingQueryService(
     private val reviewRepository: FoodSpotsReviewRepository,
     private val rankingCommandService: RankingCommandService,
     private val executor: ExecutorService,
+    private val cacheManager: CacheManager,
 ) {
+    @CircuitBreaker(name = "redisCircuitBreaker", fallbackMethod = "fallbackRankings")
     fun getReportRanking(size: Long): List<UserRanking> =
         getRanking(
             lockName = REPORT_RANKING_UPDATE_LOCK,
@@ -33,6 +38,7 @@ class RankingQueryService(
             dataProvider = foodSpotsHistoryRepository::findAllUserReportCount,
         )
 
+    @CircuitBreaker(name = "redisCircuitBreaker", fallbackMethod = "fallbackRankings")
     fun getReviewRanking(size: Long): List<UserRanking> =
         getRanking(
             lockName = REVIEW_RANKING_UPDATE_LOCK,
@@ -41,6 +47,7 @@ class RankingQueryService(
             dataProvider = reviewRepository::findAllUserReviewCount,
         )
 
+    @CircuitBreaker(name = "redisCircuitBreaker", fallbackMethod = "fallbackRankings")
     fun getLikeRanking(size: Long): List<UserRanking> =
         getRanking(
             lockName = LIKE_RANKING_UPDATE_LOCK,
@@ -49,6 +56,7 @@ class RankingQueryService(
             dataProvider = reviewRepository::findAllUserLikeCount,
         )
 
+    @CircuitBreaker(name = "redisCircuitBreaker", fallbackMethod = "fallbackRankings")
     fun getTotalRanking(size: Long): List<UserRanking> =
         getRanking(
             lockName = TOTAL_RANKING_UPDATE_LOCK,
@@ -63,6 +71,13 @@ class RankingQueryService(
         key: String,
         dataProvider: () -> List<UserRanking>,
     ): List<UserRanking> {
+        val cache = cacheManager.getCache(key)
+        val cachedData =
+            cache?.get(key, List::class.java) as? List<String>
+        if (!cachedData.isNullOrEmpty()) {
+            return convertToUserRanking(cachedData.take(size.toInt()))
+        }
+
         val ranking =
             redisTemplate
                 .opsForList()
@@ -78,15 +93,26 @@ class RankingQueryService(
             }, executor)
             throw RankingNotFoundException()
         }
-        return ranking.map { score ->
-            val data = score.split(":")
-            val userNickname = data[0]
-            val total = data[1]
 
+        return convertToUserRanking(ranking)
+    }
+
+    private fun convertToUserRanking(ranking: List<String>): List<UserRanking> =
+        ranking.map { score ->
+            val (userNickname, total) = score.split(":")
             UserRanking(
                 userNickname = userNickname,
                 total = total.toLong(),
             )
         }
+
+    fun fallbackRankings(
+        size: Long,
+        throwable: Throwable,
+    ): List<UserRanking> {
+        if (REDIS_CIRCUIT_BREAKER_TARGET_EXCEPTIONS.any { it.isInstance(throwable) }) {
+            return emptyList()
+        }
+        throw throwable
     }
 }

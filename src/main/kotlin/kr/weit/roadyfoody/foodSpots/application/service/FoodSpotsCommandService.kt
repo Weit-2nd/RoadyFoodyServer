@@ -1,6 +1,7 @@
 package kr.weit.roadyfoody.foodSpots.application.service
 
 import USER_ENTITY_LOCK_KEY
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsUpdateRequest
@@ -81,6 +82,7 @@ class FoodSpotsCommandService(
         fun getFoodSpotsReportCountKey(userId: Long) = "$FOOD_SPOTS_REPORT_LIMIT_PREFIX$userId"
     }
 
+    @CircuitBreaker(name = "redisCircuitBreaker")
     @DistributedLock(lockName = USER_ENTITY_LOCK_KEY, identifier = "user")
     @Transactional
     fun createReport(
@@ -384,6 +386,7 @@ class FoodSpotsCommandService(
     }
 
     @Scheduled(cron = "0 0 0 * * *")
+    @CircuitBreaker(name = "redisCircuitBreaker")
     fun setFoodSpotsOpen() {
         if (redissonClient
                 .getBucket<String>(

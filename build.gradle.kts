@@ -54,11 +54,15 @@ dependencies {
     implementation("org.opensearch.client:spring-data-opensearch-starter:1.5.1") {
         exclude("org.opensearch.client", "opensearch-rest-client-sniffer")
     }
+    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
     // Secret & Config
     implementation(platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.1.1"))
     implementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store:3.1.1")
     implementation("org.springframework.cloud:spring-cloud-starter-bootstrap:4.1.2")
+
+    // Toleration
+    implementation("io.github.resilience4j:resilience4j-spring-boot3:2.2.0")
 
     // Utils
     implementation("org.apache.tika:tika-core:2.9.1")
