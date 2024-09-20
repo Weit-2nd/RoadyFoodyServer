@@ -23,6 +23,7 @@ import kr.weit.roadyfoody.user.application.dto.UserLikedReviewResponse
 import kr.weit.roadyfoody.user.application.dto.UserNicknameRequest
 import kr.weit.roadyfoody.user.application.dto.UserReportHistoriesResponse
 import kr.weit.roadyfoody.user.application.dto.UserReviewResponse
+import kr.weit.roadyfoody.user.application.dto.UserStatisticsResponse
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.utils.SliceReportHistories
 import kr.weit.roadyfoody.user.utils.SliceUserLike
@@ -257,4 +258,34 @@ interface UserControllerSpec {
         @RequestParam(required = false)
         lastTime: LocalDateTime?,
     ): SliceResponse<UserLikedReviewResponse>
+
+    @Operation(
+        description = "유저 활동 통계 조회 API",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "유저 통계 조회 성공",
+                content = [
+                    Content(
+                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                        schema =
+                            Schema(
+                                implementation = UserStatisticsResponse::class,
+                            ),
+                    ),
+                ],
+            ),
+        ],
+    )
+    @ApiErrorCodeExamples(
+        [
+            ErrorCode.USER_ID_NON_POSITIVE,
+            ErrorCode.NOT_FOUND_USER,
+        ],
+    )
+    fun getUserStatistics(
+        @PathVariable("userId")
+        @Positive(message = "유저 ID는 양수여야 합니다.")
+        userId: Long,
+    ): UserStatisticsResponse
 }

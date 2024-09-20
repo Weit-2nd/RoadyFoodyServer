@@ -244,4 +244,22 @@ class UserQueryServiceTest :
                 }
             }
         }
+
+        given("getUserStatistics 테스트") {
+            `when`("userId가 들어 올 경우") {
+                every { userRepository.findById(TEST_USER_ID) } returns Optional.of(createTestUser())
+                every { foodSpotsHistoryRepository.countByUser(any()) } returns 1
+                every { reviewRepository.countByUser(any()) } returns 1
+                every { reviewLikeRepository.countByUser(any()) } returns 1
+                then("정상적으로 조회되어야 한다.") {
+                    userQueryService.getUserStatistics(TEST_USER_ID)
+                    verify(exactly = 1) {
+                        userRepository.findById(TEST_USER_ID)
+                        foodSpotsHistoryRepository.countByUser(any())
+                        reviewRepository.countByUser(any())
+                        reviewLikeRepository.countByUser(any())
+                    }
+                }
+            }
+        }
     })
