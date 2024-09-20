@@ -94,25 +94,14 @@ class ReviewLikeRepositoryTest(
             }
 
             describe("sliceLikeReviews 메소드는") {
-                context("유저와 사이즈를 받는 경우") {
-                    it("유저가 좋아요한 리뷰를 slice하여 반환한다.") {
+                context("유저와 조회할 개수를 받는 경우") {
+                    it("유저가 좋아요한 이력을 조회한다.") {
                         reviewLikeRepository
                             .sliceLikeReviews(
                                 user,
                                 1,
                                 null,
                             ).content shouldBe listOf(otherReviewLike)
-                    }
-                }
-
-                context("유저와 사이즈, 마지막 시간을 받는 경우") {
-                    it("유저가 좋아요한 리뷰를 slice하여 반환한다.") {
-                        reviewLikeRepository
-                            .sliceLikeReviews(
-                                user,
-                                10,
-                                otherReviewLike.createdDateTime,
-                            ).content shouldBe listOf(reviewLike)
                     }
                 }
             }
