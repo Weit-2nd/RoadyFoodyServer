@@ -31,7 +31,7 @@ class RankingQueryService(
     private val cacheManager: CacheManager,
 ) {
     @CircuitBreaker(name = "redisCircuitBreaker", fallbackMethod = "fallbackRankings")
-    fun getReportRanking(size: Long): List<UserRanking> =
+    fun getReportRanking(size: Long): List<UserRankingResponse> =
         getRanking(
             lockName = REPORT_RANKING_UPDATE_LOCK,
             size = size,
@@ -40,7 +40,7 @@ class RankingQueryService(
         )
 
     @CircuitBreaker(name = "redisCircuitBreaker", fallbackMethod = "fallbackRankings")
-    fun getReviewRanking(size: Long): List<UserRanking> =
+    fun getReviewRanking(size: Long): List<UserRankingResponse> =
         getRanking(
             lockName = REVIEW_RANKING_UPDATE_LOCK,
             size = size,
@@ -49,7 +49,7 @@ class RankingQueryService(
         )
 
     @CircuitBreaker(name = "redisCircuitBreaker", fallbackMethod = "fallbackRankings")
-    fun getLikeRanking(size: Long): List<UserRanking> =
+    fun getLikeRanking(size: Long): List<UserRankingResponse> =
         getRanking(
             lockName = LIKE_RANKING_UPDATE_LOCK,
             size = size,
@@ -58,7 +58,7 @@ class RankingQueryService(
         )
 
     @CircuitBreaker(name = "redisCircuitBreaker", fallbackMethod = "fallbackRankings")
-    fun getTotalRanking(size: Long): List<UserRanking> =
+    fun getTotalRanking(size: Long): List<UserRankingResponse> =
         getRanking(
             lockName = TOTAL_RANKING_UPDATE_LOCK,
             size = size,
