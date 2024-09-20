@@ -1,5 +1,6 @@
 package kr.weit.roadyfoody.ranking.application.service
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
 import kr.weit.roadyfoody.global.cache.CachePublisher
 import kr.weit.roadyfoody.ranking.dto.UserRanking
@@ -32,6 +33,7 @@ class RankingCommandService(
 ) {
     @Async("asyncTask")
     @Scheduled(cron = "0 0 5 * * *")
+    @CircuitBreaker(name = "redisCircuitBreaker")
     fun updateReportRanking() {
         updateRanking(
             lockName = REPORT_RANKING_UPDATE_LOCK,
@@ -42,6 +44,7 @@ class RankingCommandService(
 
     @Async("asyncTask")
     @Scheduled(cron = "0 0 5 * * *")
+    @CircuitBreaker(name = "redisCircuitBreaker")
     fun updateReviewRanking() {
         updateRanking(
             lockName = REVIEW_RANKING_UPDATE_LOCK,
@@ -52,6 +55,7 @@ class RankingCommandService(
 
     @Async("asyncTask")
     @Scheduled(cron = "0 0 5 * * *")
+    @CircuitBreaker(name = "redisCircuitBreaker")
     fun updateLikeRanking() {
         updateRanking(
             lockName = LIKE_RANKING_UPDATE_LOCK,
@@ -62,6 +66,7 @@ class RankingCommandService(
 
     @Async("asyncTask")
     @Scheduled(cron = "0 0 5 * * *")
+    @CircuitBreaker(name = "redisCircuitBreaker")
     fun updateTotalRanking() {
         updateRanking(
             lockName = TOTAL_RANKING_UPDATE_LOCK,

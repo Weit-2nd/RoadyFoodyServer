@@ -1,5 +1,6 @@
 package kr.weit.roadyfoody.auth.security.jwt
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
 import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.io.Decoders
@@ -53,6 +54,7 @@ class JwtUtil(
             refreshKey,
         )
 
+    @CircuitBreaker(name = "redisCircuitBreaker")
     fun storeCachedRefreshTokenRotateId(
         userId: Long,
         rotateId: String,
@@ -67,9 +69,7 @@ class JwtUtil(
     companion object {
         private const val REFRESH_TOKEN_CACHE_PREFIX = "rofo:refresh-token-cache:"
 
-        fun getRefreshTokenCacheKey(userId: Long): String {
-            return REFRESH_TOKEN_CACHE_PREFIX.plus(userId)
-        }
+        fun getRefreshTokenCacheKey(userId: Long): String = REFRESH_TOKEN_CACHE_PREFIX.plus(userId)
     }
 
     private fun generateJwtToken(
@@ -77,7 +77,8 @@ class JwtUtil(
         expirationTime: Long,
         key: SecretKey,
     ): String =
-        Jwts.builder()
+        Jwts
+            .builder()
             .claims(claims)
             .expiration(afterMillis(expirationTime))
             .signWith(key)
@@ -90,6 +91,7 @@ class JwtUtil(
 
     fun generateRotateId(): String = UUID.randomUUID().toString()
 
+    @CircuitBreaker(name = "redisCircuitBreaker")
     fun validateCachedRefreshTokenRotateId(token: String): Boolean {
         if (!redisTemplate.hasKey(getRefreshTokenCacheKey(getUserId(refreshKey, token)))) {
             return false
@@ -124,13 +126,15 @@ class JwtUtil(
     private fun parseClaims(
         key: SecretKey,
         token: String,
-    ) = Jwts.parser()
+    ) = Jwts
+        .parser()
         .verifyWith(key)
         .decryptWith(key)
         .build()
         .parseSignedClaims(token)
         .payload
 
+    @CircuitBreaker(name = "redisCircuitBreaker")
     fun removeCachedRefreshToken(userId: Long) {
         redisTemplate.delete(getRefreshTokenCacheKey(userId))
     }
