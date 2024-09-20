@@ -10,6 +10,7 @@ import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.global.swagger.ApiErrorCodeExamples
 import kr.weit.roadyfoody.global.swagger.v1.SwaggerTag
 import kr.weit.roadyfoody.ranking.dto.UserRanking
+import kr.weit.roadyfoody.ranking.dto.UserRankingResponse
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.RequestParam
 
@@ -43,7 +44,7 @@ interface RankingControllerSpec {
         @Positive(message = "size는 양수여야 합니다.")
         @RequestParam(defaultValue = "10")
         size: Long,
-    ): List<UserRanking>
+    ): List<UserRankingResponse>
 
     @ApiErrorCodeExamples(
         [
@@ -72,7 +73,7 @@ interface RankingControllerSpec {
         @Positive(message = "size는 양수여야 합니다.")
         @RequestParam(defaultValue = "10")
         size: Long,
-    ): List<UserRanking>
+    ): List<UserRankingResponse>
 
     @ApiErrorCodeExamples(
         [
@@ -101,7 +102,7 @@ interface RankingControllerSpec {
         @Positive(message = "size는 양수여야 합니다")
         @RequestParam(defaultValue = "10")
         size: Long,
-    ): List<UserRanking>
+    ): List<UserRankingResponse>
 
     @ApiErrorCodeExamples(
         [
@@ -130,5 +131,5 @@ interface RankingControllerSpec {
         @Positive(message = "size는 양수여야 합니다")
         @RequestParam(defaultValue = "10")
         size: Long,
-    ): List<UserRanking>
+    ): List<UserRankingResponse>
 }

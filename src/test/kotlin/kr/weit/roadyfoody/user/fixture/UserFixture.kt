@@ -20,6 +20,7 @@ const val TEST_USER_PROFILE_IMAGE_NAME = "test_image_name"
 const val TEST_USER_PROFILE_IMAGE_URL = "test/image/url"
 const val TEST_USER_COIN = 500
 const val TEST_OTHER_USER_ID = 2L
+const val TEST_USER_RANKING = 2L
 
 fun createTestUser(
     id: Long = TEST_USER_ID,

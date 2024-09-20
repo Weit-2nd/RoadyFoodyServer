@@ -86,7 +86,10 @@ class RankingCommandService(
             redisTemplate.delete(key)
 
             val userRanking = dataProvider()
-            val rankingData = userRanking.map { "${it.userNickname}:${it.total}" }
+            val rankingData =
+                userRanking.mapIndexed { index, it ->
+                    "${index + 1}:${it.userNickname}:${it.total}"
+                }
 
             redisTemplate
                 .opsForList()
