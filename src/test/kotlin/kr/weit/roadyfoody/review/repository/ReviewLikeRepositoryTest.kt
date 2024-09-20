@@ -28,8 +28,10 @@ class ReviewLikeRepositoryTest(
             lateinit var foodSpots: FoodSpots
             lateinit var review: FoodSpotsReview
             lateinit var otherReview: FoodSpotsReview
+            lateinit var otherReview2: FoodSpotsReview
             lateinit var reviewLike: ReviewLike
             lateinit var otherReviewLike: ReviewLike
+            lateinit var otherReviewLike2: ReviewLike
             lateinit var reviewLikeId: ReviewLikeId
             beforeEach {
                 user = userRepository.save(createTestUser(0L))
@@ -38,8 +40,11 @@ class ReviewLikeRepositoryTest(
                 foodSpots = foodSpotsRepository.save(createTestFoodSpots())
                 review = reviewRepository.save(createTestFoodSpotsReview(user, foodSpots))
                 otherReview = reviewRepository.save(createTestFoodSpotsReview(otherUser, foodSpots))
+                otherReview2 =
+                    reviewRepository.save(createTestFoodSpotsReview(otherUser, foodSpots))
                 reviewLike = reviewLikeRepository.save(ReviewLike(review, user))
                 otherReviewLike = reviewLikeRepository.save(ReviewLike(otherReview, user))
+                otherReviewLike2 = reviewLikeRepository.save(ReviewLike(otherReview2, user))
                 reviewLikeId = ReviewLikeId(reviewLike.review, reviewLike.user)
             }
 
@@ -74,6 +79,7 @@ class ReviewLikeRepositoryTest(
                             listOf(
                                 review,
                                 otherReview,
+                                otherReview2,
                             )
                     }
                 }
@@ -86,6 +92,7 @@ class ReviewLikeRepositoryTest(
                             listOf(
                                 reviewLike,
                                 otherReviewLike,
+                                otherReviewLike2,
                             )
                         reviewLikeRepository.deleteByUser(user)
                         reviewLikeRepository.findByUser(user) shouldBe emptyList()
@@ -96,12 +103,15 @@ class ReviewLikeRepositoryTest(
             describe("sliceLikeReviews 메소드는") {
                 context("유저와 조회할 개수를 받는 경우") {
                     it("유저가 좋아요한 이력을 조회한다.") {
+                        val reviewList = reviewLikeRepository.findByUser(user)
+                        val latestReview = reviewList[2]
+                        val olderReview = reviewList[1]
                         reviewLikeRepository
                             .sliceLikeReviews(
                                 user,
                                 1,
-                                null,
-                            ).content shouldBe listOf(otherReviewLike)
+                                latestReview.createdDateTime,
+                            ).content shouldBe listOf(olderReview)
                     }
                 }
             }
@@ -109,7 +119,7 @@ class ReviewLikeRepositoryTest(
             describe("countByUser 메소드는") {
                 context("유저를 받는 경우") {
                     it("유저가 좋아요한 리뷰의 개수를 반환한다.") {
-                        reviewLikeRepository.countByUser(user) shouldBe 2
+                        reviewLikeRepository.countByUser(user) shouldBe 3
                     }
                 }
 
