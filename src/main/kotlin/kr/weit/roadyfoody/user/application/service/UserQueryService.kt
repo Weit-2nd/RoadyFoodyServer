@@ -150,16 +150,6 @@ class UserQueryService(
         return SliceResponse(response)
     }
 
-    private fun getRanking(user: User): Long {
-        val cache = cacheManager.getCache(TOTAL_RANKING_KEY)
-        val cacheData = cache?.get(TOTAL_RANKING_KEY, List::class.java) as? List<String>
-
-        return cacheData?.firstNotNullOfOrNull { entry ->
-            val (ranking, nickname, _) = entry.split(":")
-            if (nickname == user.profile.nickname) ranking.toLong() else null
-        } ?: 0L
-    }
-
     @Transactional(readOnly = true)
     fun getUserStatistics(userId: Long): UserStatisticsResponse {
         val user = userRepository.getByUserId(userId)
@@ -168,5 +158,15 @@ class UserQueryService(
             reviewRepository.countByUser(user),
             reviewLikeRepository.countByUser(user),
         )
+    }
+
+    private fun getRanking(user: User): Long {
+        val cache = cacheManager.getCache(TOTAL_RANKING_KEY)
+        val cacheData = cache?.get(TOTAL_RANKING_KEY, List::class.java) as? List<String>
+
+        return cacheData?.firstNotNullOfOrNull { entry ->
+            val (ranking, nickname, _) = entry.split(":")
+            if (nickname == user.profile.nickname) ranking.toLong() else null
+        } ?: 0L
     }
 }

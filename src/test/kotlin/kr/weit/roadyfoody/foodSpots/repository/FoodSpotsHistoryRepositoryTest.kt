@@ -156,7 +156,7 @@ class FoodSpotsHistoryRepositoryTest(
                 it("0을 반환한다.") {
                     val count = foodSpotsHistoryRepository.countByUser(otherUser)
                     count shouldBe 0
+                }
             }
         }
-    }
     })
