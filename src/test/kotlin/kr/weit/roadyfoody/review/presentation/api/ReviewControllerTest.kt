@@ -3,13 +3,16 @@ package kr.weit.roadyfoody.review.presentation.api
 import TEST_INVALID_FOOD_SPOT_ID
 import TEST_INVALID_RATING
 import TEST_INVALID_RATING_OVER
+import TEST_INVALID_REVIEW_ID
 import TEST_REVIEW_CONTENT_MAX_LENGTH
+import TEST_REVIEW_CREATE_REQUEST_NAME
 import TEST_REVIEW_ID
-import TEST_REVIEW_REQUEST_NAME
 import TEST_REVIEW_REQUEST_PHOTO
+import TEST_REVIEW_UPDATE_REQUEST_NAME
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import createTestReviewRequest
+import createTestReviewUpdateRequest
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
 import io.mockk.just
@@ -24,6 +27,7 @@ import kr.weit.roadyfoody.support.utils.ImageFormat.WEBP
 import kr.weit.roadyfoody.support.utils.createMultipartFile
 import kr.weit.roadyfoody.support.utils.createTestImageFile
 import kr.weit.roadyfoody.support.utils.deleteWithAuth
+import kr.weit.roadyfoody.support.utils.multipartPatchWithAuth
 import kr.weit.roadyfoody.support.utils.multipartWithAuth
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.mock.web.MockMultipartFile
@@ -53,7 +57,7 @@ class ReviewControllerTest(
                                 multipartWithAuth(requestPath)
                                     .file(
                                         createMultipartFile(
-                                            TEST_REVIEW_REQUEST_NAME,
+                                            TEST_REVIEW_CREATE_REQUEST_NAME,
                                             objectMapper
                                                 .writeValueAsBytes(reportRequest)
                                                 .inputStream(),
@@ -72,7 +76,7 @@ class ReviewControllerTest(
                                 multipartWithAuth(requestPath)
                                     .file(
                                         createMultipartFile(
-                                            TEST_REVIEW_REQUEST_NAME,
+                                            TEST_REVIEW_CREATE_REQUEST_NAME,
                                             objectMapper
                                                 .writeValueAsBytes(reportRequest)
                                                 .inputStream(),
@@ -90,7 +94,7 @@ class ReviewControllerTest(
                                 multipartWithAuth(requestPath)
                                     .file(
                                         createMultipartFile(
-                                            TEST_REVIEW_REQUEST_NAME,
+                                            TEST_REVIEW_CREATE_REQUEST_NAME,
                                             objectMapper
                                                 .writeValueAsBytes(reportRequest)
                                                 .inputStream(),
@@ -109,7 +113,7 @@ class ReviewControllerTest(
                                 multipartWithAuth(requestPath)
                                     .file(
                                         createMultipartFile(
-                                            TEST_REVIEW_REQUEST_NAME,
+                                            TEST_REVIEW_CREATE_REQUEST_NAME,
                                             objectMapper
                                                 .writeValueAsBytes(reportRequest)
                                                 .inputStream(),
@@ -127,7 +131,7 @@ class ReviewControllerTest(
                                 multipartWithAuth(requestPath)
                                     .file(
                                         createMultipartFile(
-                                            TEST_REVIEW_REQUEST_NAME,
+                                            TEST_REVIEW_CREATE_REQUEST_NAME,
                                             objectMapper
                                                 .writeValueAsBytes(reportRequest)
                                                 .inputStream(),
@@ -145,7 +149,7 @@ class ReviewControllerTest(
                                 multipartWithAuth(requestPath)
                                     .file(
                                         createMultipartFile(
-                                            TEST_REVIEW_REQUEST_NAME,
+                                            TEST_REVIEW_CREATE_REQUEST_NAME,
                                             objectMapper
                                                 .writeValueAsBytes(reportRequest)
                                                 .inputStream(),
@@ -164,7 +168,7 @@ class ReviewControllerTest(
                                 multipartWithAuth(requestPath)
                                     .file(
                                         createMultipartFile(
-                                            TEST_REVIEW_REQUEST_NAME,
+                                            TEST_REVIEW_CREATE_REQUEST_NAME,
                                             objectMapper
                                                 .writeValueAsBytes(reportRequest)
                                                 .inputStream(),
@@ -185,7 +189,7 @@ class ReviewControllerTest(
                                 multipartWithAuth(requestPath)
                                     .file(
                                         createMultipartFile(
-                                            TEST_REVIEW_REQUEST_NAME,
+                                            TEST_REVIEW_CREATE_REQUEST_NAME,
                                             objectMapper
                                                 .writeValueAsBytes(reportRequest)
                                                 .inputStream(),
@@ -208,7 +212,7 @@ class ReviewControllerTest(
                                 multipartWithAuth(requestPath)
                                     .file(
                                         createMultipartFile(
-                                            TEST_REVIEW_REQUEST_NAME,
+                                            TEST_REVIEW_CREATE_REQUEST_NAME,
                                             objectMapper
                                                 .writeValueAsBytes(reportRequest)
                                                 .inputStream(),
@@ -247,6 +251,49 @@ class ReviewControllerTest(
                             .perform(
                                 deleteWithAuth("$requestPath/$TEST_REVIEW_ID"),
                             ).andExpect(status().isNoContent)
+                    }
+                }
+            }
+
+            given("PATCH $requestPath/{reviewId}") {
+                val reportRequest = createTestReviewUpdateRequest()
+                val reportPhotos = createMockPhotoList(WEBP)
+                every {
+                    reviewCommandService.updateReview(any(), any(), any(), any())
+                } returns Unit
+                `when`("정상적인 데이터가 들어올 경우") {
+                    then("리뷰가 수정된다.") {
+                        mockMvc
+                            .perform(
+                                multipartPatchWithAuth("$requestPath/$TEST_REVIEW_ID")
+                                    .file(
+                                        createMultipartFile(
+                                            TEST_REVIEW_UPDATE_REQUEST_NAME,
+                                            objectMapper
+                                                .writeValueAsBytes(reportRequest)
+                                                .inputStream(),
+                                        ),
+                                    ).file(TEST_REVIEW_REQUEST_PHOTO, reportPhotos[0].bytes)
+                                    .file(TEST_REVIEW_REQUEST_PHOTO, reportPhotos[1].bytes),
+                            ).andExpect(status().isNoContent)
+                    }
+                }
+
+                `when`("리뷰 id가 양수가 아닌 경우") {
+                    then("400 반환") {
+                        mockMvc
+                            .perform(
+                                multipartPatchWithAuth("$requestPath/$TEST_INVALID_REVIEW_ID")
+                                    .file(
+                                        createMultipartFile(
+                                            TEST_REVIEW_UPDATE_REQUEST_NAME,
+                                            objectMapper
+                                                .writeValueAsBytes(reportRequest)
+                                                .inputStream(),
+                                        ),
+                                    ).file(TEST_REVIEW_REQUEST_PHOTO, reportPhotos[0].bytes)
+                                    .file(TEST_REVIEW_REQUEST_PHOTO, reportPhotos[1].bytes),
+                            ).andExpect(status().isBadRequest)
                     }
                 }
             }

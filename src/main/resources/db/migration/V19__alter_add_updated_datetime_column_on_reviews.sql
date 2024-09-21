@@ -1,0 +1,6 @@
+ALTER TABLE FOOD_SPOTS_REVIEWS
+    ADD updated_datetime TIMESTAMP;
+UPDATE FOOD_SPOTS_REVIEWS
+SET updated_datetime = created_datetime
+WHERE updated_datetime IS NULL;
+ALTER TABLE FOOD_SPOTS_REVIEWS MODIFY updated_datetime TIMESTAMP NOT NULL;

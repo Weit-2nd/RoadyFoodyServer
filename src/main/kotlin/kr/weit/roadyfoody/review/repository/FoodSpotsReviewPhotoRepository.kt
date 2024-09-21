@@ -11,4 +11,9 @@ interface FoodSpotsReviewPhotoRepository : JpaRepository<FoodSpotsReviewPhoto, L
     fun findByFoodSpotsReviewIn(foodSpotsReviewList: List<FoodSpotsReview>): List<FoodSpotsReviewPhoto>
 
     fun findByFoodSpotsReview(foodSpotsReview: FoodSpotsReview): List<FoodSpotsReviewPhoto>
+
+    fun findByFoodSpotsReviewAndIdIn(
+        foodSpotsReview: FoodSpotsReview,
+        ids: Set<Long>,
+    ): List<FoodSpotsReviewPhoto>
 }
