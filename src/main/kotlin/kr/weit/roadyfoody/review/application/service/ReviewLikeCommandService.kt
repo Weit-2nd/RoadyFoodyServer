@@ -1,6 +1,7 @@
 package kr.weit.roadyfoody.review.application.service
 
 import REVIEW_LIKE_LOCK_KEY
+import USER_LIKE_LOCK_KEY
 import jakarta.persistence.EntityManager
 import kr.weit.roadyfoody.global.annotation.DistributedLock
 import kr.weit.roadyfoody.review.application.dto.ToggleLikeResponse
@@ -22,6 +23,7 @@ class ReviewLikeCommandService(
 ) {
     @Transactional
     @DistributedLock(lockName = REVIEW_LIKE_LOCK_KEY, identifier = "reviewId")
+    @DistributedLock(lockName = USER_LIKE_LOCK_KEY, identifier = "userId")
     fun toggleLike(
         reviewId: Long,
         user: User,

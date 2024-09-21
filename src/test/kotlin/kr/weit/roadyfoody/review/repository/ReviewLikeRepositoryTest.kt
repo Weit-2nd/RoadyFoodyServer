@@ -39,6 +39,9 @@ class ReviewLikeRepositoryTest(
                 review = reviewRepository.save(createTestFoodSpotsReview(user, foodSpots))
                 otherReview = reviewRepository.save(createTestFoodSpotsReview(otherUser, foodSpots))
                 reviewLike = reviewLikeRepository.save(ReviewLike(review, user))
+                // 저장시, createdDateTime이 같아지는 것이 테스트 실패를 유발함
+                // redis lock을 사용하였기 때문에 1ms 차이는 날 수 밖에 없으므로 1ms sleep한 뒤 다음 리뷰 좋아요를 저장
+                Thread.sleep(1)
                 otherReviewLike = reviewLikeRepository.save(ReviewLike(otherReview, user))
                 reviewLikeId = ReviewLikeId(reviewLike.review, reviewLike.user)
             }
@@ -94,14 +97,25 @@ class ReviewLikeRepositoryTest(
             }
 
             describe("sliceLikeReviews 메소드는") {
-                context("유저와 조회할 개수를 받는 경우") {
-                    it("유저가 좋아요한 이력을 조회한다.") {
+                context("유저와 사이즈를 받는 경우") {
+                    it("유저가 좋아요한 리뷰를 slice하여 반환한다.") {
                         reviewLikeRepository
                             .sliceLikeReviews(
                                 user,
                                 1,
                                 null,
                             ).content shouldBe listOf(otherReviewLike)
+                    }
+                }
+
+                context("유저와 사이즈, 마지막 시간을 받는 경우") {
+                    it("유저가 좋아요한 리뷰를 slice하여 반환한다.") {
+                        reviewLikeRepository
+                            .sliceLikeReviews(
+                                user,
+                                10,
+                                otherReviewLike.createdDateTime,
+                            ).content shouldBe listOf(reviewLike)
                     }
                 }
             }
