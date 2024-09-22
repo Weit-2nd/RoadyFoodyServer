@@ -37,9 +37,6 @@ class ReviewLikeRepositoryTest(
                 review = reviewRepository.save(createTestFoodSpotsReview(user, foodSpots))
                 otherReview = reviewRepository.save(createTestFoodSpotsReview(otherUser, foodSpots))
                 reviewLike = reviewLikeRepository.save(ReviewLike(review, user))
-                // 저장시, createdDateTime이 같아지는 것이 테스트 실패를 유발함
-                // redis lock을 사용하였기 때문에 1ms 차이는 날 수 밖에 없으므로 1ms sleep한 뒤 다음 리뷰 좋아요를 저장
-                Thread.sleep(1)
                 otherReviewLike = reviewLikeRepository.save(ReviewLike(otherReview, user))
             }
 
