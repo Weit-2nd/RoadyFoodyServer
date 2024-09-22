@@ -22,6 +22,6 @@ data class UserRankingResponse(
     val userId: Long,
     @Schema(description = "프로필 URL")
     val profileImageUrl: String?,
-    @Schema(description = "순위변동")
-    val changeRanking: Long,
+    @Schema(description = "순위 변동")
+    val rankChange: Long,
 )

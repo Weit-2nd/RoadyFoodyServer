@@ -21,14 +21,14 @@ fun createUserRanking(): List<UserRanking> = listOf(createCount())
 fun createCountResponse(
     ranking: Long = 1,
     user: User = createTestUser(),
-    changeRanking: Long = 1,
+    rankChange: Long = 1,
 ): UserRankingResponse =
     UserRankingResponse(
         ranking = ranking,
         userNickname = user.profile.nickname,
         userId = user.id,
         profileImageUrl = user.profile.profileImageName,
-        changeRanking = changeRanking,
+        rankChange = rankChange,
     )
 
 fun createUserRankingResponse(): List<UserRankingResponse> = listOf(createCountResponse())
