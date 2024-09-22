@@ -83,12 +83,30 @@ class RankingCommandService(
         val lock: RLock = redissonClient.getLock(lockName)
 
         if (lock.tryLock(0, 10, TimeUnit.MINUTES)) {
+            val ranking =
+                redisTemplate
+                    .opsForList()
+                    .range(key, 0, -1)
+            val userRanking = dataProvider()
+
             redisTemplate.delete(key)
 
-            val userRanking = dataProvider()
             val rankingData =
                 userRanking.mapIndexed { index, it ->
-                    "${index + 1}:${it.userNickname}:${it.total}"
+                    val oldRankIndex =
+                        ranking?.indexOfFirst { score ->
+                            val parts = score.split(":")
+                            parts[2] == it.userId.toString()
+                        }
+
+                    val rankChange =
+                        if (oldRankIndex == -1) {
+                            (ranking.size).minus((index + 1))
+                        } else {
+                            oldRankIndex?.minus(index)
+                        }
+
+                    "${index + 1}:${it.userNickname}:${it.userId}:${it.profileImageUrl}:$rankChange"
                 }
 
             redisTemplate
