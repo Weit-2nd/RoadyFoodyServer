@@ -68,16 +68,19 @@ class CustomFoodSpotsHistoryRepositoryImpl(
     override fun findAllUserReportCount(): List<UserRanking> =
         kotlinJdslJpqlExecutor
             .findList {
-                val userIdPath = path(FoodSpotsHistory::user).path(User::id)
-                val userNicknamePath = path(FoodSpotsHistory::user).path(User::profile).path(Profile::nickname)
+                val userIdPath = path(FoodSpotsHistory::user)(User::id)
+                val userNicknamePath = path(FoodSpotsHistory::user)(User::profile)(Profile::nickname)
+                val profileUrlPath = path(FoodSpotsHistory::user)(User::profile)(Profile::profileImageName)
                 val historyIdPath = path(FoodSpotsHistory::id)
                 val createdAtPath = path(FoodSpotsHistory::createdDateTime)
 
                 selectNew<UserRanking>(
                     userNicknamePath,
                     count(historyIdPath),
+                    userIdPath,
+                    profileUrlPath,
                 ).from(entity(FoodSpotsHistory::class))
-                    .groupBy(userIdPath, userNicknamePath)
+                    .groupBy(userIdPath, userNicknamePath, profileUrlPath)
                     .orderBy(
                         count(historyIdPath).desc(),
                         max(createdAtPath).asc(),

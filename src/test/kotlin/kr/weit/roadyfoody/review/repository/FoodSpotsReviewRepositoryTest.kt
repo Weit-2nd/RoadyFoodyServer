@@ -215,12 +215,15 @@ class FoodSpotsReviewRepositoryTest(
                     userReportCounts.size shouldBe 3
                     userReportCounts[0].userNickname shouldBe "existentNick"
                     userReportCounts[0].total shouldBe 3
+                    userReportCounts[0].profileImageUrl shouldBe "test_image_name_0"
 
                     userReportCounts[1].userNickname shouldBe "otherUser"
                     userReportCounts[1].total shouldBe 2
+                    userReportCounts[1].profileImageUrl shouldBe "test_image_name_0"
 
                     userReportCounts[2].userNickname shouldBe "testUser"
                     userReportCounts[2].total shouldBe 2
+                    userReportCounts[2].profileImageUrl shouldBe "test_image_name_0"
                 }
             }
 
@@ -231,12 +234,15 @@ class FoodSpotsReviewRepositoryTest(
 
                     userLikeCounts[0].userNickname shouldBe "existentNick"
                     userLikeCounts[0].total shouldBe 3
+                    userLikeCounts[0].profileImageUrl shouldBe "test_image_name_0"
 
                     userLikeCounts[1].userNickname shouldBe "otherUser"
                     userLikeCounts[1].total shouldBe 2
+                    userLikeCounts[1].profileImageUrl shouldBe "test_image_name_0"
 
                     userLikeCounts[2].userNickname shouldBe "testUser"
                     userLikeCounts[2].total shouldBe 2
+                    userLikeCounts[2].profileImageUrl shouldBe "test_image_name_0"
                 }
             }
 
@@ -261,12 +267,15 @@ class FoodSpotsReviewRepositoryTest(
 
                     userTotalCounts[0].userNickname shouldBe "existentNick"
                     userTotalCounts[0].total shouldBe 6
+                    userTotalCounts[0].profileImageUrl shouldBe "test_image_name_0"
 
                     userTotalCounts[1].userNickname shouldBe "otherUser"
                     userTotalCounts[1].total shouldBe 4
+                    userTotalCounts[1].profileImageUrl shouldBe "test_image_name_0"
 
                     userTotalCounts[2].userNickname shouldBe "testUser"
                     userTotalCounts[2].total shouldBe 4
+                    userTotalCounts[2].profileImageUrl shouldBe "test_image_name_0"
                 }
             }
         },

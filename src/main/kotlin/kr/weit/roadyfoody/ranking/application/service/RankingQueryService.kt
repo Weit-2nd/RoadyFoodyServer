@@ -100,11 +100,13 @@ class RankingQueryService(
 
     private fun convertToUserRanking(ranking: List<String>): List<UserRankingResponse> =
         ranking.map { score ->
-            val (ranking, userNickname, total) = score.split(":")
+            val (ranking, userNickname, userId, profileImageUrl, changeRanking) = score.split(":")
             UserRankingResponse(
                 ranking = ranking.toLong(),
                 userNickname = userNickname,
-                total = total.toLong(),
+                userId = userId.toLong(),
+                profileImageUrl = profileImageUrl,
+                changeRanking = changeRanking.toLong(),
             )
         }
 

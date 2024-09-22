@@ -13,8 +13,10 @@ import kr.weit.roadyfoody.support.annotation.RepositoryTest
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import kr.weit.roadyfoody.user.repository.UserRepository
+import org.springframework.transaction.annotation.Transactional
 
 @RepositoryTest
+@Transactional
 class FoodSpotsHistoryRepositoryTest(
     private val foodSpotsHistoryRepository: FoodSpotsHistoryRepository,
     private val userRepository: UserRepository,
@@ -31,6 +33,7 @@ class FoodSpotsHistoryRepositoryTest(
         lateinit var foodSpotForRanking: FoodSpots
         lateinit var foodSpotsHistories: List<FoodSpotsHistory>
         beforeEach {
+            userRepository.deleteAll()
             user = userRepository.save(createTestUser(0L))
             otherUser = userRepository.save(createTestUser(0L, nickname = "otherUser"))
             user2 = userRepository.save(createTestUser(2L, "existentNick2"))
@@ -53,6 +56,10 @@ class FoodSpotsHistoryRepositoryTest(
                         createTestFoodHistory(user = user4, foodSpots = foodSpotForRanking),
                     ),
                 )
+        }
+
+        afterEach {
+            userRepository.deleteAll()
         }
 
         describe("getHistoriesByUser 메소드는") {
@@ -132,15 +139,19 @@ class FoodSpotsHistoryRepositoryTest(
                 userReportCounts.size shouldBe 4
                 userReportCounts[0].userNickname shouldBe "existentNick2"
                 userReportCounts[0].total shouldBe 3
+                userReportCounts[0].profileImageUrl shouldBe "test_image_name_2"
 
                 userReportCounts[1].userNickname shouldBe "existentNick"
                 userReportCounts[1].total shouldBe 2
+                userReportCounts[1].profileImageUrl shouldBe "test_image_name_0"
 
                 userReportCounts[2].userNickname shouldBe "existentNick3"
                 userReportCounts[2].total shouldBe 2
+                userReportCounts[2].profileImageUrl shouldBe "test_image_name_3"
 
                 userReportCounts[3].userNickname shouldBe "existentNick4"
                 userReportCounts[3].total shouldBe 1
+                userReportCounts[3].profileImageUrl shouldBe "test_image_name_4"
             }
         }
     })
