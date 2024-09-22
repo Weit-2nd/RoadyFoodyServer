@@ -83,6 +83,7 @@ class ReviewCommandService(
         badgeCommandService.tryChangeBadgeAndIfPromotedGiveBonus(user.id)
     }
 
+    @Transactional
     fun updateReview(
         user: User,
         reviewId: Long,
@@ -95,17 +96,12 @@ class ReviewCommandService(
         }
 
         reviewRequest?.let {
-            var change = false
             it.contents?.let { contents ->
                 review.contents = contents
-                change = true
             }
             it.rating?.let { rating ->
                 review.rate = rating
-                change = true
             }
-
-            if (change) reviewRepository.save(review)
         }
         val deletePhotos =
             reviewRequest?.deletePhotoIds?.let {

@@ -146,7 +146,6 @@ class ReviewCommandServiceTest :
                         createMockTestReview(
                             user,
                         )
-                    every { reviewRepository.save(any()) } returns createMockTestReview(user)
                     every {
                         reviewPhotoRepository.findByFoodSpotsReviewAndIdIn(
                             any(),
@@ -172,7 +171,6 @@ class ReviewCommandServiceTest :
                         )
                         verify(exactly = 1) {
                             reviewRepository.getReviewByReviewId(any())
-                            reviewRepository.save(any())
                             reviewPhotoRepository.findByFoodSpotsReviewAndIdIn(any(), any())
                             reviewPhotoRepository.findByFoodSpotsReview(any())
                             reviewPhotoRepository.deleteAll(any())
@@ -191,7 +189,6 @@ class ReviewCommandServiceTest :
                         createMockTestReview(
                             user,
                         )
-                    every { reviewRepository.save(any()) } returns createMockTestReview(user)
                     every { reviewPhotoRepository.findByFoodSpotsReview(any()) } returns emptyList()
                     every { reviewPhotoRepository.saveAll(any<List<FoodSpotsReviewPhoto>>()) } returns emptyList()
                     then("정상적으로 수정되어야 한다.") {
@@ -203,7 +200,6 @@ class ReviewCommandServiceTest :
                         )
                         verify(exactly = 1) {
                             reviewRepository.getReviewByReviewId(any())
-                            reviewRepository.save(any())
                             reviewPhotoRepository.findByFoodSpotsReview(any())
                             reviewPhotoRepository.saveAll(any<List<FoodSpotsReviewPhoto>>())
                         }
@@ -215,7 +211,6 @@ class ReviewCommandServiceTest :
                         createMockTestReview(
                             user,
                         )
-                    every { reviewRepository.save(any()) } returns createMockTestReview(user)
                     every { reviewPhotoRepository.findByFoodSpotsReview(any()) } returns emptyList()
                     every { reviewPhotoRepository.saveAll(any<List<FoodSpotsReviewPhoto>>()) } returns emptyList()
                     then("정상적으로 수정되어야 한다.") {
@@ -227,7 +222,6 @@ class ReviewCommandServiceTest :
                         )
                         verify(exactly = 1) {
                             reviewRepository.getReviewByReviewId(any())
-                            reviewRepository.save(any())
                             reviewPhotoRepository.findByFoodSpotsReview(any())
                             reviewPhotoRepository.saveAll(any<List<FoodSpotsReviewPhoto>>())
                         }
@@ -239,7 +233,6 @@ class ReviewCommandServiceTest :
                         createMockTestReview(
                             user,
                         )
-                    every { reviewRepository.save(any()) } returns createMockTestReview(user)
                     every {
                         reviewPhotoRepository.findByFoodSpotsReviewAndIdIn(
                             any(),
