@@ -4,23 +4,31 @@ import com.linecorp.kotlinjdsl.support.spring.data.jpa.repository.KotlinJdslJpql
 import kr.weit.roadyfoody.global.utils.getSlice
 import kr.weit.roadyfoody.review.domain.FoodSpotsReview
 import kr.weit.roadyfoody.review.domain.ReviewLike
-import kr.weit.roadyfoody.review.domain.ReviewLikeId
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
-import java.time.LocalDateTime
 
 fun ReviewLikeRepository.getLikedReviewByUser(user: User): List<FoodSpotsReview> = findByUser(user).map { it.review }
 
 @Repository
 interface ReviewLikeRepository :
-    JpaRepository<ReviewLike, ReviewLikeId>,
+    JpaRepository<ReviewLike, Long>,
     CustomReviewLikeRepository {
+    fun existsByReviewAndUser(
+        review: FoodSpotsReview,
+        user: User,
+    ): Boolean
+
     fun findByUser(user: User): List<ReviewLike>
 
     fun deleteByUser(user: User)
+
+    fun deleteByReviewAndUser(
+        review: FoodSpotsReview,
+        user: User,
+    )
 
     fun countByUser(user: User): Int
 }
@@ -29,7 +37,7 @@ interface CustomReviewLikeRepository {
     fun sliceLikeReviews(
         user: User,
         size: Int,
-        lastTime: LocalDateTime?,
+        lastId: Long?,
     ): Slice<ReviewLike>
 }
 
@@ -39,7 +47,7 @@ class CustomReviewLikeRepositoryImpl(
     override fun sliceLikeReviews(
         user: User,
         size: Int,
-        lastTime: LocalDateTime?,
+        lastId: Long?,
     ): Slice<ReviewLike> {
         val pageable = Pageable.ofSize(size)
         return kotlinJdslJpqlExecutor
@@ -47,13 +55,13 @@ class CustomReviewLikeRepositoryImpl(
                 select(entity(ReviewLike::class))
                     .from(entity(ReviewLike::class))
                     .whereAnd(
-                        if (lastTime != null) {
-                            path(ReviewLike::createdDateTime).lessThan(lastTime)
+                        if (lastId != null) {
+                            path(ReviewLike::id).lessThan(lastId)
                         } else {
                             null
                         },
                         path(ReviewLike::user).equal(user),
-                    ).orderBy(path(ReviewLike::createdDateTime).desc())
+                    ).orderBy(path(ReviewLike::id).desc())
             }
     }
 }

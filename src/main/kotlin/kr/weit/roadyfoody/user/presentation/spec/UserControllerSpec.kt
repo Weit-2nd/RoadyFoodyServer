@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
-import jakarta.validation.constraints.Past
 import jakarta.validation.constraints.Positive
 import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.common.dto.SliceResponse
@@ -34,7 +33,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.multipart.MultipartFile
-import java.time.LocalDateTime
 
 @Tag(name = SwaggerTag.USER)
 interface UserControllerSpec {
@@ -243,7 +241,7 @@ interface UserControllerSpec {
         [
             ErrorCode.SIZE_NON_POSITIVE,
             ErrorCode.USER_ID_NON_POSITIVE,
-            ErrorCode.LAST_TIME_NOT_PAST,
+            ErrorCode.LAST_ID_NON_POSITIVE,
             ErrorCode.NOT_FOUND_USER,
         ],
     )
@@ -254,9 +252,9 @@ interface UserControllerSpec {
         @Positive(message = "조회할 개수는 양수여야 합니다.")
         @RequestParam(defaultValue = "10", required = false)
         size: Int,
-        @Past(message = "마지막 시간은 현재 시간 이전이어야 합니다.")
+        @Positive(message = "마지막 ID는 양수여야 합니다.")
         @RequestParam(required = false)
-        lastTime: LocalDateTime?,
+        lastId: Long?,
     ): SliceResponse<UserLikedReviewResponse>
 
     @Operation(
