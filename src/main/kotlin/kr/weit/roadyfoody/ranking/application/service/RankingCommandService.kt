@@ -93,14 +93,14 @@ class RankingCommandService(
 
             val rankingData =
                 userRanking.mapIndexed { index, it ->
-                    val rankDifference =
+                    val rankChange =
                         ranking
                             ?.indexOfFirst { score ->
                                 val parts = score.split(":")
                                 parts[2] == it.userId.toString()
                             }?.minus(index)
 
-                    "${index + 1}:${it.userNickname}:${it.userId}:${it.profileImageUrl}:$rankDifference"
+                    "${index + 1}:${it.userNickname}:${it.userId}:${it.profileImageUrl}:$rankChange"
                 }
 
             redisTemplate
