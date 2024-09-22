@@ -21,6 +21,7 @@ import kr.weit.roadyfoody.user.application.dto.UserReportCategoryResponse
 import kr.weit.roadyfoody.user.application.dto.UserReportHistoriesResponse
 import kr.weit.roadyfoody.user.application.dto.UserReportPhotoResponse
 import kr.weit.roadyfoody.user.application.dto.UserReviewResponse
+import kr.weit.roadyfoody.user.application.dto.UserStatisticsResponse
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.repository.UserRepository
 import kr.weit.roadyfoody.user.repository.getByUserId
@@ -146,6 +147,16 @@ class UserQueryService(
                 UserLikedReviewResponse(it, reviewPhotos, profileUrl)
             }
         return SliceResponse(response)
+    }
+
+    @Transactional(readOnly = true)
+    fun getUserStatistics(userId: Long): UserStatisticsResponse {
+        val user = userRepository.getByUserId(userId)
+        return UserStatisticsResponse(
+            foodSpotsHistoryRepository.countByUser(user),
+            reviewRepository.countByUser(user),
+            reviewLikeRepository.countByUser(user),
+        )
     }
 
     private fun getRanking(user: User): Long {
