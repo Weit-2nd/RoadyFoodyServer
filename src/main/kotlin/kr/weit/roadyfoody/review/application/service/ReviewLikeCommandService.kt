@@ -1,12 +1,10 @@
 package kr.weit.roadyfoody.review.application.service
 
 import REVIEW_LIKE_LOCK_KEY
-import jakarta.persistence.EntityManager
 import kr.weit.roadyfoody.global.annotation.DistributedLock
 import kr.weit.roadyfoody.review.application.dto.ToggleLikeResponse
 import kr.weit.roadyfoody.review.domain.FoodSpotsReview
 import kr.weit.roadyfoody.review.domain.ReviewLike
-import kr.weit.roadyfoody.review.domain.ReviewLikeId
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
 import kr.weit.roadyfoody.review.repository.ReviewLikeRepository
 import kr.weit.roadyfoody.review.repository.getReviewByReviewId
@@ -18,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional
 class ReviewLikeCommandService(
     private val reviewRepository: FoodSpotsReviewRepository,
     private val reviewLikeRepository: ReviewLikeRepository,
-    private val entityManager: EntityManager,
 ) {
     @Transactional
     @DistributedLock(lockName = REVIEW_LIKE_LOCK_KEY, identifier = "reviewId")
@@ -28,13 +25,13 @@ class ReviewLikeCommandService(
     ): ToggleLikeResponse {
         val review = reviewRepository.getReviewByReviewId(reviewId)
         var liked = true
-        if (reviewLikeRepository.existsById(ReviewLikeId(review, user))) {
+        if (reviewLikeRepository.existsByReviewAndUser(review, user)) {
             review.decreaseLike()
-            reviewLikeRepository.deleteById(ReviewLikeId(review, user))
+            reviewLikeRepository.deleteByReviewAndUser(review, user)
             liked = false
         } else {
             review.increaseLike()
-            reviewLikeRepository.save(ReviewLike(review, entityManager.merge(user)))
+            reviewLikeRepository.save(ReviewLike(review, user))
         }
 
         return ToggleLikeResponse(reviewId, review.likeTotal, liked)

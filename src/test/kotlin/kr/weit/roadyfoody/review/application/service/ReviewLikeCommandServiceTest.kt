@@ -37,7 +37,7 @@ class ReviewLikeCommandServiceTest :
             given("toggleLike 테스트") {
                 var expectedLikeTotal = review.likeTotal + 1
                 every { reviewRepository.getReviewByReviewId(any()) } returns review
-                every { reviewLikeRepository.existsById(any()) } returns false
+                every { reviewLikeRepository.existsByReviewAndUser(any(), any()) } returns false
                 every { entityManager.merge(any<User>()) } returns createTestUser()
                 every { reviewLikeRepository.save(any()) } returns createMockReviewLike()
                 `when`("리뷰에 좋아요 이력이 없는 경우") {
@@ -45,7 +45,7 @@ class ReviewLikeCommandServiceTest :
                         reviewLikeService.toggleLike(review.id, createTestUser())
                         verify(exactly = 1) {
                             reviewRepository.getReviewByReviewId(any())
-                            reviewLikeRepository.existsById(any())
+                            reviewLikeRepository.existsByReviewAndUser(any(), any())
                             reviewLikeRepository.save(any())
                         }
                         review.likeTotal shouldBe expectedLikeTotal
@@ -54,15 +54,15 @@ class ReviewLikeCommandServiceTest :
 
                 expectedLikeTotal = review.likeTotal - 1
                 every { reviewRepository.getReviewByReviewId(any()) } returns review
-                every { reviewLikeRepository.existsById(any()) } returns true
-                every { reviewLikeRepository.deleteById(any()) } returns Unit
+                every { reviewLikeRepository.existsByReviewAndUser(any(), any()) } returns true
+                every { reviewLikeRepository.deleteByReviewAndUser(any(), any()) } returns Unit
                 `when`("리뷰에 좋아요 이력이 있는 경우") {
                     then("리뷰 좋아요 이력이 삭제되고 리뷰의 좋아요 수가 감소한다.") {
                         reviewLikeService.toggleLike(TEST_REVIEW_ID, createTestUser())
                         verify(exactly = 1) {
                             reviewRepository.getReviewByReviewId(any())
-                            reviewLikeRepository.existsById(any())
-                            reviewLikeRepository.deleteById(any())
+                            reviewLikeRepository.existsByReviewAndUser(any(), any())
+                            reviewLikeRepository.deleteByReviewAndUser(any(), any())
                         }
                         review.likeTotal shouldBe expectedLikeTotal
                     }
@@ -73,7 +73,7 @@ class ReviewLikeCommandServiceTest :
                         createMockTestReview(
                             likeTotal = 0,
                         )
-                    every { reviewLikeRepository.existsById(any()) } returns true
+                    every { reviewLikeRepository.existsByReviewAndUser(any(), any()) } returns true
                     then("리뷰 좋아요 수는 음수가 될 수 없다는 예외가 발생한다.") {
                         shouldThrow<RoadyFoodyBadRequestException> {
                             reviewLikeService.toggleLike(TEST_REVIEW_ID, createTestUser())
