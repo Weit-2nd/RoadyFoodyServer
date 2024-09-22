@@ -10,13 +10,11 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import jakarta.persistence.EntityManager
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
 import kr.weit.roadyfoody.review.repository.ReviewLikeRepository
 import kr.weit.roadyfoody.review.repository.getReviewByReviewId
-import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.fixture.createTestUser
 
 class ReviewLikeCommandServiceTest :
@@ -24,12 +22,10 @@ class ReviewLikeCommandServiceTest :
         {
             val reviewRepository = mockk<FoodSpotsReviewRepository>()
             val reviewLikeRepository = mockk<ReviewLikeRepository>()
-            val entityManager = mockk<EntityManager>()
             val reviewLikeService =
                 ReviewLikeCommandService(
                     reviewRepository,
                     reviewLikeRepository,
-                    entityManager,
                 )
             var review = createMockTestReview()
             afterEach { clearAllMocks() }
@@ -38,7 +34,6 @@ class ReviewLikeCommandServiceTest :
                 var expectedLikeTotal = review.likeTotal + 1
                 every { reviewRepository.getReviewByReviewId(any()) } returns review
                 every { reviewLikeRepository.existsByReviewAndUser(any(), any()) } returns false
-                every { entityManager.merge(any<User>()) } returns createTestUser()
                 every { reviewLikeRepository.save(any()) } returns createMockReviewLike()
                 `when`("리뷰에 좋아요 이력이 없는 경우") {
                     then("리뷰 좋아요 이력 생성되고 리뷰의 좋아요 수가 증가한다.") {
