@@ -1,0 +1,4 @@
+ALTER TABLE review_likes
+    ADD id NUMBER(19, 0);
+
+CREATE SEQUENCE review_likes_seq START WITH 17 INCREMENT BY 1;

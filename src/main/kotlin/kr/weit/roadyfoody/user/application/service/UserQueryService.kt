@@ -28,7 +28,6 @@ import org.springframework.cache.CacheManager
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutorService
 
@@ -124,11 +123,11 @@ class UserQueryService(
     fun getLikeReviews(
         userId: Long,
         size: Int,
-        lastTime: LocalDateTime?,
+        lastId: Long?,
     ): SliceResponse<UserLikedReviewResponse> {
         val user = userRepository.getByUserId(userId)
         val response =
-            reviewLikeRepository.sliceLikeReviews(user, size, lastTime).map {
+            reviewLikeRepository.sliceLikeReviews(user, size, lastId).map {
                 val photosFutures =
                     reviewPhotoRepository.getByReview(it.review).map { photo ->
                         CompletableFuture
