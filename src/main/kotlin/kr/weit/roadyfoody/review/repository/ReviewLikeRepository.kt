@@ -21,6 +21,8 @@ interface ReviewLikeRepository :
     fun findByUser(user: User): List<ReviewLike>
 
     fun deleteByUser(user: User)
+
+    fun deleteByReview(review: FoodSpotsReview)
 }
 
 interface CustomReviewLikeRepository {
