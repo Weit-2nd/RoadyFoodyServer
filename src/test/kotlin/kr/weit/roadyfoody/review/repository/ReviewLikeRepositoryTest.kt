@@ -114,5 +114,15 @@ class ReviewLikeRepositoryTest(
                     }
                 }
             }
+
+            describe("deleteByReview 메소드는") {
+                context("리뷰를 받는 경우") {
+                    it("해당 리뷰 좋아요 이력을 삭제한다.") {
+                        reviewLikeRepository.findAll() shouldBe listOf(reviewLike, otherReviewLike)
+                        reviewLikeRepository.deleteByReview(review)
+                        reviewLikeRepository.findAll() shouldBe listOf(otherReviewLike)
+                    }
+                }
+            }
         },
     )
