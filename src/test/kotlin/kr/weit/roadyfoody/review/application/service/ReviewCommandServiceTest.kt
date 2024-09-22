@@ -26,6 +26,7 @@ import kr.weit.roadyfoody.review.exception.FoodSpotsReviewNotFoundException
 import kr.weit.roadyfoody.review.exception.NotFoodSpotsReviewOwnerException
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewPhotoRepository
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
+import kr.weit.roadyfoody.review.repository.ReviewLikeRepository
 import kr.weit.roadyfoody.review.repository.getReviewByReviewId
 import kr.weit.roadyfoody.support.utils.ImageFormat
 import kr.weit.roadyfoody.user.fixture.TEST_OTHER_USER_ID
@@ -39,6 +40,7 @@ class ReviewCommandServiceTest :
             val reviewRepository = mockk<FoodSpotsReviewRepository>()
             val reviewPhotoRepository = mockk<FoodSpotsReviewPhotoRepository>()
             val foodSpotsRepository = mockk<FoodSpotsRepository>()
+            val reviewLikeRepository = mockk<ReviewLikeRepository>()
             val imageService = spyk(ImageService(mockk()))
             val executor = mockk<ExecutorService>()
             val badgeCommandService = mockk<BadgeCommandService>()
@@ -47,6 +49,7 @@ class ReviewCommandServiceTest :
                     reviewRepository,
                     reviewPhotoRepository,
                     foodSpotsRepository,
+                    reviewLikeRepository,
                     imageService,
                     executor,
                     badgeCommandService,
@@ -118,7 +121,10 @@ class ReviewCommandServiceTest :
                 `when`("리뷰 삭제 요청이 들어올 경우") {
                     val user = createTestUser()
                     every { reviewRepository.getReviewByReviewId(any()) } returns
-                        createMockTestReview(user)
+                        createMockTestReview(
+                            user,
+                        )
+                    every { reviewLikeRepository.deleteByReview(any()) } returns Unit
                     every { reviewRepository.deleteById(any()) } returns Unit
                     every { reviewPhotoRepository.findByFoodSpotsReviewIn(any()) } returns
                         listOf(
@@ -132,6 +138,7 @@ class ReviewCommandServiceTest :
                         reviewService.deleteReview(user, TEST_REVIEW_ID)
                         verify(exactly = 1) {
                             imageService.remove(any())
+                            reviewLikeRepository.deleteByReview(any())
                             reviewPhotoRepository.deleteAll(any())
                             reviewRepository.delete(any())
                         }

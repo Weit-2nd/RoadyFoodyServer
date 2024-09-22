@@ -13,6 +13,7 @@ import kr.weit.roadyfoody.review.domain.FoodSpotsReviewPhoto
 import kr.weit.roadyfoody.review.exception.NotFoodSpotsReviewOwnerException
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewPhotoRepository
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
+import kr.weit.roadyfoody.review.repository.ReviewLikeRepository
 import kr.weit.roadyfoody.review.repository.getReviewByReviewId
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.stereotype.Service
@@ -26,6 +27,7 @@ class ReviewCommandService(
     private val reviewRepository: FoodSpotsReviewRepository,
     private val reviewPhotoRepository: FoodSpotsReviewPhotoRepository,
     private val foodSpotsRepository: FoodSpotsRepository,
+    private val reviewLikeRepository: ReviewLikeRepository,
     private val imageService: ImageService,
     private val executor: ExecutorService,
     private val badgeCommandService: BadgeCommandService,
@@ -77,6 +79,9 @@ class ReviewCommandService(
         val review = reviewRepository.getReviewByReviewId(reviewId)
         if (review.user.id != user.id) {
             throw NotFoodSpotsReviewOwnerException("해당 리뷰의 소유자가 아닙니다.")
+        }
+        if (review.likeTotal > 0) {
+            reviewLikeRepository.deleteByReview(review)
         }
         deleteReviewPhoto(listOf(review))
         reviewRepository.delete(review)
