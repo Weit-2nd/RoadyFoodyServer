@@ -13,10 +13,8 @@ import kr.weit.roadyfoody.support.annotation.RepositoryTest
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import kr.weit.roadyfoody.user.repository.UserRepository
-import org.springframework.transaction.annotation.Transactional
 
 @RepositoryTest
-@Transactional
 class FoodSpotsHistoryRepositoryTest(
     private val foodSpotsHistoryRepository: FoodSpotsHistoryRepository,
     private val userRepository: UserRepository,
@@ -33,7 +31,6 @@ class FoodSpotsHistoryRepositoryTest(
         lateinit var foodSpotForRanking: FoodSpots
         lateinit var foodSpotsHistories: List<FoodSpotsHistory>
         beforeEach {
-            userRepository.deleteAll()
             user = userRepository.save(createTestUser(0L))
             otherUser = userRepository.save(createTestUser(0L, nickname = "otherUser"))
             user2 = userRepository.save(createTestUser(2L, "existentNick2"))
@@ -56,10 +53,6 @@ class FoodSpotsHistoryRepositoryTest(
                         createTestFoodHistory(user = user4, foodSpots = foodSpotForRanking),
                     ),
                 )
-        }
-
-        afterEach {
-            userRepository.deleteAll()
         }
 
         describe("getHistoriesByUser 메소드는") {

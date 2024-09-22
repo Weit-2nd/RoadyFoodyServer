@@ -93,18 +93,12 @@ class RankingCommandService(
 
             val rankingData =
                 userRanking.mapIndexed { index, it ->
-                    val oldRankIndex =
-                        ranking?.indexOfFirst { score ->
-                            val parts = score.split(":")
-                            parts[2] == it.userId.toString()
-                        }
-
                     val rankChange =
-                        if (oldRankIndex == -1) {
-                            (ranking.size).minus((index + 1))
-                        } else {
-                            oldRankIndex?.minus(index)
-                        }
+                        ranking
+                            ?.indexOfFirst { score ->
+                                val parts = score.split(":")
+                                parts[2] == it.userId.toString()
+                            }?.minus(index)
 
                     "${index + 1}:${it.userNickname}:${it.userId}:${it.profileImageUrl}:$rankChange"
                 }
