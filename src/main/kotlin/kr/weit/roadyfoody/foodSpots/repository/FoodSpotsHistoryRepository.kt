@@ -30,6 +30,8 @@ interface FoodSpotsHistoryRepository :
     fun findByUser(user: User): List<FoodSpotsHistory>
 
     fun findByFoodSpots(foodSpots: FoodSpots): List<FoodSpotsHistory>
+
+    fun countByUser(user: User): Int
 }
 
 interface CustomFoodSpotsHistoryRepository {

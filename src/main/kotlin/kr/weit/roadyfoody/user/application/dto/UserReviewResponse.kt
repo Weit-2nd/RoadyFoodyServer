@@ -75,3 +75,12 @@ data class UserLikedReviewResponse(
         reviewLikeId = reviewLike.id,
     )
 }
+
+data class UserStatisticsResponse(
+    @Schema(description = "작성한 가게 리포트 수")
+    val reportCount: Int,
+    @Schema(description = "작성한 리뷰 수")
+    val reviewCount: Int,
+    @Schema(description = "좋아요 누른 리뷰 수")
+    val likeCount: Int,
+)

@@ -11,6 +11,7 @@ import kr.weit.roadyfoody.user.application.dto.UserLikedReviewResponse
 import kr.weit.roadyfoody.user.application.dto.UserNicknameRequest
 import kr.weit.roadyfoody.user.application.dto.UserReportHistoriesResponse
 import kr.weit.roadyfoody.user.application.dto.UserReviewResponse
+import kr.weit.roadyfoody.user.application.dto.UserStatisticsResponse
 import kr.weit.roadyfoody.user.application.service.UserCommandService
 import kr.weit.roadyfoody.user.application.service.UserQueryService
 import kr.weit.roadyfoody.user.domain.User
@@ -77,6 +78,13 @@ class UserController(
         @RequestParam(required = false)
         lastId: Long?,
     ): SliceResponse<UserLikedReviewResponse> = userQueryService.getLikeReviews(userId, size, lastId)
+
+    @GetMapping("{userId}/statistics")
+    override fun getUserStatistics(
+        @PathVariable("userId")
+        @Positive(message = "유저 ID는 양수여야 합니다.")
+        userId: Long,
+    ): UserStatisticsResponse = userQueryService.getUserStatistics(userId)
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PatchMapping("/nickname")
