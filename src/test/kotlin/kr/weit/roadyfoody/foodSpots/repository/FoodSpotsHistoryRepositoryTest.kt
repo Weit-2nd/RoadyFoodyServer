@@ -132,15 +132,19 @@ class FoodSpotsHistoryRepositoryTest(
                 userReportCounts.size shouldBe 4
                 userReportCounts[0].userNickname shouldBe "existentNick2"
                 userReportCounts[0].total shouldBe 3
+                userReportCounts[0].profileImageUrl shouldBe "test_image_name_2"
 
                 userReportCounts[1].userNickname shouldBe "existentNick"
                 userReportCounts[1].total shouldBe 2
+                userReportCounts[1].profileImageUrl shouldBe "test_image_name_0"
 
                 userReportCounts[2].userNickname shouldBe "existentNick3"
                 userReportCounts[2].total shouldBe 2
+                userReportCounts[2].profileImageUrl shouldBe "test_image_name_3"
 
                 userReportCounts[3].userNickname shouldBe "existentNick4"
                 userReportCounts[3].total shouldBe 1
+                userReportCounts[3].profileImageUrl shouldBe "test_image_name_4"
             }
         }
 
