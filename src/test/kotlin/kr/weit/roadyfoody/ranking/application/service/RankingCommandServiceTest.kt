@@ -44,6 +44,7 @@ class RankingCommandServiceTest :
                 every { redissonClient.getLock(any<String>()) } returns lock
                 afterEach { clearMocks(foodSpotsHistoryRepository) }
                 afterEach { clearMocks(cachePublisher) }
+                afterEach { clearMocks(redisTemplate) }
 
                 `when`("Lock을 획득한 경우") {
                     every { lock.tryLock(0, 10, TimeUnit.MINUTES) } returns true
@@ -60,6 +61,7 @@ class RankingCommandServiceTest :
                         rankingCommandService.updateReportRanking()
                         verify(exactly = 1) { foodSpotsHistoryRepository.findAllUserReportCount() }
                         verify(exactly = 1) { cachePublisher.publishCacheUpdate(any(), any()) }
+                        verify(exactly = 2) { redisTemplate.opsForList() }
                     }
                 }
 
@@ -78,6 +80,7 @@ class RankingCommandServiceTest :
                 every { redissonClient.getLock(any<String>()) } returns lock
                 afterEach { clearMocks(reviewRepository) }
                 afterEach { clearMocks(cachePublisher) }
+                afterEach { clearMocks(redisTemplate) }
 
                 `when`("Lock을 획득한 경우") {
                     every { lock.tryLock(0, 10, TimeUnit.MINUTES) } returns true
@@ -94,6 +97,7 @@ class RankingCommandServiceTest :
                         rankingCommandService.updateReviewRanking()
                         verify(exactly = 1) { reviewRepository.findAllUserReviewCount() }
                         verify(exactly = 1) { cachePublisher.publishCacheUpdate(any(), any()) }
+                        verify(exactly = 2) { redisTemplate.opsForList() }
                     }
                 }
 
@@ -112,6 +116,7 @@ class RankingCommandServiceTest :
                 every { redissonClient.getLock(any<String>()) } returns lock
                 afterEach { clearMocks(reviewRepository) }
                 afterEach { clearMocks(cachePublisher) }
+                afterEach { clearMocks(redisTemplate) }
 
                 `when`("Lock을 획득한 경우") {
                     every { lock.tryLock(0, 10, TimeUnit.MINUTES) } returns true
@@ -128,6 +133,7 @@ class RankingCommandServiceTest :
                         rankingCommandService.updateLikeRanking()
                         verify(exactly = 1) { reviewRepository.findAllUserLikeCount() }
                         verify(exactly = 1) { cachePublisher.publishCacheUpdate(any(), any()) }
+                        verify(exactly = 2) { redisTemplate.opsForList() }
                     }
                 }
 
@@ -146,6 +152,7 @@ class RankingCommandServiceTest :
                 every { redissonClient.getLock(any<String>()) } returns lock
                 afterEach { clearMocks(reviewRepository) }
                 afterEach { clearMocks(cachePublisher) }
+                afterEach { clearMocks(redisTemplate) }
 
                 `when`("Lock을 획득한 경우") {
                     every { lock.tryLock(0, 10, TimeUnit.MINUTES) } returns true
@@ -162,6 +169,7 @@ class RankingCommandServiceTest :
                         rankingCommandService.updateTotalRanking()
                         verify(exactly = 1) { reviewRepository.findAllUserTotalCount() }
                         verify(exactly = 1) { cachePublisher.publishCacheUpdate(any(), any()) }
+                        verify(exactly = 2) { redisTemplate.opsForList() }
                     }
                 }
 
