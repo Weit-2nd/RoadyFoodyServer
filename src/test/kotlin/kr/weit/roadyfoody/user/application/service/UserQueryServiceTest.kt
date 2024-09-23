@@ -25,7 +25,6 @@ import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
 import kr.weit.roadyfoody.foodSpots.repository.getHistoriesByUser
 import kr.weit.roadyfoody.global.TEST_LAST_ID
-import kr.weit.roadyfoody.global.TEST_LAST_TIME
 import kr.weit.roadyfoody.global.TEST_PAGE_SIZE
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewPhotoRepository
@@ -230,7 +229,7 @@ class UserQueryServiceTest :
                     userQueryService.getLikeReviews(
                         TEST_USER_ID,
                         TEST_PAGE_SIZE,
-                        TEST_LAST_TIME,
+                        TEST_LAST_ID,
                     )
                     verify(exactly = 1) {
                         userRepository.findById(any())
