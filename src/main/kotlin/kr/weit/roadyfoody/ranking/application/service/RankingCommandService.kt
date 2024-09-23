@@ -32,7 +32,7 @@ class RankingCommandService(
     private val cachePublisher: CachePublisher,
 ) {
     @Async("asyncTask")
-    @Scheduled(cron = "0 0 5 * * *")
+    @Scheduled(cron = "0 35 21 * * *")
     @CircuitBreaker(name = "redisCircuitBreaker")
     fun updateReportRanking() {
         updateRanking(
@@ -43,7 +43,7 @@ class RankingCommandService(
     }
 
     @Async("asyncTask")
-    @Scheduled(cron = "0 0 5 * * *")
+    @Scheduled(cron = "0 35 21 * * *")
     @CircuitBreaker(name = "redisCircuitBreaker")
     fun updateReviewRanking() {
         updateRanking(
@@ -54,7 +54,7 @@ class RankingCommandService(
     }
 
     @Async("asyncTask")
-    @Scheduled(cron = "0 0 5 * * *")
+    @Scheduled(cron = "0 35 21 * * *")
     @CircuitBreaker(name = "redisCircuitBreaker")
     fun updateLikeRanking() {
         updateRanking(
@@ -65,7 +65,7 @@ class RankingCommandService(
     }
 
     @Async("asyncTask")
-    @Scheduled(cron = "0 0 5 * * *")
+    @Scheduled(cron = "0 35 21 * * *")
     @CircuitBreaker(name = "redisCircuitBreaker")
     fun updateTotalRanking() {
         updateRanking(
@@ -83,12 +83,28 @@ class RankingCommandService(
         val lock: RLock = redissonClient.getLock(lockName)
 
         if (lock.tryLock(0, 10, TimeUnit.MINUTES)) {
+            val ranking =
+                redisTemplate
+                    .opsForList()
+                    .range(key, 0, -1)
+            val userRanking = dataProvider()
+
             redisTemplate.delete(key)
 
-            val userRanking = dataProvider()
+            val splitRanking =
+                ranking?.map { score ->
+                    score.split(":")
+                }
+
             val rankingData =
                 userRanking.mapIndexed { index, it ->
-                    "${index + 1}:${it.userNickname}:${it.total}"
+                    val rankChange =
+                        splitRanking
+                            ?.indexOfFirst { parts ->
+                                parts[2] == it.userId.toString()
+                            }?.minus(index)
+
+                    "${index + 1}:${it.userNickname}:${it.userId}:${it.profileImageUrl}:$rankChange"
                 }
 
             redisTemplate

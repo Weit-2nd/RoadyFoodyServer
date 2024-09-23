@@ -38,7 +38,7 @@ class RankingQueryServiceTest :
                 )
 
             val listOperation = mockk<ListOperations<String, String>>()
-            val list = listOf("1:user2:20", "2:user3:15", "3:user1:10")
+            val list = listOf("1:user2:2:null:20", "2:user3:3:test_image_name_3:15", "3:user1:1:test_image_name_1:10")
             val cache = mockk<Cache>()
 
             afterEach { clearMocks(reviewRepository) }

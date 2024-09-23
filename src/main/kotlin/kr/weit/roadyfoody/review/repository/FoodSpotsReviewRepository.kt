@@ -144,12 +144,15 @@ class CustomFoodSpotsReviewRepositoryImpl(
                 val userNicknamePath = path(FoodSpotsReview::user).path(User::profile).path(Profile::nickname)
                 val reviewIdPath = path(FoodSpotsReview::id)
                 val createdAtPath = path(FoodSpotsReview::createdDateTime)
+                val profileUrlPath = path(FoodSpotsReview::user).path(User::profile).path(Profile::profileImageName)
 
                 selectNew<UserRanking>(
                     userNicknamePath,
                     count(reviewIdPath),
+                    userIdPath,
+                    profileUrlPath,
                 ).from(entity(FoodSpotsReview::class))
-                    .groupBy(userIdPath, userNicknamePath)
+                    .groupBy(userIdPath, userNicknamePath, profileUrlPath)
                     .orderBy(
                         count(reviewIdPath).desc(),
                         max(createdAtPath).asc(),
@@ -162,6 +165,7 @@ class CustomFoodSpotsReviewRepositoryImpl(
                 val foodSpotsReview = entity(FoodSpotsReview::class, "foodSpotsReview")
                 val userPath = foodSpotsReview(FoodSpotsReview::user)
                 val userNicknamePath = userPath(User::profile)(Profile::nickname)
+                val profileUrlPath = userPath(User::profile)(Profile::profileImageName)
                 val likeTotalPath = foodSpotsReview(FoodSpotsReview::likeTotal)
                 val userIdPath = foodSpotsReview(FoodSpotsReview::user)(User::id)
                 val createdAtPath = path(ReviewLike::createdDateTime)
@@ -179,11 +183,14 @@ class CustomFoodSpotsReviewRepositoryImpl(
                 selectNew<UserRanking>(
                     userNicknamePath,
                     sum(likeTotalPath),
+                    userIdPath,
+                    profileUrlPath,
                 ).from(
                     foodSpotsReview,
                 ).groupBy(
                     userIdPath,
                     userNicknamePath,
+                    profileUrlPath,
                 ).orderBy(
                     sum(likeTotalPath).desc(),
                     subQuery.asc(),
@@ -238,6 +245,8 @@ class CustomFoodSpotsReviewRepositoryImpl(
                 selectNew<UserRanking>(
                     path(User::profile)(Profile::nickname),
                     subquery2.plus(subquery).`as`(total),
+                    path(User::id),
+                    path(User::profile)(Profile::profileImageName),
                 ).from(
                     entity(User::class),
                     leftJoin(foodSpotsHistory).on(foodSpotsHistory(FoodSpotsHistory::user)(User::id).eq(path(User::id))),
@@ -250,6 +259,7 @@ class CustomFoodSpotsReviewRepositoryImpl(
                 ).groupBy(
                     path(User::id),
                     path(User::profile)(Profile::nickname),
+                    path(User::profile)(Profile::profileImageName),
                 ).orderBy(
                     total.desc(),
                     greatestDateExpression.asc(),
