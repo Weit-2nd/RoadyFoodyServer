@@ -33,6 +33,8 @@ interface FoodSpotsReviewRepository :
     JpaRepository<FoodSpotsReview, Long>,
     CustomFoodSpotsReviewRepository {
     fun findByUser(user: User): List<FoodSpotsReview>
+
+    fun countByUser(user: User): Int
 }
 
 interface CustomFoodSpotsReviewRepository {

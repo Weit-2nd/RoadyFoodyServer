@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
-import jakarta.validation.constraints.Past
 import jakarta.validation.constraints.Positive
 import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.common.dto.SliceResponse
@@ -23,6 +22,7 @@ import kr.weit.roadyfoody.user.application.dto.UserLikedReviewResponse
 import kr.weit.roadyfoody.user.application.dto.UserNicknameRequest
 import kr.weit.roadyfoody.user.application.dto.UserReportHistoriesResponse
 import kr.weit.roadyfoody.user.application.dto.UserReviewResponse
+import kr.weit.roadyfoody.user.application.dto.UserStatisticsResponse
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.utils.SliceReportHistories
 import kr.weit.roadyfoody.user.utils.SliceUserLike
@@ -33,7 +33,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.multipart.MultipartFile
-import java.time.LocalDateTime
 
 @Tag(name = SwaggerTag.USER)
 interface UserControllerSpec {
@@ -222,6 +221,14 @@ interface UserControllerSpec {
 
     @Operation(
         description = "유저 좋아요 누른 게시물 조회 API",
+        parameters = [
+            Parameter(name = "size", description = "조회할 개수", example = "10"),
+            Parameter(
+                name = "lastId",
+                description = "마지막 조회된 리뷰의 좋아요 ID(reviewLikeId)",
+                example = "1",
+            ),
+        ],
         responses = [
             ApiResponse(
                 responseCode = "200",
@@ -242,7 +249,7 @@ interface UserControllerSpec {
         [
             ErrorCode.SIZE_NON_POSITIVE,
             ErrorCode.USER_ID_NON_POSITIVE,
-            ErrorCode.LAST_TIME_NOT_PAST,
+            ErrorCode.LAST_ID_NON_POSITIVE,
             ErrorCode.NOT_FOUND_USER,
         ],
     )
@@ -253,8 +260,38 @@ interface UserControllerSpec {
         @Positive(message = "조회할 개수는 양수여야 합니다.")
         @RequestParam(defaultValue = "10", required = false)
         size: Int,
-        @Past(message = "마지막 시간은 현재 시간 이전이어야 합니다.")
+        @Positive(message = "마지막 ID는 양수여야 합니다.")
         @RequestParam(required = false)
-        lastTime: LocalDateTime?,
+        lastId: Long?,
     ): SliceResponse<UserLikedReviewResponse>
+
+    @Operation(
+        description = "유저 활동 통계 조회 API",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "유저 통계 조회 성공",
+                content = [
+                    Content(
+                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                        schema =
+                            Schema(
+                                implementation = UserStatisticsResponse::class,
+                            ),
+                    ),
+                ],
+            ),
+        ],
+    )
+    @ApiErrorCodeExamples(
+        [
+            ErrorCode.USER_ID_NON_POSITIVE,
+            ErrorCode.NOT_FOUND_USER,
+        ],
+    )
+    fun getUserStatistics(
+        @PathVariable("userId")
+        @Positive(message = "유저 ID는 양수여야 합니다.")
+        userId: Long,
+    ): UserStatisticsResponse
 }

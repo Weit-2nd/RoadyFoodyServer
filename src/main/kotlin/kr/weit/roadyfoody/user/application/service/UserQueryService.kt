@@ -21,6 +21,7 @@ import kr.weit.roadyfoody.user.application.dto.UserReportCategoryResponse
 import kr.weit.roadyfoody.user.application.dto.UserReportHistoriesResponse
 import kr.weit.roadyfoody.user.application.dto.UserReportPhotoResponse
 import kr.weit.roadyfoody.user.application.dto.UserReviewResponse
+import kr.weit.roadyfoody.user.application.dto.UserStatisticsResponse
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.repository.UserRepository
 import kr.weit.roadyfoody.user.repository.getByUserId
@@ -28,7 +29,6 @@ import org.springframework.cache.CacheManager
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutorService
 
@@ -124,11 +124,11 @@ class UserQueryService(
     fun getLikeReviews(
         userId: Long,
         size: Int,
-        lastTime: LocalDateTime?,
+        lastId: Long?,
     ): SliceResponse<UserLikedReviewResponse> {
         val user = userRepository.getByUserId(userId)
         val response =
-            reviewLikeRepository.sliceLikeReviews(user, size, lastTime).map {
+            reviewLikeRepository.sliceLikeReviews(user, size, lastId).map {
                 val photosFutures =
                     reviewPhotoRepository.getByReview(it.review).map { photo ->
                         CompletableFuture
@@ -147,6 +147,16 @@ class UserQueryService(
                 UserLikedReviewResponse(it, reviewPhotos, profileUrl)
             }
         return SliceResponse(response)
+    }
+
+    @Transactional(readOnly = true)
+    fun getUserStatistics(userId: Long): UserStatisticsResponse {
+        val user = userRepository.getByUserId(userId)
+        return UserStatisticsResponse(
+            foodSpotsHistoryRepository.countByUser(user),
+            reviewRepository.countByUser(user),
+            reviewLikeRepository.countByUser(user),
+        )
     }
 
     private fun getRanking(user: User): Long {

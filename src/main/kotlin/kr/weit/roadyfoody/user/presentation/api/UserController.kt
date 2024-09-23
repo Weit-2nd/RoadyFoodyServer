@@ -1,7 +1,6 @@
 package kr.weit.roadyfoody.user.presentation.api
 
 import jakarta.validation.Valid
-import jakarta.validation.constraints.Past
 import jakarta.validation.constraints.Positive
 import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.common.dto.SliceResponse
@@ -12,6 +11,7 @@ import kr.weit.roadyfoody.user.application.dto.UserLikedReviewResponse
 import kr.weit.roadyfoody.user.application.dto.UserNicknameRequest
 import kr.weit.roadyfoody.user.application.dto.UserReportHistoriesResponse
 import kr.weit.roadyfoody.user.application.dto.UserReviewResponse
+import kr.weit.roadyfoody.user.application.dto.UserStatisticsResponse
 import kr.weit.roadyfoody.user.application.service.UserCommandService
 import kr.weit.roadyfoody.user.application.service.UserQueryService
 import kr.weit.roadyfoody.user.domain.User
@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
-import java.time.LocalDateTime
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -75,10 +74,17 @@ class UserController(
         @Positive(message = "조회할 개수는 양수여야 합니다.")
         @RequestParam(defaultValue = "10", required = false)
         size: Int,
-        @Past(message = "마지막 시간은 현재 시간 이전이어야 합니다.")
+        @Positive(message = "마지막 ID는 양수여야 합니다.")
         @RequestParam(required = false)
-        lastTime: LocalDateTime?,
-    ): SliceResponse<UserLikedReviewResponse> = userQueryService.getLikeReviews(userId, size, lastTime)
+        lastId: Long?,
+    ): SliceResponse<UserLikedReviewResponse> = userQueryService.getLikeReviews(userId, size, lastId)
+
+    @GetMapping("{userId}/statistics")
+    override fun getUserStatistics(
+        @PathVariable("userId")
+        @Positive(message = "유저 ID는 양수여야 합니다.")
+        userId: Long,
+    ): UserStatisticsResponse = userQueryService.getUserStatistics(userId)
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PatchMapping("/nickname")

@@ -29,6 +29,7 @@ class FoodSpotsReviewRepositoryTest(
             lateinit var user: User
             lateinit var otherUser: User
             lateinit var testUser: User
+            lateinit var noReviewsUser: User
             lateinit var foodSpots: FoodSpots
             lateinit var otherFoodSpots: FoodSpots
             lateinit var testFoodSpots: FoodSpots
@@ -38,6 +39,7 @@ class FoodSpotsReviewRepositoryTest(
                 user = userRepository.save(createTestUser(0L))
                 otherUser = userRepository.save(createTestUser(0L, "otherUser"))
                 testUser = userRepository.save(createTestUser(0L, "testUser"))
+                noReviewsUser = userRepository.save(createTestUser(0L, "noReviewsUser"))
                 foodSpots = foodSpotsRepository.save(createTestFoodSpots())
                 otherFoodSpots = foodSpotsRepository.save(createTestFoodSpots())
                 testFoodSpots = foodSpotsRepository.save(createTestFoodSpots())
@@ -263,7 +265,7 @@ class FoodSpotsReviewRepositoryTest(
             describe("findAllUserTotalCount 메소드는") {
                 it("전체 회원의 종합 랭킹을 리스트로 반환한다") {
                     val userTotalCounts = reviewRepository.findAllUserTotalCount()
-                    userTotalCounts.size shouldBe 3
+                    userTotalCounts.size shouldBe 4
 
                     userTotalCounts[0].userNickname shouldBe "existentNick"
                     userTotalCounts[0].total shouldBe 6
@@ -276,6 +278,25 @@ class FoodSpotsReviewRepositoryTest(
                     userTotalCounts[2].userNickname shouldBe "testUser"
                     userTotalCounts[2].total shouldBe 4
                     userTotalCounts[2].profileImageUrl shouldBe "test_image_name_0"
+
+                    userTotalCounts[3].userNickname shouldBe "noReviewsUser"
+                    userTotalCounts[3].total shouldBe 0
+                }
+            }
+
+            describe("countByUser 메소드는") {
+                context("리뷰를 작성한 user 를 받는 경우") {
+                    it("해당 user 의 리뷰 이력 개수를 반환한다.") {
+                        val count = reviewRepository.countByUser(user)
+                        count shouldBe 3
+                    }
+                }
+
+                context("리뷰를 작성하지 않은 user 를 받는 경우") {
+                    it("0을 반환한다.") {
+                        val count = reviewRepository.countByUser(noReviewsUser)
+                        count shouldBe 0
+                    }
                 }
             }
         },
