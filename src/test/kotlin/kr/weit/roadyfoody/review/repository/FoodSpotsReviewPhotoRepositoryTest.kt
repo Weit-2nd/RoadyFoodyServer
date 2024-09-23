@@ -8,6 +8,7 @@ import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
 import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpots
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
 import kr.weit.roadyfoody.review.domain.FoodSpotsReview
+import kr.weit.roadyfoody.review.domain.FoodSpotsReviewPhoto
 import kr.weit.roadyfoody.support.annotation.RepositoryTest
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.fixture.createTestUser
@@ -26,18 +27,18 @@ class FoodSpotsReviewPhotoRepositoryTest(
             lateinit var otherFoodSpots: FoodSpots
             lateinit var review: FoodSpotsReview
             lateinit var otherReview: FoodSpotsReview
+            lateinit var reviewPhoto: FoodSpotsReviewPhoto
+            lateinit var reviewPhoto2: FoodSpotsReviewPhoto
+            lateinit var otherReviewPhoto: FoodSpotsReviewPhoto
             beforeEach {
                 user = userRepository.save(createTestUser(0L))
                 foodSpots = foodSpotsRepository.save(createTestFoodSpots())
                 otherFoodSpots = foodSpotsRepository.save(createTestFoodSpots())
                 review = reviewRepository.save(createTestFoodSpotsReview(user, foodSpots))
                 otherReview = reviewRepository.save(createTestFoodSpotsReview(user, otherFoodSpots))
-                reviewPhotoRepository.saveAll(
-                    listOf(
-                        createTestReviewPhoto(review),
-                        createTestReviewPhoto(otherReview),
-                    ),
-                )
+                reviewPhoto = reviewPhotoRepository.save(createTestReviewPhoto(review))
+                reviewPhoto2 = reviewPhotoRepository.save(createTestReviewPhoto(review))
+                otherReviewPhoto = reviewPhotoRepository.save(createTestReviewPhoto(otherReview))
             }
 
             describe("findByUser 메소드는") {
@@ -45,7 +46,7 @@ class FoodSpotsReviewPhotoRepositoryTest(
                     it("해당 사용자의 리뷰 리스트를 반환한다.") {
                         val result =
                             reviewPhotoRepository.findByFoodSpotsReviewIn(listOf(review, otherReview))
-                        result.map { it.foodSpotsReview }.size shouldBe 2
+                        result.map { it.foodSpotsReview }.size shouldBe 3
                     }
                 }
             }
@@ -70,7 +71,41 @@ class FoodSpotsReviewPhotoRepositoryTest(
                 context("리뷰를 받는 경우") {
                     it("해당 리뷰의 사진 리스트를 반환한다.") {
                         val result = reviewPhotoRepository.getByReview(review)
-                        result.map { it.foodSpotsReview } shouldBe listOf(review)
+                        result shouldBe listOf(reviewPhoto, reviewPhoto2)
+                    }
+                }
+            }
+
+            describe("findByFoodSpotsReviewAndIdIn") {
+                context("리뷰와 삭제할 사진 id 리스트를 받는 경우") {
+                    it("해당 리뷰의 사진 리스트를 반환한다.") {
+                        val reviewPhotos =
+                            reviewPhotoRepository.findByFoodSpotsReviewAndIdIn(
+                                review,
+                                setOf(reviewPhoto.id, reviewPhoto2.id),
+                            )
+                        reviewPhotos shouldBe listOf(reviewPhoto, reviewPhoto2)
+                    }
+                }
+
+                context("리뷰와 해당 리뷰에 없는 사진 id가 리스트에 존재하는 경우") {
+                    it("해당 리뷰의 사진 리스트를 반환한다.") {
+                        val reviewPhotos =
+                            reviewPhotoRepository.findByFoodSpotsReviewAndIdIn(
+                                review,
+                                setOf(reviewPhoto.id, otherReviewPhoto.id),
+                            )
+                        reviewPhotos shouldBe listOf(reviewPhoto)
+                    }
+                }
+                context("리뷰와 전부 리뷰에 없는 사진 id 리스트를 받는 경우") {
+                    it("해당 리뷰의 사진 리스트를 반환한다.") {
+                        val reviewPhotos =
+                            reviewPhotoRepository.findByFoodSpotsReviewAndIdIn(
+                                otherReview,
+                                setOf(reviewPhoto.id),
+                            )
+                        reviewPhotos shouldBe emptyList()
                     }
                 }
             }

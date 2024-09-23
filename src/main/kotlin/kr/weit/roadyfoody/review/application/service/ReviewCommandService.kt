@@ -1,5 +1,6 @@
 package kr.weit.roadyfoody.review.application.service
 
+import REVIEW_LIKE_LOCK_KEY
 import USER_ENTITY_LOCK_KEY
 import kr.weit.roadyfoody.badge.service.BadgeCommandService
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
@@ -7,6 +8,7 @@ import kr.weit.roadyfoody.foodSpots.repository.getByFoodSpotsId
 import kr.weit.roadyfoody.global.annotation.DistributedLock
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.review.application.dto.ReviewRequest
+import kr.weit.roadyfoody.review.application.dto.ReviewUpdateRequest
 import kr.weit.roadyfoody.review.domain.FoodSpotsReview
 import kr.weit.roadyfoody.review.domain.FoodSpotsReviewPhoto
 import kr.weit.roadyfoody.review.exception.NotFoodSpotsReviewOwnerException
@@ -87,11 +89,74 @@ class ReviewCommandService(
         badgeCommandService.tryChangeBadgeAndIfPromotedGiveBonus(user.id)
     }
 
+    @DistributedLock(lockName = REVIEW_LIKE_LOCK_KEY, identifier = "reviewId")
+    @Transactional
+    fun updateReview(
+        user: User,
+        reviewId: Long,
+        reviewRequest: ReviewUpdateRequest?,
+        photos: List<MultipartFile>?,
+    ) {
+        val review = reviewRepository.getReviewByReviewId(reviewId)
+        if (review.user.id != user.id) {
+            throw NotFoodSpotsReviewOwnerException("해당 리뷰의 소유자가 아닙니다.")
+        }
+
+        reviewRequest?.let {
+            it.contents?.let { contents ->
+                review.contents = contents
+            }
+            it.rating?.let { rating ->
+                review.rate = rating
+            }
+        }
+        val deletePhotos =
+            reviewRequest?.deletePhotoIds?.let {
+                reviewPhotoRepository.findByFoodSpotsReviewAndIdIn(
+                    review,
+                    reviewRequest.deletePhotoIds,
+                )
+            }
+        val deleteFileName = deletePhotos?.map { it.fileName } ?: emptyList()
+        deletePhotos?.let { reviewPhotoRepository.deleteAll(it) }
+        val generatorPhotoNameMap =
+            photos?.associateBy { imageService.generateImageName(it) } ?: emptyMap()
+        validatePhotoSize(review, generatorPhotoNameMap.size)
+        generatorPhotoNameMap
+            .map { FoodSpotsReviewPhoto(review, it.key) }
+            .also { reviewPhotoRepository.saveAll(it) }
+        (
+            generatorPhotoNameMap
+                .map {
+                    CompletableFuture.supplyAsync({
+                        imageService.upload(it.key, it.value)
+                    }, executor)
+                } +
+                deleteFileName
+                    .map {
+                        CompletableFuture.supplyAsync({
+                            imageService.remove(it)
+                        }, executor)
+                    }
+        ).forEach { it.join() }
+    }
+
     private fun deleteReviewPhoto(reviews: List<FoodSpotsReview>) {
         reviewPhotoRepository
             .findByFoodSpotsReviewIn(reviews)
             .onEach { photo ->
                 imageService.remove(photo.fileName)
             }.also { photoList -> reviewPhotoRepository.deleteAll(photoList) }
+    }
+
+    private fun validatePhotoSize(
+        review: FoodSpotsReview,
+        photosCount: Int,
+    ) {
+        reviewPhotoRepository.findByFoodSpotsReview(review).size.also { currentPhotoSize ->
+            if (currentPhotoSize + photosCount > 3) {
+                throw IllegalArgumentException("이미지는 최대 3개까지 업로드할 수 있습니다.")
+            }
+        }
     }
 }

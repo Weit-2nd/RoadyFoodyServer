@@ -6,6 +6,7 @@ import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpots
 import kr.weit.roadyfoody.global.TEST_PAGE_SIZE
 import kr.weit.roadyfoody.review.application.dto.ReviewPhotoResponse
 import kr.weit.roadyfoody.review.application.dto.ReviewRequest
+import kr.weit.roadyfoody.review.application.dto.ReviewUpdateRequest
 import kr.weit.roadyfoody.review.application.dto.ToggleLikeResponse
 import kr.weit.roadyfoody.review.domain.FoodSpotsReview
 import kr.weit.roadyfoody.review.domain.FoodSpotsReviewPhoto
@@ -23,13 +24,15 @@ import java.time.LocalDateTime
 const val TEST_FOOD_SPOT_ID = 1L
 const val TEST_REVIEW_CONTENT = "testReview"
 const val TEST_REVIEW_RATING = 5
-const val TEST_REVIEW_REQUEST_NAME = "reviewRequest"
+const val TEST_REVIEW_CREATE_REQUEST_NAME = "reviewRequest"
+const val TEST_REVIEW_UPDATE_REQUEST_NAME = "reviewUpdateRequest"
 const val TEST_REVIEW_CONTENT_MAX_LENGTH = 1200
 const val TEST_INVALID_FOOD_SPOT_ID = -1L
 const val TEST_INVALID_RATING = 0
 const val TEST_INVALID_RATING_OVER = 6
 const val TEST_REVIEW_REQUEST_PHOTO = "reviewPhotos"
 const val TEST_REVIEW_ID = 1L
+const val TEST_INVALID_REVIEW_ID = -1L
 const val TEST_REVIEW_PHOTO_URL = "reviewPhotoUrl"
 const val TEST_REVIEW_PHOTO_ID = 1L
 const val TEST_REVIEW_LIKE = 1
@@ -117,6 +120,12 @@ fun createUserLikeReviewResponse(): SliceResponse<UserLikedReviewResponse> =
     )
 
 fun createTestUserStatisticsResponse(): UserStatisticsResponse = UserStatisticsResponse(0, 0, 0)
+
+fun createTestReviewUpdateRequest(
+    contents: String? = TEST_REVIEW_CONTENT,
+    rating: Int? = TEST_REVIEW_RATING,
+    deletePhotoIds: Set<Long>? = setOf(1L),
+) = ReviewUpdateRequest(contents, rating, deletePhotoIds)
 
 class MockTestReview(
     id: Long = 0L,
