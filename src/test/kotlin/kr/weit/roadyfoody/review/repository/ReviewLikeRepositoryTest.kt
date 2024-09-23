@@ -23,6 +23,7 @@ class ReviewLikeRepositoryTest(
         {
             lateinit var user: User
             lateinit var otherUser: User
+            lateinit var notLikeUser: User
             lateinit var foodSpots: FoodSpots
             lateinit var review: FoodSpotsReview
             lateinit var otherReview: FoodSpotsReview
@@ -31,6 +32,7 @@ class ReviewLikeRepositoryTest(
             beforeEach {
                 user = userRepository.save(createTestUser(0L))
                 otherUser = userRepository.save(createTestUser(0L, "otherUser"))
+                notLikeUser = userRepository.save(createTestUser(0L, "notLikeUser"))
                 foodSpots = foodSpotsRepository.save(createTestFoodSpots())
                 review = reviewRepository.save(createTestFoodSpotsReview(user, foodSpots))
                 otherReview = reviewRepository.save(createTestFoodSpotsReview(otherUser, foodSpots))
@@ -112,6 +114,20 @@ class ReviewLikeRepositoryTest(
                                 10,
                                 otherReviewLike.id,
                             ).content shouldBe listOf(reviewLike)
+                    }
+                }
+            }
+
+            describe("countByUser 메소드는") {
+                context("유저를 받는 경우") {
+                    it("유저가 좋아요한 리뷰의 개수를 반환한다.") {
+                        reviewLikeRepository.countByUser(user) shouldBe 2
+                    }
+                }
+
+                context("좋아요를 누르지 않은 유저를 받는 경우") {
+                    it("0을 반환한다.") {
+                        reviewLikeRepository.countByUser(notLikeUser) shouldBe 0
                     }
                 }
             }

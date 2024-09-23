@@ -29,6 +29,8 @@ interface ReviewLikeRepository :
         review: FoodSpotsReview,
         user: User,
     )
+
+    fun countByUser(user: User): Int
 }
 
 interface CustomReviewLikeRepository {
