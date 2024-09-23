@@ -32,7 +32,7 @@ class RankingCommandService(
     private val cachePublisher: CachePublisher,
 ) {
     @Async("asyncTask")
-    @Scheduled(cron = "0 0 5 * * *")
+    @Scheduled(cron = "0 35 21 * * *")
     @CircuitBreaker(name = "redisCircuitBreaker")
     fun updateReportRanking() {
         updateRanking(
@@ -43,7 +43,7 @@ class RankingCommandService(
     }
 
     @Async("asyncTask")
-    @Scheduled(cron = "0 0 5 * * *")
+    @Scheduled(cron = "0 35 21 * * *")
     @CircuitBreaker(name = "redisCircuitBreaker")
     fun updateReviewRanking() {
         updateRanking(
@@ -54,7 +54,7 @@ class RankingCommandService(
     }
 
     @Async("asyncTask")
-    @Scheduled(cron = "0 0 5 * * *")
+    @Scheduled(cron = "0 35 21 * * *")
     @CircuitBreaker(name = "redisCircuitBreaker")
     fun updateLikeRanking() {
         updateRanking(
@@ -65,7 +65,7 @@ class RankingCommandService(
     }
 
     @Async("asyncTask")
-    @Scheduled(cron = "0 0 5 * * *")
+    @Scheduled(cron = "0 35 21 * * *")
     @CircuitBreaker(name = "redisCircuitBreaker")
     fun updateTotalRanking() {
         updateRanking(
@@ -91,12 +91,16 @@ class RankingCommandService(
 
             redisTemplate.delete(key)
 
+            val splitRanking =
+                ranking?.map { score ->
+                    score.split(":")
+                }
+
             val rankingData =
                 userRanking.mapIndexed { index, it ->
                     val rankChange =
-                        ranking
-                            ?.indexOfFirst { score ->
-                                val parts = score.split(":")
+                        splitRanking
+                            ?.indexOfFirst { parts ->
                                 parts[2] == it.userId.toString()
                             }?.minus(index)
 
