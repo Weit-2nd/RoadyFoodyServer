@@ -99,7 +99,7 @@ class RankingQueryService(
         val ranking =
             redisTemplate
                 .opsForList()
-                .range(key, start, start + size - 1)
+                .range(key, start - 1, start + size - 2)
 
         if (ranking.isNullOrEmpty()) {
             CompletableFuture.runAsync({
