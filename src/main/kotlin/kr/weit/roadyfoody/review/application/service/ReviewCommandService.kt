@@ -1,5 +1,6 @@
 package kr.weit.roadyfoody.review.application.service
 
+import REVIEW_LIKE_LOCK_KEY
 import USER_ENTITY_LOCK_KEY
 import kr.weit.roadyfoody.badge.service.BadgeCommandService
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
@@ -83,6 +84,7 @@ class ReviewCommandService(
         badgeCommandService.tryChangeBadgeAndIfPromotedGiveBonus(user.id)
     }
 
+    @DistributedLock(lockName = REVIEW_LIKE_LOCK_KEY, identifier = "reviewId")
     @Transactional
     fun updateReview(
         user: User,
