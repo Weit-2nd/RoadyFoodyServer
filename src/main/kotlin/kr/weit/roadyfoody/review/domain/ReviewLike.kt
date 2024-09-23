@@ -30,7 +30,7 @@ import kr.weit.roadyfoody.user.domain.User
 @SequenceGenerator(
     name = "REVIEW_LIKES_SEQ_GENERATOR",
     sequenceName = "REVIEW_LIKES_SEQ",
-    initialValue = 17,
+    initialValue = 19,
     allocationSize = 1,
 )
 class ReviewLike(
