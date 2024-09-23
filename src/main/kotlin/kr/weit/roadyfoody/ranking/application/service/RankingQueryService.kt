@@ -31,37 +31,53 @@ class RankingQueryService(
     private val cacheManager: CacheManager,
 ) {
     @CircuitBreaker(name = "redisCircuitBreaker", fallbackMethod = "fallbackRankings")
-    fun getReportRanking(size: Long): List<UserRankingResponse> =
+    fun getReportRanking(
+        size: Long,
+        start: Long,
+    ): List<UserRankingResponse> =
         getRanking(
             lockName = REPORT_RANKING_UPDATE_LOCK,
             size = size,
+            start = start,
             key = REPORT_RANKING_KEY,
             dataProvider = foodSpotsHistoryRepository::findAllUserReportCount,
         )
 
     @CircuitBreaker(name = "redisCircuitBreaker", fallbackMethod = "fallbackRankings")
-    fun getReviewRanking(size: Long): List<UserRankingResponse> =
+    fun getReviewRanking(
+        size: Long,
+        start: Long,
+    ): List<UserRankingResponse> =
         getRanking(
             lockName = REVIEW_RANKING_UPDATE_LOCK,
             size = size,
+            start = start,
             key = REVIEW_RANKING_KEY,
             dataProvider = reviewRepository::findAllUserReviewCount,
         )
 
     @CircuitBreaker(name = "redisCircuitBreaker", fallbackMethod = "fallbackRankings")
-    fun getLikeRanking(size: Long): List<UserRankingResponse> =
+    fun getLikeRanking(
+        size: Long,
+        start: Long,
+    ): List<UserRankingResponse> =
         getRanking(
             lockName = LIKE_RANKING_UPDATE_LOCK,
             size = size,
+            start = start,
             key = LIKE_RANKING_KEY,
             dataProvider = reviewRepository::findAllUserLikeCount,
         )
 
     @CircuitBreaker(name = "redisCircuitBreaker", fallbackMethod = "fallbackRankings")
-    fun getTotalRanking(size: Long): List<UserRankingResponse> =
+    fun getTotalRanking(
+        size: Long,
+        start: Long,
+    ): List<UserRankingResponse> =
         getRanking(
             lockName = TOTAL_RANKING_UPDATE_LOCK,
             size = size,
+            start = start,
             key = TOTAL_RANKING_KEY,
             dataProvider = reviewRepository::findAllUserTotalCount,
         )
@@ -69,6 +85,7 @@ class RankingQueryService(
     private fun getRanking(
         lockName: String,
         size: Long,
+        start: Long,
         key: String,
         dataProvider: () -> List<UserRanking>,
     ): List<UserRankingResponse> {
@@ -76,13 +93,13 @@ class RankingQueryService(
         val cachedData =
             cache?.get(key, List::class.java) as? List<String>
         if (!cachedData.isNullOrEmpty()) {
-            return convertToUserRanking(cachedData.take(size.toInt()))
+            return convertToUserRanking(cachedData.drop(start.toInt() - 1).take(size.toInt()))
         }
 
         val ranking =
             redisTemplate
                 .opsForList()
-                .range(key, 0, size - 1)
+                .range(key, start, start + size - 1)
 
         if (ranking.isNullOrEmpty()) {
             CompletableFuture.runAsync({
@@ -112,6 +129,7 @@ class RankingQueryService(
 
     fun fallbackRankings(
         size: Long,
+        start: Long,
         throwable: Throwable,
     ): List<UserRankingResponse> {
         if (REDIS_CIRCUIT_BREAKER_TARGET_EXCEPTIONS.any { it.isInstance(throwable) }) {

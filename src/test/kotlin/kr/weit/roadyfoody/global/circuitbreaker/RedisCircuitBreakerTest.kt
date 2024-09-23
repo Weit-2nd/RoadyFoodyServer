@@ -48,9 +48,9 @@ class RedisCircuitBreakerTest(
                 }
 
                 then("fallback 정책대로 반환합니다.") {
-                    shouldNotThrow<RedisException> { sut.getReportRanking(5) }
+                    shouldNotThrow<RedisException> { sut.getReportRanking(5, 1) }
 
-                    sut.getReportRanking(5) shouldBe emptyList()
+                    sut.getReportRanking(5, 1) shouldBe emptyList()
                 }
 
                 then("Sentry 에 알림을 전송한다.") {
@@ -68,7 +68,7 @@ class RedisCircuitBreakerTest(
                 }
 
                 then("예외를 다시 던집니다.") {
-                    shouldThrow<Exception> { sut.getReportRanking(5) }
+                    shouldThrow<Exception> { sut.getReportRanking(5, 1) }
                 }
 
                 then("Sentry 에 알림을 전송하지 않는다.") {
@@ -84,7 +84,7 @@ fun repeatFailingCalls(
 ) {
     repeat(times) {
         runCatching {
-            sut.getReportRanking(5)
+            sut.getReportRanking(5, 1)
         }
     }
 }
