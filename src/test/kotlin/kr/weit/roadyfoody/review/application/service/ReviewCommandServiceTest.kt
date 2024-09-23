@@ -299,7 +299,7 @@ class ReviewCommandServiceTest :
                     }
                 }
 
-                `when`("리뷰 등록과 삭제가 동시에 되는 경우") {
+                `when`("리뷰 사진 등록과 삭제가 동시에 되는 경우") {
                     every { reviewRepository.getReviewByReviewId(any()) } returns
                         createMockTestReview(
                             user,
