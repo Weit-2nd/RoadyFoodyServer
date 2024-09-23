@@ -97,9 +97,10 @@ fun createMockSliceReview(): Slice<FoodSpotsReview> =
 fun createTestReviewPhotoResponse(): ReviewPhotoResponse = ReviewPhotoResponse(TEST_REVIEW_PHOTO_ID, TEST_REVIEW_PHOTO_URL)
 
 fun createMockReviewLike(
+    id: Long = 0L,
     review: FoodSpotsReview = createMockTestReview(),
     user: User = createTestUser(),
-): ReviewLike = MockTestReviewLike(review, user)
+): ReviewLike = MockTestReviewLike(id, review, user)
 
 fun createTestToggleLikeResponse(): ToggleLikeResponse = ToggleLikeResponse(TEST_REVIEW_ID, TEST_REVIEW_LIKE, true)
 
@@ -135,8 +136,9 @@ class MockTestReview(
 }
 
 class MockTestReviewLike(
+    id: Long = 0L,
     review: FoodSpotsReview = createMockTestReview(),
     user: User = createTestUser(),
-) : ReviewLike(review, user) {
+) : ReviewLike(id, review, user) {
     override var createdDateTime: LocalDateTime = LocalDateTime.now()
 }
