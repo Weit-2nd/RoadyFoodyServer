@@ -2,6 +2,7 @@ package kr.weit.roadyfoody.user.presentation.api
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
+import createTestUserStatisticsResponse
 import createUserLikeReviewResponse
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
@@ -393,6 +394,25 @@ class UserControllerTest(
                                 .param("size", "$TEST_PAGE_SIZE")
                                 .param("lastId", "$TEST_NON_POSITIVE_ID"),
                         ).andExpect(status().isBadRequest)
+                }
+            }
+        }
+
+        given("GET $requestPath/{userId}/statistics Test") {
+            `when`("정상적인 데이터가 들어올 경우") {
+                every { userQueryService.getUserStatistics(any()) } returns createTestUserStatisticsResponse()
+                then("해당 유저의 통계를 반환한다.") {
+                    mockMvc
+                        .perform(getWithAuth("$requestPath/$TEST_USER_ID/statistics"))
+                        .andExpect(status().isOk)
+                }
+            }
+
+            `when`("userId가 양수가 아닌 경우") {
+                then("400 반환") {
+                    mockMvc
+                        .perform(getWithAuth("$requestPath/$TEST_NON_POSITIVE_ID/statistics"))
+                        .andExpect(status().isBadRequest)
                 }
             }
         }

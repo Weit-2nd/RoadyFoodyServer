@@ -143,4 +143,20 @@ class FoodSpotsHistoryRepositoryTest(
                 userReportCounts[3].total shouldBe 1
             }
         }
+
+        describe("countByUser 메소드는") {
+            context("가게 리포트를 작성한 user 를 받는 경우") {
+                it("해당 user 의 가게 리포트 이력 개수를 반환한다.") {
+                    val count = foodSpotsHistoryRepository.countByUser(user)
+                    count shouldBe 2
+                }
+            }
+
+            context("리포트를 작성하지 않은 user 를 받는 경우") {
+                it("0을 반환한다.") {
+                    val count = foodSpotsHistoryRepository.countByUser(otherUser)
+                    count shouldBe 0
+                }
+            }
+        }
     })
