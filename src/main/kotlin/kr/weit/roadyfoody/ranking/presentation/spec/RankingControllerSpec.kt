@@ -9,7 +9,6 @@ import jakarta.validation.constraints.Positive
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.global.swagger.ApiErrorCodeExamples
 import kr.weit.roadyfoody.global.swagger.v1.SwaggerTag
-import kr.weit.roadyfoody.ranking.dto.UserRanking
 import kr.weit.roadyfoody.ranking.dto.UserRankingResponse
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.RequestParam
@@ -32,7 +31,7 @@ interface RankingControllerSpec {
                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                         schema =
                             Schema(
-                                implementation = UserRanking::class,
+                                implementation = UserRankingResponse::class,
                             ),
                     ),
                 ],
@@ -62,7 +61,7 @@ interface RankingControllerSpec {
                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                         schema =
                             Schema(
-                                implementation = UserRanking::class,
+                                implementation = UserRankingResponse::class,
                             ),
                     ),
                 ],
@@ -91,7 +90,7 @@ interface RankingControllerSpec {
                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                         schema =
                             Schema(
-                                implementation = UserRanking::class,
+                                implementation = UserRankingResponse::class,
                             ),
                     ),
                 ],
@@ -120,7 +119,7 @@ interface RankingControllerSpec {
                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                         schema =
                             Schema(
-                                implementation = UserRanking::class,
+                                implementation = UserRankingResponse::class,
                             ),
                     ),
                 ],
