@@ -62,8 +62,8 @@ data class UserLikedReviewResponse(
     val reviewCreatedAt: LocalDateTime,
     @Schema(description = "리뷰 작성자 정보")
     val reviewer: ReviewerInfoResponse,
-    @Schema(description = "좋아요 생성일")
-    val likeCreatedAt: LocalDateTime,
+    @Schema(description = "좋아요 id")
+    val reviewLikeId: Long,
 ) {
     constructor(reviewLike: ReviewLike, photos: List<ReviewPhotoResponse>, url: String?) : this(
         id = reviewLike.review.id,
@@ -72,6 +72,15 @@ data class UserLikedReviewResponse(
         photos = photos,
         reviewCreatedAt = reviewLike.review.createdDateTime,
         reviewer = ReviewerInfoResponse.of(reviewLike.review.user, url),
-        likeCreatedAt = reviewLike.createdDateTime,
+        reviewLikeId = reviewLike.id,
     )
 }
+
+data class UserStatisticsResponse(
+    @Schema(description = "작성한 가게 리포트 수")
+    val reportCount: Int,
+    @Schema(description = "작성한 리뷰 수")
+    val reviewCount: Int,
+    @Schema(description = "좋아요 누른 리뷰 수")
+    val likeCount: Int,
+)

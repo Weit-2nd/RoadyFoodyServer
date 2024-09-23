@@ -11,6 +11,7 @@ import kr.weit.roadyfoody.review.domain.FoodSpotsReview
 import kr.weit.roadyfoody.review.domain.FoodSpotsReviewPhoto
 import kr.weit.roadyfoody.review.domain.ReviewLike
 import kr.weit.roadyfoody.user.application.dto.UserLikedReviewResponse
+import kr.weit.roadyfoody.user.application.dto.UserStatisticsResponse
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.fixture.TEST_USER_PROFILE_IMAGE_URL
 import kr.weit.roadyfoody.user.fixture.createTestUser
@@ -94,9 +95,10 @@ fun createMockSliceReview(): Slice<FoodSpotsReview> =
 fun createTestReviewPhotoResponse(): ReviewPhotoResponse = ReviewPhotoResponse(TEST_REVIEW_PHOTO_ID, TEST_REVIEW_PHOTO_URL)
 
 fun createMockReviewLike(
+    id: Long = 0L,
     review: FoodSpotsReview = createMockTestReview(),
     user: User = createTestUser(),
-): ReviewLike = MockTestReviewLike(review, user)
+): ReviewLike = MockTestReviewLike(id, review, user)
 
 fun createTestToggleLikeResponse(): ToggleLikeResponse = ToggleLikeResponse(TEST_REVIEW_ID, TEST_REVIEW_LIKE, true)
 
@@ -114,6 +116,8 @@ fun createUserLikeReviewResponse(): SliceResponse<UserLikedReviewResponse> =
         false,
     )
 
+fun createTestUserStatisticsResponse(): UserStatisticsResponse = UserStatisticsResponse(0, 0, 0)
+
 class MockTestReview(
     id: Long = 0L,
     foodSpots: FoodSpots = createTestFoodSpots(),
@@ -126,8 +130,9 @@ class MockTestReview(
 }
 
 class MockTestReviewLike(
+    id: Long = 0L,
     review: FoodSpotsReview = createMockTestReview(),
     user: User = createTestUser(),
-) : ReviewLike(review, user) {
+) : ReviewLike(id, review, user) {
     override var createdDateTime: LocalDateTime = LocalDateTime.now()
 }

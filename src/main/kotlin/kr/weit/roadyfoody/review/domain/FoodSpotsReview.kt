@@ -35,8 +35,6 @@ class FoodSpotsReview(
     @Column(nullable = false)
     var likeTotal: Int,
 ) : BaseTimeEntity() {
-    constructor() : this(0L, FoodSpots(), User.of("", "defaultNickname"), 0, "", 0)
-
     fun increaseLike() {
         this.likeTotal++
     }
