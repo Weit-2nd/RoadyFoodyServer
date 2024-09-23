@@ -119,13 +119,13 @@ fun createUserLikeReviewResponse(): SliceResponse<UserLikedReviewResponse> =
         false,
     )
 
-fun createTestUserStatisticsResponse(): UserStatisticsResponse = UserStatisticsResponse(0, 0, 0)
-
 fun createTestReviewUpdateRequest(
     contents: String? = TEST_REVIEW_CONTENT,
     rating: Int? = TEST_REVIEW_RATING,
     deletePhotoIds: Set<Long>? = setOf(1L),
 ) = ReviewUpdateRequest(contents, rating, deletePhotoIds)
+
+fun createTestUserStatisticsResponse(): UserStatisticsResponse = UserStatisticsResponse(0, 0, 0)
 
 class MockTestReview(
     id: Long = 0L,
