@@ -12,6 +12,7 @@ import kr.weit.roadyfoody.review.domain.FoodSpotsReview
 import kr.weit.roadyfoody.review.domain.FoodSpotsReviewPhoto
 import kr.weit.roadyfoody.review.domain.ReviewLike
 import kr.weit.roadyfoody.user.application.dto.UserLikedReviewResponse
+import kr.weit.roadyfoody.user.application.dto.UserStatisticsResponse
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.fixture.TEST_USER_PROFILE_IMAGE_URL
 import kr.weit.roadyfoody.user.fixture.createTestUser

@@ -221,6 +221,14 @@ interface UserControllerSpec {
 
     @Operation(
         description = "유저 좋아요 누른 게시물 조회 API",
+        parameters = [
+            Parameter(name = "size", description = "조회할 개수", example = "10"),
+            Parameter(
+                name = "lastId",
+                description = "마지막 조회된 리뷰의 좋아요 ID(reviewLikeId)",
+                example = "1",
+            ),
+        ],
         responses = [
             ApiResponse(
                 responseCode = "200",
