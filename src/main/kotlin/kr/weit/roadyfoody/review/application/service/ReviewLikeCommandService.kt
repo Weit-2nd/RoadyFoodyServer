@@ -24,15 +24,16 @@ class ReviewLikeCommandService(
         user: User,
     ): ToggleLikeResponse {
         val review = reviewRepository.getReviewByReviewId(reviewId)
-        var liked = true
-        if (reviewLikeRepository.existsByReviewAndUser(review, user)) {
-            review.decreaseLike()
-            reviewLikeRepository.deleteByReviewAndUser(review, user)
-            liked = false
-        } else {
-            review.increaseLike()
-            reviewLikeRepository.save(ReviewLike(review, user))
-        }
+        val liked =
+            if (reviewLikeRepository.existsByReviewAndUser(review, user)) {
+                review.decreaseLike()
+                reviewLikeRepository.deleteByReviewAndUser(review, user)
+                false
+            } else {
+                review.increaseLike()
+                reviewLikeRepository.save(ReviewLike(review, user))
+                true
+            }
 
         return ToggleLikeResponse(reviewId, review.likeTotal, liked)
     }
