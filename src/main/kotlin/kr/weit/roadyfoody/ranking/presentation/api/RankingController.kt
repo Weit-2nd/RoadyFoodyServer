@@ -19,26 +19,38 @@ class RankingController(
         @Positive(message = "size는 양수여야 합니다.")
         @RequestParam(defaultValue = "10")
         size: Long,
-    ): List<UserRankingResponse> = rankingQueryService.getReportRanking(size)
+        @Positive(message = "시작값은 양수여야 합니다")
+        @RequestParam(defaultValue = "1")
+        start: Long,
+    ): List<UserRankingResponse> = rankingQueryService.getReportRanking(size, start)
 
     @GetMapping("/review")
     override fun getReviewRanking(
         @Positive(message = "size는 양수여야 합니다.")
         @RequestParam(defaultValue = "10")
         size: Long,
-    ): List<UserRankingResponse> = rankingQueryService.getReviewRanking(size)
+        @Positive(message = "시작값은 양수여야 합니다")
+        @RequestParam(defaultValue = "1")
+        start: Long,
+    ): List<UserRankingResponse> = rankingQueryService.getReviewRanking(size, start)
 
     @GetMapping("/like")
     override fun getLikeRanking(
         @Positive(message = "size는 양수여야 합니다")
         @RequestParam(defaultValue = "10")
         size: Long,
-    ): List<UserRankingResponse> = rankingQueryService.getLikeRanking(size)
+        @Positive(message = "시작값은 양수여야 합니다")
+        @RequestParam(defaultValue = "1")
+        start: Long,
+    ): List<UserRankingResponse> = rankingQueryService.getLikeRanking(size, start)
 
     @GetMapping("total")
     override fun getTotalRanking(
         @Positive(message = "size는 양수여야 합니다")
         @RequestParam(defaultValue = "10")
         size: Long,
-    ): List<UserRankingResponse> = rankingQueryService.getTotalRanking(size)
+        @Positive(message = "시작값은 양수여야 합니다")
+        @RequestParam(defaultValue = "1")
+        start: Long,
+    ): List<UserRankingResponse> = rankingQueryService.getTotalRanking(size, start)
 }
