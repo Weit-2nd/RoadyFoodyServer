@@ -25,6 +25,8 @@ interface ReviewLikeRepository :
 
     fun deleteByUser(user: User)
 
+    fun deleteByReview(review: FoodSpotsReview)
+
     fun deleteByReviewAndUser(
         review: FoodSpotsReview,
         user: User,
