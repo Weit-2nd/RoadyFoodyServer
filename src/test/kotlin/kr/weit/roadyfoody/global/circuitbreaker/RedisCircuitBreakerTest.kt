@@ -13,6 +13,8 @@ import io.mockk.mockkStatic
 import io.mockk.unmockkStatic
 import io.mockk.verify
 import io.sentry.Sentry
+import kr.weit.roadyfoody.global.TEST_SIZE
+import kr.weit.roadyfoody.global.TEST_START_INDEX
 import kr.weit.roadyfoody.ranking.application.service.RankingQueryService
 import kr.weit.roadyfoody.support.annotation.ServiceIntegrateTest
 import org.redisson.client.RedisException
@@ -48,9 +50,9 @@ class RedisCircuitBreakerTest(
                 }
 
                 then("fallback 정책대로 반환합니다.") {
-                    shouldNotThrow<RedisException> { sut.getReportRanking(5) }
+                    shouldNotThrow<RedisException> { sut.getReportRanking(TEST_SIZE, TEST_START_INDEX) }
 
-                    sut.getReportRanking(5) shouldBe emptyList()
+                    sut.getReportRanking(TEST_SIZE, TEST_START_INDEX) shouldBe emptyList()
                 }
 
                 then("Sentry 에 알림을 전송한다.") {
@@ -68,7 +70,7 @@ class RedisCircuitBreakerTest(
                 }
 
                 then("예외를 다시 던집니다.") {
-                    shouldThrow<Exception> { sut.getReportRanking(5) }
+                    shouldThrow<Exception> { sut.getReportRanking(TEST_SIZE, TEST_START_INDEX) }
                 }
 
                 then("Sentry 에 알림을 전송하지 않는다.") {
@@ -84,7 +86,7 @@ fun repeatFailingCalls(
 ) {
     repeat(times) {
         runCatching {
-            sut.getReportRanking(5)
+            sut.getReportRanking(TEST_SIZE, TEST_START_INDEX)
         }
     }
 }

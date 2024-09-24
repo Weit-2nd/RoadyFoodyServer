@@ -9,6 +9,8 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
+import kr.weit.roadyfoody.global.TEST_SIZE
+import kr.weit.roadyfoody.global.TEST_START_INDEX
 import kr.weit.roadyfoody.ranking.exception.RankingNotFoundException
 import kr.weit.roadyfoody.ranking.fixture.createUserRanking
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
@@ -54,7 +56,7 @@ class RankingQueryServiceTest :
                     every { cache.get(any(), List::class.java) } returns list
 
                     then("리포트 랭킹이 조회된다.") {
-                        rankingQueryService.getReportRanking(10)
+                        rankingQueryService.getReportRanking(TEST_SIZE, TEST_START_INDEX)
                         verify(exactly = 0) { listOperation.range(any(), any(), any()) }
                     }
                 }
@@ -65,7 +67,7 @@ class RankingQueryServiceTest :
                     every { listOperation.range(any(), any(), any()) } returns list
 
                     then("리포트 랭킹이 조회된다.") {
-                        rankingQueryService.getReportRanking(10)
+                        rankingQueryService.getReportRanking(TEST_SIZE, TEST_START_INDEX)
                         verify(exactly = 1) { listOperation.range(any(), any(), any()) }
                     }
                 }
@@ -78,7 +80,7 @@ class RankingQueryServiceTest :
                     every { foodSpotsHistoryRepository.findAllUserReportCount() } returns createUserRanking()
 
                     then("예외가 발생한다.") {
-                        shouldThrow<RankingNotFoundException> { rankingQueryService.getReportRanking(10) }
+                        shouldThrow<RankingNotFoundException> { rankingQueryService.getReportRanking(TEST_SIZE, TEST_START_INDEX) }
                     }
                 }
             }
@@ -89,7 +91,7 @@ class RankingQueryServiceTest :
                     every { cache.get(any(), List::class.java) } returns list
 
                     then("리뷰 랭킹이 조회된다.") {
-                        rankingQueryService.getReviewRanking(10)
+                        rankingQueryService.getReviewRanking(TEST_SIZE, TEST_START_INDEX)
                         verify(exactly = 0) { listOperation.range(any(), any(), any()) }
                     }
                 }
@@ -101,7 +103,7 @@ class RankingQueryServiceTest :
                     every { listOperation.range(any(), any(), any()) } returns list
 
                     then("리뷰 랭킹이 조회된다.") {
-                        rankingQueryService.getReviewRanking(10)
+                        rankingQueryService.getReviewRanking(TEST_SIZE, TEST_START_INDEX)
                         verify(exactly = 1) { listOperation.range(any(), any(), any()) }
                     }
                 }
@@ -115,7 +117,7 @@ class RankingQueryServiceTest :
                     every { reviewRepository.findAllUserReviewCount() } returns createUserRanking()
 
                     then("예외가 발생한다.") {
-                        shouldThrow<RankingNotFoundException> { rankingQueryService.getReviewRanking(10) }
+                        shouldThrow<RankingNotFoundException> { rankingQueryService.getReviewRanking(TEST_SIZE, TEST_START_INDEX) }
                     }
                 }
             }
@@ -126,7 +128,7 @@ class RankingQueryServiceTest :
                     every { cache.get(any(), List::class.java) } returns list
 
                     then("좋아요 랭킹이 조회된다.") {
-                        rankingQueryService.getLikeRanking(10)
+                        rankingQueryService.getLikeRanking(TEST_SIZE, TEST_START_INDEX)
                         verify(exactly = 0) { listOperation.range(any(), any(), any()) }
                     }
                 }
@@ -137,7 +139,7 @@ class RankingQueryServiceTest :
                     every { listOperation.range(any(), any(), any()) } returns list
 
                     then("리뷰 랭킹이 조회된다.") {
-                        rankingQueryService.getLikeRanking(10)
+                        rankingQueryService.getLikeRanking(TEST_SIZE, TEST_START_INDEX)
                         verify(exactly = 1) { listOperation.range(any(), any(), any()) }
                     }
                 }
@@ -151,7 +153,7 @@ class RankingQueryServiceTest :
                     every { reviewRepository.findAllUserLikeCount() } returns createUserRanking()
 
                     then("예외가 발생한다.") {
-                        shouldThrow<RankingNotFoundException> { rankingQueryService.getLikeRanking(10) }
+                        shouldThrow<RankingNotFoundException> { rankingQueryService.getLikeRanking(TEST_SIZE, TEST_START_INDEX) }
                     }
                 }
 
@@ -164,7 +166,7 @@ class RankingQueryServiceTest :
                     every { reviewRepository.findAllUserLikeCount() } returns createUserRanking()
 
                     then("예외가 발생한다.") {
-                        shouldThrow<RankingNotFoundException> { rankingQueryService.getLikeRanking(10) }
+                        shouldThrow<RankingNotFoundException> { rankingQueryService.getLikeRanking(TEST_SIZE, TEST_START_INDEX) }
                     }
                 }
             }
@@ -174,7 +176,7 @@ class RankingQueryServiceTest :
                     every { cache.get(any(), List::class.java) } returns list
 
                     then("종합 랭킹이 조회된다.") {
-                        rankingQueryService.getTotalRanking(10)
+                        rankingQueryService.getTotalRanking(TEST_SIZE, TEST_START_INDEX)
                         verify(exactly = 0) { listOperation.range(any(), any(), any()) }
                     }
                 }
@@ -186,7 +188,7 @@ class RankingQueryServiceTest :
                     every { listOperation.range(any(), any(), any()) } returns list
 
                     then("종합 랭킹이 조회된다.") {
-                        rankingQueryService.getTotalRanking(10)
+                        rankingQueryService.getTotalRanking(TEST_SIZE, TEST_START_INDEX)
                         verify(exactly = 1) { listOperation.range(any(), any(), any()) }
                     }
                 }
@@ -207,7 +209,7 @@ class RankingQueryServiceTest :
                     } just Runs
                     then("예외가 발생한다.") {
 
-                        shouldThrow<RankingNotFoundException> { rankingQueryService.getTotalRanking(10) }
+                        shouldThrow<RankingNotFoundException> { rankingQueryService.getTotalRanking(TEST_SIZE, TEST_START_INDEX) }
 
                         verify(exactly = 1) {
                             rankingCommandService.updateRanking(
@@ -234,7 +236,7 @@ class RankingQueryServiceTest :
                         )
                     } just Runs
                     then("예외가 발생한다.") {
-                        shouldThrow<RankingNotFoundException> { rankingQueryService.getTotalRanking(10) }
+                        shouldThrow<RankingNotFoundException> { rankingQueryService.getTotalRanking(TEST_SIZE, TEST_START_INDEX) }
                         verify(exactly = 1) {
                             rankingCommandService.updateRanking(
                                 any(),

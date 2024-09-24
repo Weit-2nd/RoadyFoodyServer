@@ -43,6 +43,9 @@ interface RankingControllerSpec {
         @Positive(message = "size는 양수여야 합니다.")
         @RequestParam(defaultValue = "10")
         size: Long,
+        @Positive(message = "시작값은 양수여야 합니다")
+        @RequestParam(defaultValue = "1")
+        start: Long,
     ): List<UserRankingResponse>
 
     @ApiErrorCodeExamples(
@@ -72,6 +75,9 @@ interface RankingControllerSpec {
         @Positive(message = "size는 양수여야 합니다.")
         @RequestParam(defaultValue = "10")
         size: Long,
+        @Positive(message = "시작값은 양수여야 합니다")
+        @RequestParam(defaultValue = "1")
+        start: Long,
     ): List<UserRankingResponse>
 
     @ApiErrorCodeExamples(
@@ -101,6 +107,9 @@ interface RankingControllerSpec {
         @Positive(message = "size는 양수여야 합니다")
         @RequestParam(defaultValue = "10")
         size: Long,
+        @Positive(message = "시작값은 양수여야 합니다")
+        @RequestParam(defaultValue = "1")
+        start: Long,
     ): List<UserRankingResponse>
 
     @ApiErrorCodeExamples(
@@ -130,5 +139,8 @@ interface RankingControllerSpec {
         @Positive(message = "size는 양수여야 합니다")
         @RequestParam(defaultValue = "10")
         size: Long,
+        @Positive(message = "시작값은 양수여야 합니다")
+        @RequestParam(defaultValue = "1")
+        start: Long,
     ): List<UserRankingResponse>
 }
