@@ -132,15 +132,35 @@ class FoodSpotsHistoryRepositoryTest(
                 userReportCounts.size shouldBe 4
                 userReportCounts[0].userNickname shouldBe "existentNick2"
                 userReportCounts[0].total shouldBe 3
+                userReportCounts[0].profileImageUrl shouldBe "test_image_name_2"
 
                 userReportCounts[1].userNickname shouldBe "existentNick"
                 userReportCounts[1].total shouldBe 2
+                userReportCounts[1].profileImageUrl shouldBe "test_image_name_0"
 
                 userReportCounts[2].userNickname shouldBe "existentNick3"
                 userReportCounts[2].total shouldBe 2
+                userReportCounts[2].profileImageUrl shouldBe "test_image_name_3"
 
                 userReportCounts[3].userNickname shouldBe "existentNick4"
                 userReportCounts[3].total shouldBe 1
+                userReportCounts[3].profileImageUrl shouldBe "test_image_name_4"
+            }
+        }
+
+        describe("countByUser 메소드는") {
+            context("가게 리포트를 작성한 user 를 받는 경우") {
+                it("해당 user 의 가게 리포트 이력 개수를 반환한다.") {
+                    val count = foodSpotsHistoryRepository.countByUser(user)
+                    count shouldBe 2
+                }
+            }
+
+            context("리포트를 작성하지 않은 user 를 받는 경우") {
+                it("0을 반환한다.") {
+                    val count = foodSpotsHistoryRepository.countByUser(otherUser)
+                    count shouldBe 0
+                }
             }
         }
     })

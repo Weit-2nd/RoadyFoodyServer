@@ -3,7 +3,6 @@ package kr.weit.roadyfoody.review.repository
 import createTestFoodSpotsReview
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
-import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import kr.weit.roadyfoody.badge.domain.Badge
 import kr.weit.roadyfoody.foodSpots.application.dto.ReviewAggregatedInfoResponse
@@ -12,6 +11,7 @@ import kr.weit.roadyfoody.foodSpots.fixture.createTestFoodSpots
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
 import kr.weit.roadyfoody.global.TEST_PAGE_SIZE
 import kr.weit.roadyfoody.review.domain.FoodSpotsReview
+import kr.weit.roadyfoody.review.domain.ReviewLike
 import kr.weit.roadyfoody.review.exception.FoodSpotsReviewNotFoundException
 import kr.weit.roadyfoody.support.annotation.RepositoryTest
 import kr.weit.roadyfoody.user.domain.User
@@ -23,29 +23,45 @@ class FoodSpotsReviewRepositoryTest(
     private val userRepository: UserRepository,
     private val foodSpotsRepository: FoodSpotsRepository,
     private val reviewRepository: FoodSpotsReviewRepository,
+    private val reviewLikeRepository: ReviewLikeRepository,
 ) : DescribeSpec(
         {
             lateinit var user: User
             lateinit var otherUser: User
+            lateinit var testUser: User
+            lateinit var noReviewsUser: User
             lateinit var foodSpots: FoodSpots
             lateinit var otherFoodSpots: FoodSpots
+            lateinit var testFoodSpots: FoodSpots
             lateinit var noReviewsFoodSpots: FoodSpots
             lateinit var reviewList: List<FoodSpotsReview>
             beforeEach {
                 user = userRepository.save(createTestUser(0L))
                 otherUser = userRepository.save(createTestUser(0L, "otherUser"))
+                testUser = userRepository.save(createTestUser(0L, "testUser"))
+                noReviewsUser = userRepository.save(createTestUser(0L, "noReviewsUser"))
                 foodSpots = foodSpotsRepository.save(createTestFoodSpots())
                 otherFoodSpots = foodSpotsRepository.save(createTestFoodSpots())
+                testFoodSpots = foodSpotsRepository.save(createTestFoodSpots())
                 noReviewsFoodSpots = foodSpotsRepository.save(createTestFoodSpots())
+
                 reviewList =
                     reviewRepository.saveAll(
                         listOf(
-                            createTestFoodSpotsReview(user, foodSpots, 10),
-                            createTestFoodSpotsReview(user, otherFoodSpots, 10),
-                            createTestFoodSpotsReview(otherUser, foodSpots, 4),
-                            createTestFoodSpotsReview(user, otherFoodSpots, 10),
+                            createTestFoodSpotsReview(user, foodSpots, 5),
+                            createTestFoodSpotsReview(user, otherFoodSpots, 5),
+                            createTestFoodSpotsReview(otherUser, foodSpots, 2),
+                            createTestFoodSpotsReview(user, otherFoodSpots, 5),
+                            createTestFoodSpotsReview(testUser, testFoodSpots, 2),
                         ),
                     )
+
+                reviewLikeRepository.saveAll(
+                    listOf(
+                        ReviewLike(reviewRepository.save(createTestFoodSpotsReview(otherUser, testFoodSpots, 4)), user),
+                        ReviewLike(reviewRepository.save(createTestFoodSpotsReview(testUser, testFoodSpots, 4)), otherUser),
+                    ),
+                )
             }
 
             describe("findByUser 메소드는") {
@@ -61,7 +77,7 @@ class FoodSpotsReviewRepositoryTest(
                     it("해당 리스트 모두 삭제한다.") {
                         val reviews = reviewRepository.findByUser(user)
                         reviewRepository.deleteAll(reviews)
-                        reviewRepository.findAll().size shouldBe 1
+                        reviewRepository.findAll().size shouldBe 4
                     }
                 }
             }
@@ -182,7 +198,7 @@ class FoodSpotsReviewRepositoryTest(
                     it("해당 음식점의 리뷰 평균 별점과 리뷰 개수를 반환한다.") {
                         val reviewAggregatedInfoResponse =
                             reviewRepository.getReviewAggregatedInfo(foodSpots)
-                        reviewAggregatedInfoResponse shouldBe ReviewAggregatedInfoResponse(7.0, 2)
+                        reviewAggregatedInfoResponse shouldBe ReviewAggregatedInfoResponse(3.5, 2)
                     }
                 }
 
@@ -198,19 +214,88 @@ class FoodSpotsReviewRepositoryTest(
             describe("findAllUserReviewCount 메소드는") {
                 it("전체 회원의 닉네임과 리뷰 개수를 정렬하여 리스트로 반환한다") {
                     val userReportCounts = reviewRepository.findAllUserReviewCount()
-                    userReportCounts.size shouldBe 2
+                    userReportCounts.size shouldBe 3
                     userReportCounts[0].userNickname shouldBe "existentNick"
                     userReportCounts[0].total shouldBe 3
+                    userReportCounts[0].profileImageUrl shouldBe "test_image_name_0"
 
                     userReportCounts[1].userNickname shouldBe "otherUser"
-                    userReportCounts[1].total shouldBe 1
+                    userReportCounts[1].total shouldBe 2
+                    userReportCounts[1].profileImageUrl shouldBe "test_image_name_0"
+
+                    userReportCounts[2].userNickname shouldBe "testUser"
+                    userReportCounts[2].total shouldBe 2
+                    userReportCounts[2].profileImageUrl shouldBe "test_image_name_0"
                 }
             }
 
-            describe("findByFoodSpots 메소드는") {
-                context("음식점을 받는 경우") {
-                    it("해당 음식점의 리뷰 리스트를 반환한다.") {
-                        reviewRepository.findByFoodSpots(foodSpots).shouldHaveSize(2)
+            describe("findAllUserLikeCount 메소드는") {
+                it("전체 회원의 닉네임과 좋아요 개수를 정렬하여 리스트로 반환한다") {
+                    val userLikeCounts = reviewRepository.findAllUserLikeCount()
+                    userLikeCounts.size shouldBe 3
+
+                    userLikeCounts[0].userNickname shouldBe "existentNick"
+                    userLikeCounts[0].total shouldBe 3
+                    userLikeCounts[0].profileImageUrl shouldBe "test_image_name_0"
+
+                    userLikeCounts[1].userNickname shouldBe "otherUser"
+                    userLikeCounts[1].total shouldBe 2
+                    userLikeCounts[1].profileImageUrl shouldBe "test_image_name_0"
+
+                    userLikeCounts[2].userNickname shouldBe "testUser"
+                    userLikeCounts[2].total shouldBe 2
+                    userLikeCounts[2].profileImageUrl shouldBe "test_image_name_0"
+                }
+            }
+
+            describe("getRatingCount 메소드는") {
+                context("음식점 ID를 받는 경우") {
+                    it("해당 음식점의 별점 개수를 반환한다.") {
+                        val countRates = reviewRepository.getRatingCount(foodSpots.id)
+                        countRates.size shouldBe 5
+                        val countList = listOf(1, 0, 0, 1, 0)
+                        for (i in countRates.indices) {
+                            countRates[i].rating shouldBe 5 - i
+                            countRates[i].count shouldBe countList[i]
+                        }
+                    }
+                }
+            }
+
+            describe("findAllUserTotalCount 메소드는") {
+                it("전체 회원의 종합 랭킹을 리스트로 반환한다") {
+                    val userTotalCounts = reviewRepository.findAllUserTotalCount()
+                    userTotalCounts.size shouldBe 4
+
+                    userTotalCounts[0].userNickname shouldBe "existentNick"
+                    userTotalCounts[0].total shouldBe 6
+                    userTotalCounts[0].profileImageUrl shouldBe "test_image_name_0"
+
+                    userTotalCounts[1].userNickname shouldBe "otherUser"
+                    userTotalCounts[1].total shouldBe 4
+                    userTotalCounts[1].profileImageUrl shouldBe "test_image_name_0"
+
+                    userTotalCounts[2].userNickname shouldBe "testUser"
+                    userTotalCounts[2].total shouldBe 4
+                    userTotalCounts[2].profileImageUrl shouldBe "test_image_name_0"
+
+                    userTotalCounts[3].userNickname shouldBe "noReviewsUser"
+                    userTotalCounts[3].total shouldBe 0
+                }
+            }
+
+            describe("countByUser 메소드는") {
+                context("리뷰를 작성한 user 를 받는 경우") {
+                    it("해당 user 의 리뷰 이력 개수를 반환한다.") {
+                        val count = reviewRepository.countByUser(user)
+                        count shouldBe 3
+                    }
+                }
+
+                context("리뷰를 작성하지 않은 user 를 받는 경우") {
+                    it("0을 반환한다.") {
+                        val count = reviewRepository.countByUser(noReviewsUser)
+                        count shouldBe 0
                     }
                 }
             }

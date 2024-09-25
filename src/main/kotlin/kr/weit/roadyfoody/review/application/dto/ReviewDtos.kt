@@ -19,8 +19,8 @@ data class ReviewRequest(
     @field:Length(max = 1200, message = "리뷰 최대 길이를 초과했습니다.")
     val contents: String,
     @Schema(description = "별점")
-    @field:Min(0, message = "별점은 0점 이상으로 입력해주세요.")
-    @field:Max(10, message = "별점은 10점 이하로 입력해주세요.")
+    @field:Min(1, message = "별점은 1점 이상으로 입력해주세요.")
+    @field:Max(5, message = "별점은 5점 이하로 입력해주세요.")
     val rating: Int,
 ) {
     fun toEntity(
@@ -28,6 +28,19 @@ data class ReviewRequest(
         foodSpot: FoodSpots,
     ): FoodSpotsReview = FoodSpotsReview(id = 0L, foodSpot, user, rating, contents, 0)
 }
+
+data class ReviewUpdateRequest(
+    @Schema(description = "리뷰 내용(수정할 내용이 없으면 null)")
+    @field:NotBlank(message = "리뷰는 필수 입력값입니다.")
+    @field:Length(max = 1200, message = "리뷰 최대 길이를 초과했습니다.")
+    val contents: String?,
+    @Schema(description = "별점(수정할 내용이 없으면 null)")
+    @field:Min(1, message = "별점은 1점 이상으로 입력해주세요.")
+    @field:Max(5, message = "별점은 5점 이하로 입력해주세요.")
+    val rating: Int?,
+    @Schema(description = "삭제할 리뷰 사진 ID 목록(수정할 내용이 없으면 null)")
+    val deletePhotoIds: Set<Long>?,
+)
 
 data class ReviewPhotoResponse(
     @Schema(description = "리뷰 사진 ID", example = "1")

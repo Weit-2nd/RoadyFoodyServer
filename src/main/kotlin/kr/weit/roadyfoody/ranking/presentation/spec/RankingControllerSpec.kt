@@ -9,7 +9,7 @@ import jakarta.validation.constraints.Positive
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.global.swagger.ApiErrorCodeExamples
 import kr.weit.roadyfoody.global.swagger.v1.SwaggerTag
-import kr.weit.roadyfoody.ranking.dto.UserRanking
+import kr.weit.roadyfoody.ranking.dto.UserRankingResponse
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.RequestParam
 
@@ -31,7 +31,7 @@ interface RankingControllerSpec {
                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                         schema =
                             Schema(
-                                implementation = UserRanking::class,
+                                implementation = UserRankingResponse::class,
                             ),
                     ),
                 ],
@@ -43,7 +43,10 @@ interface RankingControllerSpec {
         @Positive(message = "size는 양수여야 합니다.")
         @RequestParam(defaultValue = "10")
         size: Long,
-    ): List<UserRanking>
+        @Positive(message = "시작값은 양수여야 합니다")
+        @RequestParam(defaultValue = "1")
+        start: Long,
+    ): List<UserRankingResponse>
 
     @ApiErrorCodeExamples(
         [
@@ -61,7 +64,7 @@ interface RankingControllerSpec {
                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                         schema =
                             Schema(
-                                implementation = UserRanking::class,
+                                implementation = UserRankingResponse::class,
                             ),
                     ),
                 ],
@@ -72,5 +75,72 @@ interface RankingControllerSpec {
         @Positive(message = "size는 양수여야 합니다.")
         @RequestParam(defaultValue = "10")
         size: Long,
-    ): List<UserRanking>
+        @Positive(message = "시작값은 양수여야 합니다")
+        @RequestParam(defaultValue = "1")
+        start: Long,
+    ): List<UserRankingResponse>
+
+    @ApiErrorCodeExamples(
+        [
+            ErrorCode.SIZE_NON_POSITIVE,
+        ],
+    )
+    @Operation(
+        description = "리뷰 좋아요 랭킹 조회 API",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "리뷰 좋아요 랭킹 조회 성공",
+                content = [
+                    Content(
+                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                        schema =
+                            Schema(
+                                implementation = UserRankingResponse::class,
+                            ),
+                    ),
+                ],
+            ),
+        ],
+    )
+    fun getLikeRanking(
+        @Positive(message = "size는 양수여야 합니다")
+        @RequestParam(defaultValue = "10")
+        size: Long,
+        @Positive(message = "시작값은 양수여야 합니다")
+        @RequestParam(defaultValue = "1")
+        start: Long,
+    ): List<UserRankingResponse>
+
+    @ApiErrorCodeExamples(
+        [
+            ErrorCode.SIZE_NON_POSITIVE,
+        ],
+    )
+    @Operation(
+        description = "종합 랭킹 조회 API",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "종합 랭킹 조회 성공",
+                content = [
+                    Content(
+                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                        schema =
+                            Schema(
+                                implementation = UserRankingResponse::class,
+                            ),
+                    ),
+                ],
+            ),
+        ],
+    )
+    fun getTotalRanking(
+        @Positive(message = "size는 양수여야 합니다")
+        @RequestParam(defaultValue = "10")
+        size: Long,
+        @Positive(message = "시작값은 양수여야 합니다")
+        @RequestParam(defaultValue = "1")
+        start: Long,
+    ): List<UserRankingResponse>
 }

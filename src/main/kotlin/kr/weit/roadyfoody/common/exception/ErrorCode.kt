@@ -96,8 +96,8 @@ enum class ErrorCode(
     FOOD_SPOT_ID_NON_POSITIVE(HttpStatus.BAD_REQUEST, -14000, "음식점 ID는 양수여야 합니다."),
     REVIEW_CONTENT_BLANK(HttpStatus.BAD_REQUEST, -14000, "리뷰는 필수 입력값입니다."),
     REVIEW_CONTENT_LENGTH_TOO_LONG(HttpStatus.BAD_REQUEST, -14000, "리뷰 최대 길이를 초과했습니다."),
-    REVIEW_RATING_NEGATIVE(HttpStatus.BAD_REQUEST, -14000, "별점은 0점 이상으로 입력해주세요."),
-    REVIEW_RATING_TOO_HIGH(HttpStatus.BAD_REQUEST, -14000, "별점은 10점 이하로 입력해주세요."),
+    REVIEW_RATING_NEGATIVE(HttpStatus.BAD_REQUEST, -14000, "별점은 1점 이상으로 입력해주세요."),
+    REVIEW_RATING_TOO_HIGH(HttpStatus.BAD_REQUEST, -14000, "별점은 5점 이하로 입력해주세요."),
     REVIEW_ID_NON_POSITIVE(HttpStatus.BAD_REQUEST, -14000, "리뷰 ID는 양수여야 합니다."),
     NEGATIVE_NUMBER_OF_LIKED(HttpStatus.BAD_REQUEST, -14000, "리뷰 좋아요 수는 음수가 될 수 없습니다."),
     NOT_FOUND_FOOD_SPOTS(HttpStatus.NOT_FOUND, -14001, "해당 음식점이 존재하지 않습니다."),
@@ -111,4 +111,7 @@ enum class ErrorCode(
 
     // Admin API error 16000대
     DAILY_REPORT_COUNT_NEGATIVE(HttpStatus.BAD_REQUEST, -16000, "일일 리포트 생성 횟수는 양수 또는 0이여야 합니다."),
+
+    // RANKING API error 17000대
+    NOT_FOUND_FOOD_SPOTS_RANKING(HttpStatus.NOT_FOUND, -17001, "해당 랭킹이 존재하지 않습니다."),
 }

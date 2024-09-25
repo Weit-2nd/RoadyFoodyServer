@@ -2,6 +2,8 @@ package kr.weit.roadyfoody.user.presentation.api
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
+import createTestUserStatisticsResponse
+import createUserLikeReviewResponse
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
 import io.mockk.mockk
@@ -344,6 +346,73 @@ class UserControllerTest(
                             deleteWithAuth("$requestPath/profile"),
                         ).andExpect(status().isNoContent)
                     verify(exactly = 1) { userCommandService.deleteProfileImage(any<User>()) }
+                }
+            }
+        }
+
+        given("GET $requestPath/{userId}/likes/reviews Test") {
+            val response = createUserLikeReviewResponse()
+            every {
+                userQueryService.getLikeReviews(any(), any(), any())
+            } returns response
+            `when`("정상적인 데이터가 들어올 경우") {
+                then("유저가 좋아요한 리뷰 리스트가 조회된다") {
+                    mockMvc
+                        .perform(
+                            getWithAuth("$requestPath/$TEST_USER_ID/likes/reviews")
+                                .param("size", "$TEST_PAGE_SIZE")
+                                .param("lastId", "$TEST_LAST_ID"),
+                        ).andExpect(status().isOk)
+                    verify(exactly = 1) { userQueryService.getLikeReviews(any(), any(), any()) }
+                }
+            }
+
+            `when`("userId가 양수가 아닌 경우") {
+                then("400 반환") {
+                    mockMvc
+                        .perform(
+                            getWithAuth("$requestPath/$TEST_NON_POSITIVE_ID/likes/reviews"),
+                        ).andExpect(status().isBadRequest)
+                }
+            }
+
+            `when`("조회할 개수가 양수가 아닌 경우") {
+                then("400 반환") {
+                    mockMvc
+                        .perform(
+                            getWithAuth("$requestPath/$TEST_USER_ID/likes/reviews")
+                                .param("size", "$TEST_NON_POSITIVE_SIZE"),
+                        ).andExpect(status().isBadRequest)
+                }
+            }
+
+            `when`("마지막 ID가 양수가 아닌 경우") {
+                then("400 반환") {
+                    mockMvc
+                        .perform(
+                            getWithAuth("$requestPath/$TEST_USER_ID/likes/reviews")
+                                .param("size", "$TEST_PAGE_SIZE")
+                                .param("lastId", "$TEST_NON_POSITIVE_ID"),
+                        ).andExpect(status().isBadRequest)
+                }
+            }
+        }
+
+        given("GET $requestPath/{userId}/statistics Test") {
+            `when`("정상적인 데이터가 들어올 경우") {
+                every { userQueryService.getUserStatistics(any()) } returns createTestUserStatisticsResponse()
+                then("해당 유저의 통계를 반환한다.") {
+                    mockMvc
+                        .perform(getWithAuth("$requestPath/$TEST_USER_ID/statistics"))
+                        .andExpect(status().isOk)
+                }
+            }
+
+            `when`("userId가 양수가 아닌 경우") {
+                then("400 반환") {
+                    mockMvc
+                        .perform(getWithAuth("$requestPath/$TEST_NON_POSITIVE_ID/statistics"))
+                        .andExpect(status().isBadRequest)
                 }
             }
         }

@@ -1,0 +1,4 @@
+ALTER TABLE review_likes DROP CONSTRAINT pk_review_like;
+ALTER TABLE review_likes
+    ADD CONSTRAINT pk_review_like PRIMARY KEY (id);
+DROP INDEX REVIEW_LIKES_CREATED_DATETIME_INDEX;

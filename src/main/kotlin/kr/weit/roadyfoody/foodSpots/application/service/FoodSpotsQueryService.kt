@@ -5,6 +5,7 @@ import kr.weit.roadyfoody.common.dto.SliceResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsDetailResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsOperationHoursResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.FoodSpotsReviewResponse
+import kr.weit.roadyfoody.foodSpots.application.dto.RatingCountResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportCategoryResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportHistoryDetailResponse
 import kr.weit.roadyfoody.foodSpots.application.dto.ReportOperationHoursResponse
@@ -53,10 +54,7 @@ class FoodSpotsQueryService(
     private val executor: ExecutorService,
 ) {
     @Transactional(readOnly = true)
-    fun searchFoodSpots(
-        foodSpotsSearchQuery: FoodSpotsSearchCondition,
-        today: LocalDate = LocalDate.now(),
-    ): FoodSpotsSearchResponses {
+    fun searchFoodSpots(foodSpotsSearchQuery: FoodSpotsSearchCondition): FoodSpotsSearchResponses {
         val result: List<FoodSpots> =
             foodSpotsRepository.findFoodSpotsByPointWithinRadius(
                 foodSpotsSearchQuery.centerLongitude,
@@ -70,14 +68,7 @@ class FoodSpotsQueryService(
             result.map { foodSpots ->
                 val openValue: OperationStatus = determineOpenStatus(foodSpots)
                 val foodSpotsPhoto = foodSpotsPhotoRepository.findOneByFoodSpots(foodSpots.id)
-                val reviews = reviewRepository.findByFoodSpots(foodSpots)
-                val averageRating =
-                    if (reviews.isNotEmpty()) {
-                        val sum = reviews.sumOf { it.rate }.toDouble()
-                        ((sum / reviews.size) * 10).toInt() / 10.0
-                    } else {
-                        0.0
-                    }
+                val (averageRating, reviewCount) = reviewRepository.getReviewAggregatedInfo(foodSpots)
 
                 FoodSpotsSearchResponse(
                     id = foodSpots.id,
@@ -85,12 +76,12 @@ class FoodSpotsQueryService(
                     longitude = foodSpots.point.x,
                     latitude = foodSpots.point.y,
                     open = openValue,
-                    operationHours = getTodayOperationHoursResponse(foodSpots, today),
+                    operationHours = getTodayOperationHoursResponse(foodSpots),
                     foodCategories = foodSpots.foodCategoryList.map { it.foodCategory.name },
                     foodTruck = foodSpots.foodTruck,
                     imageUrl = foodSpotsPhoto?.let { imageService.getDownloadUrl(it.fileName) },
                     averageRating = averageRating,
-                    reviewCount = reviews.size,
+                    reviewCount = reviewCount,
                     createdDateTime = foodSpots.createdDateTime,
                 )
             }
@@ -167,6 +158,8 @@ class FoodSpotsQueryService(
     fun getFoodSpotsDetail(foodSpotsId: Long): FoodSpotsDetailResponse =
         foodSpotsRepository.getByFoodSpotsId(foodSpotsId).let { foodSpots ->
             val reviewAggregatedInfoResponse = reviewRepository.getReviewAggregatedInfo(foodSpots)
+            val ratingCountResponse =
+                reviewRepository.getRatingCount(foodSpotsId).map { RatingCountResponse(it) }
             val photosFutures =
                 foodSpotsHistoryRepository.findByFoodSpots(foodSpots).let {
                     foodSpotsPhotoRepository.findByHistoryIn(it).map { photo ->
@@ -185,6 +178,7 @@ class FoodSpotsQueryService(
                 determineOpenStatus(foodSpots),
                 foodSpotsPhotos,
                 reviewAggregatedInfoResponse,
+                ratingCountResponse,
             )
         }
 
@@ -213,10 +207,8 @@ class FoodSpotsQueryService(
         }
     }
 
-    private fun getTodayOperationHoursResponse(
-        foodSpot: FoodSpots,
-        today: LocalDate = LocalDate.now(),
-    ): FoodSpotsOperationHoursResponse {
+    private fun getTodayOperationHoursResponse(foodSpot: FoodSpots): FoodSpotsOperationHoursResponse {
+        val today = LocalDate.now()
         val dayOfWeekValue = today.get(ChronoField.DAY_OF_WEEK) - 1
         val dayOfWeek = DayOfWeek.of(dayOfWeekValue)
 

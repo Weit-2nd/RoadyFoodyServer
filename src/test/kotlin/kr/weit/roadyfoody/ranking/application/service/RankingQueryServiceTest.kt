@@ -1,88 +1,251 @@
 package kr.weit.roadyfoody.ranking.application.service
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
+import io.mockk.Runs
 import io.mockk.clearMocks
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
-import kr.weit.roadyfoody.ranking.fixture.createUserRankingResponse
+import kr.weit.roadyfoody.global.TEST_SIZE
+import kr.weit.roadyfoody.global.TEST_START_INDEX
+import kr.weit.roadyfoody.ranking.exception.RankingNotFoundException
+import kr.weit.roadyfoody.ranking.fixture.createUserRanking
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
+import org.springframework.cache.Cache
+import org.springframework.cache.CacheManager
+import org.springframework.data.redis.core.ListOperations
 import org.springframework.data.redis.core.RedisTemplate
-import org.springframework.data.redis.core.ZSetOperations
+import java.util.concurrent.ExecutorService
 
 class RankingQueryServiceTest :
-    BehaviorSpec({
-
-        val redisTemplate = mockk<RedisTemplate<String, String>>()
-        val foodSpotsHistoryRepository = mockk<FoodSpotsHistoryRepository>()
-        val reviewRepository = mockk<FoodSpotsReviewRepository>()
-        val rankingQueryService = RankingQueryService(redisTemplate, foodSpotsHistoryRepository, reviewRepository)
-
-        given("getReportRanking 테스트") {
-            val zSetOperations = mockk<ZSetOperations<String, String>>()
-            val typedTupleSet =
-                setOf(
-                    ZSetOperations.TypedTuple.of("user1", 10.0),
-                    ZSetOperations.TypedTuple.of("user2", 20.0),
-                )
-            afterEach { clearMocks(zSetOperations) }
-
-            `when`("레디스의 데이터를 조회한 경우") {
-                every { redisTemplate.opsForZSet() } returns zSetOperations
-                every { zSetOperations.reverseRangeWithScores(any(), any(), any()) } returns typedTupleSet
-
-                then("리포트 랭킹이 조회된다.") {
-                    rankingQueryService.getReportRanking(10)
-                    verify(exactly = 1) { zSetOperations.reverseRangeWithScores(any(), any(), any()) }
-                }
-            }
-
-            `when`("레디스의 데이터가 조회가 안되는 경우") {
-                every { redisTemplate.opsForZSet() } returns zSetOperations
-                every { zSetOperations.reverseRangeWithScores(any(), any(), any()) } returns null
-                every { zSetOperations.add("rofo:user-report-ranking", "existentNick", 10.0) } returns true
-                every { foodSpotsHistoryRepository.findAllUserReportCount() } returns createUserRankingResponse()
-
-                then("리포트 랭킹이 조회된다.") {
-                    rankingQueryService.getReportRanking(10)
-                    verify(exactly = 1) { zSetOperations.reverseRangeWithScores(any(), any(), any()) }
-                    verify(exactly = 1) { foodSpotsHistoryRepository.findAllUserReportCount() }
-                }
-            }
-        }
-
-        given("getReviewRanking 테스트") {
-            val zSetOperations = mockk<ZSetOperations<String, String>>()
-            val typedTupleSet =
-                setOf(
-                    ZSetOperations.TypedTuple.of("user1", 10.0),
-                    ZSetOperations.TypedTuple.of("user2", 20.0),
+    BehaviorSpec(
+        {
+            val redisTemplate = mockk<RedisTemplate<String, String>>()
+            val foodSpotsHistoryRepository = mockk<FoodSpotsHistoryRepository>()
+            val reviewRepository = mockk<FoodSpotsReviewRepository>()
+            val rankingCommandService = mockk<RankingCommandService>()
+            val executor = mockk<ExecutorService>()
+            val cacheManager = mockk<CacheManager>()
+            val rankingQueryService =
+                RankingQueryService(
+                    redisTemplate,
+                    foodSpotsHistoryRepository,
+                    reviewRepository,
+                    rankingCommandService,
+                    executor,
+                    cacheManager,
                 )
 
-            afterEach { clearMocks(zSetOperations) }
+            val listOperation = mockk<ListOperations<String, String>>()
+            val list = listOf("1:user2:2:null:20", "2:user3:3:test_image_name_3:15", "3:user1:1:test_image_name_1:10")
+            val cache = mockk<Cache>()
 
-            `when`("레디스의 데이터를 조회한 경우") {
-                every { redisTemplate.opsForZSet() } returns zSetOperations
-                every { zSetOperations.reverseRangeWithScores(any(), any(), any()) } returns typedTupleSet
+            afterEach { clearMocks(reviewRepository) }
+            afterEach { clearMocks(listOperation) }
+            afterEach { clearMocks(rankingCommandService) }
+            every { executor.execute(any()) } answers {
+                firstArg<Runnable>().run()
+            }
 
-                then("리뷰 랭킹이 조회된다.") {
-                    rankingQueryService.getReviewRanking(10)
-                    verify(exactly = 1) { zSetOperations.reverseRangeWithScores(any(), any(), any()) }
+            given("getReportRanking 테스트") {
+                `when`("로컬캐시의 데이터를 조회한 경우") {
+                    every { cacheManager.getCache(any()) } returns cache
+                    every { cache.get(any(), List::class.java) } returns list
+
+                    then("리포트 랭킹이 조회된다.") {
+                        rankingQueryService.getReportRanking(TEST_SIZE, TEST_START_INDEX)
+                        verify(exactly = 0) { listOperation.range(any(), any(), any()) }
+                    }
+                }
+                `when`("레디스의 데이터를 조회한 경우") {
+                    every { cacheManager.getCache(any()) } returns cache
+                    every { cache.get(any(), List::class.java) } returns null
+                    every { redisTemplate.opsForList() } returns listOperation
+                    every { listOperation.range(any(), any(), any()) } returns list
+
+                    then("리포트 랭킹이 조회된다.") {
+                        rankingQueryService.getReportRanking(TEST_SIZE, TEST_START_INDEX)
+                        verify(exactly = 1) { listOperation.range(any(), any(), any()) }
+                    }
+                }
+
+                `when`("레디스의 데이터가 조회가 안되는 경우") {
+                    every { cacheManager.getCache(any()) } returns cache
+                    every { cache.get(any(), List::class.java) } returns null
+                    every { listOperation.range(any(), any(), any()) } returns listOf()
+                    every { listOperation.rightPushAll(any(), any<List<String>>()) } returns 1L
+                    every { foodSpotsHistoryRepository.findAllUserReportCount() } returns createUserRanking()
+
+                    then("예외가 발생한다.") {
+                        shouldThrow<RankingNotFoundException> { rankingQueryService.getReportRanking(TEST_SIZE, TEST_START_INDEX) }
+                    }
                 }
             }
 
-            `when`("레디스의 데이터가 조회가 안되는 경우") {
-                every { redisTemplate.opsForZSet() } returns zSetOperations
-                every { zSetOperations.reverseRangeWithScores(any(), any(), any()) } returns null
-                every { zSetOperations.add("rofo:user-review-ranking", "existentNick", 10.0) } returns true
-                every { reviewRepository.findAllUserReviewCount() } returns createUserRankingResponse()
+            given("getReviewRanking 테스트") {
+                `when`("로컬캐시의 데이터를 조회한 경우") {
+                    every { cacheManager.getCache(any()) } returns cache
+                    every { cache.get(any(), List::class.java) } returns list
 
-                then("리뷰 랭킹이 조회된다.") {
-                    rankingQueryService.getReviewRanking(10)
-                    verify(exactly = 1) { zSetOperations.reverseRangeWithScores(any(), any(), any()) }
-                    verify(exactly = 1) { reviewRepository.findAllUserReviewCount() }
+                    then("리뷰 랭킹이 조회된다.") {
+                        rankingQueryService.getReviewRanking(TEST_SIZE, TEST_START_INDEX)
+                        verify(exactly = 0) { listOperation.range(any(), any(), any()) }
+                    }
+                }
+
+                `when`("레디스의 데이터를 조회한 경우") {
+                    every { cacheManager.getCache(any()) } returns cache
+                    every { cache.get(any(), List::class.java) } returns null
+                    every { redisTemplate.opsForList() } returns listOperation
+                    every { listOperation.range(any(), any(), any()) } returns list
+
+                    then("리뷰 랭킹이 조회된다.") {
+                        rankingQueryService.getReviewRanking(TEST_SIZE, TEST_START_INDEX)
+                        verify(exactly = 1) { listOperation.range(any(), any(), any()) }
+                    }
+                }
+
+                `when`("레디스의 데이터가 조회가 안되는 경우") {
+                    every { cacheManager.getCache(any()) } returns cache
+                    every { cache.get(any(), List::class.java) } returns null
+                    every { redisTemplate.opsForList() } returns listOperation
+                    every { listOperation.range(any(), any(), any()) } returns listOf()
+                    every { listOperation.rightPushAll(any(), any<List<String>>()) } returns 1L
+                    every { reviewRepository.findAllUserReviewCount() } returns createUserRanking()
+
+                    then("예외가 발생한다.") {
+                        shouldThrow<RankingNotFoundException> { rankingQueryService.getReviewRanking(TEST_SIZE, TEST_START_INDEX) }
+                    }
                 }
             }
-        }
-    })
+
+            given("getLikeRanking 테스트") {
+                `when`("로컬캐시의 데이터를 조회한 경우") {
+                    every { cacheManager.getCache(any()) } returns cache
+                    every { cache.get(any(), List::class.java) } returns list
+
+                    then("좋아요 랭킹이 조회된다.") {
+                        rankingQueryService.getLikeRanking(TEST_SIZE, TEST_START_INDEX)
+                        verify(exactly = 0) { listOperation.range(any(), any(), any()) }
+                    }
+                }
+                `when`("레디스의 데이터를 조회한 경우") {
+                    every { cacheManager.getCache(any()) } returns cache
+                    every { cache.get(any(), List::class.java) } returns null
+                    every { redisTemplate.opsForList() } returns listOperation
+                    every { listOperation.range(any(), any(), any()) } returns list
+
+                    then("리뷰 랭킹이 조회된다.") {
+                        rankingQueryService.getLikeRanking(TEST_SIZE, TEST_START_INDEX)
+                        verify(exactly = 1) { listOperation.range(any(), any(), any()) }
+                    }
+                }
+
+                `when`("레디스의 데이터가 null인 경우") {
+                    every { cacheManager.getCache(any()) } returns cache
+                    every { cache.get(any(), List::class.java) } returns null
+                    every { redisTemplate.opsForList() } returns listOperation
+                    every { listOperation.range(any(), any(), any()) } returns null
+                    every { listOperation.rightPushAll(any(), any<List<String>>()) } returns 1L
+                    every { reviewRepository.findAllUserLikeCount() } returns createUserRanking()
+
+                    then("예외가 발생한다.") {
+                        shouldThrow<RankingNotFoundException> { rankingQueryService.getLikeRanking(TEST_SIZE, TEST_START_INDEX) }
+                    }
+                }
+
+                `when`("레디스의 데이터가 빈값인 경우") {
+                    every { cacheManager.getCache(any()) } returns cache
+                    every { cache.get(any(), List::class.java) } returns null
+                    every { redisTemplate.opsForList() } returns listOperation
+                    every { listOperation.range(any(), any(), any()) } returns listOf()
+                    every { listOperation.rightPushAll(any(), any<List<String>>()) } returns 1L
+                    every { reviewRepository.findAllUserLikeCount() } returns createUserRanking()
+
+                    then("예외가 발생한다.") {
+                        shouldThrow<RankingNotFoundException> { rankingQueryService.getLikeRanking(TEST_SIZE, TEST_START_INDEX) }
+                    }
+                }
+            }
+            given("getTotalRanking 테스트") {
+                `when`("로컬캐시의 데이터를 조회한 경우") {
+                    every { cacheManager.getCache(any()) } returns cache
+                    every { cache.get(any(), List::class.java) } returns list
+
+                    then("종합 랭킹이 조회된다.") {
+                        rankingQueryService.getTotalRanking(TEST_SIZE, TEST_START_INDEX)
+                        verify(exactly = 0) { listOperation.range(any(), any(), any()) }
+                    }
+                }
+
+                `when`("레디스의 데이터를 조회한 경우") {
+                    every { cacheManager.getCache(any()) } returns cache
+                    every { cache.get(any(), List::class.java) } returns null
+                    every { redisTemplate.opsForList() } returns listOperation
+                    every { listOperation.range(any(), any(), any()) } returns list
+
+                    then("종합 랭킹이 조회된다.") {
+                        rankingQueryService.getTotalRanking(TEST_SIZE, TEST_START_INDEX)
+                        verify(exactly = 1) { listOperation.range(any(), any(), any()) }
+                    }
+                }
+
+                `when`("레디스의 데이터가 null인 경우") {
+                    every { cacheManager.getCache(any()) } returns cache
+                    every { cache.get(any(), List::class.java) } returns null
+                    every { redisTemplate.opsForList() } returns listOperation
+                    every { listOperation.range(any(), any(), any()) } returns null
+                    every { listOperation.rightPushAll(any(), any<List<String>>()) } returns 1L
+                    every { reviewRepository.findAllUserTotalCount() } returns createUserRanking()
+                    every {
+                        rankingCommandService.updateRanking(
+                            any(),
+                            any(),
+                            any(),
+                        )
+                    } just Runs
+                    then("예외가 발생한다.") {
+
+                        shouldThrow<RankingNotFoundException> { rankingQueryService.getTotalRanking(TEST_SIZE, TEST_START_INDEX) }
+
+                        verify(exactly = 1) {
+                            rankingCommandService.updateRanking(
+                                any(),
+                                any(),
+                                any(),
+                            )
+                        }
+                    }
+                }
+
+                `when`("레디스의 데이터가 빈값인 경우") {
+                    every { cacheManager.getCache(any()) } returns cache
+                    every { cache.get(any(), List::class.java) } returns null
+                    every { redisTemplate.opsForList() } returns listOperation
+                    every { listOperation.range(any(), any(), any()) } returns listOf()
+                    every { listOperation.rightPushAll(any(), any<List<String>>()) } returns 1L
+                    every { reviewRepository.findAllUserTotalCount() } returns createUserRanking()
+                    every {
+                        rankingCommandService.updateRanking(
+                            any(),
+                            any(),
+                            any(),
+                        )
+                    } just Runs
+                    then("예외가 발생한다.") {
+                        shouldThrow<RankingNotFoundException> { rankingQueryService.getTotalRanking(TEST_SIZE, TEST_START_INDEX) }
+                        verify(exactly = 1) {
+                            rankingCommandService.updateRanking(
+                                any(),
+                                any(),
+                                any(),
+                            )
+                        }
+                    }
+                }
+            }
+        },
+    )

@@ -9,7 +9,7 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
-import kr.weit.roadyfoody.common.domain.BaseTimeEntity
+import kr.weit.roadyfoody.common.domain.BaseModifiableEntity
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
@@ -28,15 +28,13 @@ class FoodSpotsReview(
     @ManyToOne
     @JoinColumn(name = "user_id", updatable = false)
     val user: User,
-    @Column(nullable = false, updatable = false)
-    val rate: Int,
-    @Column(nullable = false, updatable = false, length = 1200)
-    val contents: String,
+    @Column(nullable = false)
+    var rate: Int,
+    @Column(nullable = false, length = 1200)
+    var contents: String,
     @Column(nullable = false)
     var likeTotal: Int,
-) : BaseTimeEntity() {
-    constructor() : this(0L, FoodSpots(), User.of("", "defaultNickname"), 0, "", 0)
-
+) : BaseModifiableEntity() {
     fun increaseLike() {
         this.likeTotal++
     }

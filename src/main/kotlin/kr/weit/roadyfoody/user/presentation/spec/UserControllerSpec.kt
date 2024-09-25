@@ -18,11 +18,14 @@ import kr.weit.roadyfoody.global.swagger.v1.SwaggerTag
 import kr.weit.roadyfoody.global.validator.MaxFileSize
 import kr.weit.roadyfoody.global.validator.WebPImage
 import kr.weit.roadyfoody.user.application.dto.UserInfoResponse
+import kr.weit.roadyfoody.user.application.dto.UserLikedReviewResponse
 import kr.weit.roadyfoody.user.application.dto.UserNicknameRequest
 import kr.weit.roadyfoody.user.application.dto.UserReportHistoriesResponse
 import kr.weit.roadyfoody.user.application.dto.UserReviewResponse
+import kr.weit.roadyfoody.user.application.dto.UserStatisticsResponse
 import kr.weit.roadyfoody.user.domain.User
 import kr.weit.roadyfoody.user.utils.SliceReportHistories
+import kr.weit.roadyfoody.user.utils.SliceUserLike
 import kr.weit.roadyfoody.user.utils.SliceUserReview
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PathVariable
@@ -215,4 +218,80 @@ interface UserControllerSpec {
     fun deleteProfile(
         @LoginUser user: User,
     )
+
+    @Operation(
+        description = "유저 좋아요 누른 게시물 조회 API",
+        parameters = [
+            Parameter(name = "size", description = "조회할 개수", example = "10"),
+            Parameter(
+                name = "lastId",
+                description = "마지막 조회된 리뷰의 좋아요 ID(reviewLikeId)",
+                example = "1",
+            ),
+        ],
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "유저 좋아요 누른 게시물 조회 성공",
+                content = [
+                    Content(
+                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                        schema =
+                            Schema(
+                                implementation = SliceUserLike::class,
+                            ),
+                    ),
+                ],
+            ),
+        ],
+    )
+    @ApiErrorCodeExamples(
+        [
+            ErrorCode.SIZE_NON_POSITIVE,
+            ErrorCode.USER_ID_NON_POSITIVE,
+            ErrorCode.LAST_ID_NON_POSITIVE,
+            ErrorCode.NOT_FOUND_USER,
+        ],
+    )
+    fun getUserLikeReviews(
+        @PathVariable("userId")
+        @Positive(message = "유저 ID는 양수여야 합니다.")
+        userId: Long,
+        @Positive(message = "조회할 개수는 양수여야 합니다.")
+        @RequestParam(defaultValue = "10", required = false)
+        size: Int,
+        @Positive(message = "마지막 ID는 양수여야 합니다.")
+        @RequestParam(required = false)
+        lastId: Long?,
+    ): SliceResponse<UserLikedReviewResponse>
+
+    @Operation(
+        description = "유저 활동 통계 조회 API",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "유저 통계 조회 성공",
+                content = [
+                    Content(
+                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                        schema =
+                            Schema(
+                                implementation = UserStatisticsResponse::class,
+                            ),
+                    ),
+                ],
+            ),
+        ],
+    )
+    @ApiErrorCodeExamples(
+        [
+            ErrorCode.USER_ID_NON_POSITIVE,
+            ErrorCode.NOT_FOUND_USER,
+        ],
+    )
+    fun getUserStatistics(
+        @PathVariable("userId")
+        @Positive(message = "유저 ID는 양수여야 합니다.")
+        userId: Long,
+    ): UserStatisticsResponse
 }

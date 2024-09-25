@@ -296,6 +296,8 @@ data class FoodSpotsReviewResponse(
     val photos: List<ReviewPhotoResponse>,
     @Schema(description = "리뷰 작성일")
     val createdAt: LocalDateTime,
+    @Schema(description = "좋아요 수")
+    val likeTotal: Int,
 ) {
     companion object {
         fun of(
@@ -310,6 +312,7 @@ data class FoodSpotsReviewResponse(
             rate = review.rate,
             photos = photoList,
             createdAt = review.createdDateTime,
+            likeTotal = review.likeTotal,
         )
     }
 }
@@ -339,12 +342,15 @@ data class FoodSpotsDetailResponse(
     val createdDateTime: LocalDateTime,
     @Schema(description = "가게 리뷰 정보")
     val reviewInfo: ReviewAggregatedInfoResponse,
+    @Schema(description = "별점 개수")
+    val ratingCount: List<RatingCountResponse>,
 ) {
     constructor(
         foodSpots: FoodSpots,
         openStatus: OperationStatus,
         foodSpotsPhotos: List<ReportPhotoResponse>,
         reviewInfo: ReviewAggregatedInfoResponse,
+        ratingCount: List<RatingCountResponse>,
     ) :
         this(
             id = foodSpots.id,
@@ -364,6 +370,7 @@ data class FoodSpotsDetailResponse(
             foodSpotsPhotos = foodSpotsPhotos,
             createdDateTime = foodSpots.createdDateTime,
             reviewInfo = reviewInfo,
+            ratingCount = ratingCount,
         )
 }
 
@@ -407,4 +414,22 @@ data class ReviewAggregatedInfoResponse(
         ((avgRating ?: 0.0) * 10).toInt() / 10.0f,
         reviewCount ?: 0,
     )
+}
+
+data class CountRate(
+    @Schema(description = "별점")
+    val rating: Int,
+    @Schema(description = "개수")
+    val count: Int,
+) {
+    constructor(rating: Int, count: Long) : this(rating, count.toInt())
+}
+
+data class RatingCountResponse(
+    @Schema(description = "별점")
+    val rating: Int,
+    @Schema(description = "개수")
+    val count: Int,
+) {
+    constructor(countRate: CountRate) : this(countRate.rating, countRate.count)
 }
