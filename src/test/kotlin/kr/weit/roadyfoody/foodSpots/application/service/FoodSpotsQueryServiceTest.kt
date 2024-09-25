@@ -47,7 +47,6 @@ import kr.weit.roadyfoody.review.exception.FoodSpotsNotFoundException
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewPhotoRepository
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
 import kr.weit.roadyfoody.review.repository.ReviewSortType
-import kr.weit.roadyfoody.review.repository.getByReview
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
 import kr.weit.roadyfoody.user.fixture.createTestUser
 import kr.weit.roadyfoody.user.repository.UserRepository
@@ -350,16 +349,16 @@ class FoodSpotsQueryServiceTest :
 
             given("getReportHistory 테스트") {
                 every { foodSpotsHistoryRepository.getByHistoryId(any()) } returns createMockTestFoodHistory()
-                every { foodSpotsPhotoRepository.getByHistoryId(any()) } returns
+                every { foodSpotsPhotoRepository.findByHistoryId(any()) } returns
                     listOf(
                         createTestFoodSpotsPhoto(),
                     )
                 every { imageService.getDownloadUrl(any()) } returns TEST_FOOD_SPOTS_PHOTO_URL
-                every { reportFoodCategoryRepository.getByHistoryId(any()) } returns
+                every { reportFoodCategoryRepository.findByFoodSpotsHistoryId(any()) } returns
                     listOf(
                         createTestReportFoodCategory(),
                     )
-                every { reportOperationHoursRepository.getByHistoryId(any()) } returns
+                every { reportOperationHoursRepository.findByFoodSpotsHistoryId(any()) } returns
                     listOf(
                         createTestReportOperationHours(),
                     )
@@ -371,10 +370,10 @@ class FoodSpotsQueryServiceTest :
                         foodSPotsQueryService.getReportHistory(TEST_FOOD_SPOTS_HISTORY_ID)
                         verify(exactly = 1) {
                             foodSpotsHistoryRepository.getByHistoryId(any())
-                            foodSpotsPhotoRepository.getByHistoryId(any())
+                            foodSpotsPhotoRepository.findByHistoryId(any())
                             imageService.getDownloadUrl(any())
-                            reportFoodCategoryRepository.getByHistoryId(any())
-                            reportOperationHoursRepository.getByHistoryId(any())
+                            reportFoodCategoryRepository.findByFoodSpotsHistoryId(any())
+                            reportOperationHoursRepository.findByFoodSpotsHistoryId(any())
                             executor.execute(any())
                         }
                     }
@@ -401,7 +400,7 @@ class FoodSpotsQueryServiceTest :
                     )
                 } returns createMockSliceReview()
                 every { imageService.getDownloadUrl(any()) } returns TEST_REVIEW_PHOTO_URL
-                every { reviewPhotoRepository.getByReview(any()) } returns
+                every { reviewPhotoRepository.findByFoodSpotsReview(any()) } returns
                     listOf(
                         createTestReviewPhoto(),
                     )
@@ -420,7 +419,7 @@ class FoodSpotsQueryServiceTest :
                             userRepository.findById(any())
                             reviewRepository.sliceByFoodSpots(any(), any(), any(), any())
                             userRepository.findById(any())
-                            reviewPhotoRepository.getByReview(any())
+                            reviewPhotoRepository.findByFoodSpotsReview(any())
                             executor.execute(any())
                         }
                         verify(exactly = 2) { imageService.getDownloadUrl(any()) }

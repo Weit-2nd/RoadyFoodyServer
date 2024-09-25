@@ -16,7 +16,6 @@ import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsPhotoRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportOperationHoursRepository
-import kr.weit.roadyfoody.foodSpots.repository.getByFoodSpots
 import kr.weit.roadyfoody.foodSpots.repository.getByFoodSpotsId
 import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
 import kr.weit.roadyfoody.global.service.ImageService
@@ -24,7 +23,6 @@ import kr.weit.roadyfoody.review.application.dto.ReviewPhotoResponse
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewPhotoRepository
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
 import kr.weit.roadyfoody.review.repository.ReviewSortType
-import kr.weit.roadyfoody.review.repository.getByReview
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponse
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponses
@@ -104,18 +102,18 @@ class FoodSpotsQueryService(
     fun getReportHistory(historyId: Long): ReportHistoryDetailResponse {
         val foodSpotsHistory = foodSpotsHistoryRepository.getByHistoryId(historyId)
         val reportCategoryResponse =
-            reportFoodCategoryRepository.getByHistoryId(historyId).map { category ->
+            reportFoodCategoryRepository.findByFoodSpotsHistoryId(historyId).map { category ->
                 ReportCategoryResponse(category)
             }
         val reportOperationHoursResponse =
             reportOperationHoursRepository
-                .getByHistoryId(foodSpotsHistory.foodSpots.id)
+                .findByFoodSpotsHistoryId(foodSpotsHistory.foodSpots.id)
                 .map { operationHours ->
                     ReportOperationHoursResponse(operationHours)
                 }
 
         val photosFutures =
-            foodSpotsPhotoRepository.getByHistoryId(historyId).map { photo ->
+            foodSpotsPhotoRepository.findByHistoryId(historyId).map { photo ->
                 CompletableFuture
                     .supplyAsync({
                         ReportPhotoResponse(photo.id, imageService.getDownloadUrl(photo.fileName))
@@ -146,7 +144,7 @@ class FoodSpotsQueryService(
                         imageService.getDownloadUrl(fileName)
                     }
                 val photosFutures =
-                    reviewPhotoRepository.getByReview(it).map { photo ->
+                    reviewPhotoRepository.findByFoodSpotsReview(it).map { photo ->
                         CompletableFuture
                             .supplyAsync({
                                 ReviewPhotoResponse(
@@ -170,7 +168,7 @@ class FoodSpotsQueryService(
         foodSpotsRepository.getByFoodSpotsId(foodSpotsId).let { foodSpots ->
             val reviewAggregatedInfoResponse = reviewRepository.getReviewAggregatedInfo(foodSpots)
             val photosFutures =
-                foodSpotsHistoryRepository.getByFoodSpots(foodSpots).let {
+                foodSpotsHistoryRepository.findByFoodSpots(foodSpots).let {
                     foodSpotsPhotoRepository.findByHistoryIn(it).map { photo ->
                         CompletableFuture
                             .supplyAsync({

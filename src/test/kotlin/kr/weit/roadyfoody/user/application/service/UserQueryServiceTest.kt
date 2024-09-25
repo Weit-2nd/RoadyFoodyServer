@@ -20,14 +20,11 @@ import kr.weit.roadyfoody.foodSpots.fixture.createTestReportFoodCategory
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsPhotoRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
-import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
-import kr.weit.roadyfoody.foodSpots.repository.getHistoriesByUser
 import kr.weit.roadyfoody.global.TEST_LAST_ID
 import kr.weit.roadyfoody.global.TEST_PAGE_SIZE
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewPhotoRepository
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
-import kr.weit.roadyfoody.review.repository.getByReview
 import kr.weit.roadyfoody.user.exception.UserNotFoundException
 import kr.weit.roadyfoody.user.fixture.TEST_USER_ID
 import kr.weit.roadyfoody.user.fixture.TEST_USER_PROFILE_IMAGE_URL
@@ -92,18 +89,18 @@ class UserQueryServiceTest :
             val user = createTestUser()
             every { userRepository.findById(TEST_USER_ID) } returns Optional.of(user)
             every {
-                foodSpotsHistoryRepository.getHistoriesByUser(
+                foodSpotsHistoryRepository.findSliceByUser(
                     user,
                     TEST_FOOD_SPOTS_SIZE,
                     TEST_FOOD_SPOTS_LAST_ID,
                 )
             } returns createMockSliceFoodHistory()
-            every { foodSpotsPhotoRepository.getByHistoryId(any()) } returns
+            every { foodSpotsPhotoRepository.findByHistoryId(any()) } returns
                 listOf(
                     createTestFoodSpotsPhoto(),
                 )
             every { imageService.getDownloadUrl(any()) } returns TEST_FOOD_SPOTS_PHOTO_URL
-            every { reportFoodCategoryRepository.getByHistoryId(any()) } returns
+            every { reportFoodCategoryRepository.findByFoodSpotsHistoryId(any()) } returns
                 listOf(
                     createTestReportFoodCategory(),
                 )
@@ -119,9 +116,9 @@ class UserQueryServiceTest :
                     )
                     verify(exactly = 1) {
                         userRepository.findById(any())
-                        reportFoodCategoryRepository.getByHistoryId(any())
-                        foodSpotsHistoryRepository.getHistoriesByUser(any(), any(), any())
-                        foodSpotsPhotoRepository.getByHistoryId(any())
+                        reportFoodCategoryRepository.findByFoodSpotsHistoryId(any())
+                        foodSpotsHistoryRepository.findSliceByUser(any(), any(), any())
+                        foodSpotsPhotoRepository.findByHistoryId(any())
                         imageService.getDownloadUrl(any())
                         executor.execute(any())
                     }
@@ -151,7 +148,7 @@ class UserQueryServiceTest :
                     any(),
                 )
             } returns createMockSliceReview()
-            every { reviewPhotoRepository.getByReview(any()) } returns listOf(createTestReviewPhoto())
+            every { reviewPhotoRepository.findByFoodSpotsReview(any()) } returns listOf(createTestReviewPhoto())
             every { imageService.getDownloadUrl(any()) } returns TEST_FOOD_SPOTS_PHOTO_URL
             every { executor.execute(any()) } answers {
                 firstArg<Runnable>().run()
@@ -166,7 +163,7 @@ class UserQueryServiceTest :
                     verify(exactly = 1) {
                         userRepository.findById(any())
                         reviewRepository.sliceByUser(any(), any(), any())
-                        reviewPhotoRepository.getByReview(any())
+                        reviewPhotoRepository.findByFoodSpotsReview(any())
                         imageService.getDownloadUrl(any())
                         executor.execute(any())
                     }

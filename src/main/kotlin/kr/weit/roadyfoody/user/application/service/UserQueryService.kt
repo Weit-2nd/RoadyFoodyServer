@@ -6,13 +6,10 @@ import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsCommandService.
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsPhotoRepository
 import kr.weit.roadyfoody.foodSpots.repository.ReportFoodCategoryRepository
-import kr.weit.roadyfoody.foodSpots.repository.getByHistoryId
-import kr.weit.roadyfoody.foodSpots.repository.getHistoriesByUser
 import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.review.application.dto.ReviewPhotoResponse
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewPhotoRepository
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
-import kr.weit.roadyfoody.review.repository.getByReview
 import kr.weit.roadyfoody.user.application.dto.UserInfoResponse
 import kr.weit.roadyfoody.user.application.dto.UserReportCategoryResponse
 import kr.weit.roadyfoody.user.application.dto.UserReportHistoriesResponse
@@ -64,13 +61,13 @@ class UserQueryService(
     ): SliceResponse<UserReportHistoriesResponse> {
         val user = userRepository.getByUserId(userId)
         val reportResponse =
-            foodSpotsHistoryRepository.getHistoriesByUser(user, size, lastId).map {
+            foodSpotsHistoryRepository.findSliceByUser(user, size, lastId).map {
                 val reportCategoryResponse =
-                    reportFoodCategoryRepository.getByHistoryId(it.id).map { category ->
+                    reportFoodCategoryRepository.findByFoodSpotsHistoryId(it.id).map { category ->
                         UserReportCategoryResponse(category)
                     }
                 val photosFutures =
-                    foodSpotsPhotoRepository.getByHistoryId(it.id).map { photo ->
+                    foodSpotsPhotoRepository.findByHistoryId(it.id).map { photo ->
                         CompletableFuture
                             .supplyAsync({
                                 UserReportPhotoResponse(
@@ -97,7 +94,7 @@ class UserQueryService(
                 .sliceByUser(user, size, lastId)
                 .map {
                     val photosFutures =
-                        reviewPhotoRepository.getByReview(it).map { photo ->
+                        reviewPhotoRepository.findByFoodSpotsReview(it).map { photo ->
                             CompletableFuture
                                 .supplyAsync({
                                     ReviewPhotoResponse(
