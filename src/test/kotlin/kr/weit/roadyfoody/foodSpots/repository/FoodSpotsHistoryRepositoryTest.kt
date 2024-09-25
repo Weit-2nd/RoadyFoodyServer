@@ -58,7 +58,7 @@ class FoodSpotsHistoryRepositoryTest(
         describe("getHistoriesByUser 메소드는") {
             context("존재하는 user 와 size, lastId 를 받는 경우") {
                 it("해당 user 의 size 만큼의 FoodSpotsHistory 리스트를 반환한다.") {
-                    val histories = foodSpotsHistoryRepository.getHistoriesByUser(user, TEST_FOOD_SPOTS_SIZE, null)
+                    val histories = foodSpotsHistoryRepository.findSliceByUser(user, TEST_FOOD_SPOTS_SIZE, null)
                     histories.map { it.id }.content shouldBe listOf(otherFoodSpots.id, foodSpots.id)
                     histories.content.size shouldBe 2
                 }
@@ -112,7 +112,7 @@ class FoodSpotsHistoryRepositoryTest(
         describe("getByFoodSpots 메소드는") {
             context("존재하는 FoodSpots 를 받는 경우") {
                 it("해당 FoodSpots 에 대한 FoodSpotsHistory 리스트를 반환한다.") {
-                    val histories = foodSpotsHistoryRepository.getByFoodSpots(foodSpots)
+                    val histories = foodSpotsHistoryRepository.findByFoodSpots(foodSpots)
                     histories.size shouldBe 1
                     histories[0].foodSpots shouldBe foodSpots
                 }
@@ -120,7 +120,7 @@ class FoodSpotsHistoryRepositoryTest(
 
             context("존재하지 않는 FoodSpots 를 받는 경우") {
                 it("빈 리스트를 반환한다.") {
-                    val histories = foodSpotsHistoryRepository.getByFoodSpots(notExistFoodSpots)
+                    val histories = foodSpotsHistoryRepository.findByFoodSpots(notExistFoodSpots)
                     histories shouldBe emptyList()
                 }
             }

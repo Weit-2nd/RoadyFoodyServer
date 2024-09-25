@@ -54,14 +54,14 @@ class FoodSpotsPhotoRepositoryTest(
         describe("getByHistoryId 메소드는") {
             context("존재하는 historyId 를 받는 경우") {
                 it("일치하는 FoodSpotsPhoto 리스트를 반환한다.") {
-                    val result = foodSpotsPhotoRepository.getByHistoryId(foodSpotsHistory.id)
+                    val result = foodSpotsPhotoRepository.findByHistoryId(foodSpotsHistory.id)
                     result.map { it.id } shouldBe listOf(foodSpotsPhoto.id, otherFoodSpotsPhoto.id)
                 }
             }
 
             context("존재하지 않는 historyId 를 받는 경우") {
                 it("빈 리스트를 반환한다.") {
-                    val result = foodSpotsPhotoRepository.getByHistoryId(0L)
+                    val result = foodSpotsPhotoRepository.findByHistoryId(0L)
                     result.size shouldBe 0
                 }
             }
