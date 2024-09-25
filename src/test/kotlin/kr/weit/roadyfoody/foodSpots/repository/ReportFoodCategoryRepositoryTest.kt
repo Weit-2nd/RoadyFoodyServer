@@ -53,7 +53,7 @@ class ReportFoodCategoryRepositoryTest(
         describe("getByHistoryId 메소드는") {
             context("존재하는 historyId 를 받는 경우") {
                 it("일치하는 ReportFoodCategory 리스트를 반환한다.") {
-                    val result = reportFoodCategoryRepository.getByHistoryId(foodSpotsHistory.id)
+                    val result = reportFoodCategoryRepository.findByFoodSpotsHistoryId(foodSpotsHistory.id)
                     result.map { it.id }.sorted() shouldBe givenReportCategories.map { it.id }
                 }
             }
@@ -63,7 +63,7 @@ class ReportFoodCategoryRepositoryTest(
             context("카테고리를 등록한 report history 리스트를 받는 경우") {
                 it("해당 history 리스트 모두 삭제한다.") {
                     reportFoodCategoryRepository.deleteByFoodSpotsHistoryIn(listOf(foodSpotsHistory))
-                    val result = reportFoodCategoryRepository.getByHistoryId(foodSpotsHistory.id)
+                    val result = reportFoodCategoryRepository.findByFoodSpotsHistoryId(foodSpotsHistory.id)
                     result.size shouldBe 0
                 }
             }

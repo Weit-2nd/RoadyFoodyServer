@@ -13,16 +13,8 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.jpa.repository.JpaRepository
 
-fun FoodSpotsHistoryRepository.getHistoriesByUser(
-    user: User,
-    size: Int,
-    lastId: Long?,
-): Slice<FoodSpotsHistory> = findSliceByUser(user, size, lastId)
-
 fun FoodSpotsHistoryRepository.getByHistoryId(historyId: Long): FoodSpotsHistory =
     findById(historyId).orElseThrow { FoodSpotsHistoryNotFoundException() }
-
-fun FoodSpotsHistoryRepository.getByFoodSpots(foodSpots: FoodSpots): List<FoodSpotsHistory> = findByFoodSpots(foodSpots)
 
 interface FoodSpotsHistoryRepository :
     JpaRepository<FoodSpotsHistory, Long>,
