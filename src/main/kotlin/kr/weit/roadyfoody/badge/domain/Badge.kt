@@ -16,7 +16,7 @@ enum class Badge(
     ;
 
     companion object {
-        const val HIGH_RATING_CONDITION = 6
+        const val HIGH_RATING_CONDITION = 3
 
         fun getBadge(
             totalReviews: Int,

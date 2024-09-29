@@ -14,6 +14,7 @@ import kr.weit.roadyfoody.review.domain.FoodSpotsReviewPhoto
 import kr.weit.roadyfoody.review.exception.NotFoodSpotsReviewOwnerException
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewPhotoRepository
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
+import kr.weit.roadyfoody.review.repository.ReviewFlagRepository
 import kr.weit.roadyfoody.review.repository.ReviewLikeRepository
 import kr.weit.roadyfoody.review.repository.getReviewByReviewId
 import kr.weit.roadyfoody.user.domain.User
@@ -29,6 +30,7 @@ class ReviewCommandService(
     private val reviewPhotoRepository: FoodSpotsReviewPhotoRepository,
     private val foodSpotsRepository: FoodSpotsRepository,
     private val reviewLikeRepository: ReviewLikeRepository,
+    private val reviewFlagRepository: ReviewFlagRepository,
     private val imageService: ImageService,
     private val executor: ExecutorService,
     private val badgeCommandService: BadgeCommandService,
@@ -63,11 +65,8 @@ class ReviewCommandService(
 
     @Transactional
     fun deleteWithdrewUserReview(user: User) {
-        reviewRepository.findByUser(user).also {
-            if (it.isNotEmpty()) {
-                deleteReviewPhoto(it)
-                reviewRepository.deleteAll(it)
-            }
+        reviewRepository.findByUser(user).onEach { review ->
+            deleteReviewCascade(review.id)
         }
     }
 
@@ -81,12 +80,18 @@ class ReviewCommandService(
         if (review.user.id != user.id) {
             throw NotFoodSpotsReviewOwnerException("해당 리뷰의 소유자가 아닙니다.")
         }
+        deleteReviewCascade(reviewId)
+        badgeCommandService.tryChangeBadgeAndIfPromotedGiveBonus(user.id)
+    }
+
+    fun deleteReviewCascade(reviewId: Long) {
+        val review = reviewRepository.getReviewByReviewId(reviewId)
         if (review.likeTotal > 0) {
             reviewLikeRepository.deleteByReview(review)
         }
         deleteReviewPhoto(listOf(review))
+        reviewFlagRepository.deleteByReviewId(review.id)
         reviewRepository.delete(review)
-        badgeCommandService.tryChangeBadgeAndIfPromotedGiveBonus(user.id)
     }
 
     @DistributedLock(lockName = REVIEW_LIKE_LOCK_KEY, identifier = "reviewId")

@@ -20,12 +20,14 @@ import kr.weit.roadyfoody.foodSpots.fixture.createMockTestFoodSpot
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsRepository
 import kr.weit.roadyfoody.foodSpots.repository.getByFoodSpotsId
 import kr.weit.roadyfoody.global.service.ImageService
+import kr.weit.roadyfoody.review.domain.FoodSpotsReview
 import kr.weit.roadyfoody.review.domain.FoodSpotsReviewPhoto
 import kr.weit.roadyfoody.review.exception.FoodSpotsNotFoundException
 import kr.weit.roadyfoody.review.exception.FoodSpotsReviewNotFoundException
 import kr.weit.roadyfoody.review.exception.NotFoodSpotsReviewOwnerException
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewPhotoRepository
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
+import kr.weit.roadyfoody.review.repository.ReviewFlagRepository
 import kr.weit.roadyfoody.review.repository.ReviewLikeRepository
 import kr.weit.roadyfoody.review.repository.getReviewByReviewId
 import kr.weit.roadyfoody.support.utils.ImageFormat
@@ -41,18 +43,23 @@ class ReviewCommandServiceTest :
             val reviewPhotoRepository = mockk<FoodSpotsReviewPhotoRepository>()
             val foodSpotsRepository = mockk<FoodSpotsRepository>()
             val reviewLikeRepository = mockk<ReviewLikeRepository>()
+            val reviewFlagRepository = mockk<ReviewFlagRepository>()
             val imageService = spyk(ImageService(mockk()))
             val executor = mockk<ExecutorService>()
             val badgeCommandService = mockk<BadgeCommandService>()
             val reviewService =
-                ReviewCommandService(
-                    reviewRepository,
-                    reviewPhotoRepository,
-                    foodSpotsRepository,
-                    reviewLikeRepository,
-                    imageService,
-                    executor,
-                    badgeCommandService,
+                spyk(
+                    ReviewCommandService(
+                        reviewRepository,
+                        reviewPhotoRepository,
+                        foodSpotsRepository,
+                        reviewLikeRepository,
+                        reviewFlagRepository,
+                        imageService,
+                        executor,
+                        badgeCommandService,
+                    ),
+                    recordPrivateCalls = true,
                 )
             afterEach { clearAllMocks() }
 
@@ -99,8 +106,7 @@ class ReviewCommandServiceTest :
                         createTestReviewPhoto(),
                     )
                 every { imageService.remove(any()) } returns Unit
-                every { reviewRepository.deleteAll(any()) } returns Unit
-                every { reviewPhotoRepository.deleteAll(any()) } returns Unit
+                every { reviewService.deleteReviewCascade(any()) } returns Unit
                 `when`("정상적인 삭제 요청이 들어올 경우") {
                     then("정상적으로 삭제되어야 한다.") {
                         reviewService.deleteWithdrewUserReview(createTestUser())
@@ -124,22 +130,34 @@ class ReviewCommandServiceTest :
                         createMockTestReview(
                             user,
                         )
-                    every { reviewLikeRepository.deleteByReview(any()) } returns Unit
-                    every { reviewRepository.deleteById(any()) } returns Unit
                     every { reviewPhotoRepository.findByFoodSpotsReviewIn(any()) } returns
                         listOf(
                             createTestReviewPhoto(),
                         )
-                    every { imageService.remove(any()) } returns Unit
-                    every { reviewPhotoRepository.deleteAll(any()) } returns Unit
-                    every { reviewRepository.delete(any()) } returns Unit
+                    every { reviewService.deleteReviewCascade(any()) } returns Unit
                     every { badgeCommandService.tryChangeBadgeAndIfPromotedGiveBonus(any()) } just runs
                     then("정상적으로 삭제되어야 한다.") {
                         reviewService.deleteReview(user, TEST_REVIEW_ID)
                         verify(exactly = 1) {
-                            imageService.remove(any())
+                            reviewService.deleteReviewCascade(any())
+                        }
+                    }
+                }
+            }
+
+            given("deleteReviewCascade 테스트") {
+                every { reviewRepository.getReviewByReviewId(any()) } returns createMockTestReview()
+                every { reviewLikeRepository.deleteByReview(any()) } returns Unit
+                every { reviewService["deleteReviewPhoto"](any<List<FoodSpotsReview>>()) } returns Unit
+                every { reviewFlagRepository.deleteByReviewId(any()) } returns Unit
+                every { reviewRepository.delete(any()) } returns Unit
+                `when`("정상적인 삭제 요청이 들어올 경우") {
+                    then("정상적으로 삭제되어야 한다.") {
+                        reviewService.deleteReviewCascade(TEST_REVIEW_ID)
+                        verify(exactly = 1) {
                             reviewLikeRepository.deleteByReview(any())
-                            reviewPhotoRepository.deleteAll(any())
+                            reviewService["deleteReviewPhoto"](any<List<FoodSpotsReview>>())
+                            reviewFlagRepository.deleteByReviewId(any())
                             reviewRepository.delete(any())
                         }
                     }
