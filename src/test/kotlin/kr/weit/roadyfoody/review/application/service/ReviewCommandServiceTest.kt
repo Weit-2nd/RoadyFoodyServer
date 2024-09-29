@@ -27,6 +27,7 @@ import kr.weit.roadyfoody.review.exception.FoodSpotsReviewNotFoundException
 import kr.weit.roadyfoody.review.exception.NotFoodSpotsReviewOwnerException
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewPhotoRepository
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
+import kr.weit.roadyfoody.review.repository.ReviewFlagRepository
 import kr.weit.roadyfoody.review.repository.ReviewLikeRepository
 import kr.weit.roadyfoody.review.repository.getReviewByReviewId
 import kr.weit.roadyfoody.support.utils.ImageFormat
@@ -42,6 +43,7 @@ class ReviewCommandServiceTest :
             val reviewPhotoRepository = mockk<FoodSpotsReviewPhotoRepository>()
             val foodSpotsRepository = mockk<FoodSpotsRepository>()
             val reviewLikeRepository = mockk<ReviewLikeRepository>()
+            val reviewFlagRepository = mockk<ReviewFlagRepository>()
             val imageService = spyk(ImageService(mockk()))
             val executor = mockk<ExecutorService>()
             val badgeCommandService = mockk<BadgeCommandService>()
@@ -52,6 +54,7 @@ class ReviewCommandServiceTest :
                         reviewPhotoRepository,
                         foodSpotsRepository,
                         reviewLikeRepository,
+                        reviewFlagRepository,
                         imageService,
                         executor,
                         badgeCommandService,
@@ -146,6 +149,7 @@ class ReviewCommandServiceTest :
                 every { reviewRepository.getReviewByReviewId(any()) } returns createMockTestReview()
                 every { reviewLikeRepository.deleteByReview(any()) } returns Unit
                 every { reviewService["deleteReviewPhoto"](any<List<FoodSpotsReview>>()) } returns Unit
+                every { reviewFlagRepository.deleteByReviewId(any()) } returns Unit
                 every { reviewRepository.delete(any()) } returns Unit
                 `when`("정상적인 삭제 요청이 들어올 경우") {
                     then("정상적으로 삭제되어야 한다.") {
@@ -153,6 +157,7 @@ class ReviewCommandServiceTest :
                         verify(exactly = 1) {
                             reviewLikeRepository.deleteByReview(any())
                             reviewService["deleteReviewPhoto"](any<List<FoodSpotsReview>>())
+                            reviewFlagRepository.deleteByReviewId(any())
                             reviewRepository.delete(any())
                         }
                     }

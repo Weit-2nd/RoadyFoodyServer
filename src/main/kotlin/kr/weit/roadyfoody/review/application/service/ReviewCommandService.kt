@@ -14,6 +14,7 @@ import kr.weit.roadyfoody.review.domain.FoodSpotsReviewPhoto
 import kr.weit.roadyfoody.review.exception.NotFoodSpotsReviewOwnerException
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewPhotoRepository
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
+import kr.weit.roadyfoody.review.repository.ReviewFlagRepository
 import kr.weit.roadyfoody.review.repository.ReviewLikeRepository
 import kr.weit.roadyfoody.review.repository.getReviewByReviewId
 import kr.weit.roadyfoody.user.domain.User
@@ -29,6 +30,7 @@ class ReviewCommandService(
     private val reviewPhotoRepository: FoodSpotsReviewPhotoRepository,
     private val foodSpotsRepository: FoodSpotsRepository,
     private val reviewLikeRepository: ReviewLikeRepository,
+    private val reviewFlagRepository: ReviewFlagRepository,
     private val imageService: ImageService,
     private val executor: ExecutorService,
     private val badgeCommandService: BadgeCommandService,
@@ -88,6 +90,7 @@ class ReviewCommandService(
             reviewLikeRepository.deleteByReview(review)
         }
         deleteReviewPhoto(listOf(review))
+        reviewFlagRepository.deleteByReviewId(review.id)
         reviewRepository.delete(review)
     }
 
