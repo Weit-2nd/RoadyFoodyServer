@@ -24,7 +24,7 @@ class ReviewFlagControllerTest(
         given("POST $requestPath/{reviewId}/flag") {
             every { reviewFlagCommandService.flagReview(any(), any()) } just runs
             `when`("정상적인 데이터가 들어올 경우") {
-                then("리뷰 신고가 성공하고 203 반환") {
+                then("리뷰 신고가 성공하고 201 반환") {
                     mockMvc
                         .perform(
                             postWithAuth("$requestPath/$TEST_REVIEW_ID/flag"),
