@@ -3,8 +3,7 @@ package kr.weit.roadyfoody.review.repository
 import createTestFoodSpotsReview
 import createTestReviewFlag
 import io.kotest.core.spec.style.DescribeSpec
-import io.kotest.matchers.collections.shouldContainAll
-import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.ints.shouldBeZero
 import io.kotest.matchers.shouldBe
 import kr.weit.roadyfoody.foodSpots.domain.FoodSpots
@@ -36,20 +35,19 @@ class ReviewFlagRepositoryTest(
                 reviewFlags = reviewFlagRepository.saveAll(users.map { createTestReviewFlag(review, it) })
             }
 
-            describe("findByReviewId") {
-                it("리뷰 ID로 리뷰 신고를 조회한다.") {
-                    val actualReviewFlags = reviewFlagRepository.findByReviewId(review.id)
-
-                    actualReviewFlags.shouldContainAll(reviewFlags)
-                    actualReviewFlags.shouldHaveSize(reviewFlags.size)
-                }
-            }
-
             describe("countByReviewId") {
                 it("리뷰 ID로 리뷰 신고 수를 조회한다.") {
                     val count = reviewFlagRepository.countByReviewId(review.id)
 
                     count shouldBe reviewFlags.size
+                }
+            }
+
+            describe("existsByReviewIdAndUserId") {
+                it("리뷰 ID와 사용자 ID로 리뷰 신고가 존재하는지 확인한다.") {
+                    val exists = reviewFlagRepository.existsByReviewIdAndUserId(review.id, users[0].id)
+
+                    exists.shouldBeTrue()
                 }
             }
 

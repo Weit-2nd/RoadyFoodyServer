@@ -15,7 +15,7 @@ interface ReviewFlagControllerSpec {
         description = "리뷰 신고 API",
         responses = [
             ApiResponse(
-                responseCode = "203",
+                responseCode = "201",
                 description = "리뷰 신고 성공",
             ),
         ],

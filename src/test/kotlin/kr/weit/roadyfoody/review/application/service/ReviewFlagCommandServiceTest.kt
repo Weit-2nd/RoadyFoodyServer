@@ -2,7 +2,6 @@ package kr.weit.roadyfoody.review.application.service
 
 import TEST_REVIEW_ID
 import createMockTestReview
-import createTestReviewFlag
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.clearAllMocks
@@ -15,7 +14,6 @@ import kr.weit.roadyfoody.review.exception.ReviewFlagAlreadyExistsException
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
 import kr.weit.roadyfoody.review.repository.ReviewFlagRepository
 import kr.weit.roadyfoody.user.fixture.createTestUser
-import java.util.Optional
 
 class ReviewFlagCommandServiceTest :
     BehaviorSpec({
@@ -37,11 +35,11 @@ class ReviewFlagCommandServiceTest :
 
         given("flagReview 테스트") {
             `when`("정상적인 요청일 시 ") {
-                every { reviewFlagRepository.findByReviewId(any()) } returns listOf()
-                every { reviewRepository.findById(any()) } returns Optional.of(createMockTestReview())
+                every { reviewRepository.findReviewById(any()) } returns createMockTestReview()
+                every { reviewFlagRepository.existsByReviewIdAndUserId(any(), any()) } returns false
+                every { reviewFlagRepository.countByReviewId(any()) } returns 3
                 every { reviewFlagRepository.save(any()) } returns
                     FoodSpotsReviewFlag(review = createMockTestReview(), user = createTestUser())
-                every { reviewFlagRepository.countByReviewId(any()) } returns 3
 
                 then("리뷰신고 저장을 성공한다.") {
                     reviewFlagCommandService.flagReview(user, TEST_REVIEW_ID)
@@ -51,8 +49,8 @@ class ReviewFlagCommandServiceTest :
             }
 
             `when`("이미 신고를 한 경우") {
-                every { reviewFlagRepository.findByReviewId(any()) } returns
-                    listOf(FoodSpotsReviewFlag(review = createMockTestReview(), user = user))
+                every { reviewRepository.findReviewById(any()) } returns createMockTestReview()
+                every { reviewFlagRepository.existsByReviewIdAndUserId(any(), any()) } returns true
 
                 then("예외가 발생한다.") {
                     shouldThrow<ReviewFlagAlreadyExistsException> {
@@ -62,9 +60,8 @@ class ReviewFlagCommandServiceTest :
             }
 
             `when`("신고 임계값을 초과하는 경우") {
-                every { reviewFlagRepository.findByReviewId(any()) } returns listOf()
-                every { reviewRepository.findById(any()) } returns Optional.of(createMockTestReview())
-                every { reviewFlagRepository.save(any()) } returns createTestReviewFlag()
+                every { reviewRepository.findReviewById(any()) } returns createMockTestReview()
+                every { reviewFlagRepository.existsByReviewIdAndUserId(any(), any()) } returns false
                 every { reviewFlagRepository.countByReviewId(any()) } returns 4
                 every { reviewCommandService.deleteReviewCascade(any()) } returns Unit
                 every { badgeCommandService.tryChangeBadgeAndIfPromotedGiveBonus(any()) } returns Unit
@@ -73,7 +70,6 @@ class ReviewFlagCommandServiceTest :
                     reviewFlagCommandService.flagReview(user, TEST_REVIEW_ID)
 
                     verify(exactly = 1) {
-                        reviewFlagRepository.countByReviewId(any())
                         reviewCommandService.deleteReviewCascade(any())
                         badgeCommandService.tryChangeBadgeAndIfPromotedGiveBonus(any())
                     }
