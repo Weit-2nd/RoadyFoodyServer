@@ -7,7 +7,7 @@ import kr.weit.roadyfoody.review.domain.FoodSpotsReviewFlag
 import kr.weit.roadyfoody.review.exception.ReviewFlagAlreadyExistsException
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
 import kr.weit.roadyfoody.review.repository.ReviewFlagRepository
-import kr.weit.roadyfoody.review.repository.getReviewByReviewId
+import kr.weit.roadyfoody.review.repository.getByIdWithPessimisticLock
 import kr.weit.roadyfoody.user.domain.User
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -29,17 +29,15 @@ class ReviewFlagCommandService(
         user: User,
         reviewId: Long,
     ) {
-        val reviewFlagsWithLock = reviewFlagRepository.findByReviewId(reviewId)
+        val review = reviewRepository.getByIdWithPessimisticLock(reviewId)
 
-        if (reviewFlagsWithLock.any { it.user.id == user.id }) {
+        if (reviewFlagRepository.existsByReviewIdAndUserId(review.id, user.id)) {
             throw ReviewFlagAlreadyExistsException()
         }
 
-        val review = reviewRepository.getReviewByReviewId(reviewId)
-
         if (reviewFlagRepository.countByReviewId(review.id) >= FLAG_THRESHOLD) {
             reviewCommandService.deleteReviewCascade(review.id)
-            badgeCommandService.tryChangeBadgeAndIfPromotedGiveBonus(user.id)
+            badgeCommandService.tryChangeBadgeAndIfPromotedGiveBonus(review.user.id)
         } else {
             reviewFlagRepository.save(FoodSpotsReviewFlag(review = review, user = user))
         }
