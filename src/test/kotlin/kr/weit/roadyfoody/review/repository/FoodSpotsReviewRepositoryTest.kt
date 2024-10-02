@@ -72,6 +72,14 @@ class FoodSpotsReviewRepositoryTest(
                 }
             }
 
+            describe("findReviewById 메소드는") {
+                context("리뷰 ID를 받는 경우") {
+                    it("해당 ID의 리뷰를 반환한다.") {
+                        reviewRepository.findReviewById(reviewList.first().id) shouldBe reviewList.first()
+                    }
+                }
+            }
+
             describe("deleteAll 메소드는") {
                 context("삭제할 리스트를 받는 경우") {
                     it("해당 리스트 모두 삭제한다.") {
@@ -81,6 +89,7 @@ class FoodSpotsReviewRepositoryTest(
                     }
                 }
             }
+
             describe("getReviewByReviewId 메소드는") {
                 context("리뷰 ID를 받는 경우") {
                     it("해당 ID의 리뷰를 반환한다.") {
@@ -92,6 +101,22 @@ class FoodSpotsReviewRepositoryTest(
                     it("에러가 발생한다") {
                         shouldThrow<FoodSpotsReviewNotFoundException> {
                             reviewRepository.getReviewByReviewId(0L)
+                        }
+                    }
+                }
+            }
+
+            describe("getByIdWithPessimisticLock 메소드는") {
+                context("리뷰 ID를 받는 경우") {
+                    it("해당 ID의 리뷰를 반환한다.") {
+                        reviewRepository.getByIdWithPessimisticLock(reviewList.first().id) shouldBe reviewList.first()
+                    }
+                }
+
+                context("존재하지 않는 리뷰 ID 를 받는 경우") {
+                    it("에러가 발생한다") {
+                        shouldThrow<FoodSpotsReviewNotFoundException> {
+                            reviewRepository.getByIdWithPessimisticLock(0L)
                         }
                     }
                 }

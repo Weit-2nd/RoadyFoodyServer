@@ -5,6 +5,8 @@ import com.linecorp.kotlinjdsl.querymodel.jpql.expression.Expressions
 import com.linecorp.kotlinjdsl.querymodel.jpql.predicate.Predicate
 import com.linecorp.kotlinjdsl.querymodel.jpql.sort.Sortable
 import com.linecorp.kotlinjdsl.support.spring.data.jpa.repository.KotlinJdslJpqlExecutor
+import jakarta.persistence.LockModeType
+import jakarta.persistence.QueryHint
 import kr.weit.roadyfoody.badge.domain.Badge
 import kr.weit.roadyfoody.foodSpots.application.dto.CountRate
 import kr.weit.roadyfoody.foodSpots.application.dto.ReviewAggregatedInfoResponse
@@ -22,6 +24,8 @@ import kr.weit.roadyfoody.user.domain.User
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Lock
+import org.springframework.data.jpa.repository.QueryHints
 import java.time.LocalDateTime
 
 fun FoodSpotsReviewRepository.getReviewByReviewId(reviewId: Long): FoodSpotsReview =
@@ -29,10 +33,17 @@ fun FoodSpotsReviewRepository.getReviewByReviewId(reviewId: Long): FoodSpotsRevi
         FoodSpotsReviewNotFoundException()
     }
 
+fun FoodSpotsReviewRepository.getByIdWithPessimisticLock(reviewId: Long): FoodSpotsReview =
+    findReviewById(reviewId) ?: throw FoodSpotsReviewNotFoundException()
+
 interface FoodSpotsReviewRepository :
     JpaRepository<FoodSpotsReview, Long>,
     CustomFoodSpotsReviewRepository {
     fun findByUser(user: User): List<FoodSpotsReview>
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @QueryHints(value = [QueryHint(name = "jakarta.persistence.lock.timeout", value = "3000")])
+    fun findReviewById(id: Long): FoodSpotsReview?
 
     fun countByUser(user: User): Int
 }

@@ -9,6 +9,7 @@ import kr.weit.roadyfoody.review.application.dto.ReviewRequest
 import kr.weit.roadyfoody.review.application.dto.ReviewUpdateRequest
 import kr.weit.roadyfoody.review.application.dto.ToggleLikeResponse
 import kr.weit.roadyfoody.review.domain.FoodSpotsReview
+import kr.weit.roadyfoody.review.domain.FoodSpotsReviewFlag
 import kr.weit.roadyfoody.review.domain.FoodSpotsReviewPhoto
 import kr.weit.roadyfoody.review.domain.ReviewLike
 import kr.weit.roadyfoody.user.application.dto.UserLikedReviewResponse
@@ -145,3 +146,8 @@ class MockTestReviewLike(
 ) : ReviewLike(id, review, user) {
     override var createdDateTime: LocalDateTime = LocalDateTime.now()
 }
+
+fun createTestReviewFlag(
+    review: FoodSpotsReview = createMockTestReview(),
+    user: User = createTestUser(),
+) = FoodSpotsReviewFlag(review = review, user = user)
