@@ -1,5 +1,6 @@
 package kr.weit.roadyfoody.search.foodSpots.application.service
 
+import POPULAR_SEARCH_KEY
 import USER_ENTITY_LOCK_KEY
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
 import kr.weit.roadyfoody.common.exception.ErrorCode
@@ -10,17 +11,21 @@ import kr.weit.roadyfoody.global.circuitbreaker.targetexception.REDIS_CIRCUIT_BR
 import kr.weit.roadyfoody.rewards.application.service.RewardsCommandService
 import kr.weit.roadyfoody.rewards.domain.RewardType
 import kr.weit.roadyfoody.rewards.domain.Rewards
+import kr.weit.roadyfoody.search.foodSpots.domain.FoodSpotsSearchHistory
 import kr.weit.roadyfoody.search.foodSpots.domain.SearchCoinCache
+import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsPopularSearchesResponse
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponses
 import kr.weit.roadyfoody.search.foodSpots.dto.RequiredCoinRequest
 import kr.weit.roadyfoody.search.foodSpots.dto.RequiredCoinResponse
+import kr.weit.roadyfoody.search.foodSpots.repository.FoodSpotsSearchHistoryRepository
 import kr.weit.roadyfoody.search.foodSpots.repository.SearchCoinCacheRepository
 import kr.weit.roadyfoody.user.application.service.UserCommandService
 import kr.weit.roadyfoody.user.domain.User
+import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.lang.Exception
+import java.util.concurrent.CompletableFuture
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.pow
@@ -36,6 +41,9 @@ class FoodSpotsSearchService(
     private val userCommandService: UserCommandService,
     private val searchCoinCacheRepository: SearchCoinCacheRepository,
     private val rewardsCommandService: RewardsCommandService,
+    private val foodSpotsSearchHistoryRepository: FoodSpotsSearchHistoryRepository,
+    private val foodSpotsSearchCommandService: FoodSpotsSearchCommandService,
+    private val redisTemplate: RedisTemplate<String, String>,
 ) {
     @DistributedLock(lockName = USER_ENTITY_LOCK_KEY, identifier = "user")
     @Transactional
@@ -79,7 +87,9 @@ class FoodSpotsSearchService(
             ),
         )
         userCommandService.decreaseCoin(user.id, coinRequired)
-
+        if (foodSpotsSearchQuery.name != null) {
+            foodSpotsSearchHistoryRepository.save(FoodSpotsSearchHistory(keyword = foodSpotsSearchQuery.name))
+        }
         return foodSpotsSearchResponses
     }
 
@@ -164,5 +174,21 @@ class FoodSpotsSearchService(
             return RequiredCoinResponse(0)
         }
         throw exception
+    }
+
+    fun getPopularSearches(): List<FoodSpotsPopularSearchesResponse> {
+        val cachedPopularSearches = redisTemplate.opsForValue().get(POPULAR_SEARCH_KEY)
+        if (cachedPopularSearches == null) {
+            CompletableFuture.runAsync {
+                foodSpotsSearchCommandService.updatePopularSearchesCache()
+            }
+            throw RoadyFoodyBadRequestException(ErrorCode.POPULAR_SEARCHES_NOT_FOUND)
+        }
+        return cachedPopularSearches.split(":").mapIndexed { index, keyword ->
+            FoodSpotsPopularSearchesResponse(
+                index + 1,
+                keyword,
+            )
+        }
     }
 }

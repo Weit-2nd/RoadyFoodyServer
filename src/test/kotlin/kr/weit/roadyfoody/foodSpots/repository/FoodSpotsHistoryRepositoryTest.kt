@@ -59,7 +59,11 @@ class FoodSpotsHistoryRepositoryTest(
             context("존재하는 user 와 size, lastId 를 받는 경우") {
                 it("해당 user 의 size 만큼의 FoodSpotsHistory 리스트를 반환한다.") {
                     val histories = foodSpotsHistoryRepository.findSliceByUser(user, TEST_FOOD_SPOTS_SIZE, null)
-                    histories.map { it.id }.content shouldBe listOf(otherFoodSpots.id, foodSpots.id)
+                    histories.map { it.foodSpots.id }.content shouldBe
+                        listOf(
+                            otherFoodSpots.id,
+                            foodSpots.id,
+                        )
                     histories.content.size shouldBe 2
                 }
             }

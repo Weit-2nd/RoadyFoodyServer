@@ -1,5 +1,7 @@
 package kr.weit.roadyfoody.search.foodSpots.application
 
+import POPULAR_SEARCH_KEY
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
@@ -8,6 +10,7 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
+import kr.weit.roadyfoody.common.exception.RoadyFoodyBadRequestException
 import kr.weit.roadyfoody.foodSpots.application.service.FoodSpotsQueryService
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOT_LATITUDE
 import kr.weit.roadyfoody.foodSpots.fixture.TEST_FOOD_SPOT_LONGITUDE
@@ -15,13 +18,18 @@ import kr.weit.roadyfoody.foodSpots.fixture.createFoodSpotsSearchResponses
 import kr.weit.roadyfoody.foodSpots.fixture.createMockSearchCoinCaches
 import kr.weit.roadyfoody.rewards.application.service.RewardsCommandService
 import kr.weit.roadyfoody.rewards.fixture.createTestRewards
+import kr.weit.roadyfoody.search.foodSpots.application.service.FoodSpotsSearchCommandService
 import kr.weit.roadyfoody.search.foodSpots.application.service.FoodSpotsSearchService
+import kr.weit.roadyfoody.search.foodSpots.fixture.createFoodSpotsPopularSearchesResponse
 import kr.weit.roadyfoody.search.foodSpots.fixture.createFoodSpotsSearchCondition
+import kr.weit.roadyfoody.search.foodSpots.fixture.createFoodSpotsSearchKeywords
 import kr.weit.roadyfoody.search.foodSpots.fixture.createRequiredCoinRequest
 import kr.weit.roadyfoody.search.foodSpots.fixture.createRequiredCoinResponse
+import kr.weit.roadyfoody.search.foodSpots.repository.FoodSpotsSearchHistoryRepository
 import kr.weit.roadyfoody.search.foodSpots.repository.SearchCoinCacheRepository
 import kr.weit.roadyfoody.user.application.service.UserCommandService
 import kr.weit.roadyfoody.user.fixture.createTestUser
+import org.springframework.data.redis.core.RedisTemplate
 
 class FoodSpotsSearchServiceTest :
     BehaviorSpec({
@@ -29,13 +37,18 @@ class FoodSpotsSearchServiceTest :
         val userCommandService = mockk<UserCommandService>()
         val searchCoinCacheRepository = mockk<SearchCoinCacheRepository>()
         val rewardsCommandService = mockk<RewardsCommandService>()
-
+        val foodSpotsSearchHistoryRepository = mockk<FoodSpotsSearchHistoryRepository>()
+        val foodSpotsSearchCommandService = mockk<FoodSpotsSearchCommandService>()
+        val redisTemplate = mockk<RedisTemplate<String, String>>()
         val foodSpotsSearchService =
             FoodSpotsSearchService(
                 foodSpotsQueryService,
                 userCommandService,
                 searchCoinCacheRepository,
                 rewardsCommandService,
+                foodSpotsSearchHistoryRepository,
+                foodSpotsSearchCommandService,
+                redisTemplate,
             )
 
         afterEach { clearAllMocks() }
@@ -151,6 +164,29 @@ class FoodSpotsSearchServiceTest :
                     verify(exactly = 0) { searchCoinCacheRepository.save(any()) }
                     verify(exactly = 0) { rewardsCommandService.createRewards(createTestRewards(user = user, rewardPoint = 200)) }
                     verify(exactly = 0) { userCommandService.decreaseCoin(any(), any()) }
+                }
+            }
+        }
+
+        given("getPopularSearches 테스트") {
+            `when`("인기 검색어 조회 요청시") {
+                every {
+                    redisTemplate.opsForValue().get(POPULAR_SEARCH_KEY)
+                } returns createFoodSpotsSearchKeywords().joinToString(":")
+                then("레디스에 캐시된 인기 검색어 리스트를 반환한다.") {
+                    val result = foodSpotsSearchService.getPopularSearches()
+                    result shouldBe createFoodSpotsPopularSearchesResponse()
+                }
+            }
+
+            `when`("인기 검색어 조회 요청시 레디스에 캐시된 값이 없으면") {
+                every { redisTemplate.opsForValue().get(POPULAR_SEARCH_KEY) } returns null
+                every { foodSpotsSearchCommandService.updatePopularSearchesCache() } just runs
+                then("캐시를 하고 예외를 발생시킨다") {
+                    shouldThrow<RoadyFoodyBadRequestException> { foodSpotsSearchService.getPopularSearches() }
+                    verify(exactly = 1) {
+                        foodSpotsSearchCommandService.updatePopularSearchesCache()
+                    }
                 }
             }
         }
