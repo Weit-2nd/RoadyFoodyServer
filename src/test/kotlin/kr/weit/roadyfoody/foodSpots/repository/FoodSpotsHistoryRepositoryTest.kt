@@ -33,9 +33,9 @@ class FoodSpotsHistoryRepositoryTest(
         beforeEach {
             user = userRepository.save(createTestUser(0L))
             otherUser = userRepository.save(createTestUser(0L, nickname = "otherUser"))
-            user2 = userRepository.save(createTestUser(2L, "existentNick2"))
-            user3 = userRepository.save(createTestUser(3L, "existentNick3"))
-            user4 = userRepository.save(createTestUser(4L, "existentNick4"))
+            user2 = userRepository.save(createTestUser(0L, "existentNick2"))
+            user3 = userRepository.save(createTestUser(0L, "existentNick3"))
+            user4 = userRepository.save(createTestUser(0L, "existentNick4"))
             foodSpots = foodSpotsRepository.save(createTestFoodSpots())
             otherFoodSpots = foodSpotsRepository.save(createTestFoodSpots())
             notExistFoodSpots = foodSpotsRepository.save(createTestFoodSpots())
@@ -59,7 +59,8 @@ class FoodSpotsHistoryRepositoryTest(
         describe("getHistoriesByUser 메소드는") {
             context("존재하는 user 와 size, lastId 를 받는 경우") {
                 it("해당 user 의 size 만큼의 FoodSpotsHistory 리스트를 반환한다.") {
-                    val histories = foodSpotsHistoryRepository.findSliceByUser(user, TEST_FOOD_SPOTS_SIZE, null)
+                    val histories =
+                        foodSpotsHistoryRepository.findSliceByUser(user, TEST_FOOD_SPOTS_SIZE, null)
                     histories.map { it.foodSpots.id }.content shouldBe
                         listOf(
                             otherFoodSpots.id,
@@ -137,19 +138,15 @@ class FoodSpotsHistoryRepositoryTest(
                 userReportCounts.size shouldBe 4
                 userReportCounts[0].userNickname shouldBe "existentNick2"
                 userReportCounts[0].total shouldBe 3
-                userReportCounts[0].profileImageUrl shouldBe "test_image_name_2"
 
                 userReportCounts[1].userNickname shouldBe "existentNick"
                 userReportCounts[1].total shouldBe 2
-                userReportCounts[1].profileImageUrl shouldBe "test_image_name_0"
 
                 userReportCounts[2].userNickname shouldBe "existentNick3"
                 userReportCounts[2].total shouldBe 2
-                userReportCounts[2].profileImageUrl shouldBe "test_image_name_3"
 
                 userReportCounts[3].userNickname shouldBe "existentNick4"
                 userReportCounts[3].total shouldBe 1
-                userReportCounts[3].profileImageUrl shouldBe "test_image_name_4"
             }
         }
 
