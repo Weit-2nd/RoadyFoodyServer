@@ -31,6 +31,7 @@ import kr.weit.roadyfoody.user.fixture.createTestUser
 import org.springframework.cache.Cache
 import org.springframework.cache.CacheManager
 import org.springframework.data.redis.core.RedisTemplate
+import java.util.concurrent.ExecutorService
 
 class FoodSpotsSearchServiceTest :
     BehaviorSpec({
@@ -42,6 +43,7 @@ class FoodSpotsSearchServiceTest :
         val foodSpotsSearchCommandService = mockk<FoodSpotsSearchCommandService>()
         val redisTemplate = mockk<RedisTemplate<String, String>>()
         val cacheManager = mockk<CacheManager>()
+        val executor = mockk<ExecutorService>()
         val foodSpotsSearchService =
             FoodSpotsSearchService(
                 foodSpotsQueryService,
@@ -52,6 +54,7 @@ class FoodSpotsSearchServiceTest :
                 foodSpotsSearchCommandService,
                 redisTemplate,
                 cacheManager,
+                executor,
             )
 
         afterEach { clearAllMocks() }
@@ -197,12 +200,9 @@ class FoodSpotsSearchServiceTest :
             `when`("인기 검색어 조회 요청시 레디스에 캐시된 값이 없으면") {
                 every { cacheManager.getCache(any()) } returns null
                 every { redisTemplate.opsForValue().get(any()) } returns null
-                every { foodSpotsSearchCommandService.updatePopularSearchesCache() } just runs
+                every { executor.execute(any()) } just runs
                 then("캐시를 하고 예외를 발생시킨다") {
                     shouldThrow<RoadyFoodyBadRequestException> { foodSpotsSearchService.getPopularSearches() }
-                    verify(exactly = 1) {
-                        foodSpotsSearchCommandService.updatePopularSearchesCache()
-                    }
                 }
             }
         }

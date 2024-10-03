@@ -27,6 +27,7 @@ import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutorService
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.pow
@@ -46,6 +47,7 @@ class FoodSpotsSearchService(
     private val foodSpotsSearchCommandService: FoodSpotsSearchCommandService,
     private val redisTemplate: RedisTemplate<String, String>,
     private val cacheManager: CacheManager,
+    private val executor: ExecutorService,
 ) {
     @DistributedLock(lockName = USER_ENTITY_LOCK_KEY, identifier = "user")
     @Transactional
@@ -186,9 +188,9 @@ class FoodSpotsSearchService(
         }
         val cachedPopularSearches = redisTemplate.opsForValue().get(POPULAR_SEARCH_KEY)
         if (cachedPopularSearches == null) {
-            CompletableFuture.runAsync {
+            CompletableFuture.runAsync({
                 foodSpotsSearchCommandService.updatePopularSearchesCache()
-            }
+            }, executor)
             throw RoadyFoodyBadRequestException(ErrorCode.POPULAR_SEARCHES_NOT_FOUND)
         }
         return convertToResponse(cachedPopularSearches)
