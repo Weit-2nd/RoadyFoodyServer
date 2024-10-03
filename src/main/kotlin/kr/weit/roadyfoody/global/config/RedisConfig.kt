@@ -1,5 +1,6 @@
 package kr.weit.roadyfoody.global.config
 
+import POPULAR_SEARCH_TOPIC
 import kr.weit.roadyfoody.global.cache.CacheSubscriber
 import kr.weit.roadyfoody.ranking.utils.RANKING_TOPIC
 import org.springframework.context.annotation.Bean
@@ -21,6 +22,7 @@ class RedisConfig {
         val container = RedisMessageListenerContainer()
         container.setConnectionFactory(connectionFactory)
         container.addMessageListener(cacheSubscriber, PatternTopic(RANKING_TOPIC))
+        container.addMessageListener(cacheSubscriber, PatternTopic(POPULAR_SEARCH_TOPIC))
         return container
     }
 }

@@ -22,6 +22,7 @@ import kr.weit.roadyfoody.search.foodSpots.repository.FoodSpotsSearchHistoryRepo
 import kr.weit.roadyfoody.search.foodSpots.repository.SearchCoinCacheRepository
 import kr.weit.roadyfoody.user.application.service.UserCommandService
 import kr.weit.roadyfoody.user.domain.User
+import org.springframework.cache.CacheManager
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -44,6 +45,7 @@ class FoodSpotsSearchService(
     private val foodSpotsSearchHistoryRepository: FoodSpotsSearchHistoryRepository,
     private val foodSpotsSearchCommandService: FoodSpotsSearchCommandService,
     private val redisTemplate: RedisTemplate<String, String>,
+    private val cacheManager: CacheManager,
 ) {
     @DistributedLock(lockName = USER_ENTITY_LOCK_KEY, identifier = "user")
     @Transactional
@@ -177,6 +179,11 @@ class FoodSpotsSearchService(
     }
 
     fun getPopularSearches(): List<FoodSpotsPopularSearchesResponse> {
+        val cachedLocalPopularSearches = cacheManager.getCache(POPULAR_SEARCH_KEY)
+        val cacheData = cachedLocalPopularSearches?.get(POPULAR_SEARCH_KEY, String::class.java)
+        if (cacheData != null) {
+            return convertToResponse(cacheData)
+        }
         val cachedPopularSearches = redisTemplate.opsForValue().get(POPULAR_SEARCH_KEY)
         if (cachedPopularSearches == null) {
             CompletableFuture.runAsync {
@@ -184,11 +191,14 @@ class FoodSpotsSearchService(
             }
             throw RoadyFoodyBadRequestException(ErrorCode.POPULAR_SEARCHES_NOT_FOUND)
         }
-        return cachedPopularSearches.split(":").mapIndexed { index, keyword ->
+        return convertToResponse(cachedPopularSearches)
+    }
+
+    private fun convertToResponse(popularSearches: String): List<FoodSpotsPopularSearchesResponse> =
+        popularSearches.split(":").mapIndexed { index, keyword ->
             FoodSpotsPopularSearchesResponse(
                 index + 1,
                 keyword,
             )
         }
-    }
 }

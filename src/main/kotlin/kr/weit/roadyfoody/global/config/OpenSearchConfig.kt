@@ -32,7 +32,7 @@ class OpenSearchConfig(
                     HttpHost(
                         properties.uri,
                         properties.port,
-                        properties.schema,
+                        properties.scheme,
                     ),
                 ).setHttpClientConfigCallback { httpClientBuilder ->
                     httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider)

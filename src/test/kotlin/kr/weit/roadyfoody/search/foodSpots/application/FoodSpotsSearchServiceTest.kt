@@ -1,6 +1,5 @@
 package kr.weit.roadyfoody.search.foodSpots.application
 
-import POPULAR_SEARCH_KEY
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
@@ -29,6 +28,8 @@ import kr.weit.roadyfoody.search.foodSpots.repository.FoodSpotsSearchHistoryRepo
 import kr.weit.roadyfoody.search.foodSpots.repository.SearchCoinCacheRepository
 import kr.weit.roadyfoody.user.application.service.UserCommandService
 import kr.weit.roadyfoody.user.fixture.createTestUser
+import org.springframework.cache.Cache
+import org.springframework.cache.CacheManager
 import org.springframework.data.redis.core.RedisTemplate
 
 class FoodSpotsSearchServiceTest :
@@ -40,6 +41,7 @@ class FoodSpotsSearchServiceTest :
         val foodSpotsSearchHistoryRepository = mockk<FoodSpotsSearchHistoryRepository>()
         val foodSpotsSearchCommandService = mockk<FoodSpotsSearchCommandService>()
         val redisTemplate = mockk<RedisTemplate<String, String>>()
+        val cacheManager = mockk<CacheManager>()
         val foodSpotsSearchService =
             FoodSpotsSearchService(
                 foodSpotsQueryService,
@@ -49,6 +51,7 @@ class FoodSpotsSearchServiceTest :
                 foodSpotsSearchHistoryRepository,
                 foodSpotsSearchCommandService,
                 redisTemplate,
+                cacheManager,
             )
 
         afterEach { clearAllMocks() }
@@ -169,10 +172,22 @@ class FoodSpotsSearchServiceTest :
         }
 
         given("getPopularSearches 테스트") {
-            `when`("인기 검색어 조회 요청시") {
+            val keywords = createFoodSpotsSearchKeywords().joinToString(":")
+            val cache = mockk<Cache>()
+            every { cacheManager.getCache(any()) } returns cache
+            every { cache.get(any(), String::class.java) } returns keywords
+            `when`("로컬 캐시의 인기 검색어 조회 요청시") {
+                then("로컬에 캐시된 인기 검색어 리스트를 반환한다.") {
+                    val result = foodSpotsSearchService.getPopularSearches()
+                    result shouldBe createFoodSpotsPopularSearchesResponse()
+                }
+            }
+
+            `when`("레디스의 인기 검색어 조회 요청시") {
+                every { cacheManager.getCache(any()) } returns null
                 every {
-                    redisTemplate.opsForValue().get(POPULAR_SEARCH_KEY)
-                } returns createFoodSpotsSearchKeywords().joinToString(":")
+                    redisTemplate.opsForValue().get(any())
+                } returns keywords
                 then("레디스에 캐시된 인기 검색어 리스트를 반환한다.") {
                     val result = foodSpotsSearchService.getPopularSearches()
                     result shouldBe createFoodSpotsPopularSearchesResponse()
@@ -180,7 +195,8 @@ class FoodSpotsSearchServiceTest :
             }
 
             `when`("인기 검색어 조회 요청시 레디스에 캐시된 값이 없으면") {
-                every { redisTemplate.opsForValue().get(POPULAR_SEARCH_KEY) } returns null
+                every { cacheManager.getCache(any()) } returns null
+                every { redisTemplate.opsForValue().get(any()) } returns null
                 every { foodSpotsSearchCommandService.updatePopularSearchesCache() } just runs
                 then("캐시를 하고 예외를 발생시킨다") {
                     shouldThrow<RoadyFoodyBadRequestException> { foodSpotsSearchService.getPopularSearches() }

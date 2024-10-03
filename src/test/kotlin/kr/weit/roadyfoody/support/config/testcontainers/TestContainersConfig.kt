@@ -107,7 +107,7 @@ class TestContainersConfig {
                         opensearchContainer
                             .getMappedPort(OPENSEARCH_PORT)
                             .toString(),
-                    "spring.opensearch.schema" to "http",
+                    "spring.opensearch.scheme" to "http",
                 )
             isSQLInit.set(true)
 

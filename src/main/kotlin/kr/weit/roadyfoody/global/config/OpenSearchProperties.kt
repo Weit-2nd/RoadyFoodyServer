@@ -8,5 +8,5 @@ class OpenSearchProperties(
     val password: String,
     val uri: String,
     val port: Int,
-    val schema: String,
+    val scheme: String,
 )
