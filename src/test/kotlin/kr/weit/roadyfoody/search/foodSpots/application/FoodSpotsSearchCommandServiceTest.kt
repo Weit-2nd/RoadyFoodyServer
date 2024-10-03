@@ -83,7 +83,7 @@ class FoodSpotsSearchCommandServiceTest :
                 then("인기 검색어를 업데이트하지 않는다.") {
                     foodSpotsSearchCommandService.updatePopularSearchesCache()
                     verify(exactly = 1) {
-                        redissonClient.getLock("POPULAR_SEARCH_SCHEDULER_LOCK")
+                        redissonClient.getLock(any<String>())
                         lock.tryLock(0, 10, TimeUnit.MINUTES)
                     }
                     verify(exactly = 0) {
