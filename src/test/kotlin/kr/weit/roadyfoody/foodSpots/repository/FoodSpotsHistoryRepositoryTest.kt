@@ -40,7 +40,6 @@ class FoodSpotsHistoryRepositoryTest(
             otherFoodSpots = foodSpotsRepository.save(createTestFoodSpots())
             notExistFoodSpots = foodSpotsRepository.save(createTestFoodSpots())
             foodSpotForRanking = foodSpotsRepository.save(createTestFoodSpots())
-            foodSpotsHistoryRepository.deleteAll()
             foodSpotsHistories =
                 foodSpotsHistoryRepository.saveAll(
                     listOf(
