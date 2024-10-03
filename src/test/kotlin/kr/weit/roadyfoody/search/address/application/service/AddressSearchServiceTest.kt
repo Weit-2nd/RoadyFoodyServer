@@ -15,13 +15,22 @@ import kr.weit.roadyfoody.search.address.config.KakaoProperties
 import kr.weit.roadyfoody.search.address.fixture.AddressFixture
 import kr.weit.roadyfoody.search.address.presentation.client.KakaoAddressClientInterface
 import kr.weit.roadyfoody.search.address.presentation.client.KakaoPointClientInterface
+import kr.weit.roadyfoody.search.foodSpots.fixture.createFoodSpotsSearchHistory
+import kr.weit.roadyfoody.search.foodSpots.repository.FoodSpotsSearchHistoryRepository
 
 class AddressSearchServiceTest :
     BehaviorSpec({
         val kakaoProperties = KakaoProperties("apiKey")
         val kakaoAddressClientInterface = mockk<KakaoAddressClientInterface>()
         val kakaoPointClientInterface = mockk<KakaoPointClientInterface>()
-        val addressService = AddressSearchService(kakaoProperties, kakaoAddressClientInterface, kakaoPointClientInterface)
+        val foodSpotsSearchHistoryRepository = mockk<FoodSpotsSearchHistoryRepository>()
+        val addressService =
+            AddressSearchService(
+                kakaoProperties,
+                kakaoAddressClientInterface,
+                kakaoPointClientInterface,
+                foodSpotsSearchHistoryRepository,
+            )
 
         given("searchAddress 테스트") {
             `when`("정상적으로 주소 검색이 가능한 경우") {
@@ -33,6 +42,7 @@ class AddressSearchServiceTest :
                         TEST_PAGE_SIZE,
                     )
                 } returns addressResponseWrapper
+                every { foodSpotsSearchHistoryRepository.save(any()) } returns createFoodSpotsSearchHistory()
 
                 val addressResponses = addressService.searchAddress(TEST_KEYWORD, TEST_PAGE_SIZE)
 

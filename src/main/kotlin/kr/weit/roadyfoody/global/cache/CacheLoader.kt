@@ -1,5 +1,6 @@
 package kr.weit.roadyfoody.global.cache
 
+import POPULAR_SEARCH_KEY
 import kr.weit.roadyfoody.ranking.utils.LIKE_RANKING_KEY
 import kr.weit.roadyfoody.ranking.utils.REPORT_RANKING_KEY
 import kr.weit.roadyfoody.ranking.utils.REVIEW_RANKING_KEY
@@ -20,10 +21,18 @@ class CacheLoader(
         rankingLoader(REVIEW_RANKING_KEY)
         rankingLoader(LIKE_RANKING_KEY)
         rankingLoader(TOTAL_RANKING_KEY)
+        popularSearchesLoader()
     }
 
     private fun rankingLoader(key: String) {
         val value = redisTemplate.opsForList().range(key, 0, -1)
         cacheManager.getCache(key)?.put(key, value)
+    }
+
+    private fun popularSearchesLoader() {
+        val popularSearches = redisTemplate.opsForValue().get(POPULAR_SEARCH_KEY)
+        if (popularSearches != null) {
+            cacheManager.getCache(POPULAR_SEARCH_KEY)?.put(POPULAR_SEARCH_KEY, popularSearches)
+        }
     }
 }
