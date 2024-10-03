@@ -28,4 +28,4 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run Test Containers
-        run: ./gradlew test -S -d
+        run: ./gradlew test -S
