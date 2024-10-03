@@ -80,5 +80,10 @@ interface FoodSpotsSearchControllerSpec {
             ),
         ],
     )
+    @ApiErrorCodeExamples(
+        [
+            ErrorCode.POPULAR_SEARCHES_NOT_FOUND,
+        ],
+    )
     fun getPopularSearches(): List<FoodSpotsPopularSearchesResponse>
 }
