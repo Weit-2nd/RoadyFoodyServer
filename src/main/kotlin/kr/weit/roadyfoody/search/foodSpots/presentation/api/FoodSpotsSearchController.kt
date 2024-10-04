@@ -25,4 +25,7 @@ class FoodSpotsSearchController(
         user: User,
         requiredCoinRequest: RequiredCoinRequest,
     ) = foodSpotsSearchService.getRequiredCoin(user, requiredCoinRequest)
+
+    @GetMapping("/popular-searches")
+    override fun getPopularSearches() = foodSpotsSearchService.getPopularSearches()
 }

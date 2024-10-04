@@ -9,6 +9,8 @@ import kr.weit.roadyfoody.search.address.dto.AddressSearchResponses
 import kr.weit.roadyfoody.search.address.dto.Point2AddressResponse
 import kr.weit.roadyfoody.search.address.presentation.client.KakaoAddressClientInterface
 import kr.weit.roadyfoody.search.address.presentation.client.KakaoPointClientInterface
+import kr.weit.roadyfoody.search.foodSpots.domain.FoodSpotsSearchHistory
+import kr.weit.roadyfoody.search.foodSpots.repository.FoodSpotsSearchHistoryRepository
 import org.springframework.stereotype.Service
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -20,6 +22,7 @@ class AddressSearchService(
     private val kakaoProperties: KakaoProperties,
     private val kakaoAddressClientInterface: KakaoAddressClientInterface,
     private val kakaoPointClientInterface: KakaoPointClientInterface,
+    private val foodSpotsSearchHistoryRepository: FoodSpotsSearchHistoryRepository,
 ) {
     fun searchAddress(
         keyword: String,
@@ -27,6 +30,7 @@ class AddressSearchService(
     ): AddressSearchResponses {
         val encodedKeyword: String = URLEncoder.encode(keyword.trim(), StandardCharsets.UTF_8)
         val originalResponse = kakaoAddressClientInterface.searchAddress(encodedKeyword, size)
+        foodSpotsSearchHistoryRepository.save(FoodSpotsSearchHistory(keyword = keyword))
         return convertResponse(originalResponse)
     }
 

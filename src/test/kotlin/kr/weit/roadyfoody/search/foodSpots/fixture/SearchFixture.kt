@@ -1,5 +1,7 @@
 package kr.weit.roadyfoody.search.foodSpots.fixture
 
+import kr.weit.roadyfoody.search.foodSpots.domain.FoodSpotsSearchHistory
+import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsPopularSearchesResponse
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
 import kr.weit.roadyfoody.search.foodSpots.dto.RequiredCoinRequest
 import kr.weit.roadyfoody.search.foodSpots.dto.RequiredCoinResponse
@@ -31,3 +33,17 @@ fun createRequiredCoinRequest(
     )
 
 fun createRequiredCoinResponse(coin: Int): RequiredCoinResponse = RequiredCoinResponse(coin)
+
+fun createFoodSpotsSearchKeywords(): List<String> = listOf("횟집", "치킨")
+
+fun createFoodSpotsSearchHistory(keyword: String = "횟집"): FoodSpotsSearchHistory = FoodSpotsSearchHistory(keyword = keyword)
+
+fun createFoodSpotsPopularSearchesResponse(
+    foodSpotsSearchKeywords: List<String> = createFoodSpotsSearchKeywords(),
+): List<FoodSpotsPopularSearchesResponse> =
+    foodSpotsSearchKeywords.mapIndexed { index, keyword ->
+        FoodSpotsPopularSearchesResponse(
+            index + 1,
+            keyword,
+        )
+    }

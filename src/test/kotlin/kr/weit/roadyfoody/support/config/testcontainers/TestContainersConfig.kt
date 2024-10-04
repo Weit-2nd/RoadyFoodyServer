@@ -101,8 +101,13 @@ class TestContainersConfig {
                     "spring.cloud.aws.credentials.accessKey" to s3Container.accessKey,
                     "spring.cloud.aws.credentials.secretKey" to s3Container.secretKey,
                     "spring.opensearch.username" to opensearchContainer.username,
-                    "spring.opensearch.uri" to opensearchContainer.httpHostAddress,
+                    "spring.opensearch.uri" to opensearchContainer.host,
                     "spring.opensearch.password" to opensearchContainer.password,
+                    "spring.opensearch.port" to
+                        opensearchContainer
+                            .getMappedPort(OPENSEARCH_PORT)
+                            .toString(),
+                    "spring.opensearch.scheme" to "http",
                 )
             isSQLInit.set(true)
 

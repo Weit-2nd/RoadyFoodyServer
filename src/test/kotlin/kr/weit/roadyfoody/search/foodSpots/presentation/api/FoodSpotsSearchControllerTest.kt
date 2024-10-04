@@ -6,6 +6,7 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
 import kr.weit.roadyfoody.foodSpots.fixture.createFoodSpotsSearchResponses
 import kr.weit.roadyfoody.search.foodSpots.application.service.FoodSpotsSearchService
+import kr.weit.roadyfoody.search.foodSpots.fixture.createFoodSpotsPopularSearchesResponse
 import kr.weit.roadyfoody.search.foodSpots.fixture.createRequiredCoinResponse
 import kr.weit.roadyfoody.support.annotation.ControllerTest
 import kr.weit.roadyfoody.support.utils.getWithAuth
@@ -75,4 +76,19 @@ class FoodSpotsSearchControllerTest(
                 }
             }
         }
+
+        given("GET getPopularSearches API 호출") {
+            every {
+                foodSpotsSearchService.getPopularSearches()
+            } returns createFoodSpotsPopularSearchesResponse()
+            `when`("정상적인 요청이 들어온 경우") {
+                then("음식점 인기 검색어를 조회한다.") {
+                    mockMvc
+                        .perform(
+                            getWithAuth("$requestPath/popular-searches")
+                                .contentType("application/json"),
+                        ).andExpect(status().isOk)
+            }
+        }
+    }
     })

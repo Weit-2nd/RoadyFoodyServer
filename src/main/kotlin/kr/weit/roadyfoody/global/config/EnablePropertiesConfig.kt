@@ -6,6 +6,12 @@ import kr.weit.roadyfoody.search.tourism.config.TourismProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration
 
-@EnableConfigurationProperties(TourismProperties::class, S3Properties::class, KakaoProperties::class, JwtProperties::class)
+@EnableConfigurationProperties(
+    TourismProperties::class,
+    S3Properties::class,
+    KakaoProperties::class,
+    JwtProperties::class,
+    OpenSearchProperties::class,
+)
 @Configuration
 class EnablePropertiesConfig

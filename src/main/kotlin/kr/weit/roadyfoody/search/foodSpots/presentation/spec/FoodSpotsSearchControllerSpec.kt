@@ -2,12 +2,16 @@ package kr.weit.roadyfoody.search.foodSpots.presentation.spec
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import kr.weit.roadyfoody.auth.security.LoginUser
 import kr.weit.roadyfoody.common.exception.ErrorCode
 import kr.weit.roadyfoody.global.swagger.ApiErrorCodeExamples
 import kr.weit.roadyfoody.global.swagger.v1.SwaggerTag
+import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsPopularSearchesResponse
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchCondition
 import kr.weit.roadyfoody.search.foodSpots.dto.FoodSpotsSearchResponses
 import kr.weit.roadyfoody.search.foodSpots.dto.RequiredCoinRequest
@@ -62,4 +66,24 @@ interface FoodSpotsSearchControllerSpec {
         @LoginUser user: User,
         @ModelAttribute @Valid requiredCoinRequest: RequiredCoinRequest,
     ): RequiredCoinResponse
+
+    @Operation(
+        description = "인기 검색어 Top10 조회 API",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                content = [
+                    Content(
+                        schema = Schema(implementation = FoodSpotsPopularSearchesResponse::class),
+                    ),
+                ],
+            ),
+        ],
+    )
+    @ApiErrorCodeExamples(
+        [
+            ErrorCode.POPULAR_SEARCHES_NOT_FOUND,
+        ],
+    )
+    fun getPopularSearches(): List<FoodSpotsPopularSearchesResponse>
 }

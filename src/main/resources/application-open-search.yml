@@ -1,0 +1,20 @@
+---
+spring.config.activate.on-profile: test
+
+open-search:
+  indices:
+    food-spots-search-history: roady-foody-test-food-spots-search-history
+
+---
+spring.config.activate.on-profile: sandbox
+
+open-search:
+  indices:
+    food-spots-search-history: roady-foody-sandbox-food-spots-search-history
+
+---
+spring.config.activate.on-profile: stable
+
+open-search:
+  indices:
+    food-spots-search-history: roady-foody-stable-food-spots-search-history
