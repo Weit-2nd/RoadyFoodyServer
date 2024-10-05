@@ -32,7 +32,7 @@ class RankingCommandService(
     private val cachePublisher: CachePublisher,
 ) {
     @Async("asyncTask")
-    @Scheduled(cron = "0 50 23 * * *")
+    @Scheduled(cron = "0 30 1 * * *")
     @CircuitBreaker(name = "redisCircuitBreaker")
     fun updateReportRanking() {
         updateRanking(
@@ -43,7 +43,7 @@ class RankingCommandService(
     }
 
     @Async("asyncTask")
-    @Scheduled(cron = "0 50 23 * * *")
+    @Scheduled(cron = "0 30 1 * * *")
     @CircuitBreaker(name = "redisCircuitBreaker")
     fun updateReviewRanking() {
         updateRanking(
@@ -54,7 +54,7 @@ class RankingCommandService(
     }
 
     @Async("asyncTask")
-    @Scheduled(cron = "0 50 23 * * *")
+    @Scheduled(cron = "0 30 1 * * *")
     @CircuitBreaker(name = "redisCircuitBreaker")
     fun updateLikeRanking() {
         updateRanking(
@@ -65,7 +65,7 @@ class RankingCommandService(
     }
 
     @Async("asyncTask")
-    @Scheduled(cron = "0 50 23 * * *")
+    @Scheduled(cron = "0 30 1 * * *")
     @CircuitBreaker(name = "redisCircuitBreaker")
     fun updateTotalRanking() {
         updateRanking(
@@ -81,7 +81,6 @@ class RankingCommandService(
         dataProvider: () -> List<UserRanking>,
     ) {
         val lock: RLock = redissonClient.getLock(lockName)
-
         if (lock.tryLock(0, 10, TimeUnit.MINUTES)) {
             val ranking =
                 redisTemplate

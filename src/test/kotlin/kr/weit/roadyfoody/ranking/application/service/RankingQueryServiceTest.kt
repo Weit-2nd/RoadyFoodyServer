@@ -64,7 +64,7 @@ class RankingQueryServiceTest :
                     then("리포트 랭킹이 조회된다.") {
                         rankingQueryService.getReportRanking(TEST_SIZE, TEST_START_INDEX)
                         verify(exactly = 0) { listOperation.range(any(), any(), any()) }
-                        verify(exactly = 3) { imageService.getDownloadUrl(any()) }
+                        verify(exactly = 2) { imageService.getDownloadUrl(any()) }
                     }
                 }
                 `when`("레디스의 데이터를 조회한 경우") {
@@ -77,7 +77,7 @@ class RankingQueryServiceTest :
                     then("리포트 랭킹이 조회된다.") {
                         rankingQueryService.getReportRanking(TEST_SIZE, TEST_START_INDEX)
                         verify(exactly = 1) { listOperation.range(any(), any(), any()) }
-                        verify(exactly = 3) { imageService.getDownloadUrl(any()) }
+                        verify(exactly = 2) { imageService.getDownloadUrl(any()) }
                     }
                 }
 
@@ -103,7 +103,7 @@ class RankingQueryServiceTest :
                     then("리뷰 랭킹이 조회된다.") {
                         rankingQueryService.getReviewRanking(TEST_SIZE, TEST_START_INDEX)
                         verify(exactly = 0) { listOperation.range(any(), any(), any()) }
-                        verify(exactly = 3) { imageService.getDownloadUrl(any()) }
+                        verify(exactly = 2) { imageService.getDownloadUrl(any()) }
                     }
                 }
 
@@ -117,7 +117,7 @@ class RankingQueryServiceTest :
                     then("리뷰 랭킹이 조회된다.") {
                         rankingQueryService.getReviewRanking(TEST_SIZE, TEST_START_INDEX)
                         verify(exactly = 1) { listOperation.range(any(), any(), any()) }
-                        verify(exactly = 3) { imageService.getDownloadUrl(any()) }
+                        verify(exactly = 2) { imageService.getDownloadUrl(any()) }
                     }
                 }
 
@@ -144,7 +144,7 @@ class RankingQueryServiceTest :
                     then("좋아요 랭킹이 조회된다.") {
                         rankingQueryService.getLikeRanking(TEST_SIZE, TEST_START_INDEX)
                         verify(exactly = 0) { listOperation.range(any(), any(), any()) }
-                        verify(exactly = 3) { imageService.getDownloadUrl(any()) }
+                        verify(exactly = 2) { imageService.getDownloadUrl(any()) }
                     }
                 }
                 `when`("레디스의 데이터를 조회한 경우") {
@@ -157,7 +157,7 @@ class RankingQueryServiceTest :
                     then("리뷰 랭킹이 조회된다.") {
                         rankingQueryService.getLikeRanking(TEST_SIZE, TEST_START_INDEX)
                         verify(exactly = 1) { listOperation.range(any(), any(), any()) }
-                        verify(exactly = 3) { imageService.getDownloadUrl(any()) }
+                        verify(exactly = 2) { imageService.getDownloadUrl(any()) }
                     }
                 }
 
@@ -196,7 +196,7 @@ class RankingQueryServiceTest :
                     then("종합 랭킹이 조회된다.") {
                         rankingQueryService.getTotalRanking(TEST_SIZE, TEST_START_INDEX)
                         verify(exactly = 0) { listOperation.range(any(), any(), any()) }
-                        verify(exactly = 3) { imageService.getDownloadUrl(any()) }
+                        verify(exactly = 2) { imageService.getDownloadUrl(any()) }
                     }
                 }
 
@@ -210,7 +210,7 @@ class RankingQueryServiceTest :
                     then("종합 랭킹이 조회된다.") {
                         rankingQueryService.getTotalRanking(TEST_SIZE, TEST_START_INDEX)
                         verify(exactly = 1) { listOperation.range(any(), any(), any()) }
-                        verify(exactly = 3) { imageService.getDownloadUrl(any()) }
+                        verify(exactly = 2) { imageService.getDownloadUrl(any()) }
                     }
                 }
 
