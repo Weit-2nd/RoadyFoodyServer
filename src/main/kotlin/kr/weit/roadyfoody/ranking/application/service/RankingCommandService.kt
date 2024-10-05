@@ -32,7 +32,7 @@ class RankingCommandService(
     private val cachePublisher: CachePublisher,
 ) {
     @Async("asyncTask")
-    @Scheduled(cron = "0 0 5 * * *")
+    @Scheduled(cron = "0 45 22 * * *")
     @CircuitBreaker(name = "redisCircuitBreaker")
     fun updateReportRanking() {
         updateRanking(
@@ -65,7 +65,7 @@ class RankingCommandService(
     }
 
     @Async("asyncTask")
-    @Scheduled(cron = "0 0 5 * * *")
+    @Scheduled(cron = "0 45 22 * * *")
     @CircuitBreaker(name = "redisCircuitBreaker")
     fun updateTotalRanking() {
         updateRanking(
