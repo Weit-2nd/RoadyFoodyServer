@@ -121,7 +121,7 @@ class RankingQueryService(
         ranking.map { score ->
             val (ranking, userNickname, userId, profileImage, rankChange) = score.split(":")
             val profileImageUrl =
-                profileImage.let {
+                profileImage.takeIf { it != "null" }?.let {
                     imageService.getDownloadUrl(it)
                 }
             UserRankingResponse(
