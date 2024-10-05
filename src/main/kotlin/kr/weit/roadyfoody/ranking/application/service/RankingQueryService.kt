@@ -3,6 +3,7 @@ package kr.weit.roadyfoody.ranking.application.service
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
 import kr.weit.roadyfoody.global.circuitbreaker.targetexception.REDIS_CIRCUIT_BREAKER_TARGET_EXCEPTIONS
+import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.ranking.dto.UserRanking
 import kr.weit.roadyfoody.ranking.dto.UserRankingResponse
 import kr.weit.roadyfoody.ranking.exception.RankingNotFoundException
@@ -29,6 +30,7 @@ class RankingQueryService(
     private val rankingCommandService: RankingCommandService,
     private val executor: ExecutorService,
     private val cacheManager: CacheManager,
+    private val imageService: ImageService,
 ) {
     @CircuitBreaker(name = "redisCircuitBreaker", fallbackMethod = "fallbackRankings")
     fun getReportRanking(
@@ -117,7 +119,11 @@ class RankingQueryService(
 
     private fun convertToUserRanking(ranking: List<String>): List<UserRankingResponse> =
         ranking.map { score ->
-            val (ranking, userNickname, userId, profileImageUrl, rankChange) = score.split(":")
+            val (ranking, userNickname, userId, profileImage, rankChange) = score.split(":")
+            val profileImageUrl =
+                profileImage.let {
+                    imageService.getDownloadUrl(it)
+                }
             UserRankingResponse(
                 ranking = ranking.toLong(),
                 userNickname = userNickname,
