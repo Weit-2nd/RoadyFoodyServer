@@ -102,7 +102,9 @@ class RankingCommandService(
                         splitRanking
                             ?.indexOfFirst { parts ->
                                 parts[2] == it.userId.toString()
-                            }?.minus(index)
+                            }?.let { result ->
+                                if (result == -1) 0 else result - index
+                            }
 
                     "${index + 1}:${it.userNickname}:${it.userId}:${it.profileImageUrl}:$rankChange"
                 }

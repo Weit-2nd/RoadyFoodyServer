@@ -11,9 +11,11 @@ import io.mockk.verify
 import kr.weit.roadyfoody.foodSpots.repository.FoodSpotsHistoryRepository
 import kr.weit.roadyfoody.global.TEST_SIZE
 import kr.weit.roadyfoody.global.TEST_START_INDEX
+import kr.weit.roadyfoody.global.service.ImageService
 import kr.weit.roadyfoody.ranking.exception.RankingNotFoundException
 import kr.weit.roadyfoody.ranking.fixture.createUserRanking
 import kr.weit.roadyfoody.review.repository.FoodSpotsReviewRepository
+import kr.weit.roadyfoody.user.fixture.TEST_USER_PROFILE_IMAGE_URL
 import org.springframework.cache.Cache
 import org.springframework.cache.CacheManager
 import org.springframework.data.redis.core.ListOperations
@@ -29,6 +31,7 @@ class RankingQueryServiceTest :
             val rankingCommandService = mockk<RankingCommandService>()
             val executor = mockk<ExecutorService>()
             val cacheManager = mockk<CacheManager>()
+            val imageService = mockk<ImageService>()
             val rankingQueryService =
                 RankingQueryService(
                     redisTemplate,
@@ -37,6 +40,7 @@ class RankingQueryServiceTest :
                     rankingCommandService,
                     executor,
                     cacheManager,
+                    imageService,
                 )
 
             val listOperation = mockk<ListOperations<String, String>>()
@@ -46,6 +50,8 @@ class RankingQueryServiceTest :
             afterEach { clearMocks(reviewRepository) }
             afterEach { clearMocks(listOperation) }
             afterEach { clearMocks(rankingCommandService) }
+            afterEach { clearMocks(imageService) }
+            afterEach { clearMocks(imageService) }
             every { executor.execute(any()) } answers {
                 firstArg<Runnable>().run()
             }
@@ -54,10 +60,12 @@ class RankingQueryServiceTest :
                 `when`("로컬캐시의 데이터를 조회한 경우") {
                     every { cacheManager.getCache(any()) } returns cache
                     every { cache.get(any(), List::class.java) } returns list
+                    every { imageService.getDownloadUrl(any()) } returns TEST_USER_PROFILE_IMAGE_URL
 
                     then("리포트 랭킹이 조회된다.") {
                         rankingQueryService.getReportRanking(TEST_SIZE, TEST_START_INDEX)
                         verify(exactly = 0) { listOperation.range(any(), any(), any()) }
+                        verify(exactly = 2) { imageService.getDownloadUrl(any()) }
                     }
                 }
                 `when`("레디스의 데이터를 조회한 경우") {
@@ -65,10 +73,12 @@ class RankingQueryServiceTest :
                     every { cache.get(any(), List::class.java) } returns null
                     every { redisTemplate.opsForList() } returns listOperation
                     every { listOperation.range(any(), any(), any()) } returns list
+                    every { imageService.getDownloadUrl(any()) } returns TEST_USER_PROFILE_IMAGE_URL
 
                     then("리포트 랭킹이 조회된다.") {
                         rankingQueryService.getReportRanking(TEST_SIZE, TEST_START_INDEX)
                         verify(exactly = 1) { listOperation.range(any(), any(), any()) }
+                        verify(exactly = 2) { imageService.getDownloadUrl(any()) }
                     }
                 }
 
@@ -89,10 +99,12 @@ class RankingQueryServiceTest :
                 `when`("로컬캐시의 데이터를 조회한 경우") {
                     every { cacheManager.getCache(any()) } returns cache
                     every { cache.get(any(), List::class.java) } returns list
+                    every { imageService.getDownloadUrl(any()) } returns TEST_USER_PROFILE_IMAGE_URL
 
                     then("리뷰 랭킹이 조회된다.") {
                         rankingQueryService.getReviewRanking(TEST_SIZE, TEST_START_INDEX)
                         verify(exactly = 0) { listOperation.range(any(), any(), any()) }
+                        verify(exactly = 2) { imageService.getDownloadUrl(any()) }
                     }
                 }
 
@@ -101,10 +113,12 @@ class RankingQueryServiceTest :
                     every { cache.get(any(), List::class.java) } returns null
                     every { redisTemplate.opsForList() } returns listOperation
                     every { listOperation.range(any(), any(), any()) } returns list
+                    every { imageService.getDownloadUrl(any()) } returns TEST_USER_PROFILE_IMAGE_URL
 
                     then("리뷰 랭킹이 조회된다.") {
                         rankingQueryService.getReviewRanking(TEST_SIZE, TEST_START_INDEX)
                         verify(exactly = 1) { listOperation.range(any(), any(), any()) }
+                        verify(exactly = 2) { imageService.getDownloadUrl(any()) }
                     }
                 }
 
@@ -126,10 +140,12 @@ class RankingQueryServiceTest :
                 `when`("로컬캐시의 데이터를 조회한 경우") {
                     every { cacheManager.getCache(any()) } returns cache
                     every { cache.get(any(), List::class.java) } returns list
+                    every { imageService.getDownloadUrl(any()) } returns TEST_USER_PROFILE_IMAGE_URL
 
                     then("좋아요 랭킹이 조회된다.") {
                         rankingQueryService.getLikeRanking(TEST_SIZE, TEST_START_INDEX)
                         verify(exactly = 0) { listOperation.range(any(), any(), any()) }
+                        verify(exactly = 2) { imageService.getDownloadUrl(any()) }
                     }
                 }
                 `when`("레디스의 데이터를 조회한 경우") {
@@ -137,10 +153,12 @@ class RankingQueryServiceTest :
                     every { cache.get(any(), List::class.java) } returns null
                     every { redisTemplate.opsForList() } returns listOperation
                     every { listOperation.range(any(), any(), any()) } returns list
+                    every { imageService.getDownloadUrl(any()) } returns TEST_USER_PROFILE_IMAGE_URL
 
                     then("리뷰 랭킹이 조회된다.") {
                         rankingQueryService.getLikeRanking(TEST_SIZE, TEST_START_INDEX)
                         verify(exactly = 1) { listOperation.range(any(), any(), any()) }
+                        verify(exactly = 2) { imageService.getDownloadUrl(any()) }
                     }
                 }
 
@@ -174,10 +192,12 @@ class RankingQueryServiceTest :
                 `when`("로컬캐시의 데이터를 조회한 경우") {
                     every { cacheManager.getCache(any()) } returns cache
                     every { cache.get(any(), List::class.java) } returns list
+                    every { imageService.getDownloadUrl(any()) } returns TEST_USER_PROFILE_IMAGE_URL
 
                     then("종합 랭킹이 조회된다.") {
                         rankingQueryService.getTotalRanking(TEST_SIZE, TEST_START_INDEX)
                         verify(exactly = 0) { listOperation.range(any(), any(), any()) }
+                        verify(exactly = 2) { imageService.getDownloadUrl(any()) }
                     }
                 }
 
@@ -186,10 +206,12 @@ class RankingQueryServiceTest :
                     every { cache.get(any(), List::class.java) } returns null
                     every { redisTemplate.opsForList() } returns listOperation
                     every { listOperation.range(any(), any(), any()) } returns list
+                    every { imageService.getDownloadUrl(any()) } returns TEST_USER_PROFILE_IMAGE_URL
 
                     then("종합 랭킹이 조회된다.") {
                         rankingQueryService.getTotalRanking(TEST_SIZE, TEST_START_INDEX)
                         verify(exactly = 1) { listOperation.range(any(), any(), any()) }
+                        verify(exactly = 2) { imageService.getDownloadUrl(any()) }
                     }
                 }
 
