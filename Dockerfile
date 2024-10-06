@@ -18,5 +18,4 @@ EXPOSE 8080
 
 ENTRYPOINT java \
 -Dspring.profiles.active=${APP_PHASE} \
--Duser.timezone=${TZ} \
 -jar /app/app.jar
