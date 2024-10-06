@@ -411,13 +411,13 @@ class FoodSpotsCommandService(
             throw NotFoodSpotsHistoriesOwnerException("해당 음식점 리포트의 소유자가 아닙니다.")
         }
 
-        val categories = reportFoodCategoryRepository.getByHistoryId(historyId)
+        val categories = reportFoodCategoryRepository.findByFoodSpotsHistoryId(historyId)
         reportFoodCategoryRepository.deleteAll(categories)
 
-        val operationHours = reportOperationHoursRepository.getByHistoryId(historyId)
+        val operationHours = reportOperationHoursRepository.findByFoodSpotsHistoryId(historyId)
         reportOperationHoursRepository.deleteAll(operationHours)
 
-        val photos = foodSpotsPhotoRepository.getByHistoryId(historyId)
+        val photos = foodSpotsPhotoRepository.findByHistoryId(historyId)
         foodSpotsPhotoRepository.deleteAll(photos)
 
         foodSpotsHistoryRepository.deleteById(historyId)

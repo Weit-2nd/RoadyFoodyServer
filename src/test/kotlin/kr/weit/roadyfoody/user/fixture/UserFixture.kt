@@ -40,7 +40,7 @@ fun createTestUser(
     badge,
 )
 
-fun createTestUsers(size: Int = 5) = List(size) { createTestUser(it.toLong() + 1) }
+fun createTestUsers(size: Int = 5) = List(size) { createTestUser(it.toLong() + 1, nickname = "$TEST_USER_NICKNAME$it") }
 
 fun createTestUserNicknameRequest(nickname: String = TEST_USER_NICKNAME) = UserNicknameRequest(nickname)
 

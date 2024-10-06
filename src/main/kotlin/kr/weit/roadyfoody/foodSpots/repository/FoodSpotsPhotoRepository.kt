@@ -7,8 +7,6 @@ import kr.weit.roadyfoody.foodSpots.domain.FoodSpotsPhoto
 import kr.weit.roadyfoody.global.utils.findOne
 import org.springframework.data.jpa.repository.JpaRepository
 
-fun FoodSpotsPhotoRepository.getByHistoryId(historyId: Long): List<FoodSpotsPhoto> = findByHistoryId(historyId)
-
 interface FoodSpotsPhotoRepository :
     JpaRepository<FoodSpotsPhoto, Long>,
     CustomFoodSpotsPhotoRepository {

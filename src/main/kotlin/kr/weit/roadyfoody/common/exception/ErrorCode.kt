@@ -53,6 +53,7 @@ enum class ErrorCode(
     INVALID_POINT_TO_ADDRESS(HttpStatus.BAD_REQUEST, -11000, "좌표를 주소로 변환할 수 없습니다."),
     REST_CLIENT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, -11001, "외부 API 호출 중 에러 발생"),
     RETRIES_EXCEEDED_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, -11002, "외부 API 호출 재시도 횟수 초과"),
+    POPULAR_SEARCHES_NOT_FOUND(HttpStatus.NOT_FOUND, -11003, "인기 검색어가 존재하지 않습니다."),
 
     // Auth API error 12000대
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, -12000, "유효하지 않은 토큰입니다."),
@@ -103,6 +104,7 @@ enum class ErrorCode(
     NOT_FOUND_FOOD_SPOTS(HttpStatus.NOT_FOUND, -14001, "해당 음식점이 존재하지 않습니다."),
     NOT_FOUND_FOOD_SPOTS_REVIEW(HttpStatus.NOT_FOUND, -14002, "해당 리뷰가 존재하지 않습니다."),
     NOT_FOOD_SPOTS_REVIEW_OWNER(HttpStatus.FORBIDDEN, -14003, "해당 리뷰의 소유자가 아닙니다."),
+    REVIEW_FLAG_ALREADY_EXISTS(HttpStatus.CONFLICT, -14004, "이미 리뷰를 신고하셨습니다."),
 
     // User API error 15000대
     USER_ID_NON_POSITIVE(HttpStatus.BAD_REQUEST, -15000, "유저 ID는 양수여야 합니다."),
