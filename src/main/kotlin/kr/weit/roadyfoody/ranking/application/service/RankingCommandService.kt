@@ -32,7 +32,7 @@ class RankingCommandService(
     private val cachePublisher: CachePublisher,
 ) {
     @Async("asyncTask")
-    @Scheduled(cron = "0 15 11 * * *")
+    @Scheduled(cron = "0 0 5 * * *")
     @CircuitBreaker(name = "redisCircuitBreaker")
     fun updateReportRanking() {
         updateRanking(
@@ -43,7 +43,7 @@ class RankingCommandService(
     }
 
     @Async("asyncTask")
-    @Scheduled(cron = "0 15 11 * * *")
+    @Scheduled(cron = "0 0 5 * * *")
     @CircuitBreaker(name = "redisCircuitBreaker")
     fun updateReviewRanking() {
         updateRanking(
@@ -54,7 +54,7 @@ class RankingCommandService(
     }
 
     @Async("asyncTask")
-    @Scheduled(cron = "0 15 11 * * *")
+    @Scheduled(cron = "0 0 5 * * *")
     @CircuitBreaker(name = "redisCircuitBreaker")
     fun updateLikeRanking() {
         updateRanking(
@@ -65,7 +65,7 @@ class RankingCommandService(
     }
 
     @Async("asyncTask")
-    @Scheduled(cron = "0 15 11 * * *")
+    @Scheduled(cron = "0 0 5 * * *")
     @CircuitBreaker(name = "redisCircuitBreaker")
     fun updateTotalRanking() {
         updateRanking(
@@ -101,7 +101,9 @@ class RankingCommandService(
                         splitRanking
                             ?.indexOfFirst { parts ->
                                 parts[2] == it.userId.toString()
-                            }?.minus(index)
+                            }?.let { result ->
+                                if (result == -1) 0 else result - index
+                            }
 
                     "${index + 1}:${it.userNickname}:${it.userId}:${it.profileImageUrl}:$rankChange"
                 }
