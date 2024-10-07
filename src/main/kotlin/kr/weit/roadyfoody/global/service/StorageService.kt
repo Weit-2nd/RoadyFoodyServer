@@ -24,12 +24,12 @@ class StorageService(
     fun downloadUrl(key: String): String {
         val cacheKey = getObjectStorageCacheKey(key)
         if (redisTemplate.hasKey(cacheKey)) {
-            return redisTemplate.opsForValue().get(cacheKey)!!
+            return redisTemplate.opsForValue().get(cacheKey)!!.split("?")[0]
         } else {
             val url = s3Template.createSignedGetURL(s3Properties.bucket, key, CACHE_DURATION).toString()
             // 캐싱시간은 실제 파일의 생명주기보다 살짝 짧아야한다
             redisTemplate.opsForValue().set(cacheKey, url, CACHE_DURATION.minusMinutes(30))
-            return url
+            return url.split("?")[0]
         }
     }
 
